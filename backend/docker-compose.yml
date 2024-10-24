@@ -1,0 +1,17 @@
+services:
+  database:
+    image: postgres:latest
+    env_file:
+      - .env
+      - .envexample
+    ports:
+      - ${DB_PORT:-5432}:5432
+    environment:
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PASS
+      - POSTGRES_DB=$DB_NAME
+    networks:
+      - backend
+
+networks:
+  backend:
