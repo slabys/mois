@@ -12,6 +12,16 @@ services:
       - POSTGRES_DB=$DB_NAME
     networks:
       - backend
+  api1:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        - PROJECT_NAME=api
+    env_file:
+      - .env
+    ports:
+      - ${PORT:-3000}:3000
 
 networks:
   backend:
