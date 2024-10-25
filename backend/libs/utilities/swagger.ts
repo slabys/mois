@@ -35,7 +35,7 @@ const template = `
 
 export const includeSwagger = (app: INestApplication<Express>, openApi: Omit<OpenAPIObject, "paths">) => {
 	const document = SwaggerModule.createDocument(app, openApi, {
-		operationIdFactory: (controllerKey: string, methodKey: string) => {
+		operationIdFactory: (_, methodKey: string) => {
 			// Convert "getUsers" to "Get Users"
 			const methodName = methodKey
 				.replace(/([A-Z])/g, " $1")
@@ -54,8 +54,12 @@ export const includeSwagger = (app: INestApplication<Express>, openApi: Omit<Ope
 	// Serve custom documentation page
 	app.use("/api", (_, res: Response) => res.send(template));
 
-	// biome-ignore lint/suspicious/noExplicitAny: NestJS does not expose direct httpServer access. This is for informative, can be deleted
-	(app as any).httpServer.on("listening", () => {
-		Logger.log("Listening docs on: /api", "Swagger");
+  // biome-ignore lint/suspicious/noExplicitAny: NestJS does not expose direct httpServer access. This is for informative, can be deleted
+  const httpServer = (app as any).httpServer as Express;
+  httpServer.on("listening", () => {
+    // biome-ignore lint/suspicious/noExplicitAny: Express does not expose direct `address` method
+    const test = httpServer as any;
+    const { port } = test.address();
+		Logger.log(`Listening docs on: http://localhost:${port}/api`, "Swagger");
 	});
 };
