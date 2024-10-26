@@ -40,9 +40,7 @@ export const includeSwagger = (app: INestApplication<Express>, openApi: Omit<Ope
 			const methodName = methodKey
 				.replace(/([A-Z])/g, " $1")
 				// Capitalize first letter
-				.replace(/^./, (str) => str.toUpperCase())
-				// Remove common prefixes like 'get', 'post', etc.
-				.replace(/^(Get|Post|Put|Delete|Patch)\s/, "");
+				.replace(/^./, (str) => str.toUpperCase());
 
 			return methodName.trim();
 		},
