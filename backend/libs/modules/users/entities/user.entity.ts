@@ -1,4 +1,5 @@
 import { ApiHideProperty } from "@nestjs/swagger";
+import { Exclude } from "class-transformer";
 import {
   BaseEntity,
   BeforeInsert,
@@ -12,7 +13,6 @@ import {
 } from "typeorm";
 
 import { hashPassword } from "modules/auth/utilities/crypto";
-import { Exclude } from "class-transformer";
 
 @Entity()
 export class User extends BaseEntity {
@@ -22,6 +22,15 @@ export class User extends BaseEntity {
   @Index()
   @Column()
   email: string;
+
+  @Column()
+  username: string;
+
+  @Column()
+  firstName: string;
+  
+  @Column()
+  lastName: string;
 
   // Exclude property from generated docs
   @ApiHideProperty()

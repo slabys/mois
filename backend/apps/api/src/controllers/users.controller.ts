@@ -14,10 +14,12 @@ import {
   ApiOkResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { User, UsersService } from "modules/users";
-import { CreateUser, UpdateUser } from "../models/requests";
+
 import { JwtGuard } from "modules/auth/providers/guards";
+import { User, UsersService } from "modules/users";
+
 import { CurrentUser } from "../decorators";
+import { CreateUser, UpdateUser } from "../models/requests";
 
 @ApiTags("Users")
 @Controller("users")
@@ -34,7 +36,11 @@ export class UsersController {
     let newUser = new User({
       email: body.email,
       password: body.password,
+      firstName: body.firstName,
+      lastName: body.lastName,
+      username: body.username,
     });
+
     newUser = await this.usersService.save(newUser);
     newUser.password = undefined;
     return newUser;
@@ -44,7 +50,12 @@ export class UsersController {
   @UseGuards(JwtGuard)
   @Patch()
   async updateCurrentUser(@Body() body: UpdateUser, @CurrentUser() user: User) {
-    user.password = body.password;
+    // For safety reasons set each property individually
+    user.password = body.password ?? user.password;
+    user.firstName = body.firstName ?? user.firstName;
+    user.lastName = body.lastName ?? user.lastName;
+    user.username = body.username ?? user.username;
+
     return this.usersService.save(user);
   }
 

@@ -4,13 +4,14 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
+
 import { LocalGuard } from "modules/auth/providers/guards";
+import { CurrentUser } from "../decorators";
 import { LoginUser } from "../models/requests";
 import { AccessToken } from "../models/responses";
 
 import { AuthService } from "modules/auth";
 import { User } from "modules/users";
-import { CurrentUser } from "../decorators";
 
 @ApiTags("Auth")
 @Controller("auth")
