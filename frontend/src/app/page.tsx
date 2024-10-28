@@ -1,5 +1,17 @@
-import { Button } from "@mantine/core";
+import EventSummaryCard from "@components/homepage/EventSummaryCard";
+import { Container, Stack, Title } from "@mantine/core";
 
 export default function Home() {
-  return <Button>a</Button>;
+  return (
+    <Container size={"xl"}>
+      <Stack>
+        <Title>Upcoming Events</Title>
+        <Stack>
+          <EventSummaryCard />
+          <EventSummaryCard />
+          <EventSummaryCard />
+        </Stack>
+      </Stack>
+    </Container>
+  );
 }
