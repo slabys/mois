@@ -1,15 +1,18 @@
 import LayoutFooter from "@components/layout/LayoutFooter";
 import LayoutHeader from "@components/layout/LayoutHeader";
 import { Box } from "@mantine/core";
+import { ReactNode } from "react";
 
-interface LayoutProps {}
+interface LayoutProps {
+  children: ReactNode;
+}
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <Box mih={"100%"} h={"100%"}>
+    <Box mih="100%" h="100%">
       <LayoutHeader />
       {/* Height calculated from full height (100% - Header - Footer) */}
-      <Box mih={"calc(100% - (84px + 24px) - (50px + 32px))"}>{children}</Box>
+      <Box mih="calc(100% - (84px + 24px) - (50px + 32px))">{children}</Box>
       <LayoutFooter />
     </Box>
   );
