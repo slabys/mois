@@ -1,4 +1,9 @@
+# Enviroment variables
+.env
+
+# JetBrains
 .idea
+
 # Logs
 logs
 *.log

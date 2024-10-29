@@ -33,8 +33,8 @@ const LayoutHeader = () => {
 
   return (
     <header className={styles.header}>
-      <Container size={"xl"} className={styles.inner}>
-        <img src={"/logo_esncz.png"} alt={""} height={"100%"} />
+      <Container size="xl" className={styles.inner}>
+        <img src="/logo_esncz.png" alt="" height="100%" />
         <Box className={styles.links} visibleFrom="sm">
           <Group gap={0} justify="flex-end">
             {mainItems}

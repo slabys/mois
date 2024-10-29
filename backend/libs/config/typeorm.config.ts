@@ -15,9 +15,9 @@ export const getDataSourceOptions = () => {
     type: "postgres",
     host: configService.getOrThrow("DB_HOST"),
     port: +configService.get("DB_PORT") || 5432,
-    username: configService.get("DB_USER"),
-    password: configService.get("DB_PASS"),
     database: configService.getOrThrow("DB_NAME"),
+    username: configService.get("DN_USER"),
+    password: configService.get("DB_PASS"),
     namingStrategy: new SnakeNamingStrategy(),
     entities: [`./**/*.entity${migrationFiles}`],
     migrations: [
