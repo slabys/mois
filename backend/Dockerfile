@@ -1,62 +1,48 @@
-ARG PROJECT_NAME=api
-
-# ***************
-# * BUILD IMAGE *
-# ***************
+# ============================
+# Builder Stage
+# ============================
 FROM node:22-alpine AS builder
 
 ARG PROJECT_NAME
-ARG PROJECT_DIST="dist/apps/${PROJECT_NAME}"
-
 # Set working directory
 WORKDIR /app
 
 # Copy package.json and pnpm-lock.yaml
-COPY package.json pnpm-lock.yaml ./
-
-# Install pnpm
-RUN npm install -g pnpm
-
-# Install dev dependencies
-RUN apk add --no-cache python3 make g++
-
-# Install dependencies
-RUN pnpm install --frozen-lockfile --prod=false
-
-# Copy all files
+#COPY package.json pnpm-lock.yaml ./
 COPY . .
 
-# Build the apps
-RUN pnpm build ${PROJECT_NAME}
+# Install pnpm and dependencies
+RUN npm install -g pnpm && pnpm install --frozen-lock
 
-# Copy package.json and pnpm-lock.yaml
-RUN \cp -f ./package.json ${PROJECT_DIST}
-RUN \cp -f ./pnpm-lock.yaml ${PROJECT_DIST}
+# Remove node_modules to avoid conflicts when copying all files
+#RUN rm -rf node_modules
 
-# Clear images that are not necessary
+# Copy the rest of the backend files
+#COPY . .
 
-# Switch to dist
-WORKDIR ${PROJECT_DIST}
+# Build the NestJS project
+RUN pnpm run build ${PROJECT_NAME}
 
-# Reinstall modules
-RUN pnpm install
-
-# Go back to /app
-WORKDIR /app
-
-# **********************
-# * # PRODUCTION IMAGE *
-# **********************
+# ============================
+# Production Stage
+# ============================
 FROM node:22-alpine AS production
 
 ARG PROJECT_NAME
-ARG PROJECT_DIST="dist/apps/${PROJECT_NAME}"
-
 # Set working directory
 WORKDIR /app
 
-# Copy the built apps from the builder stage
-COPY --from=builder /app/${PROJECT_DIST} .
+# Install pnpm for running the application in production
+#RUN npm install -g pnpm
 
-# Entrypoint
-ENTRYPOINT node main.js
+# Copy only the built application and necessary files from builder
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+#COPY --from=builder /app/package.json ./
+#COPY --from=builder /app/pnpm-lock.yaml ./
+
+#EXPOSE 4000
+# Start the server
+ENV APP_MAIN_FILE=./dist/apps/${PROJECT_NAME}/main
+CMD node ${APP_MAIN_FILE}
+#CMD ["pnpm", "start:prod"]
