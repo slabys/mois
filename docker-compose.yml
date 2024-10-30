@@ -7,7 +7,7 @@ services:
     ports:
       - ${POSTGRES_PORT:-5432}:5432
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+      - ./database/data:/var/lib/postgresql/data
     networks:
       - app-network
     healthcheck:
@@ -20,17 +20,18 @@ services:
     container_name: backend_app1
     build:
       context: ./backend
+      args:
+        - PROJECT_NAME=api
     env_file:
       - ./backend/.env
     ports:
-      - ${PORT_APP1:-4000}:4000
-    volumes:
-      - ./backend:/app
+      - 4000:4000
+    #    volumes:
+    #      - ./backend:/app
     networks:
       - app-network
     depends_on:
-      database:
-        condition: service_healthy
+      - database
 
   frontend:
     container_name: frontend
@@ -40,8 +41,8 @@ services:
       - ./frontend/.env
     ports:
       - ${PORT:-3000}:3000
-    volumes:
-      - ./frontend:/app
+    #    volumes:
+    #      - ./frontend:/app
     networks:
       - app-network
     depends_on:
@@ -69,7 +70,6 @@ services:
   certbot:
     container_name: certbot
     image: certbot/certbot
-
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
       - /var/www/certbot:/var/www/certbot
