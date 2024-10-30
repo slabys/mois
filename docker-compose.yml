@@ -22,6 +22,7 @@ services:
       context: ./backend
       args:
         - PROJECT_NAME=api
+      target: production
     env_file:
       - ./backend/.env
     ports:
