@@ -1,10 +1,8 @@
 import { User } from "modules/users";
 import {
-  Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { Organization } from "./organization.entity";
@@ -14,10 +12,10 @@ export class OrganizationMember {
   @PrimaryGeneratedColumn()
   id: string;
   // TODO: Define own roles?
-  @Column()
-  roles: string[];
+  // @Column()
+  // roles: string[];
 
-  @OneToMany(() => Organization, (organization) => organization.members)
+  @ManyToOne(() => Organization, (organization) => organization.members)
   organization: Organization;
 
   @ManyToOne(() => User, { nullable: false, onDelete: "CASCADE" })

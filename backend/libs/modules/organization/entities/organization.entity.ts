@@ -17,9 +17,8 @@ export class Organization {
   @Column()
   name: string;
 
-
   // Relations
-  @ManyToOne(() => OrganizationMember, (member) => member.organization)
+  @OneToMany(() => OrganizationMember, (member) => member.organization)
   members: OrganizationMember[];
 
   @ManyToOne(() => Organization, (organization) => organization.children)

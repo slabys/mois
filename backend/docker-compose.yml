@@ -12,6 +12,9 @@ services:
       - POSTGRES_DB=$DB_NAME
     networks:
       - backend
+    volumes:
+      - database:/var/lib/postgresql/data
+
   api1:
     build:
       context: .
@@ -27,3 +30,6 @@ services:
 
 networks:
   backend:
+
+volumes:
+  database:
