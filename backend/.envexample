@@ -8,4 +8,8 @@ DB_PASS=password
 # Auth
 JWT_SECRET=secret
 
+# Storage
 STORAGE_ROOT=storage
+
+# Base URL
+BASE_URL=http://localhost:3000

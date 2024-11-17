@@ -23,6 +23,7 @@ export const getDataSourceOptions = () => {
     migrations: [
       path.join(process.cwd(), "database", "migrations", `*${migrationFiles}`),
     ],
+    
   };
 };
 

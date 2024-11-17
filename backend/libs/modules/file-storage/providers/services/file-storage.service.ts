@@ -7,9 +7,11 @@ import { ConfigService } from "@nestjs/config";
 export class FileStorageService {
   // Storage base path for docker volumes
   private readonly BasePath: string;
+  private readonly BaseUrl: string;
 
   constructor(private readonly configService: ConfigService) {
     this.BasePath = this.configService.getOrThrow("STORAGE_ROOT");
+    this.BaseUrl = this.configService.getOrThrow("BASE_URL");
   }
 
   /**
@@ -18,31 +20,27 @@ export class FileStorageService {
    * @returns Full file path resolved against the base path
    */
   private getFilePath(filePath: string) {
-    return path.join(this.BasePath, filePath);
+    return path.join(process.cwd(), this.BasePath, filePath);
   }
 
-  /**
-   * Saves a file to the specified path.
-   * This method overload supports saving a file from a source path or from a buffer.
-   * @param filePath - Destination path where the file will be stored
-   * @param fileToSavePath - Path to the file being saved
-   * @returns Promise resolving to a boolean indicating success or failure
-   */
-  save(filePath: string, fileToSavePath: string): Promise<boolean>;
   /**
    * Saves a file to the specified path.
    * @param filePath - Destination path where the file will be stored
    * @param buffer - Data to save (Buffer or string)
    * @returns Promise resolving to a boolean indicating success or failure
    */
-  async save(filePath: string, buffer: Buffer | string): Promise<boolean> {
-    const dirname = path.dirname(filePath);
+  async save(
+    filePath: string,
+    buffer: Buffer | string
+  ): Promise<string | null> {
+    const fullFilePath = this.getFilePath(filePath);
+    const dirname = path.dirname(fullFilePath);
     await fs.mkdir(dirname, { recursive: true });
 
     return fs
-      .writeFile(this.getFilePath(filePath), buffer)
-      .then(() => true)
-      .catch(() => false);
+      .writeFile(fullFilePath, buffer)
+      .then(() => filePath)
+      .catch(() => null);
   }
 
   /**
@@ -61,5 +59,9 @@ export class FileStorageService {
    */
   async getFullPath(filePath: string) {
     return this.getFilePath(filePath);
+  }
+
+  getPublicUrl(filePath: string) {
+    return `${this.BaseUrl}/${path.join(this.BasePath, filePath)}`;
   }
 }

@@ -4,6 +4,7 @@ import {
   ConflictException,
   Controller,
   Get,
+  InternalServerErrorException,
   Patch,
   Post,
   UseGuards,
@@ -12,24 +13,28 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConflictResponse,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiTags,
 } from "@nestjs/swagger";
+import { FormDataRequest, MemoryStoredFile } from "nestjs-form-data";
 
 import { JwtGuard } from "modules/auth/providers/guards";
 import { User, UsersService } from "modules/users";
 
-import { CurrentUser } from "../decorators";
-import { CreateUser, UpdateUser } from "../models/requests";
+import { PhotoService } from "modules/photo";
 import { UniversityService } from "modules/university";
+import { CurrentUser } from "../decorators";
+import { CreateUser, UpdatePhoto, UpdateUser } from "../models/requests";
 
 @ApiTags("Users")
 @Controller("users")
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly universityService: UniversityService
+    private readonly universityService: UniversityService,
+    private readonly photoService: PhotoService
   ) {}
 
   @ApiConflictResponse({ description: "User with email already exist" })
@@ -79,5 +84,21 @@ export class UsersController {
   @Get()
   async getCurrentUser(@CurrentUser() user: User) {
     return user;
+  }
+
+  @ApiConsumes("multipart/form-data")
+  @FormDataRequest({ storage: MemoryStoredFile })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  @Patch("photo")
+  async updateCurrentUserPhoto(
+    @CurrentUser() user: User,
+    @Body() body: UpdatePhoto
+  ) {
+    const photo = await this.photoService.save(body.file.buffer, "user_photo");
+    if (!photo) throw new InternalServerErrorException();
+
+    user.photo = photo;
+    return this.usersService.save(user);
   }
 }
