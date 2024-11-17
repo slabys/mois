@@ -27,4 +27,10 @@ export class CreateUser {
 
   @MinLength(6)
   username: string;
+
+  /**
+   * University ID
+   */
+  @Allow()
+  universityId: string;
 }

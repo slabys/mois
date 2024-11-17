@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   ConflictException,
   Controller,
@@ -8,6 +9,7 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConflictResponse,
   ApiCreatedResponse,
@@ -20,18 +22,29 @@ import { User, UsersService } from "modules/users";
 
 import { CurrentUser } from "../decorators";
 import { CreateUser, UpdateUser } from "../models/requests";
+import { UniversityService } from "modules/university";
 
 @ApiTags("Users")
 @Controller("users")
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly universityService: UniversityService
+  ) {}
 
   @ApiConflictResponse({ description: "User with email already exist" })
   @ApiCreatedResponse({ type: User, description: "User has been created" })
+  @ApiBadRequestResponse({
+    description:
+      "Invalid university ID given or payload did not pass validation",
+  })
   @Post()
   async createUser(@Body() body: CreateUser) {
     const user = await this.usersService.findByEmailWithPassword(body.email);
     if (user) throw new ConflictException();
+
+    const university = await this.universityService.findById(body.universityId);
+    if (!university) throw new BadRequestException("Invalid university ID");
 
     let newUser = new User({
       email: body.email,
@@ -39,6 +52,7 @@ export class UsersController {
       firstName: body.firstName,
       lastName: body.lastName,
       username: body.username,
+      university,
     });
 
     newUser = await this.usersService.save(newUser);
