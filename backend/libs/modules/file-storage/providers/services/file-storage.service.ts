@@ -17,7 +17,10 @@ export class FileStorageService {
   }
 
   save(filePath: string, fileToSavePath: string): Promise<boolean>;
-  save(filePath: string, buffer: Buffer | string): Promise<boolean> {
+  async save(filePath: string, buffer: Buffer | string): Promise<boolean> {
+    const dirname = path.dirname(filePath);
+    await fs.mkdir(dirname, { recursive: true });
+
     return fs
       .writeFile(this.getFilePath(filePath), buffer)
       .then(() => true)
