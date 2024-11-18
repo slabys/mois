@@ -17,6 +17,7 @@ import { UniversityModule } from "modules/university";
 import { UsersModule } from "modules/users";
 import { NestjsFormDataModule } from "nestjs-form-data";
 import { OrganizationModule } from "modules/organization";
+import { EventsModule } from "modules/events";
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { OrganizationModule } from "modules/organization";
     UniversityModule,
     PhotoModule,
     OrganizationModule,
+    EventsModule,
     NestjsFormDataModule.config({}),
     TypeOrmModule.forRootAsync({
       useFactory: () => {
@@ -44,7 +46,7 @@ import { OrganizationModule } from "modules/organization";
     UniversitiesController,
     PhotoController,
     OrganizationsController,
-    OrganizationMembersController
+    OrganizationMembersController,
   ],
   providers: [],
 })
