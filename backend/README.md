@@ -10,6 +10,6 @@ Install deps using: `pnpm install`
 
 1. Copy `.env.example` file to `.env` file and tweak settings.
 2. Start `database` using `docker compose up -d database`. It uses `.env` file to set database and it's access.
-3. Start any app from `apps/` using `pnpm start:dev <app_name>` or `PORT=3001 pnpm start:dev <app_name>` to change
+3. Start any app from `apps/` using `pnpm start:dev <app_name>` or `PORT=4001 pnpm start:dev <app_name>` to change
    listening port.
-4. Now API should be accesible on https://localhost:3000, if PORT is not changed.
+4. Now API should be accesible on https://localhost:4000, if PORT is not changed.
