@@ -1,9 +1,12 @@
+import { OrganizationMember } from "modules/organization/entities";
+import { Photo } from "modules/photo";
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
   Index,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 
@@ -19,11 +22,23 @@ export class Event extends BaseEntity {
   @Column()
   title: string;
 
-  // @ManyToOne(() => Organization, { nullable: false })
-  // createdBy: Organization;
+  @Column()
+  description: string;
+
+  @Column()
+  since: Date;
+
+  @Column()
+  until: Date;
+
+  @ManyToOne(() => OrganizationMember)
+  createdBy: OrganizationMember;
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @ManyToOne(() => Photo, { nullable: true })
+  photo: Photo | null;
 
   constructor(event?: Partial<Event>) {
     super();

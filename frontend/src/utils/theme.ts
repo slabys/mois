@@ -83,6 +83,7 @@ const themeOverride = createTheme({
   components: {},
 } as MantineThemeOverride);
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CONTAINER_SIZES: Record<string, string> = {
   xs: rem(320),
   sm: rem(640),
@@ -91,7 +92,7 @@ const CONTAINER_SIZES: Record<string, string> = {
   xl: rem(1440),
 };
 
-export const resolver: CSSVariablesResolver = (theme) => ({
+export const resolver: CSSVariablesResolver = () => ({
   variables: {},
   light: {},
   dark: {},

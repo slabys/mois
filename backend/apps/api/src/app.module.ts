@@ -4,6 +4,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { getDataSourceOptions } from "config/typeorm.config";
 import {
   AuthController,
+  EventsController,
   OrganizationMembersController,
   OrganizationsController,
   PhotoController,
@@ -12,12 +13,12 @@ import {
 } from "./controllers";
 
 import { AuthModule } from "modules/auth";
+import { EventsModule } from "modules/events";
+import { OrganizationModule } from "modules/organization";
 import { PhotoModule } from "modules/photo";
 import { UniversityModule } from "modules/university";
 import { UsersModule } from "modules/users";
 import { NestjsFormDataModule } from "nestjs-form-data";
-import { OrganizationModule } from "modules/organization";
-import { EventsModule } from "modules/events";
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { EventsModule } from "modules/events";
     PhotoController,
     OrganizationsController,
     OrganizationMembersController,
+    EventsController,
   ],
   providers: [],
 })

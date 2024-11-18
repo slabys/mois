@@ -9,10 +9,10 @@ const LayoutFooter = () => {
 
   return (
     <footer className={styles.footer}>
-      <Container size={"xl"}>
-        <Group justify={"end"}>
+      <Container size="xl">
+        <Group justify="end">
           {userLinks.map((item) => (
-            <Anchor href={item.link} key={item.label} c={"gray"} size={"sm"}>
+            <Anchor href={item.link} key={item.label} c="gray" size="sm">
               {item.label}
             </Anchor>
           ))}

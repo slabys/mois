@@ -1,9 +1,9 @@
 import EventSummaryCard from "@components/homepage/EventSummaryCard";
 import { Container, Stack, Title } from "@mantine/core";
 
-export default function Home() {
+const Home = () => {
   return (
-    <Container size={"xl"}>
+    <Container size="xl">
       <Stack>
         <Title>Upcoming Events</Title>
         <Stack>
@@ -14,4 +14,6 @@ export default function Home() {
       </Stack>
     </Container>
   );
-}
+};
+
+export default Home;

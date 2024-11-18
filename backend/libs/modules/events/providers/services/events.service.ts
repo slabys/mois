@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Event } from "modules/events/entities";
 import slugify from "slugify";
-import { Repository } from "typeorm";
+import { MoreThan, Repository } from "typeorm";
 
 @Injectable()
 export class EventsService {
@@ -10,6 +10,22 @@ export class EventsService {
     @InjectRepository(Event)
     private readonly eventsRepository: Repository<Event>
   ) {}
+
+  /**
+   * Find event by ID
+   * @param id Event ID
+   * @returns {Event | null}
+   */
+  findById(id: string) {
+    return this.eventsRepository.findOne({
+      where: { id },
+      relations: {
+        createdBy: {
+          organization: true,
+        },
+      },
+    });
+  }
 
   save(event: Partial<Event>) {
     const newEvent = new Event(event);
@@ -21,5 +37,30 @@ export class EventsService {
       }).substring(0, 60);
 
     return this.eventsRepository.save(newEvent);
+  }
+
+  /**
+   * TODO: Add pagination
+   * All upcoming events
+   * @returns {Event[]} Events
+   */
+  getUpcomingEvents() {
+    return this.eventsRepository.find({
+      where: {
+        since: MoreThan(new Date()),
+      },
+      relations: {
+        createdBy: {
+          organization: true,
+          user: {
+            photo: true,
+          },
+        },
+        photo: true,
+      },
+      order: {
+        since: "DESC",
+      },
+    });
   }
 }
