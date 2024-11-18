@@ -1,10 +1,12 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
+// biome-ignore lint/style/useImportType: BiomeJS, must be value, not type
 import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class FileStorageService {
+  private readonly logger = new Logger(FileStorageService.name);
   // Storage base path for docker volumes
   private readonly BasePath: string;
   private readonly BaseUrl: string;
@@ -12,6 +14,11 @@ export class FileStorageService {
   constructor(private readonly configService: ConfigService) {
     this.BasePath = this.configService.getOrThrow("STORAGE_ROOT");
     this.BaseUrl = this.configService.getOrThrow("BASE_URL");
+
+    const fullBasePath = path.join(process.cwd(), this.BasePath);
+    fs.mkdir(fullBasePath, { recursive: true });
+
+    this.logger.log(`Storage is located at: ${fullBasePath}`);
   }
 
   /**

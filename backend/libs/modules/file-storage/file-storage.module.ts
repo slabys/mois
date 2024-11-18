@@ -5,7 +5,7 @@ import { FileStorageService } from "./providers/services";
 
 @Module({
   imports: [
-    ConfigModule,
+    ConfigModule.forRoot(),
     ServeStaticModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

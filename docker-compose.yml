@@ -25,10 +25,14 @@ services:
       target: production
     env_file:
       - ./backend/.env
+    environment:
+      - DB_HOST=database
     ports:
       - ${PORT_APP1:-4000}:4000
     networks:
       - app-network
+    volumes:
+      - backend_data:/app/storage
     depends_on:
       - database
 
@@ -79,6 +83,7 @@ services:
 
 volumes:
   postgres_data:
+  backend_data:
 
 networks:
   app-network:
