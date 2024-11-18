@@ -17,6 +17,8 @@ RUN yarn build
 # Production image
 FROM node:20-alpine as runner
 
+ARG PORT_FE
+
 # Set working directory
 WORKDIR /frontend/app
 
@@ -26,7 +28,7 @@ COPY --from=build /frontend/app/.next/static /frontend/app/.next/static
 COPY --from=build /frontend/app/public /frontend/app/public
 
 # Expose the required port
-EXPOSE 3000
+EXPOSE $PORT_FE
 
 # Start the Next.js application
 CMD ["node", "server.js"]
