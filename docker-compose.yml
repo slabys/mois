@@ -35,6 +35,21 @@ services:
       - backend_data:/app/storage
     depends_on:
       - database
+      - database_run_migrations
+
+  database_run_migrations:
+    container_name: database_migrations
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.Migration
+    env_file:
+      - ./backend/.env
+    environment:
+      - DB_HOST=database
+    networks:
+      - app-network
+    depends_on:
+      - database
 
   frontend:
     container_name: frontend
