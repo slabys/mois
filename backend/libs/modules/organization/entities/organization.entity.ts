@@ -1,3 +1,4 @@
+import { ApiHideProperty } from "@nestjs/swagger";
 import {
   Column,
   CreateDateColumn,
@@ -18,12 +19,15 @@ export class Organization {
   name: string;
 
   // Relations
+  @ApiHideProperty()
   @OneToMany(() => OrganizationMember, (member) => member.organization)
   members: OrganizationMember[];
 
+  @ApiHideProperty()
   @ManyToOne(() => Organization, (organization) => organization.children)
   parent: Organization | null;
 
+  @ApiHideProperty()
   @OneToMany(() => Organization, (organization) => organization.parent)
   children: Organization[] | null;
 

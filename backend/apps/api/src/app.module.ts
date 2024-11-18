@@ -4,16 +4,19 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { getDataSourceOptions } from "config/typeorm.config";
 import {
   AuthController,
+  OrganizationMembersController,
+  OrganizationsController,
   PhotoController,
   UniversitiesController,
   UsersController,
 } from "./controllers";
 
 import { AuthModule } from "modules/auth";
+import { PhotoModule } from "modules/photo";
 import { UniversityModule } from "modules/university";
 import { UsersModule } from "modules/users";
 import { NestjsFormDataModule } from "nestjs-form-data";
-import { PhotoModule } from "modules/photo";
+import { OrganizationModule } from "modules/organization";
 
 @Module({
   imports: [
@@ -21,6 +24,7 @@ import { PhotoModule } from "modules/photo";
     UsersModule,
     UniversityModule,
     PhotoModule,
+    OrganizationModule,
     NestjsFormDataModule.config({}),
     TypeOrmModule.forRootAsync({
       useFactory: () => {
@@ -39,6 +43,8 @@ import { PhotoModule } from "modules/photo";
     UsersController,
     UniversitiesController,
     PhotoController,
+    OrganizationsController,
+    OrganizationMembersController
   ],
   providers: [],
 })

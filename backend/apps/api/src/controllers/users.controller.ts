@@ -5,6 +5,8 @@ import {
   Controller,
   Get,
   InternalServerErrorException,
+  Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   UseGuards,
@@ -21,12 +23,14 @@ import {
 import { FormDataRequest, MemoryStoredFile } from "nestjs-form-data";
 
 import { JwtGuard } from "modules/auth/providers/guards";
-import { User, UsersService } from "modules/users";
-
 import { PhotoService } from "modules/photo";
 import { UniversityService } from "modules/university";
+import { User, UsersService } from "modules/users";
+
 import { CurrentUser } from "../decorators";
 import { CreateUser, UpdatePhoto, UpdateUser } from "../models/requests";
+import { OrganizationService } from "modules/organization";
+import { OrganizationMemberWithoutUser } from "../models/responses";
 
 @ApiTags("Users")
 @Controller("users")
@@ -34,7 +38,8 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly universityService: UniversityService,
-    private readonly photoService: PhotoService
+    private readonly photoService: PhotoService,
+    private readonly organizationService: OrganizationService
   ) {}
 
   @ApiConflictResponse({ description: "User with email already exist" })
@@ -100,5 +105,16 @@ export class UsersController {
 
     user.photo = photo;
     return this.usersService.save(user);
+  }
+
+  @ApiOkResponse({
+    type: [OrganizationMemberWithoutUser],
+    description: "All organizations where user is member of",
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  @Get(":id/organizations")
+  userOrganizationMemberships(@Param("id", ParseUUIDPipe) userId: string) {
+    return this.organizationService.findUserMemberships(userId);
   }
 }
