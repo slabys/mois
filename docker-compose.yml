@@ -26,9 +26,7 @@ services:
     env_file:
       - ./backend/.env
     ports:
-      - 4000:4000
-    #    volumes:
-    #      - ./backend:/app
+      - ${PORT_APP1:-4000}:4000
     networks:
       - app-network
     depends_on:
@@ -41,12 +39,11 @@ services:
     env_file:
       - ./frontend/.env
     ports:
-      - ${PORT:-3000}:3000
-    #    volumes:
-    #      - ./frontend:/app
+      - ${PORT_FE:-3000}:3000
     networks:
       - app-network
     depends_on:
+      - backend
       - database
 
   nginx:

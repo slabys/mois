@@ -3,3 +3,4 @@ node_modules/
 dist
 .idea
 postgres_data
+.env
