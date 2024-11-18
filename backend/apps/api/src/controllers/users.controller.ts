@@ -1,37 +1,60 @@
 import {
+  BadRequestException,
   Body,
   ConflictException,
   Controller,
   Get,
+  InternalServerErrorException,
+  Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   UseGuards,
 } from "@nestjs/common";
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConflictResponse,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiTags,
 } from "@nestjs/swagger";
+import { FormDataRequest, MemoryStoredFile } from "nestjs-form-data";
 
 import { JwtGuard } from "modules/auth/providers/guards";
+import { PhotoService } from "modules/photo";
+import { UniversityService } from "modules/university";
 import { User, UsersService } from "modules/users";
 
 import { CurrentUser } from "../decorators";
-import { CreateUser, UpdateUser } from "../models/requests";
+import { CreateUser, UpdatePhoto, UpdateUser } from "../models/requests";
+import { OrganizationService } from "modules/organization";
+import { OrganizationMemberWithoutUser } from "../models/responses";
 
 @ApiTags("Users")
 @Controller("users")
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly universityService: UniversityService,
+    private readonly photoService: PhotoService,
+    private readonly organizationService: OrganizationService
+  ) {}
 
   @ApiConflictResponse({ description: "User with email already exist" })
   @ApiCreatedResponse({ type: User, description: "User has been created" })
+  @ApiBadRequestResponse({
+    description:
+      "Invalid university ID given or payload did not pass validation",
+  })
   @Post()
   async createUser(@Body() body: CreateUser) {
     const user = await this.usersService.findByEmailWithPassword(body.email);
     if (user) throw new ConflictException();
+
+    const university = await this.universityService.findById(body.universityId);
+    if (!university) throw new BadRequestException("Invalid university ID");
 
     let newUser = new User({
       email: body.email,
@@ -39,6 +62,7 @@ export class UsersController {
       firstName: body.firstName,
       lastName: body.lastName,
       username: body.username,
+      university,
     });
 
     newUser = await this.usersService.save(newUser);
@@ -65,5 +89,32 @@ export class UsersController {
   @Get()
   async getCurrentUser(@CurrentUser() user: User) {
     return user;
+  }
+
+  @ApiConsumes("multipart/form-data")
+  @FormDataRequest({ storage: MemoryStoredFile })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  @Patch("photo")
+  async updateCurrentUserPhoto(
+    @CurrentUser() user: User,
+    @Body() body: UpdatePhoto
+  ) {
+    const photo = await this.photoService.save(body.file.buffer, "user_photo");
+    if (!photo) throw new InternalServerErrorException();
+
+    user.photo = photo;
+    return this.usersService.save(user);
+  }
+
+  @ApiOkResponse({
+    type: [OrganizationMemberWithoutUser],
+    description: "All organizations where user is member of",
+  })
+  @ApiBearerAuth()
+  @UseGuards(JwtGuard)
+  @Get(":id/organizations")
+  userOrganizationMemberships(@Param("id", ParseUUIDPipe) userId: string) {
+    return this.organizationService.findUserMemberships(userId);
   }
 }

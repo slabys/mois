@@ -1,0 +1,15 @@
+# Database
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_NAME=todo
+DB_USER=user
+DB_PASS=password
+
+# Auth
+JWT_SECRET=secret
+
+# Storage
+STORAGE_ROOT=storage
+
+# Base URL
+BASE_URL=http://localhost:3000

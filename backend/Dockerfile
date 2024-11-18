@@ -11,7 +11,7 @@ COPY . .
 
 # Install pnpm and dependencies
 RUN npm install -g pnpm
-RUN npm cache clean --force && rm -rf node_modules && pnpm install
+RUN npm cache clean --force && rm -rf node_modules && pnpm install --frozen-lockfile --prod=false
 
 # Build the NestJS project
 RUN pnpm run build ${PROJECT_NAME}
@@ -25,17 +25,15 @@ ARG PROJECT_NAME
 # Set working directory
 WORKDIR /app
 
-# Install pnpm for running the application in production
 RUN npm install -g pnpm
 
 # Copy only the built application and necessary files from builder
-# /app/dist
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
 
-#RUN pnpm install
+# Install prod dependencies
+RUN pnpm install --frozen-lockfile --prod=true
 
 # Start the server
-ENTRYPOINT ["pnpm", "start:prod"]
+ENTRYPOINT ["npm", "run", "start:prod"]
