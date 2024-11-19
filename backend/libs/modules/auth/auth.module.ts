@@ -2,12 +2,12 @@ import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { PassportModule } from "@nestjs/passport";
 
-import { JwtStrategy, LocalStrategy } from "./providers/strategies";
+import { CookieGuard, LocalGuard } from "./providers/guards";
 import { AuthService } from "./providers/services";
-import { JwtGuard, LocalGuard } from "./providers/guards";
+import { LocalStrategy } from "./providers/strategies";
 
-import { UsersModule } from "modules/users";
 import { JwtModule } from "@nestjs/jwt";
+import { UsersModule } from "modules/users";
 
 @Module({
   imports: [
@@ -18,14 +18,14 @@ import { JwtModule } from "@nestjs/jwt";
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secretOrPrivateKey: configService.getOrThrow("JWT_SECRET"),
+        secret: configService.getOrThrow("JWT_SECRET"),
         signOptions: {
           issuer: "MOIS",
         },
       }),
     }),
   ],
-  providers: [AuthService, JwtStrategy, LocalStrategy, JwtGuard, LocalGuard],
-  exports: [AuthService, JwtGuard],
+  providers: [AuthService, LocalStrategy, CookieGuard, LocalGuard],
+  exports: [AuthService, CookieGuard],
 })
 export class AuthModule {}

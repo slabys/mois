@@ -11,21 +11,22 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import {
-  ApiBearerAuth,
   ApiConsumes,
+  ApiCookieAuth,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { JwtGuard } from "modules/auth/providers/guards";
+
+import { CookieGuard } from "modules/auth/providers/guards";
 import { Event, EventsService } from "modules/events";
 import { OrganizationService } from "modules/organization";
-import { CurrentUser } from "../decorators";
-import { User } from "modules/users";
-import { Permission } from "modules/roles";
-import { CreateEvent, UpdatePhoto } from "../models/requests";
 import { PhotoService } from "modules/photo";
+import { Permission } from "modules/roles";
+import { User } from "modules/users";
 import { FormDataRequest } from "nestjs-form-data";
+import { CurrentUser } from "../decorators";
+import { CreateEvent, UpdatePhoto } from "../models/requests";
 
 @ApiTags("Events")
 @Controller("events")
@@ -50,8 +51,8 @@ export class EventsController {
     description:
       "User is not member of event organization or does not have required permissions",
   })
-  @ApiBearerAuth()
-  @UseGuards(JwtGuard)
+  @ApiCookieAuth()
+  @UseGuards(CookieGuard)
   @Post(":organizationId")
   async createEvent(
     @Param("organizationId") organizationId: string,
@@ -91,10 +92,10 @@ export class EventsController {
       "User is not member of event organization or does not have required permissions",
   })
   @ApiNotFoundResponse({ description: "Event not found" })
-  @ApiBearerAuth()
+  @ApiCookieAuth()
   @ApiConsumes("multipart/form-data")
   @FormDataRequest()
-  @UseGuards(JwtGuard)
+  @UseGuards(CookieGuard)
   @Patch(":eventId")
   async updateEventPhoto(
     @Param("eventId") eventId: string,

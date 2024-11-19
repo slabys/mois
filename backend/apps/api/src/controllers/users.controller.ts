@@ -12,20 +12,20 @@ import {
 } from "@nestjs/common";
 import {
   ApiBadRequestResponse,
-  ApiBearerAuth,
   ApiConflictResponse,
   ApiConsumes,
+  ApiCookieAuth,
   ApiCreatedResponse,
   ApiOkResponse,
-  ApiTags,
+  ApiTags
 } from "@nestjs/swagger";
 import { FormDataRequest, MemoryStoredFile } from "nestjs-form-data";
 
-import { JwtGuard } from "modules/auth/providers/guards";
+import { OrganizationService } from "modules/organization";
 import { PhotoService } from "modules/photo";
 import { User, UsersService } from "modules/users";
-import { OrganizationService } from "modules/organization";
 
+import { CookieGuard } from "modules/auth/providers/guards";
 import { CurrentUser } from "../decorators";
 import { CreateUser, UpdatePhoto, UpdateUser } from "../models/requests";
 import { OrganizationMemberWithoutUser } from "../models/responses";
@@ -63,8 +63,8 @@ export class UsersController {
     return newUser;
   }
 
-  @ApiBearerAuth()
-  @UseGuards(JwtGuard)
+  @ApiCookieAuth()
+  @UseGuards(CookieGuard)
   @Patch()
   async updateCurrentUser(@Body() body: UpdateUser, @CurrentUser() user: User) {
     // For safety reasons set each property individually
@@ -77,8 +77,8 @@ export class UsersController {
   }
 
   @ApiOkResponse({ type: User, description: "Current user data" })
-  @ApiBearerAuth()
-  @UseGuards(JwtGuard)
+  @ApiCookieAuth()
+  @UseGuards(CookieGuard)
   @Get()
   async getCurrentUser(@CurrentUser() user: User) {
     return user;
@@ -86,8 +86,8 @@ export class UsersController {
 
   @ApiConsumes("multipart/form-data")
   @FormDataRequest({ storage: MemoryStoredFile })
-  @ApiBearerAuth()
-  @UseGuards(JwtGuard)
+  @ApiCookieAuth()
+  @UseGuards(CookieGuard)
   @Patch("photo")
   async updateCurrentUserPhoto(
     @CurrentUser() user: User,
@@ -104,8 +104,8 @@ export class UsersController {
     type: [OrganizationMemberWithoutUser],
     description: "All organizations where user is member of",
   })
-  @ApiBearerAuth()
-  @UseGuards(JwtGuard)
+  @ApiCookieAuth()
+  @UseGuards(CookieGuard)
   @Get(":id/organizations")
   userOrganizationMemberships(@Param("id", ParseUUIDPipe) userId: string) {
     return this.organizationService.findUserMemberships(userId);

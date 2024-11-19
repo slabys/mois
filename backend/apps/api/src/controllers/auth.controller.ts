@@ -1,4 +1,11 @@
-import { Body, Controller, Post, UseGuards } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  HttpStatus,
+  Post,
+  Res,
+  UseGuards,
+} from "@nestjs/common";
 import {
   ApiCreatedResponse,
   ApiTags,
@@ -12,6 +19,8 @@ import { AccessToken } from "../models/responses";
 
 import { AuthService } from "modules/auth";
 import { User } from "modules/users";
+import { Response } from "express";
+import { isProduction } from "utilities/env";
 
 @ApiTags("Auth")
 @Controller("auth")
@@ -27,11 +36,19 @@ export class AuthController {
   @ApiCreatedResponse({ type: AccessToken, description: "User access token" })
   @UseGuards(LocalGuard)
   @Post("login")
-  async loginUserWithEmail(@Body() data: LoginUser, @CurrentUser() user: User) {
+  async loginUserWithEmail(
+    @Body() data: LoginUser,
+    @CurrentUser() user: User,
+    @Res({ passthrough: true }) response: Response
+  ) {
     const token = await this.authService.createToken(user);
 
-    return <AccessToken>{
-      accessToken: token,
-    };
+    response
+      .cookie("AuthCookie", token, {
+        maxAge: 7 * 24 * 60 * 1_000,
+        httpOnly: true,
+        secure: isProduction,
+      })
+      .sendStatus(HttpStatus.OK);
   }
 }
