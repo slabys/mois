@@ -6,7 +6,7 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import {
-  ApiCookieAuth,
+  ApiBearerAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
@@ -37,7 +37,7 @@ export class OrganizationMembersController {
     description: "Current user membership within organization",
   })
   @ApiNotFoundResponse({ description: "User is not member of organization" })
-  @ApiCookieAuth()
+  @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Get("membership")
   async userOrganizationMembership(

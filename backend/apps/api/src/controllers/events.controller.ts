@@ -11,11 +11,11 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import {
+  ApiBearerAuth,
   ApiConsumes,
-  ApiCookieAuth,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
-  ApiTags,
+  ApiTags
 } from "@nestjs/swagger";
 
 import { CookieGuard } from "modules/auth/providers/guards";
@@ -51,7 +51,7 @@ export class EventsController {
     description:
       "User is not member of event organization or does not have required permissions",
   })
-  @ApiCookieAuth()
+  @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Post(":organizationId")
   async createEvent(
@@ -92,7 +92,7 @@ export class EventsController {
       "User is not member of event organization or does not have required permissions",
   })
   @ApiNotFoundResponse({ description: "Event not found" })
-  @ApiCookieAuth()
+  @ApiBearerAuth()
   @ApiConsumes("multipart/form-data")
   @FormDataRequest()
   @UseGuards(CookieGuard)

@@ -9,15 +9,18 @@ import helmet from "helmet";
 import { isDevelopment, isProduction } from "utilities/env";
 import { includeSwagger } from "utilities/swagger";
 import { AppModule } from "./app.module";
+import { ConfigService } from "@nestjs/config";
+import { ExpressAdapter } from "@nestjs/platform-express";
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    cors: {
-      credentials: true,
-      methods: ["POST", "GET", "PATCH"],
-      preflightContinue: true,
-    },
+  const app = await NestFactory.create(AppModule, new ExpressAdapter());
+  //app.enableCors({ credentials: true, origin: true });
+
+  app.enableCors({
+    origin: "http://localhost:4000", // Replace with your frontend URL
+    credentials: true, // Allow cookies
   });
+
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.enableShutdownHooks();
 
@@ -26,10 +29,7 @@ async function bootstrap() {
       .setTitle(`${packageJson.name} API`)
       .setDescription(`The ${packageJson.name} API description`)
       .setVersion(packageJson.version)
-      .addCookieAuth("AuthCookie", {
-        type: "apiKey",
-        in: "cookie",
-      })
+      .addBearerAuth()
       .build();
 
     includeSwagger(app, config);
@@ -39,6 +39,7 @@ async function bootstrap() {
     app.use(helmet());
   }
 
+  const configService = app.get(ConfigService);
   app.use(cookieParser());
   await app.listen(process.env.PORT_APP1 ?? 4000);
 }

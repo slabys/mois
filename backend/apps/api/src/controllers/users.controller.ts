@@ -12,9 +12,9 @@ import {
 } from "@nestjs/common";
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiConflictResponse,
   ApiConsumes,
-  ApiCookieAuth,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiTags
@@ -63,7 +63,7 @@ export class UsersController {
     return newUser;
   }
 
-  @ApiCookieAuth()
+  @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Patch()
   async updateCurrentUser(@Body() body: UpdateUser, @CurrentUser() user: User) {
@@ -77,7 +77,7 @@ export class UsersController {
   }
 
   @ApiOkResponse({ type: User, description: "Current user data" })
-  @ApiCookieAuth()
+  @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Get()
   async getCurrentUser(@CurrentUser() user: User) {
@@ -86,7 +86,7 @@ export class UsersController {
 
   @ApiConsumes("multipart/form-data")
   @FormDataRequest({ storage: MemoryStoredFile })
-  @ApiCookieAuth()
+  @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Patch("photo")
   async updateCurrentUserPhoto(
@@ -104,7 +104,7 @@ export class UsersController {
     type: [OrganizationMemberWithoutUser],
     description: "All organizations where user is member of",
   })
-  @ApiCookieAuth()
+  @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Get(":id/organizations")
   userOrganizationMemberships(@Param("id", ParseUUIDPipe) userId: string) {
