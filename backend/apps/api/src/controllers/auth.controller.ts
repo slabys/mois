@@ -43,7 +43,11 @@ export class AuthController {
     const token = await this.authService.createToken(user);
 
     response
-      .cookie("AuthCookie", token, { httpOnly: true, secure: true })
+      .cookie("AuthCookie", token, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 7 * 24 * 60 * 1_000,
+      })
       .status(HttpStatus.OK)
       .send(<AccessToken>{ accessToken: token });
   }
