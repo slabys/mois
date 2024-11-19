@@ -28,6 +28,7 @@ const template = `
       apiDescriptionUrl="/api-json"
       router="hash"
       layout="sidebar"
+      tryItCredentialsPolicy="include"
     />
   </body>
 </html>
