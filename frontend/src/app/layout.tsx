@@ -1,4 +1,3 @@
-import Layout from "@/components/layout/Layout";
 import { theme } from "@/utils/theme";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
@@ -22,9 +21,7 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body style={{ width: "100%", height: "100vh" }}>
-        <MantineProvider theme={theme}>
-          <Layout>{children}</Layout>
-        </MantineProvider>
+        <MantineProvider theme={theme}>{children}</MantineProvider>
       </body>
     </html>
   );
