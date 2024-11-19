@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   ConflictException,
   Controller,
@@ -24,12 +23,11 @@ import { FormDataRequest, MemoryStoredFile } from "nestjs-form-data";
 
 import { JwtGuard } from "modules/auth/providers/guards";
 import { PhotoService } from "modules/photo";
-import { UniversityService } from "modules/university";
 import { User, UsersService } from "modules/users";
+import { OrganizationService } from "modules/organization";
 
 import { CurrentUser } from "../decorators";
 import { CreateUser, UpdatePhoto, UpdateUser } from "../models/requests";
-import { OrganizationService } from "modules/organization";
 import { OrganizationMemberWithoutUser } from "../models/responses";
 
 @ApiTags("Users")
@@ -37,7 +35,6 @@ import { OrganizationMemberWithoutUser } from "../models/responses";
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private readonly universityService: UniversityService,
     private readonly photoService: PhotoService,
     private readonly organizationService: OrganizationService
   ) {}
@@ -53,16 +50,12 @@ export class UsersController {
     const user = await this.usersService.findByEmailWithPassword(body.email);
     if (user) throw new ConflictException();
 
-    const university = await this.universityService.findById(body.universityId);
-    if (!university) throw new BadRequestException("Invalid university ID");
-
     let newUser = new User({
       email: body.email,
       password: body.password,
       firstName: body.firstName,
       lastName: body.lastName,
       username: body.username,
-      university,
     });
 
     newUser = await this.usersService.save(newUser);

@@ -15,7 +15,6 @@ import {
 
 import { hashPassword } from "modules/auth/utilities/crypto";
 import { Photo } from "modules/photo/entities";
-import { University } from "modules/university";
 
 @Entity()
 export class User extends BaseEntity {
@@ -40,10 +39,6 @@ export class User extends BaseEntity {
   @Exclude()
   @Column({ type: "varchar", length: 255, select: false })
   password: string;
-
-  // Auto-load university data
-  @ManyToOne(() => University, { nullable: false, eager: true })
-  university: University;
 
   @ManyToOne(() => Photo, { eager: true })
   photo: Photo;

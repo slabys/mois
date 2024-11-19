@@ -31,7 +31,7 @@ export class Event extends BaseEntity {
   @Column()
   until: Date;
 
-  @ManyToOne(() => OrganizationMember)
+  @ManyToOne(() => OrganizationMember, { nullable: false })
   createdBy: OrganizationMember;
 
   @CreateDateColumn()
