@@ -14,8 +14,8 @@ export const middleware = async (request: NextRequest) => {
     return NextResponse.next();
   }
 
-  // AUTH
-  if (!request.cookies.has("Auth")) {
+  // AUTH - TODO
+  if (request.cookies.has("Auth")) {
     return NextResponse.next();
   }
 

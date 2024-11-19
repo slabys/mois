@@ -25,16 +25,16 @@ const LoginForm = ({}: LoginFormProps) => {
   });
 
   const loginUser = async (values: LoginFormType) => {
-    console.log(values);
-    const res = await apiFetch("https://cat-fact.herokuapp.com/facts", { method: "GET" });
-    console.log(res);
+    // console.log(values);
+    const res = await apiFetch("https://cat-fact.herokuapp.com/facts", "GET");
+    return res;
     // console.log(data, status, statusText);
   };
 
   return (
     <form
       onSubmit={form.onSubmit((values) => {
-        loginUser(values);
+        loginUser(values).then((data) => console.log(data));
       })}
     >
       <Flex direction="column" gap={12}>

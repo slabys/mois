@@ -1,6 +1,7 @@
 "use client";
 
-import { Container, TextInput } from "@mantine/core";
+import LoginForm from "@components/auth/LoginForm";
+import { Container, Title } from "@mantine/core";
 import { isNotEmpty, useForm } from "@mantine/form";
 
 const LoginPage = () => {
@@ -20,7 +21,8 @@ const LoginPage = () => {
 
   return (
     <Container>
-      <TextInput></TextInput>
+      <Title>Login</Title>
+      <LoginForm />
     </Container>
   );
 };
