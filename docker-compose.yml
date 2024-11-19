@@ -27,10 +27,16 @@ services:
       - ./backend/.env
     environment:
       - DB_HOST=database
+      - STORAGE_ROOT=/app/storage
     ports:
       - ${PORT_APP1:-4000}:4000
     networks:
       - app-network
+    healthcheck:
+      test: curl --fail http://127.0.0.1:4000/health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
     volumes:
       - backend_data:/app/storage
     depends_on:

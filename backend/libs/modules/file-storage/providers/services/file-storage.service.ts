@@ -15,10 +15,12 @@ export class FileStorageService {
     this.BasePath = this.configService.getOrThrow("STORAGE_ROOT");
     this.BaseUrl = this.configService.getOrThrow("BASE_URL");
 
-    const fullBasePath = path.join(process.cwd(), this.BasePath);
-    fs.mkdir(fullBasePath, { recursive: true });
+    this.BasePath = path.isAbsolute(this.BasePath)
+      ? this.BasePath
+      : path.join(process.cwd(), this.BasePath);
+    fs.mkdir(this.BasePath, { recursive: true });
 
-    this.logger.log(`Storage is located at: ${fullBasePath}`);
+    this.logger.log(`Storage is located at: ${this.BasePath}`);
   }
 
   /**
@@ -27,7 +29,7 @@ export class FileStorageService {
    * @returns Full file path resolved against the base path
    */
   private getFilePath(filePath: string) {
-    return path.join(process.cwd(), this.BasePath, filePath);
+    return path.join(this.BasePath, filePath);
   }
 
   /**
