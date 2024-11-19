@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   HttpStatus,
   Post,
   Res,
@@ -61,6 +62,7 @@ export class AuthController {
   @ApiOkResponse({ description: "User is no longer logged-in" })
   @ApiBearerAuth()
   @UseGuards(CookieGuard)
+  @Delete("logout")
   async logoutUser(@Res({ passthrough: true }) response: Response) {
     response.clearCookie("AuthCookie").status(HttpStatus.OK);
   }
