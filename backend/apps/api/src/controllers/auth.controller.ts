@@ -7,12 +7,14 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import {
+  ApiBearerAuth,
   ApiCreatedResponse,
+  ApiOkResponse,
   ApiTags,
   ApiUnauthorizedResponse,
 } from "@nestjs/swagger";
 
-import { LocalGuard } from "modules/auth/providers/guards";
+import { CookieGuard, LocalGuard } from "modules/auth/providers/guards";
 import { CurrentUser } from "../decorators";
 import { LoginUser } from "../models/requests";
 import { AccessToken } from "../models/responses";
@@ -50,5 +52,16 @@ export class AuthController {
       })
       .status(HttpStatus.OK)
       .send(<AccessToken>{ accessToken: token });
+  }
+
+  /**
+   * Logout user
+   * @param response 
+   */
+  @ApiOkResponse({ description: "User is no longer logged-in" })
+  @ApiBearerAuth()
+  @UseGuards(CookieGuard)
+  async logoutUser(@Res({ passthrough: true }) response: Response) {
+    response.clearCookie("AuthCookie").status(HttpStatus.OK);
   }
 }

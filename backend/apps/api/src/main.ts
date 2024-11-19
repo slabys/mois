@@ -17,8 +17,8 @@ async function bootstrap() {
   //app.enableCors({ credentials: true, origin: true });
 
   app.enableCors({
-    origin: "http://localhost:4000", // Replace with your frontend URL
-    credentials: true, // Allow cookies
+    origin: "*",
+    credentials: true,
   });
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
@@ -39,7 +39,7 @@ async function bootstrap() {
     app.use(helmet());
   }
 
-  const configService = app.get(ConfigService);
+  // const configService = app.get(ConfigService);
   app.use(cookieParser());
   await app.listen(process.env.PORT_APP1 ?? 4000);
 }
