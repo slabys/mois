@@ -9,7 +9,6 @@ import {
   OrganizationMembersController,
   OrganizationsController,
   PhotoController,
-  UniversitiesController,
   UsersController,
 } from "./controllers";
 
@@ -17,7 +16,6 @@ import { AuthModule } from "modules/auth";
 import { EventsModule } from "modules/events";
 import { OrganizationModule } from "modules/organization";
 import { PhotoModule } from "modules/photo";
-import { UniversityModule } from "modules/university";
 import { UsersModule } from "modules/users";
 import { NestjsFormDataModule } from "nestjs-form-data";
 
@@ -25,7 +23,6 @@ import { NestjsFormDataModule } from "nestjs-form-data";
   imports: [
     AuthModule,
     UsersModule,
-    UniversityModule,
     PhotoModule,
     OrganizationModule,
     EventsModule,
@@ -45,7 +42,6 @@ import { NestjsFormDataModule } from "nestjs-form-data";
   controllers: [
     AuthController,
     UsersController,
-    UniversitiesController,
     PhotoController,
     OrganizationsController,
     OrganizationMembersController,
