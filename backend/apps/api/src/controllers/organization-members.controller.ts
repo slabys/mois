@@ -6,12 +6,13 @@ import {
   UseGuards,
 } from "@nestjs/common";
 import {
-  ApiBearerAuth,
+  ApiCookieAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { JwtGuard } from "modules/auth/providers/guards";
+
+import { CookieGuard } from "modules/auth/providers/guards";
 import { OrganizationService } from "modules/organization";
 import { User } from "modules/users";
 import { CurrentUser } from "../decorators";
@@ -36,8 +37,8 @@ export class OrganizationMembersController {
     description: "Current user membership within organization",
   })
   @ApiNotFoundResponse({ description: "User is not member of organization" })
-  @ApiBearerAuth()
-  @UseGuards(JwtGuard)
+  @ApiCookieAuth()
+  @UseGuards(CookieGuard)
   @Get("membership")
   async userOrganizationMembership(
     @Param("id") organizationId: string,
