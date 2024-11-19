@@ -43,7 +43,7 @@ export const includeSwagger = (app: INestApplication<Express>, openApi: Omit<Ope
 				.replace(/^./, (str) => str.toUpperCase());
 
 			return methodName.trim();
-		},
+		}
 	});
 
 	app.use("/api-json", (_, res) => {

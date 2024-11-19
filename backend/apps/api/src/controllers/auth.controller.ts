@@ -20,7 +20,6 @@ import { AccessToken } from "../models/responses";
 import { AuthService } from "modules/auth";
 import { User } from "modules/users";
 import { Response } from "express";
-import { isProduction } from "utilities/env";
 
 @ApiTags("Auth")
 @Controller("auth")
@@ -44,11 +43,8 @@ export class AuthController {
     const token = await this.authService.createToken(user);
 
     response
-      .cookie("AuthCookie", token, {
-        maxAge: 7 * 24 * 60 * 1_000,
-        httpOnly: true,
-        secure: isProduction,
-      })
-      .sendStatus(HttpStatus.OK);
+      .cookie("AuthCookie", token, { httpOnly: true, secure: true })
+      .status(HttpStatus.OK)
+      .send(<AccessToken>{ accessToken: token });
   }
 }

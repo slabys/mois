@@ -4,7 +4,7 @@ import { PassportModule } from "@nestjs/passport";
 
 import { CookieGuard, LocalGuard } from "./providers/guards";
 import { AuthService } from "./providers/services";
-import { LocalStrategy } from "./providers/strategies";
+import { CookieStrategy, LocalStrategy } from "./providers/strategies";
 
 import { JwtModule } from "@nestjs/jwt";
 import { UsersModule } from "modules/users";
@@ -25,7 +25,13 @@ import { UsersModule } from "modules/users";
       }),
     }),
   ],
-  providers: [AuthService, LocalStrategy, CookieGuard, LocalGuard],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    CookieStrategy,
+    CookieGuard,
+    LocalGuard,
+  ],
   exports: [AuthService, CookieGuard],
 })
 export class AuthModule {}
