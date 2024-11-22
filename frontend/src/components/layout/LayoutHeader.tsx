@@ -1,8 +1,11 @@
 "use client";
 
+import { useLogoutUser } from "@/utils/api";
+import routes from "@/utils/routes";
 import styles from "@components/layout/LayoutHeader.module.css";
 import { Anchor, Box, Burger, Button, Container, Divider, Drawer, Group, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const mainLinks = [
@@ -13,6 +16,15 @@ const mainLinks = [
 ];
 
 const LayoutHeader = () => {
+  const router = useRouter();
+  const logoutMutation = useLogoutUser({
+    mutation: {
+      onSuccess: () => {
+        router.push(routes.LOGIN);
+      },
+    },
+  });
+
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
   const [active, setActive] = useState(0);
 
@@ -34,15 +46,17 @@ const LayoutHeader = () => {
   return (
     <header className={styles.header}>
       <Container size="xl" className={styles.inner}>
-        <img src="/logo_esncz.png" alt="" height="100%" />
+        <picture style={{ height: "inherit" }}>
+          <img src="/logo_esncz.png" alt="Logo" height="100%" />
+        </picture>
         <Box className={styles.links} visibleFrom="sm">
           <Group gap={0} justify="flex-end">
             {mainItems}
           </Group>
         </Box>
+        <Button onClick={() => logoutMutation.mutate()}>Logout</Button>
         <Burger opened={drawerOpened} onClick={toggleDrawer} size="sm" hiddenFrom="sm" />
       </Container>
-
       <Drawer
         opened={drawerOpened}
         onClose={closeDrawer}
