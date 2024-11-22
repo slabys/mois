@@ -1,4 +1,5 @@
 import { theme } from "@/utils/theme";
+import Providers from "@components/layout/Providers";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
@@ -21,7 +22,9 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body style={{ width: "100%", height: "100vh" }}>
-        <MantineProvider theme={theme}>{children}</MantineProvider>
+        <MantineProvider theme={theme}>
+          <Providers>{children}</Providers>
+        </MantineProvider>
       </body>
     </html>
   );

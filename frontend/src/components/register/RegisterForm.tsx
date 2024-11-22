@@ -1,83 +1,76 @@
 "use client";
 
-import { apiFetch } from "@/utils/apiFetch";
-import { Button, Flex, Select, Text, TextInput } from "@mantine/core";
-import { isEmail, isNotEmpty, useForm } from "@mantine/form";
-import React from "react";
-
-export interface RegisterFormType {
-  email: string;
-  password: string;
-  firstname: string;
-  lastname: string;
-  username: string;
-  universityId: string;
-}
+import { useCreateUser } from "@/utils/api";
+import { CreateUser } from "@/utils/api.schemas";
+import routes from "@/utils/routes";
+import { Button, Flex, Text, TextInput } from "@mantine/core";
+import { Form, isEmail, isNotEmpty, useForm } from "@mantine/form";
+import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 
 interface RegisterFormProps {}
 
 const RegisterForm = () => {
-  const form = useForm<RegisterFormType>({
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  const registerMutation = useCreateUser({
+    mutation: {
+      onSuccess: (data) => {
+        router.push(routes.LOGIN);
+      },
+      onError: (data) => {
+        console.log(data.status);
+        switch (data.status) {
+          case 409:
+            return setError("This e-mail is already registered!");
+          default:
+            return setError("Something went wrong! Please try again.");
+        }
+      },
+    },
+  });
+  const form = useForm<CreateUser>({
     initialValues: {
       email: "",
       password: "",
-      firstname: "",
-      lastname: "",
+      firstName: "",
+      lastName: "",
       username: "",
-      universityId: "",
+      // TODO - remove
+      universityId: "asddasds",
     },
     validate: {
       email: isEmail("Must be a valid email"),
       password: isNotEmpty("Password can not be empty."),
-      firstname: isNotEmpty("First name can not be empty."),
-      lastname: isNotEmpty("Last name can not be empty."),
+      firstName: isNotEmpty("First name can not be empty."),
+      lastName: isNotEmpty("Last name can not be empty."),
       username: isNotEmpty("User name can not be empty."),
-      universityId: isNotEmpty("University must be selected."),
     },
   });
 
-  const registerUser = async (values: RegisterFormType) => {
-    const res = await apiFetch("/auth/register", {
-      method: "POST",
-      data: {
-        email: "mlejnpe1@gmail.com",
-        password: "password",
-        firstname: "Petr",
-        lastname: "Mlejnek",
-        username: "Mlejnas",
-        universityId: "changeme",
-      },
+  const registerUser = (values: CreateUser) => {
+    registerMutation.mutate({
+      data: { ...values },
     });
-    console.log(res);
   };
 
   return (
     <>
-      <form
-        onSubmit={form.onSubmit((values) => {
-          registerUser(values);
-        })}
-      >
+      <Form form={form} onSubmit={registerUser}>
         <Flex direction="column" gap={12}>
-          <TextInput label="Email" />
-          <TextInput label="Password" type="password" />
-          <TextInput label="FirstName" />
-          <TextInput label="LastName" />
-          <TextInput label="UserName" />
-          <Select
-            label="University"
-            placeholder="Select your university"
-            data={["UHK", "UPCE", "MUNI", "ČVUT", "VUT"]}
-          />
+          <TextInput label="Email" {...form.getInputProps("email")} />
+          <TextInput label="Password" type="password" {...form.getInputProps("password")} />
+          <TextInput label="FirstName" {...form.getInputProps("firstName")} />
+          <TextInput label="LastName" {...form.getInputProps("lastName")} />
+          <TextInput label="UserName" {...form.getInputProps("username")} />
         </Flex>
         <Flex direction="column" gap={16} mt={16}>
-          <Button loading={false} type="submit">
-            Register
-          </Button>
+          <Button type="submit">Register</Button>
           {/* REGISTER ERROR*/}
-          <Text c="bfiRed.6">Something went wrong! Please try again.</Text>
+          {error && <Text c="red">{error}</Text>}
         </Flex>
-      </form>
+      </Form>
     </>
   );
 };

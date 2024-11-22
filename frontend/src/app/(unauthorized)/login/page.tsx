@@ -1,28 +1,13 @@
-"use client";
-
 import LoginForm from "@components/auth/LoginForm";
-import { Container, Title } from "@mantine/core";
-import { isNotEmpty, useForm } from "@mantine/form";
+import { Container, Flex, Title } from "@mantine/core";
 
 const LoginPage = () => {
-  const form = useForm({
-    initialValues: {
-      email: "",
-      password: "",
-    },
-
-    validate: {
-      email: (value) => (/^\S+@\S+$/.test(value) ? null : "Invalid email"),
-      password: isNotEmpty("Password cannot be empty!"),
-    },
-  });
-
-  console.log(form);
-
   return (
-    <Container>
-      <Title>Login</Title>
-      <LoginForm />
+    <Container h="100vh">
+      <Flex direction="column" justify="center" align="center" h="100%">
+        <Title>Login</Title>
+        <LoginForm />
+      </Flex>
     </Container>
   );
 };
