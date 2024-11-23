@@ -22,6 +22,7 @@ RUN pnpm run build ${PROJECT_NAME}
 FROM node:22-alpine AS production
 
 ARG PROJECT_NAME
+ARG PORT_APP1
 # Set working directory
 WORKDIR /app
 
@@ -34,6 +35,8 @@ COPY --from=builder /app/pnpm-lock.yaml ./
 
 # Install prod dependencies
 RUN pnpm install --frozen-lockfile --prod=true
+
+EXPOSE $PORT_APP1
 
 # Start the server
 ENTRYPOINT ["npm", "run", "start:prod"]
