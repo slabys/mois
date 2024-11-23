@@ -7,8 +7,11 @@ import {
   Entity,
   Index,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
+import { EventSpot } from "./event-spot.entity";
+import { EventApplication } from "./event-application.entity";
 
 @Entity()
 export class Event extends BaseEntity {
@@ -40,8 +43,15 @@ export class Event extends BaseEntity {
   @ManyToOne(() => Photo, { nullable: true })
   photo: Photo | null;
 
+  @OneToMany(() => EventSpot, (spot) => spot.event, { cascade: true })
+  spotTypes: EventSpot[];
+
+  @OneToMany(() => EventApplication, (application) => application.spotType)
+  applications: EventApplication[];
+
   constructor(event?: Partial<Event>) {
     super();
+
     Object.assign(this, event);
   }
 }

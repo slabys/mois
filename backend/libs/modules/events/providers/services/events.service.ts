@@ -2,19 +2,22 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Event } from "modules/events/entities";
 import slugify from "slugify";
-import { MoreThan, Repository } from "typeorm";
+import { MoreThan, type Repository } from "typeorm";
 
 @Injectable()
 export class EventsService {
   constructor(
     @InjectRepository(Event)
     private readonly eventsRepository: Repository<Event>
-  ) {}
+  )
+  {
+
+  }
 
   /**
    * Find event by ID
    * @param id Event ID
-   * @returns {Event | null}
+   * @returns
    */
   findById(id: string) {
     return this.eventsRepository.findOne({

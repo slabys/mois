@@ -96,7 +96,7 @@ export class EventsController {
   @ApiConsumes("multipart/form-data")
   @FormDataRequest()
   @UseGuards(CookieGuard)
-  @Patch(":eventId")
+  @Patch(":eventId/photo")
   async updateEventPhoto(
     @Param("eventId") eventId: string,
     @CurrentUser() user: User,

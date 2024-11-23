@@ -4,6 +4,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import { getDataSourceOptions } from "config/typeorm.config";
 import {
   AuthController,
+  EventSpotsController,
   EventsController,
   HealthController,
   OrganizationMembersController,
@@ -46,6 +47,7 @@ import { NestjsFormDataModule } from "nestjs-form-data";
     OrganizationsController,
     OrganizationMembersController,
     EventsController,
+    EventSpotsController,
     HealthController,
   ],
   providers: [],
