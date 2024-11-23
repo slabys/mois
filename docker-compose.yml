@@ -2,10 +2,13 @@ services:
   database:
     container_name: database
     image: postgres:16-alpine
-    env_file:
-      - .env
+    environment:
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME:-database}
+      - DB_USER=${DB_USER:-user}
+      - DB_PASS=${DB_PASS:-password}
     ports:
-      - ${POSTGRES_PORT:-5432}:5432
+      - ${DB_PORT:-5432}:${DB_PORT:-5432}
     volumes:
       - ./database/data:/var/lib/postgresql/data
     networks:
@@ -23,13 +26,17 @@ services:
       args:
         - PROJECT_NAME=api
       target: production
-    env_file:
-      - .env
     environment:
-      - DB_HOST=database
-      - STORAGE_ROOT=/app/storage
+      - DB_HOST=${DB_HOST:-database}
+      - DB_PORT=${DB_PORT:-5432}
+      - DB_NAME=${DB_NAME:-database}
+      - DB_USER=${DB_USER:-user}
+      - BASE_URL=${BASE_URL:-http://localhost:4000}
+      - PORT_APP1=${PORT_APP1:-4000}
+      - JWT_SECRET=${JWT_SECRET:-secret}
+      - STORAGE_ROOT=${STORAGE_ROOT:-/app/storage}
     ports:
-      - ${PORT_APP1:-4000}:4000
+      - ${PORT_APP1:-4000}:${PORT_APP1:-4000}
     networks:
       - app-network
     healthcheck:
@@ -48,10 +55,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.Migration
-    env_file:
-      - .env
     environment:
-      - DB_HOST=database
+      - DB_HOST=${DB_HOST:-database}
     networks:
       - app-network
     depends_on:
@@ -61,10 +66,13 @@ services:
     container_name: frontend
     build:
       context: ./frontend
+    environment:
+      - NEXT_PUBLIC_APP1_URL=${NEXT_PUBLIC_APP1_URL:-http://localhost:4000}
+      - PORT_FE=${PORT_FE:-3000}
     env_file:
       - .env
     ports:
-      - ${PORT_FE:-3000}:3000
+      - ${PORT_FE:-3000}:${PORT_FE:-3000}
     networks:
       - app-network
     depends_on:
