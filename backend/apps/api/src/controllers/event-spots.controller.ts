@@ -8,6 +8,7 @@ import {
   NotFoundException,
   Param,
   ParseUUIDPipe,
+  Patch,
   Post,
   UseGuards,
 } from "@nestjs/common";
@@ -23,7 +24,11 @@ import {
 import { EventSpotsService, EventsService } from "modules/events";
 import { EventSpotSimple } from "../models/responses";
 import { CookieGuard } from "modules/auth/providers/guards";
-import { CreateEventSpot, DeleteEventSpot } from "../models/requests";
+import {
+  CreateEventSpot,
+  DeleteEventSpot,
+  UpdateEventSpot,
+} from "../models/requests";
 import { OrganizationService } from "modules/organization";
 import { CurrentUser } from "../decorators";
 import { User } from "modules/users";
@@ -63,7 +68,7 @@ export class EventSpotsController {
   })
   @ApiNotFoundResponse({ description: "Event not found" })
   @ApiCreatedResponse({
-    type: EventSpot,
+    type: EventSpotSimple,
     description: "Created event spot",
   })
   @ApiEventIdParam()
@@ -143,5 +148,41 @@ export class EventSpotsController {
     }
 
     await this.eventSpotsService.delete(eventSpot);
+  }
+
+  @ApiForbiddenResponse({
+    description:
+      "Not member of organization or missing `CreateEvent` permission",
+  })
+  @ApiNotFoundResponse({ description: "Event spot not found" })
+  @ApiOkResponse({ type: EventSpotSimple, description: "Event spot updated" })
+  @ApiParam({ name: "id", description: "Event spot ID" })
+  @ApiBearerAuth()
+  @UseGuards(CookieGuard)
+  @Patch("events/spots/:id")
+  async updateEventSpot(
+    @Param("id", ParseUUIDPipe) eventSpotId: string,
+    @Body() body: UpdateEventSpot,
+    @CurrentUser() user: User
+  ) {
+    const eventSpot = await this.eventSpotsService.findById(eventSpotId);
+    if (!eventSpot) throw new NotFoundException("Event spot not found");
+
+    const { organization } = eventSpot.event.createdBy;
+
+    const member = await this.organizationsService.findMemberByUserId(
+      organization.id,
+      user.id
+    );
+
+    if (!member) throw new ForbiddenException("Not member of organization");
+    if (member.hasPermission(Permission.CreateEvent))
+      throw new ForbiddenException("Missing required permissions");
+
+    eventSpot.name = body.name ?? eventSpot.name;
+    eventSpot.capacity = body.capacity ?? eventSpot.capacity;
+    eventSpot.price = body.price ?? eventSpot.price;
+
+    return this.eventsService.save(eventSpot);
   }
 }
