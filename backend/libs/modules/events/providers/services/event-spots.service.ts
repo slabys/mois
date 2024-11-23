@@ -7,9 +7,7 @@ import { Repository } from "typeorm";
 export class EventSpotsService {
   constructor(
     @InjectRepository(EventSpot)
-    private readonly eventSpotRepository: Repository<EventSpot>,
-    @InjectRepository(EventApplication)
-    private readonly eventApplicationRepository: Repository<EventApplication>
+    private readonly eventSpotRepository: Repository<EventSpot>
   ) {}
 
   findById(id: EventSpot["id"]) {

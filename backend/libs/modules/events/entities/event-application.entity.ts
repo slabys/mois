@@ -3,11 +3,13 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
 } from "typeorm";
 import { User } from "modules/users";
 import { EventSpot } from "./event-spot.entity";
 import { Event } from "./event.entity";
 
+@Unique(["user", "event"])
 @Entity()
 export class EventApplication {
   @PrimaryGeneratedColumn()
