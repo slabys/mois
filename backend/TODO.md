@@ -1,24 +1,23 @@
 # TODO
 
 - Events
-  - Spot types
+  - [x] Spot types
     - Title
     - Count
     - Price
-  - Update photo (admin)
-  - Register users
-    - Spot updated by creator or admin
-    - Status
+  - [x] Update photo (admin)
+  - [ ] Register users
+    - [ ] Spot updated by creator or admin
+    - [ ] Status
       - Completed
       - Cancelled
-  - Register form
-  - Payment PDF
-  - Payment confirmation PDF/JPG/PNG
-  - Update
-  - Filter (registered users)
+  - [ ] Register form
+  - [ ] Payment PDF
+  - [ ] Payment confirmation PDF/JPG/PNG
+  - [ ] Update
+  - [ ] Filter (registered users)
     - Organization
     - Applicant name
     - Paid
   
-
-- My sent applications
+- [ ] My sent applications

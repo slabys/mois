@@ -13,9 +13,11 @@ import {
 import {
   ApiBearerAuth,
   ApiConsumes,
+  ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiNotFoundResponse,
-  ApiTags
+  ApiOkResponse,
+  ApiTags,
 } from "@nestjs/swagger";
 
 import { CookieGuard } from "modules/auth/providers/guards";
@@ -27,6 +29,7 @@ import { User } from "modules/users";
 import { FormDataRequest } from "nestjs-form-data";
 import { CurrentUser } from "../decorators";
 import { CreateEvent, UpdatePhoto } from "../models/requests";
+import { EventSimple } from "../models/responses";
 
 @ApiTags("Events")
 @Controller("events")
@@ -37,6 +40,7 @@ export class EventsController {
     private readonly photoService: PhotoService
   ) {}
 
+  @ApiOkResponse({ type: [EventSimple] })
   @Get("upcoming")
   upcomingEvents() {
     return this.eventsService.getUpcomingEvents();
@@ -47,6 +51,7 @@ export class EventsController {
    *
    * Organization permissions required: `create.event`
    */
+  @ApiCreatedResponse({ type: EventSimple, description: "Created event" })
   @ApiForbiddenResponse({
     description:
       "User is not member of event organization or does not have required permissions",
@@ -121,6 +126,6 @@ export class EventsController {
     if (!photo) new InternalServerErrorException("Could not save photo");
 
     event.photo = photo;
-    return this.eventsService.save(event);
+    await this.eventsService.save(event);
   }
 }
