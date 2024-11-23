@@ -25,7 +25,7 @@ export class EventApplication {
   // Spot, must be one of event spots
   @ManyToOne(() => EventSpot, {
     nullable: true,
-    onDelete: "CASCADE",
+    onDelete: "SET NULL",
   })
   spotType: EventSpot | null;
 
