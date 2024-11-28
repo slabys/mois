@@ -23,6 +23,8 @@ RUN yarn build
 FROM node:20-alpine AS runner
 
 ARG PORT_FE
+ARG NEXT_PUBLIC_APP1_URL
+RUN echo "NEXT_PUBLIC_APP1_URL=${NEXT_PUBLIC_APP1_URL}" >> .env.production
 
 # Set working directory
 WORKDIR /frontend/app
