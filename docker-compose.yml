@@ -16,7 +16,8 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: [ "CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} ${POSTGRES_DB}'" ]
+      test:
+        ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} ${POSTGRES_DB}'"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -53,6 +54,8 @@ services:
     depends_on:
       - database
       - database_run_migrations
+    labels:
+      - traefik.enable=false
 
   database_run_migrations:
     container_name: database_migrations
@@ -85,6 +88,8 @@ services:
     depends_on:
       - backend
       - database
+    labels:
+      - traefik.enable=false
 
 volumes:
   postgres_data:
