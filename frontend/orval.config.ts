@@ -1,4 +1,3 @@
-import { customInstance } from "@/utils/customInstance";
 import { defineConfig } from "orval";
 
 export default defineConfig({

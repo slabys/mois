@@ -1,19 +1,5 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  HttpStatus,
-  Post,
-  Res,
-  UseGuards,
-} from "@nestjs/common";
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiTags,
-  ApiUnauthorizedResponse,
-} from "@nestjs/swagger";
+import { Body, Controller, Delete, HttpStatus, Post, Res, UseGuards } from "@nestjs/common";
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
 
 import { CookieGuard, LocalGuard } from "modules/auth/providers/guards";
 import { CurrentUser } from "../decorators";
@@ -27,7 +13,8 @@ import { Response } from "express";
 @ApiTags("Auth")
 @Controller("auth")
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {
+  }
 
   /**
    * Try to login user with given email and password
@@ -41,7 +28,7 @@ export class AuthController {
   async loginUserWithEmail(
     @Body() data: LoginUser,
     @CurrentUser() user: User,
-    @Res({ passthrough: true }) response: Response
+    @Res({ passthrough: true }) response: Response,
   ) {
     const token = await this.authService.createToken(user);
 
@@ -49,6 +36,7 @@ export class AuthController {
       .cookie("AuthCookie", token, {
         httpOnly: true,
         secure: true,
+        sameSite: "lax",
         maxAge: 7 * 24 * 60 * 1_000,
       })
       .status(HttpStatus.OK)
@@ -57,7 +45,7 @@ export class AuthController {
 
   /**
    * Logout user
-   * @param response 
+   * @param response
    */
   @ApiOkResponse({ description: "User is no longer logged-in" })
   @ApiBearerAuth()
