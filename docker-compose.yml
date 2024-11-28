@@ -54,8 +54,6 @@ services:
     depends_on:
       - database
       - database_run_migrations
-    labels:
-      - traefik.enable=false
 
   database_run_migrations:
     container_name: database_migrations
@@ -88,8 +86,6 @@ services:
     depends_on:
       - backend
       - database
-    labels:
-      - traefik.enable=false
 
 volumes:
   postgres_data:

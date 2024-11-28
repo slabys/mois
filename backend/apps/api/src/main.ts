@@ -13,20 +13,8 @@ import { ExpressAdapter } from "@nestjs/platform-express";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, new ExpressAdapter());
-  //app.enableCors({ credentials: true, origin: true });
-
-  // const allowedOrigins = ['http://localhost:3000', 'http://example.com'];
 
   app.enableCors({
-    // TODO - possibility to limit origins
-    // origin: (origin, callback) => {
-    //   if (!origin || allowedOrigins.includes(origin)) {
-    //     callback(null, true);
-    //   } else {
-    //     callback(new Error('Not allowed by CORS'));
-    //   }
-    // },
-    
     // Allow all origins
     origin: true,
     credentials: true,
