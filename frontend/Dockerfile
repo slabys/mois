@@ -1,9 +1,6 @@
 # Use Node.js 20 as the base image for the build stage
 FROM node:20-alpine AS build
 
-ARG NEXT_PUBLIC_APP1_URL
-ENV NEXT_PUBLIC_APP1_URL=$NEXT_PUBLIC_APP1_URL
-
 # Set working directory
 WORKDIR /frontend/app
 
@@ -14,6 +11,11 @@ RUN yarn install
 # Copy all project files
 COPY . .
 
+ARG NEXT_PUBLIC_APP1_URL
+RUN echo "NEXT_PUBLIC_APP1_URL=${NEXT_PUBLIC_APP1_URL}" >> .env.production
+
+ENV NODE_ENV=production
+
 # Build the Next.js application
 RUN yarn build
 
@@ -21,8 +23,6 @@ RUN yarn build
 FROM node:20-alpine AS runner
 
 ARG PORT_FE
-ARG NEXT_PUBLIC_APP1_URL
-ENV NEXT_PUBLIC_APP1_URL=$NEXT_PUBLIC_APP1_URL
 
 # Set working directory
 WORKDIR /frontend/app
