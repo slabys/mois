@@ -5,6 +5,7 @@
  * The backend API description
  * OpenAPI spec version: 0.0.1
  */
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -18,7 +19,6 @@ import type {
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { useMutation, useQuery } from "@tanstack/react-query";
 
 import type {
   AccessToken,
@@ -33,8 +33,8 @@ import type {
   UpdateUser,
   User,
 } from "./api.schemas";
-import type { BodyType, ErrorType } from "./customInstance";
 import { customInstance } from "./customInstance";
+import type { BodyType, ErrorType } from "./customInstance";
 
 type SecondParameter<T extends (...args: any) => any> = Parameters<T>[1];
 
@@ -47,13 +47,7 @@ export const loginUserWithEmail = (
   signal?: AbortSignal,
 ) => {
   return customInstance<AccessToken>(
-    {
-      url: `http://localhost:4000/auth/login`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: loginUser,
-      signal,
-    },
+    { url: `/auth/login`, method: "POST", headers: { "Content-Type": "application/json" }, data: loginUser, signal },
     options,
   );
 };
@@ -112,7 +106,7 @@ export const useLoginUserWithEmail = <TError = ErrorType<void>, TContext = unkno
  * Logout user
  */
 export const logoutUser = (options?: SecondParameter<typeof customInstance>) => {
-  return customInstance<void>({ url: `http://localhost:4000/auth/logout`, method: "DELETE" }, options);
+  return customInstance<void>({ url: `/auth/logout`, method: "DELETE" }, options);
 };
 
 export const getLogoutUserMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
@@ -147,13 +141,7 @@ export const createUser = (
   signal?: AbortSignal,
 ) => {
   return customInstance<User>(
-    {
-      url: `http://localhost:4000/users`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: createUser,
-      signal,
-    },
+    { url: `/users`, method: "POST", headers: { "Content-Type": "application/json" }, data: createUser, signal },
     options,
   );
 };
@@ -203,12 +191,7 @@ export const updateCurrentUser = (
   options?: SecondParameter<typeof customInstance>,
 ) => {
   return customInstance<User>(
-    {
-      url: `http://localhost:4000/users`,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      data: updateUser,
-    },
+    { url: `/users`, method: "PATCH", headers: { "Content-Type": "application/json" }, data: updateUser },
     options,
   );
 };
@@ -264,11 +247,11 @@ export const useUpdateCurrentUser = <TError = ErrorType<unknown>, TContext = unk
 };
 
 export const getCurrentUser = (options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
-  return customInstance<User>({ url: `http://localhost:4000/users`, method: "GET", signal }, options);
+  return customInstance<User>({ url: `/users`, method: "GET", signal }, options);
 };
 
 export const getGetCurrentUserQueryKey = () => {
-  return [`http://localhost:4000/users`] as const;
+  return [`/users`] as const;
 };
 
 export const getGetCurrentUserQueryOptions = <
@@ -343,12 +326,7 @@ export const updateCurrentUserPhoto = (
   formData.append("file", updatePhoto.file);
 
   return customInstance<User>(
-    {
-      url: `http://localhost:4000/users/photo`,
-      method: "PATCH",
-      headers: { "Content-Type": "multipart/form-data" },
-      data: formData,
-    },
+    { url: `/users/photo`, method: "PATCH", headers: { "Content-Type": "multipart/form-data" }, data: formData },
     options,
   );
 };
@@ -410,13 +388,13 @@ export const userOrganizationMemberships = (
   signal?: AbortSignal,
 ) => {
   return customInstance<OrganizationMemberWithoutUser[]>(
-    { url: `http://localhost:4000/users/${id}/organizations`, method: "GET", signal },
+    { url: `/users/${id}/organizations`, method: "GET", signal },
     options,
   );
 };
 
 export const getUserOrganizationMembershipsQueryKey = (id: string) => {
-  return [`http://localhost:4000/users/${id}/organizations`] as const;
+  return [`/users/${id}/organizations`] as const;
 };
 
 export const getUserOrganizationMembershipsQueryOptions = <
@@ -507,11 +485,11 @@ export function useUserOrganizationMemberships<
 }
 
 export const getPhoto = (id: string, options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
-  return customInstance<void>({ url: `http://localhost:4000/photo/${id}`, method: "GET", signal }, options);
+  return customInstance<void>({ url: `/photo/${id}`, method: "GET", signal }, options);
 };
 
 export const getGetPhotoQueryKey = (id: string) => {
-  return [`http://localhost:4000/photo/${id}`] as const;
+  return [`/photo/${id}`] as const;
 };
 
 export const getGetPhotoQueryOptions = <TData = Awaited<ReturnType<typeof getPhoto>>, TError = ErrorType<void>>(
@@ -579,11 +557,11 @@ export function useGetPhoto<TData = Awaited<ReturnType<typeof getPhoto>>, TError
 }
 
 export const allOrganizations = (options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
-  return customInstance<Organization[]>({ url: `http://localhost:4000/organizations`, method: "GET", signal }, options);
+  return customInstance<Organization[]>({ url: `/organizations`, method: "GET", signal }, options);
 };
 
 export const getAllOrganizationsQueryKey = () => {
-  return [`http://localhost:4000/organizations`] as const;
+  return [`/organizations`] as const;
 };
 
 export const getAllOrganizationsQueryOptions = <
@@ -656,13 +634,13 @@ export const organizationMembers = (
   signal?: AbortSignal,
 ) => {
   return customInstance<OrganizationMemberWithoutOrganization[]>(
-    { url: `http://localhost:4000/organization/${id}/members`, method: "GET", signal },
+    { url: `/organization/${id}/members`, method: "GET", signal },
     options,
   );
 };
 
 export const getOrganizationMembersQueryKey = (id: string) => {
-  return [`http://localhost:4000/organization/${id}/members`] as const;
+  return [`/organization/${id}/members`] as const;
 };
 
 export const getOrganizationMembersQueryOptions = <
@@ -750,13 +728,13 @@ export const userOrganizationMembership = (
   signal?: AbortSignal,
 ) => {
   return customInstance<OrganizationMemberWithoutOrganization>(
-    { url: `http://localhost:4000/organization/${id}/membership`, method: "GET", signal },
+    { url: `/organization/${id}/membership`, method: "GET", signal },
     options,
   );
 };
 
 export const getUserOrganizationMembershipQueryKey = (id: string) => {
-  return [`http://localhost:4000/organization/${id}/membership`] as const;
+  return [`/organization/${id}/membership`] as const;
 };
 
 export const getUserOrganizationMembershipQueryOptions = <
@@ -845,11 +823,11 @@ export function useUserOrganizationMembership<
 }
 
 export const upcomingEvents = (options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
-  return customInstance<Event[]>({ url: `http://localhost:4000/events/upcoming`, method: "GET", signal }, options);
+  return customInstance<Event[]>({ url: `/events/upcoming`, method: "GET", signal }, options);
 };
 
 export const getUpcomingEventsQueryKey = () => {
-  return [`http://localhost:4000/events/upcoming`] as const;
+  return [`/events/upcoming`] as const;
 };
 
 export const getUpcomingEventsQueryOptions = <
@@ -919,7 +897,7 @@ export function useUpcomingEvents<
 /**
  * Create new event
 
- Organization permissions required: `create.event`
+Organization permissions required: `create.event`
  */
 export const createEvent = (
   organizationId: string,
@@ -929,7 +907,7 @@ export const createEvent = (
 ) => {
   return customInstance<Event>(
     {
-      url: `http://localhost:4000/events/${organizationId}`,
+      url: `/events/${organizationId}`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
       data: createEvent,
@@ -992,7 +970,7 @@ export const useCreateEvent = <TError = ErrorType<void>, TContext = unknown>(opt
 
 /**
  * Update event photo
- Organization permissions required: `create.event`
+Organization permissions required: `create.event`
  */
 export const updateEventPhoto = (
   eventId: string,
@@ -1003,12 +981,7 @@ export const updateEventPhoto = (
   formData.append("file", updatePhoto.file);
 
   return customInstance<Event>(
-    {
-      url: `http://localhost:4000/events/${eventId}`,
-      method: "PATCH",
-      headers: { "Content-Type": "multipart/form-data" },
-      data: formData,
-    },
+    { url: `/events/${eventId}`, method: "PATCH", headers: { "Content-Type": "multipart/form-data" }, data: formData },
     options,
   );
 };

@@ -15,7 +15,7 @@ COPY . .
 RUN yarn build
 
 # Production image
-FROM node:20-alpine as runner
+FROM node:20-alpine AS runner
 
 ARG PORT_FE
 

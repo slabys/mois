@@ -7,7 +7,6 @@ export default defineConfig({
       mode: "split",
       client: "react-query",
       target: "src/utils/api.ts",
-      baseUrl: "http://localhost:4000",
       override: {
         mutator: {
           path: "./src/utils/customInstance.ts",
@@ -16,7 +15,7 @@ export default defineConfig({
       },
     },
     input: {
-      target: "http://localhost:4000/api-json",
+      target: "https://api.slabys.cz/api-json",
     },
     hooks: {
       afterAllFilesWrite: ["yarn prettier --write ./src/utils/api.ts"],
