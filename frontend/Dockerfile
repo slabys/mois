@@ -1,6 +1,9 @@
 # Use Node.js 20 as the base image for the build stage
 FROM node:20-alpine AS build
 
+ARG NEXT_PUBLIC_APP1_URL
+ENV NEXT_PUBLIC_APP1_URL=$NEXT_PUBLIC_APP1_URL
+
 # Set working directory
 WORKDIR /frontend/app
 
@@ -18,6 +21,8 @@ RUN yarn build
 FROM node:20-alpine AS runner
 
 ARG PORT_FE
+ARG NEXT_PUBLIC_APP1_URL
+ENV NEXT_PUBLIC_APP1_URL=$NEXT_PUBLIC_APP1_URL
 
 # Set working directory
 WORKDIR /frontend/app
