@@ -36,7 +36,6 @@ export class AuthController {
       .cookie("AuthCookie", token, {
         httpOnly: true,
         secure: true,
-        sameSite: "none",
         maxAge: 7 * 24 * 60 * 1_000,
       })
       .status(HttpStatus.OK)
