@@ -16,7 +16,7 @@ async function bootstrap() {
 
   app.enableCors({
     // Allow all origins
-    origin: ["https://slabys.cz", "https://api.slabys.cz"],
+    origin: true,
     credentials: true,
   });
 
