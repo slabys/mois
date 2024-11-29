@@ -9,9 +9,6 @@ export const customInstance = <T>(config: AxiosRequestConfig, options?: AxiosReq
     ...config,
     ...options,
     withCredentials: true,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-    },
     cancelToken: source.token,
   }).then(({ data }) => data);
 
