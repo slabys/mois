@@ -38,6 +38,7 @@ export class AuthController {
         secure: true,
         sameSite: "none",
         maxAge: 7 * 24 * 60 * 1_000,
+        path: "/",
       })
       .status(HttpStatus.OK)
       .send(<AccessToken>{ accessToken: token });
