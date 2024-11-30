@@ -11,7 +11,7 @@ export const middleware = async (request: NextRequest) => {
   const path = request.nextUrl.pathname;
 
   // AUTH
-  if (request.cookies.has("AuthCookie")) {
+  if (!request.cookies.has("AuthCookie")) {
     if (notAuthorizedPaths.find((allowed) => path.startsWith(allowed))) {
       return NextResponse.redirect(new URL(routes.DASHBOARD, request.url));
     } else {
