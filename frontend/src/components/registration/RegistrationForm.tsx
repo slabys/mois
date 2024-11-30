@@ -8,7 +8,7 @@ import { Form, isNotEmpty, useForm } from "@mantine/form";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-const RegisterForm = () => {
+const RegistrationForm = () => {
   const router = useRouter();
   const registerUserMutation = useCreateUser({
     mutation: {
@@ -64,4 +64,4 @@ const RegisterForm = () => {
   );
 };
 
-export default RegisterForm;
+export default RegistrationForm;
