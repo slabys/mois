@@ -15,8 +15,7 @@ const AccountPage = () => {
     university: "Univerzita Karlova",
   });
 
-  //TODO: dodělat typescript
-  const handleInputChange = () => {
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
