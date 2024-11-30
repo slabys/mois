@@ -59,8 +59,12 @@ export class AuthController {
   @Delete("logout")
   async logoutUser(@Res({ passthrough: true }) response: Response) {
     response.clearCookie("AuthCookie", {
+      domain: "slabys.cz",
       sameSite: "none",
       secure: true,
+      expires: new Date(),
+      maxAge: 0,
+      path: "/",
     }).status(HttpStatus.OK);
   }
 }
