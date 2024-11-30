@@ -18,3 +18,14 @@ Install deps using: `pnpm install`
 ## Documentation
 
 Documentation is running at `/docs`. Usually `http://localhost:4000/docs`.
+
+
+## Apps
+
+- api
+- documents
+
+Run with `pnpm start:dev <app_name>`
+
+
+
