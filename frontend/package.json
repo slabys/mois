@@ -33,6 +33,7 @@
     "@types/react-dom": "^18",
     "@typescript-eslint/eslint-plugin": "^8.11.0",
     "@typescript-eslint/parser": "^8.11.0",
+    "cookies-next": "4.3.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "^15.0.1",
     "eslint-config-prettier": "^9.1.0",

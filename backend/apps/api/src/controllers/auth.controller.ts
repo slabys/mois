@@ -31,13 +31,18 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const token = await this.authService.createToken(user);
+    const expire = new Date();
+    expire.setTime(expire.getTime() + 7 * 24 * 60 * 60 * 1_000);
 
     response
       .cookie("AuthCookie", token, {
+        domain: "slabys.cz",
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        maxAge: 7 * 24 * 60 * 1_000,
+        partitioned: true,
+        expires: expire,
+        maxAge: 7 * 24 * 60 * 60 * 1_000,
         path: "/",
       })
       .status(HttpStatus.OK)
@@ -53,6 +58,9 @@ export class AuthController {
   @UseGuards(CookieGuard)
   @Delete("logout")
   async logoutUser(@Res({ passthrough: true }) response: Response) {
-    response.clearCookie("AuthCookie").status(HttpStatus.OK);
+    response.clearCookie("AuthCookie", {
+      sameSite: "none",
+      secure: true,
+    }).status(HttpStatus.OK);
   }
 }

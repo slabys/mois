@@ -12,8 +12,16 @@ const LoginForm = () => {
   const router = useRouter();
   const loginUserMutation = useLoginUserWithEmail({
     mutation: {
-      onSuccess: () => {
+      onSuccess: (data) => {
+        console.log("Login successful, redirecting...", data);
         router.push(routes.DASHBOARD);
+      },
+      onError: (error) => {
+        console.error("Login failed:", error);
+      },
+      onSettled: (settled, error, variables, context) => {
+        console.log("Login Settled:");
+        console.log(settled, error, variables, context);
       },
     },
   });
@@ -29,7 +37,7 @@ const LoginForm = () => {
     },
   });
 
-  const loginUser = (values: LoginUser) => {
+  const loginUser = async (values: LoginUser) => {
     loginUserMutation.mutate({
       data: values,
     });
