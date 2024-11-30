@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "jsx": "react",
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
@@ -20,9 +21,15 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "paths": {
-      "utilities/*": ["libs/utilities/*"],
-      "modules/*": ["libs/modules/*"],
-      "config/*": ["libs/config/*"]
+      "utilities/*": [
+        "libs/utilities/*"
+      ],
+      "modules/*": [
+        "libs/modules/*"
+      ],
+      "config/*": [
+        "libs/config/*"
+      ]
     }
   }
 }
