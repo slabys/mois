@@ -15,10 +15,7 @@
           "introspectComments": true,
           "controllerKeyOfComment": "description",
           "dtoKeyOfComment": "description",
-          "dtoFileNameSuffix": [
-            ".dto.ts",
-            ".entity.ts"
-          ]
+          "dtoFileNameSuffix": [".dto.ts", ".entity.ts"]
         }
       }
     ]
@@ -41,7 +38,10 @@
       "entryFile": "main",
       "sourceRoot": "apps/documents/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/documents/tsconfig.json"
+        "tsConfigPath": "apps/documents/tsconfig.json",
+        "assets": [
+            "**/*.ttf"
+        ]
       }
     }
   }
