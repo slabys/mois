@@ -9,7 +9,7 @@ export class DocumentsService implements OnApplicationBootstrap {
 
   async onApplicationBootstrap() {
     const buffer = await renderToBuffer(
-      SampleDocument({ text: "This is PDF content" })
+      SampleDocument({organization: "UHK", customer: "Jan Novák", text: "This is PDF content" })
     );
 
     await this.storageService.save("documents/sample.pdf", buffer);
