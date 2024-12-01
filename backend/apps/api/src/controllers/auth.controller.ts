@@ -31,17 +31,16 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const token = await this.authService.createToken(user);
-    const expire = new Date();
-    expire.setTime(expire.getTime() + 7 * 24 * 60 * 60 * 1_000);
+
+    const isProduction = process.env.NODE_ENV === "production";
 
     response
       .cookie("AuthCookie", token, {
-        domain: "slabys.cz",
+        // domain: isProduction ? process.env.WEB_URL : "localhost",
         httpOnly: true,
         secure: true,
         sameSite: "none",
-        partitioned: true,
-        expires: expire,
+        partitioned: isProduction,
         maxAge: 7 * 24 * 60 * 60 * 1_000,
         path: "/",
       })
@@ -58,14 +57,15 @@ export class AuthController {
   @UseGuards(CookieGuard)
   @Delete("logout")
   async logoutUser(@Res({ passthrough: true }) response: Response) {
+    const isProduction = process.env.NODE_ENV === "production";
+
     response.clearCookie("AuthCookie", {
-      domain: "slabys.cz",
+      // domain: isProduction ? process.env.WEB_URL : "localhost",
       httpOnly: true,
       secure: true,
       sameSite: "none",
+      partitioned: isProduction,
       maxAge: 0,
-      expires: new Date(),
-      partitioned: true,
       path: "/",
     }).status(HttpStatus.OK);
   }
