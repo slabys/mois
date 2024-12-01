@@ -4,6 +4,10 @@ import { Event } from "modules/events/entities";
 import slugify from "slugify";
 import { MoreThan, type Repository } from "typeorm";
 
+interface EventFindOptions {
+  visible?: boolean;
+}
+
 @Injectable()
 export class EventsService {
   constructor(
@@ -16,9 +20,9 @@ export class EventsService {
    * @param id Event ID
    * @returns
    */
-  findById(id: string) {
+  findById(id: string, options?: EventFindOptions) {
     return this.eventsRepository.findOne({
-      where: { id },
+      where: { id, visible: options?.visible },
       relations: {
         createdBy: {
           organization: true,
@@ -29,19 +33,15 @@ export class EventsService {
 
   /**
    * Find event by ID or slug
-   * @param idOrSlug ID or slug
+   * @param slug slug
    * @returns Event or null
    */
-  findByIdOrSlug(idOrSlug: string) {
+  findBySlug(slug: string, options?: EventFindOptions) {
     return this.eventsRepository.findOne({
-      where: [
-        {
-          id: idOrSlug,
-        },
-        {
-          slug: idOrSlug,
-        },
-      ],
+      where: {
+        slug,
+        visible: options?.visible,
+      },
       relations: {
         createdBy: {
           organization: true,
@@ -64,13 +64,14 @@ export class EventsService {
 
   /**
    * TODO: Add pagination
-   * All upcoming events
+   * All upcoming visible events
    * @returns {Event[]} Events
    */
-  getUpcomingEvents() {
+  getUpcomingEvents(options?: EventFindOptions) {
     return this.eventsRepository.find({
       where: {
         since: MoreThan(new Date()),
+        visible: options.visible,
       },
       relations: {
         createdBy: {

@@ -19,6 +19,7 @@ import {
   ApiOkResponse,
   ApiTags,
 } from "@nestjs/swagger";
+import { isUUID } from "class-validator";
 
 import { CookieGuard } from "modules/auth/providers/guards";
 import { Event, EventsService } from "modules/events";
@@ -40,10 +41,30 @@ export class EventsController {
     private readonly photoService: PhotoService
   ) {}
 
+  /**
+   * Find upcoming visible events
+   */
   @ApiOkResponse({ type: [EventSimple] })
   @Get("upcoming")
   upcomingEvents() {
     return this.eventsService.getUpcomingEvents();
+  }
+
+  /**
+   * Find event by ID or slug
+   */
+  @ApiOkResponse({ type: EventSimple, description: "Found event" })
+  @ApiNotFoundResponse({ description: "Event not found" })
+  @Get(":idOrSlug")
+  async getEvent(@Param("idOrSlug") idOrSlug: string) {
+    // Must be used different method for searching because postgres throws error if id is not UUID
+    const event = await (isUUID(idOrSlug)
+      ? this.eventsService.findById(idOrSlug, { visible: true })
+      : this.eventsService.findBySlug(idOrSlug, { visible: true }));
+
+    if (!event) throw new NotFoundException("Event not found");
+
+    return event;
   }
 
   /**
@@ -89,8 +110,7 @@ export class EventsController {
     return event;
   }
 
-
-  @ApiOkResponse({ type: EventSimple, description: "Updated event"})
+  @ApiOkResponse({ type: EventSimple, description: "Updated event" })
   @ApiForbiddenResponse({
     description:
       "User is not member of event organization or does not have required permissions",
@@ -103,7 +123,7 @@ export class EventsController {
     @CurrentUser() user: User,
     @Body() body: UpdateEvent
   ) {
-    const event = await this.eventsService.findById(eventId);
+    const event = await this.eventsService.findById(eventId, { visible: true });
     if (!event) throw new NotFoundException("Event not found");
 
     const membership = await this.organizationService.findMemberByUserId(
@@ -141,7 +161,7 @@ export class EventsController {
     @CurrentUser() user: User,
     @Body() body: UpdatePhoto
   ) {
-    const event = await this.eventsService.findById(eventId);
+    const event = await this.eventsService.findById(eventId, { visible: true });
     if (!event) throw new NotFoundException("Event not found");
 
     const membership = await this.organizationService.findMemberByUserId(
