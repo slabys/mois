@@ -36,7 +36,7 @@ export class AuthController {
 
     response
       .cookie("AuthCookie", token, {
-        // domain: isProduction ? process.env.WEB_URL : "localhost",
+        domain: isProduction ? process.env.WEB_URL : "localhost",
         httpOnly: true,
         secure: true,
         sameSite: "none",
@@ -60,7 +60,7 @@ export class AuthController {
     const isProduction = process.env.NODE_ENV === "production";
 
     response.clearCookie("AuthCookie", {
-      // domain: isProduction ? process.env.WEB_URL : "localhost",
+      domain: isProduction ? process.env.WEB_URL : "localhost",
       httpOnly: true,
       secure: true,
       sameSite: "none",
