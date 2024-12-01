@@ -34,6 +34,7 @@ import { CurrentUser } from "../decorators";
 import { User } from "modules/users";
 import { Permission } from "modules/roles";
 import { EventSpot } from "modules/events/entities";
+import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 
 const ApiEventIdParam = () => ApiParam({ name: "id", description: "Event ID" });
 
@@ -55,8 +56,11 @@ export class EventSpotsController {
   })
   @ApiEventIdParam()
   @Get("events/:id/spots")
-  getEventSpots(@Param("id", ParseUUIDPipe) eventId: string) {
-    return this.eventSpotsService.findByEventId(eventId);
+  getEventSpots(
+    @Param("id", ParseUUIDPipe) eventId: string,
+    @Pagination() pagination: PaginationOptions
+  ) {
+    return this.eventSpotsService.findByEventId(eventId, { pagination });
   }
 
   /**

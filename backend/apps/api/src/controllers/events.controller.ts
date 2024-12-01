@@ -32,6 +32,7 @@ import { User } from "modules/users";
 import { CurrentUser } from "../decorators";
 import { CreateEvent, UpdateEvent, UpdatePhoto } from "../models/requests";
 import { EventSimple } from "../models/responses";
+import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 
 @ApiTags("Events")
 @Controller("events")
@@ -47,8 +48,8 @@ export class EventsController {
    */
   @ApiOkResponse({ type: [EventSimple] })
   @Get("upcoming")
-  upcomingEvents() {
-    return this.eventsService.getUpcomingEvents();
+  upcomingEvents(@Pagination() pagination: PaginationOptions) {
+    return this.eventsService.getUpcomingEvents({ pagination, visible: true });
   }
 
   /**

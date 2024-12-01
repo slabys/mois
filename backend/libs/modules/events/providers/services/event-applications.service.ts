@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { FindManyOptions } from "libs/types";
 import { EventApplication } from "modules/events/entities";
 import { Repository } from "typeorm";
 
@@ -15,7 +16,7 @@ export class EventApplicationsService {
    * @param id User ID
    * @returns Array of user applications
    */
-  findByUserId(id: string) {
+  findByUserId(id: string, options?: FindManyOptions) {
     return this.eventApplicationRepository.find({
       where: {
         user: { id },
@@ -26,8 +27,10 @@ export class EventApplicationsService {
             organization: true,
           },
         },
-        spotType: true
+        spotType: true,
       },
+      take: options?.pagination?.take,
+      skip: options?.pagination?.skip,
     });
   }
 }

@@ -4,8 +4,9 @@ import slugify from "slugify";
 import { MoreThan, type Repository } from "typeorm";
 
 import { Event } from "modules/events/entities";
+import { FindManyOptions } from "libs/types";
 
-interface EventFindOptions {
+interface EventFindOptions extends FindManyOptions {
   visible?: boolean;
 }
 
@@ -86,6 +87,8 @@ export class EventsService {
       order: {
         since: "DESC",
       },
+      skip: options?.pagination?.skip,
+      take: options?.pagination?.take,
     });
   }
 }

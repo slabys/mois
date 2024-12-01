@@ -4,6 +4,7 @@ import { CookieGuard } from "modules/auth/providers/guards";
 import { EventApplicationsService } from "modules/events";
 import { CurrentUser } from "../decorators";
 import { User } from "modules/users";
+import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 
 @ApiTags("Event applications")
 @Controller("events/applications")
@@ -18,7 +19,10 @@ export class EventApplicationsController {
   @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Get()
-  getUserApplications(@CurrentUser() user: User) {
-    return this.eventApplicationsService.findByUserId(user.id);
+  getUserApplications(
+    @CurrentUser() user: User,
+    @Pagination() pagination: PaginationOptions
+  ) {
+    return this.eventApplicationsService.findByUserId(user.id, { pagination });
   }
 }
