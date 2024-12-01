@@ -1,72 +1,149 @@
+import { Document, Page, StyleSheet, View } from "@react-pdf/renderer";
 import React from "react";
-import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
+import {
+  Dates,
+  Header,
+  ItemsTable,
+  Payment,
+  PriceTotal,
+  Subject,
+} from "./invoice";
+import { EnhancedText } from "./text";
 
 const currentYear = new Date().getFullYear();
 
 // Create styles
 const styles = StyleSheet.create({
-  page: { 
-    padding: 30, 
-    flexDirection: 'column', 
-    justifyContent: 'space-between',
-    height: '100%'
+  page: {
+    padding: 30,
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
-  header: { fontSize: 15, marginBottom: 20, textAlign: 'center' },
+  row: {
+    display: "flex",
+    flexDirection: "row",
+  },
+  column: {
+    display: "flex",
+    flexDirection: "column",
+  },
+  subject: {
+    width: "50%",
+  },
+  header: { fontSize: 15, marginBottom: 20, textAlign: "center" },
   section: { marginBottom: 15 },
-  table: { marginTop: 10, width: '100%' },
-  tableRow: { flexDirection: 'row', borderBottom: '1 solid black' },
-  tableHeader: { backgroundColor: '#f3f3f3' },
-  tableCol: { flex: 1, padding: 5 },
-  tableCell: { fontSize: 10 },
-  tableCellSmall: { fontSize: 9 },
   content: { flexGrow: 1 },
-  footer: { marginTop: 20, textAlign: 'center', fontSize: 12 },
+  footer: { bottom: 0 },
 });
 
 interface SampleDocumentProps {
-  organization: string,
-  customer: string,
+  organization: string;
+  customer: string;
   text: string;
 }
 
 // Sample document with props
 export const SampleDocument = (props: SampleDocumentProps) => (
   <Document>
-    <Page size="A4" style={styles.page}>
-      {/* Header */}
-      <Text style={styles.header}>Faktura</Text>
-      <View style={styles.content}>
-      {/* Company and Client Info */}
-      <View style={styles.section}>
-        <Text>Organizace: {props.organization} </Text>
-        <Text>Zákazník: {props.customer}</Text>
+    <Page size="A4">
+      <View style={styles.page}>
+        {/* HEADER */}
+        <View style={{ paddingBottom: 20 }}>
+          <Header invoiceId={45646456} />
+        </View>
+        {/* Supplier / subscriber */}
+        <View style={styles.row}>
+          <View style={styles.subject}>
+            <EnhancedText fontSize={12} bold>
+              SUPPLIER
+            </EnhancedText>
+            <Subject
+              address={{
+                city: "Hradec Králové",
+                country: "Czech Republic",
+                houseNumber: "977/24",
+                region: "Nové Město",
+                street: "Senovážné náměstí",
+                zip: "110 00",
+              }}
+              name="Erasmus Student Network Česká republika z. s."
+              cin="22678123"
+              vatId="CZ22670874"
+            />
+          </View>
+          <View style={styles.subject}>
+            <EnhancedText fontSize={12} bold>
+              SUBSCRIBER
+            </EnhancedText>
+            <Subject
+              address={{
+                city: "Hradec Králové",
+                country: "Czech Republic",
+                houseNumber: "977/24",
+                region: "Nové Město",
+                street: "Senovážné náměstí",
+                zip: "110 00",
+              }}
+              name="Erasmus Student Network Česká republika z. s."
+            />
+          </View>
+        </View>
       </View>
 
-      {/* Items Table */}
-      <View style={styles.table}>
-        {/* Header Row */}
-        <View style={[styles.tableRow, styles.tableHeader]}>
-          <Text style={styles.tableCol}>Popis</Text>
-          <Text style={styles.tableCol}>Množství</Text>
-          <Text style={styles.tableCol}>Cena</Text>
-          <Text style={styles.tableCol}>Celkem</Text>
-        </View>
-        {/* Data Rows */}
-        <View style={styles.tableRow}>
-            <Text style={[styles.tableCol, styles.tableCellSmall]}>Test</Text>
-            <Text style={[styles.tableCol, styles.tableCellSmall]}>3</Text>
-            <Text style={[styles.tableCol, styles.tableCellSmall]}>4</Text>
-            <Text style={[styles.tableCol, styles.tableCellSmall]}>12</Text>
-        </View>
+      <View style={styles.row}>
+        <Payment
+          amount={1000}
+          receiverName="Hradec Králové"
+          ban="2100063040/2010"
+          paymentMethod="dsa"
+          variableSymbol={2024209}
+          swift="FIOBCZPPXXX"
+          iban="CZ0820100000002100063040"
+        />
+        <Dates dateOfIssue={new Date()} dueDate={new Date()} />
       </View>
 
-      {/* Total */}
-      <View style={styles.section}>
-      <Text style={styles.tableCol}>Celková cena: 12</Text>
+      <View style={styles.page}>
+        <ItemsTable
+          items={[
+            {
+              amount: 10,
+              name: "Položka",
+              unitPrice: 10,
+              vatRate: 21,
+            },
+            {
+              amount: 150,
+              name: "Položka",
+              unitPrice: 10,
+              vatRate: 21,
+            },
+            {
+              amount: 10,
+              name: "Položka",
+              unitPrice: 10,
+              vatRate: 21,
+            },
+            {
+              amount: 200,
+              name: "Položka",
+              unitPrice: 10,
+              vatRate: 21,
+            },
+            {
+              amount: 150,
+              name: "Položka",
+              unitPrice: 10,
+              vatRate: 21,
+            },
+          ]}
+        />
       </View>
-      </View>
-      {/* Footer */}
-      <Text style={styles.footer}>ESN {currentYear}</Text>
+      <PriceTotal total={5000} currency="CZK" />
+      {/* 
+      <Text style={styles.footer} fixed>
+        ESN {currentYear}
+      </Text> */}
     </Page>
   </Document>
 );
