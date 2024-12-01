@@ -20,6 +20,7 @@ import {
   ApiTags,
 } from "@nestjs/swagger";
 import { isUUID } from "class-validator";
+import { FormDataRequest } from "nestjs-form-data";
 
 import { CookieGuard } from "modules/auth/providers/guards";
 import { Event, EventsService } from "modules/events";
@@ -27,7 +28,7 @@ import { OrganizationService } from "modules/organization";
 import { PhotoService } from "modules/photo";
 import { Permission } from "modules/roles";
 import { User } from "modules/users";
-import { FormDataRequest } from "nestjs-form-data";
+
 import { CurrentUser } from "../decorators";
 import { CreateEvent, UpdateEvent, UpdatePhoto } from "../models/requests";
 import { EventSimple } from "../models/responses";

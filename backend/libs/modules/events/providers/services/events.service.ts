@@ -1,8 +1,9 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Event } from "modules/events/entities";
 import slugify from "slugify";
 import { MoreThan, type Repository } from "typeorm";
+
+import { Event } from "modules/events/entities";
 
 interface EventFindOptions {
   visible?: boolean;
@@ -32,7 +33,7 @@ export class EventsService {
   }
 
   /**
-   * Find event by ID or slug
+   * Find event by slug
    * @param slug slug
    * @returns Event or null
    */

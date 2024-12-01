@@ -6,5 +6,5 @@ export class DeleteEventSpot {
    */
   @IsOptional()
   @IsString()
-  replaceWithSpotId: string | null;
+  replaceWithSpotId?: string;
 }
