@@ -49,6 +49,9 @@ export class Event extends BaseEntity {
   @OneToMany(() => EventApplication, (application) => application.spotType)
   applications: EventApplication[];
 
+  @Column({ default: true })
+  visible: boolean;
+
   constructor(event?: Partial<Event>) {
     super();
 

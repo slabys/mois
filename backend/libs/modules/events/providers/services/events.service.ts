@@ -9,10 +9,7 @@ export class EventsService {
   constructor(
     @InjectRepository(Event)
     private readonly eventsRepository: Repository<Event>
-  )
-  {
-
-  }
+  ) {}
 
   /**
    * Find event by ID
@@ -22,6 +19,29 @@ export class EventsService {
   findById(id: string) {
     return this.eventsRepository.findOne({
       where: { id },
+      relations: {
+        createdBy: {
+          organization: true,
+        },
+      },
+    });
+  }
+
+  /**
+   * Find event by ID or slug
+   * @param idOrSlug ID or slug
+   * @returns Event or null
+   */
+  findByIdOrSlug(idOrSlug: string) {
+    return this.eventsRepository.findOne({
+      where: [
+        {
+          id: idOrSlug,
+        },
+        {
+          slug: idOrSlug,
+        },
+      ],
       relations: {
         createdBy: {
           organization: true,

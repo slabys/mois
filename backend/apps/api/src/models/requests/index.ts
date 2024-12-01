@@ -4,6 +4,6 @@ export * from "./create-user.dto";
 export * from "./delete-event-spot.dto";
 export * from "./login-user.dto";
 export * from "./update-event-spot.dto";
+export * from "./update-event.dto";
 export * from "./update-photo.dto";
 export * from "./update-user.dto";
-

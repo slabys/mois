@@ -28,7 +28,7 @@ import { Permission } from "modules/roles";
 import { User } from "modules/users";
 import { FormDataRequest } from "nestjs-form-data";
 import { CurrentUser } from "../decorators";
-import { CreateEvent, UpdatePhoto } from "../models/requests";
+import { CreateEvent, UpdateEvent, UpdatePhoto } from "../models/requests";
 import { EventSimple } from "../models/responses";
 
 @ApiTags("Events")
@@ -82,10 +82,44 @@ export class EventsController {
     event.since = body.since;
     event.until = body.until;
     event.createdBy = membership;
+    event.visible = body.visible;
 
     event = await this.eventsService.save(event);
     event.createdBy = undefined;
     return event;
+  }
+
+
+  @ApiOkResponse({ type: EventSimple, description: "Updated event"})
+  @ApiForbiddenResponse({
+    description:
+      "User is not member of event organization or does not have required permissions",
+  })
+  @ApiBearerAuth()
+  @UseGuards(CookieGuard)
+  @Patch(":eventId")
+  async updateEvent(
+    @Param("eventId") eventId: string,
+    @CurrentUser() user: User,
+    @Body() body: UpdateEvent
+  ) {
+    const event = await this.eventsService.findById(eventId);
+    if (!event) throw new NotFoundException("Event not found");
+
+    const membership = await this.organizationService.findMemberByUserId(
+      event.createdBy.organization.id,
+      user.id
+    );
+    if (!membership)
+      throw new ForbiddenException("You are not member of event organization");
+
+    if (!membership.hasPermission(Permission.CreateEvent))
+      throw new ForbiddenException(
+        "You dont have permission to create new event"
+      );
+
+    Object.assign(event, body);
+    return this.eventsService.save(event);
   }
 
   /**

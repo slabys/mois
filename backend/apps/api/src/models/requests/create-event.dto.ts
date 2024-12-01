@@ -12,4 +12,7 @@ export class CreateEvent {
 
   @MinLength(30)
   description: string;
+
+  @Allow()
+  visible?: boolean = true;
 }
