@@ -6,7 +6,7 @@ import { Dropzone } from "@components/Dropzone/Dropzone";
 import ImageEditor from "@components/ImageEditor/ImageEditor";
 import getCroppedImg from "@components/ImageEditor/imageEdit";
 import { Avatar, Box, Button, Container, Flex, Group, Image, Overlay, Stack, Text, TextInput } from "@mantine/core";
-import { hasLength, isNotEmpty, useForm } from "@mantine/form";
+import { Form, hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { useHover } from "@mantine/hooks";
 import { IconMoodEdit } from "@tabler/icons-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -39,21 +39,18 @@ const AccountPage = () => {
     ];
   }, [newUserPhoto]);
 
-  const { data: currentUser } = useGetCurrentUser();
+  const { data: currentUser, refetch: refetchCurrectUser } = useGetCurrentUser();
 
   const form = useForm<UpdateUser>({
-    mode: "uncontrolled",
     initialValues: {
       username: "",
       firstName: "",
       lastName: "",
-      password: "",
     },
     validate: {
       username: hasLength({ min: 6 }, "Must be at least 6 characters"),
       firstName: isNotEmpty("This field cannot be empty"),
       lastName: isNotEmpty("This field cannot be empty"),
-      password: hasLength({ min: 6 }, "Must be at least 6 characters"),
     },
   });
 
@@ -71,13 +68,19 @@ const AccountPage = () => {
   }, [currentUser]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateUserMutation = useUpdateCurrentUser({
-    request: {
-      data: form.values,
-    },
     mutation: {
-      onSuccess: ({}: UpdateUser) => {},
+      onSuccess: () => {
+        refetchCurrectUser();
+        setIsEditing(false);
+      },
     },
   });
+
+  const handleUpdateUser = (values: UpdateUser) => {
+    updateUserMutation.mutate({
+      data: form.values,
+    });
+  };
 
   const isTouchedDirty = form.isTouched() && form.isDirty();
 
@@ -185,7 +188,7 @@ const AccountPage = () => {
         )}
       </Flex>
 
-      <form>
+      <Form form={form} onSubmit={handleUpdateUser}>
         <TextInput label="First name" {...form.getInputProps("firstName")} disabled={!isEditing} />
         <TextInput label="Second name" {...form.getInputProps("lastName")} disabled={!isEditing} />
         <TextInput label="Username" {...form.getInputProps("username")} disabled={!isEditing} />
@@ -197,11 +200,11 @@ const AccountPage = () => {
           >
             {isEditing ? "Cancel" : "Edit Info"}
           </Button>
-          <Button disabled={!isTouchedDirty} loading={updateUserMutation.isPending}>
+          <Button type="submit" disabled={!isTouchedDirty} loading={updateUserMutation.isPending}>
             Save changes
           </Button>
         </Group>
-      </form>
+      </Form>
     </Container>
   );
 };
