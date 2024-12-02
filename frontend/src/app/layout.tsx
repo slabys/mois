@@ -3,6 +3,7 @@ import Providers from "@components/layout/Providers";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
+import "@mantine/notifications/styles.css";
 import type { Metadata } from "next";
 import React from "react";
 

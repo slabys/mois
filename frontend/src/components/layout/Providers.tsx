@@ -1,5 +1,6 @@
 "use client";
 
+import { Notifications } from "@mantine/notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useMemo } from "react";
 
@@ -19,7 +20,12 @@ const Providers = ({ children }: ProvidersProps) => {
       }),
     [],
   );
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Notifications />
+      {children}
+    </QueryClientProvider>
+  );
 };
 
 export default Providers;

@@ -41,11 +41,11 @@ const mockData: Event[] = [
   },
 ];
 
-const ManageEventsPage = () => {
+const SentApplicationsPage = () => {
   return (
     <Container size="xl">
       <Stack>
-        <Title>Manage Events</Title>
+        <Title>Sent Applications</Title>
         {mockData && (
           <Stack>
             {mockData?.length >= 0 ? (
@@ -69,4 +69,4 @@ const ManageEventsPage = () => {
   );
 };
 
-export default ManageEventsPage;
+export default SentApplicationsPage;

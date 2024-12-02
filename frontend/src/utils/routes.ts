@@ -11,6 +11,10 @@ export const routes = {
   SENT_APPLICATIONS: "/sent-applications",
   ACCOUNT: "/account",
   EVENT_DETAIL: (props: { id: string }) => `/event/${props.id}`,
+
+  // Footer
+  PRIVACY_POLICY: "/privacy-policy",
+  TERMS_AND_CONDITIONS: "/terms-and-conditions",
 };
 
 export default routes;
