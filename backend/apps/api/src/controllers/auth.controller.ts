@@ -9,6 +9,7 @@ import { AccessToken } from "../models/responses";
 import { AuthService } from "modules/auth";
 import { User } from "modules/users";
 import { Response } from "express";
+import { isProduction } from "utilities/env";
 
 @ApiTags("Auth")
 @Controller("auth")
@@ -31,9 +32,6 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     const token = await this.authService.createToken(user);
-
-    const isProduction = process.env.NODE_ENV === "production";
-
     response
       .cookie("AuthCookie", token, {
         domain: isProduction ? process.env.WEB_DOMAIN : "localhost",
@@ -57,8 +55,6 @@ export class AuthController {
   @UseGuards(CookieGuard)
   @Delete("logout")
   async logoutUser(@Res({ passthrough: true }) response: Response) {
-    const isProduction = process.env.NODE_ENV === "production";
-
     response.clearCookie("AuthCookie", {
       domain: isProduction ? process.env.WEB_DOMAIN : "localhost",
       httpOnly: true,

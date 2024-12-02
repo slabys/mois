@@ -7,10 +7,10 @@ export const routes = {
 
   // --- Authorized ---
   DASHBOARD: "/",
-  MANAGE_EVENTS: "/events",
+  MANAGE_EVENTS: "/manage-events",
   SENT_APPLICATIONS: "/sent-applications",
   ACCOUNT: "/account",
-  EVENT_DETAIL: (props: { id: number }) => `/event/${props.id}`,
+  EVENT_DETAIL: (props: { id: string }) => `/event/${props.id}`,
 };
 
 export default routes;

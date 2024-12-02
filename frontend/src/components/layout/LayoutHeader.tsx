@@ -1,6 +1,6 @@
 "use client";
 
-import { useLogoutUser } from "@/utils/api";
+import { useGetCurrentUser, useLogoutUser } from "@/utils/api";
 import routes from "@/utils/routes";
 import styles from "@components/layout/LayoutHeader.module.css";
 import { Anchor, Box, Burger, Button, Container, Divider, Drawer, Group, Image, Menu, Stack } from "@mantine/core";
@@ -31,6 +31,8 @@ const LayoutHeader = () => {
     },
   });
 
+  const { data: currentUser } = useGetCurrentUser();
+
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
   const [active, setActive] = useState(0);
 
@@ -40,9 +42,7 @@ const LayoutHeader = () => {
       key={item.label}
       className={styles.mainLink}
       data-active={index === active || undefined}
-      onClick={(event) => {
-        // TODO - remove when pages exists
-        event.preventDefault();
+      onClick={() => {
         setActive(index);
       }}
     >
@@ -69,11 +69,13 @@ const LayoutHeader = () => {
                   fw={700}
                   rightSection={<IconChevronDown size={16} stroke={2} />}
                 >
-                  email@email.com
+                  {currentUser?.email}
                 </Button>
               </Menu.Target>
               <Menu.Dropdown>
-                <Menu.Item leftSection={<IconUser size={16} stroke={1.5} />}>Account</Menu.Item>
+                <Anchor href={routes.ACCOUNT} underline="never">
+                  <Menu.Item leftSection={<IconUser size={16} stroke={1.5} />}>Account</Menu.Item>
+                </Anchor>
                 <Menu.Divider />
                 <Menu.Item leftSection={<IconLogout size={16} stroke={1.5} />} onClick={() => logoutMutation.mutate()}>
                   Logout

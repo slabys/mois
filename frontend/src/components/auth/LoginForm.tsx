@@ -19,10 +19,6 @@ const LoginForm = () => {
       onError: (error) => {
         console.error("Login failed:", error);
       },
-      onSettled: (settled, error, variables, context) => {
-        console.log("Login Settled:");
-        console.log(settled, error, variables, context);
-      },
     },
   });
 

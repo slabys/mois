@@ -15,6 +15,7 @@
   "dependencies": {
     "@mantine/core": "^7.14.1",
     "@mantine/dates": "^7.14.1",
+    "@mantine/dropzone": "^7.14.3",
     "@mantine/form": "^7.14.1",
     "@mantine/hooks": "^7.14.1",
     "@tabler/icons-react": "^3.23.0",
@@ -24,7 +25,8 @@
     "dayjs": "^1.11.13",
     "next": "14.2.18",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-easy-crop": "^5.2.0"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
