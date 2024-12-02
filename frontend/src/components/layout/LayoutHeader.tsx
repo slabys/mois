@@ -7,8 +7,8 @@ import { Anchor, Box, Burger, Button, Container, Divider, Drawer, Group, Image, 
 import { useDisclosure } from "@mantine/hooks";
 import { IconChevronDown, IconLogout, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 interface MainLinksProps {
   link: string;
@@ -23,6 +23,8 @@ const mainLinks: MainLinksProps[] = [
 
 const LayoutHeader = () => {
   const router = useRouter();
+  const pathname = usePathname();
+
   const logoutMutation = useLogoutUser({
     mutation: {
       onSuccess: () => {
@@ -34,17 +36,17 @@ const LayoutHeader = () => {
   const { data: currentUser } = useGetCurrentUser();
 
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
-  const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    closeDrawer();
+  }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const mainItems = mainLinks.map((item, index) => (
     <Anchor
+      key={`main-link-${index}-${item.label}`}
       href={item.link}
-      key={item.label}
       className={styles.mainLink}
-      data-active={index === active || undefined}
-      onClick={() => {
-        setActive(index);
-      }}
+      data-active={pathname === item.link || undefined}
     >
       {item.label}
     </Anchor>
@@ -68,6 +70,7 @@ const LayoutHeader = () => {
                   fs="14px"
                   fw={700}
                   rightSection={<IconChevronDown size={16} stroke={2} />}
+                  loading={!currentUser?.email}
                 >
                   {currentUser?.email}
                 </Button>
@@ -87,13 +90,12 @@ const LayoutHeader = () => {
 
         <Burger opened={drawerOpened} onClick={toggleDrawer} size="sm" hiddenFrom="sm" />
       </Container>
-      {/*TODO - user*/}
       <Drawer
         opened={drawerOpened}
         onClose={closeDrawer}
         size="100%"
         padding="md"
-        title="email@email.com"
+        title={currentUser?.email}
         hiddenFrom="sm"
         zIndex={1000000}
       >

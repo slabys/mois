@@ -2,31 +2,36 @@
 
 import { useUpcomingEvents } from "@/utils/api";
 import routes from "@/utils/routes";
-import EventSummaryCard from "@components/homepage/EventSummaryCard";
-import { Anchor, Container, Stack, Text, Title } from "@mantine/core";
+import EventCard from "@components/events/EventCard";
+import { Anchor, Center, Container, Loader, Stack, Text, Title } from "@mantine/core";
 
 const Home = () => {
   const { data: upcomingEvents } = useUpcomingEvents();
+
   return (
     <Container size="xl">
       <Stack>
         <Title>Upcoming Events</Title>
-        {upcomingEvents && (
+        {upcomingEvents ? (
           <Stack>
-            {upcomingEvents?.length >= 0 ? (
-              upcomingEvents?.map((event, index) => (
+            {upcomingEvents.length > 0 ? (
+              upcomingEvents.map((event, index) => (
                 <Anchor
                   key={`event-card-${index}-${event.id}`}
                   href={routes.EVENT_DETAIL({ id: event.id })}
                   underline="never"
                 >
-                  <EventSummaryCard event={event} />
+                  <EventCard event={event} />
                 </Anchor>
               ))
             ) : (
               <Text>No upcoming events</Text>
             )}
           </Stack>
+        ) : (
+          <Center>
+            <Loader />
+          </Center>
         )}
       </Stack>
     </Container>

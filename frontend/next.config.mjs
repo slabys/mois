@@ -1,3 +1,13 @@
+import withPWAInit from "@ducanh2912/next-pwa";
+
+const withPWA = withPWAInit({
+  dest: "public",
+  scope: "/",
+  workboxOptions: {
+    disableDevLogs: true,
+  },
+});
+
 /** @type {import("next").NextConfig} */
 const nextConfig = {
   output: "standalone",
@@ -12,4 +22,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withPWA(nextConfig);
