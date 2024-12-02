@@ -2,6 +2,7 @@ import routes from "@/utils/routes";
 import LoginForm from "@components/auth/LoginForm";
 import { Anchor, Container, Flex, Title } from "@mantine/core";
 import { IconArrowRight } from "@tabler/icons-react";
+import Link from "next/link";
 
 const LoginPage = () => {
   return (
@@ -12,7 +13,7 @@ const LoginPage = () => {
           <LoginForm />
         </Flex>
         <Flex justify="end" w="100%" maw={512}>
-          <Anchor href={routes.REGISTER} display="flex">
+          <Anchor component={Link} href={routes.REGISTER} display="flex">
             <IconArrowRight />
             Register
           </Anchor>

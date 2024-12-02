@@ -6,8 +6,9 @@ import { Dropzone } from "@components/Dropzone/Dropzone";
 import ImageEditor from "@components/ImageEditor/ImageEditor";
 import getCroppedImg from "@components/ImageEditor/imageEdit";
 import { Avatar, Box, Button, Container, Flex, Group, Image, Overlay, Stack, Text, TextInput } from "@mantine/core";
-import { Form, hasLength, isNotEmpty, useForm } from "@mantine/form";
+import { Form, isNotEmpty, useForm } from "@mantine/form";
 import { useHover } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import { IconMoodEdit } from "@tabler/icons-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FileWithPath } from "react-dropzone-esm";
@@ -48,7 +49,7 @@ const AccountPage = () => {
       lastName: "",
     },
     validate: {
-      username: hasLength({ min: 6 }, "Must be at least 6 characters"),
+      // username: hasLength({ min: 6 }, "Must be at least 6 characters"),
       firstName: isNotEmpty("This field cannot be empty"),
       lastName: isNotEmpty("This field cannot be empty"),
     },
@@ -69,9 +70,47 @@ const AccountPage = () => {
 
   const updateUserMutation = useUpdateCurrentUser({
     mutation: {
+      onMutate: () => {
+        notifications.show({
+          id: "user-mutation",
+          loading: true,
+          title: "Loading! Please wait...",
+          message: "We are updating your information.",
+          autoClose: false,
+        });
+      },
       onSuccess: () => {
+        notifications.update({
+          id: "user-mutation",
+          title: "Account Edit",
+          message: "Account information updated successfully.",
+          color: "green",
+          loading: false,
+          autoClose: true,
+        });
         refetchCurrectUser();
         setIsEditing(false);
+      },
+      onError: (error) => {
+        notifications.update({
+          id: "user-mutation",
+          title: "Something went wrong.",
+          message: "Please check all information first. Then try again.",
+          color: "red",
+          loading: false,
+          autoClose: true,
+        });
+        // @ts-ignore - message
+        if (error.response?.data && error.response.data.message) {
+          // @ts-ignore - message
+          (error.response.data.message as string[]).forEach((err) => {
+            notifications.show({
+              title: "Error",
+              message: err,
+              color: "red",
+            });
+          });
+        }
       },
     },
   });
@@ -86,9 +125,48 @@ const AccountPage = () => {
 
   const updateUserPhotoMutation = useUpdateCurrentUserPhoto({
     mutation: {
+      onMutate: () => {
+        notifications.show({
+          id: "photo-update-mutation",
+          loading: true,
+          title: "Loading! Please wait...",
+          message: "We are updating your photo information.",
+          autoClose: false,
+        });
+      },
       onSuccess: () => {
+        notifications.update({
+          id: "photo-update-mutation",
+          title: "Update User Photo",
+          message: "Account photo updated successfully.",
+          color: "green",
+          loading: false,
+          autoClose: true,
+        });
         setCroppedArea(null);
         setNewUserPhoto(null);
+        refetchCurrectUser();
+      },
+      onError: (error) => {
+        notifications.update({
+          id: "photo-update-mutation",
+          title: "Something went wrong.",
+          message: "Please, try again.",
+          color: "red",
+          loading: false,
+          autoClose: true,
+        });
+        // @ts-ignore - message
+        if (error.response?.data && error.response.data.message) {
+          // @ts-ignore - message
+          (error.response.data.message as string[]).forEach((err) => {
+            notifications.show({
+              title: "Error",
+              message: err,
+              color: "red",
+            });
+          });
+        }
       },
     },
   });

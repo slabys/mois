@@ -4,7 +4,8 @@ import { useCreateUser } from "@/utils/api";
 import { CreateUser } from "@/utils/api.schemas";
 import routes from "@/utils/routes";
 import { Box, Button, Flex, Text, TextInput } from "@mantine/core";
-import { Form, isNotEmpty, useForm } from "@mantine/form";
+import { Form, hasLength, isNotEmpty, useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
 import React from "react";
 
@@ -13,7 +14,25 @@ const RegistrationForm = () => {
   const registerUserMutation = useCreateUser({
     mutation: {
       onSuccess: () => {
+        notifications.show({
+          title: "Registration",
+          message: "You have registered successfully!",
+          color: "green",
+        });
         router.push(routes.LOGIN);
+      },
+      onError: (error) => {
+        // @ts-ignore - message
+        if (error.response?.data && error.response.data.message) {
+          // @ts-ignore - message
+          (error.response.data.message as string[]).forEach((err) => {
+            notifications.show({
+              title: "Error",
+              message: err,
+              color: "red",
+            });
+          });
+        }
       },
     },
   });
@@ -28,9 +47,9 @@ const RegistrationForm = () => {
       universityId: "",
     },
     validate: {
-      email: isNotEmpty("Username can not be empty."),
-      username: isNotEmpty("Username can not be empty."),
-      password: isNotEmpty("Password can not be empty."),
+      // email: isEmail("E-mail is not valid."),
+      // username: hasLength({ min: 6 }, "Must be at least 6 characters"),
+      password: hasLength({ min: 6 }, "Must be at least 6 characters"),
       firstName: isNotEmpty("Password can not be empty."),
       lastName: isNotEmpty("Password can not be empty."),
     },
@@ -57,7 +76,9 @@ const RegistrationForm = () => {
             Register
           </Button>
           {/* Register ERROR */}
-          {registerUserMutation.isError && <Text c="red">Something went wrong! Please try again.</Text>}
+          <Flex direction="row">
+            {registerUserMutation.isError && <Text c="red">Something went wrong! Please try again.</Text>}
+          </Flex>
         </Flex>
       </Form>
     </Box>

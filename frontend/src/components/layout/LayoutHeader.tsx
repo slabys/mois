@@ -8,7 +8,6 @@ import { useDisclosure } from "@mantine/hooks";
 import { IconChevronDown, IconLogout, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 interface MainLinksProps {
   link: string;
@@ -37,16 +36,16 @@ const LayoutHeader = () => {
 
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
 
-  useEffect(() => {
-    closeDrawer();
-  }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
-
   const mainItems = mainLinks.map((item, index) => (
     <Anchor
+      component={Link}
       key={`main-link-${index}-${item.label}`}
       href={item.link}
       className={styles.mainLink}
       data-active={pathname === item.link || undefined}
+      onClick={() => {
+        closeDrawer();
+      }}
     >
       {item.label}
     </Anchor>
@@ -55,7 +54,7 @@ const LayoutHeader = () => {
   return (
     <header className={styles.header}>
       <Container size="xl" className={styles.inner}>
-        <Anchor href={routes.DASHBOARD}>
+        <Anchor component={Link} href={routes.DASHBOARD}>
           <Image src="/logo_esncz.png" alt="LOGO" height={84} width="100%" />
         </Anchor>
         <Box className={styles.links} visibleFrom="sm">
@@ -76,11 +75,17 @@ const LayoutHeader = () => {
                 </Button>
               </Menu.Target>
               <Menu.Dropdown>
-                <Anchor href={routes.ACCOUNT} underline="never">
+                <Anchor component={Link} href={routes.ACCOUNT} underline="never" onClick={closeDrawer}>
                   <Menu.Item leftSection={<IconUser size={16} stroke={1.5} />}>Account</Menu.Item>
                 </Anchor>
                 <Menu.Divider />
-                <Menu.Item leftSection={<IconLogout size={16} stroke={1.5} />} onClick={() => logoutMutation.mutate()}>
+                <Menu.Item
+                  leftSection={<IconLogout size={16} stroke={1.5} />}
+                  onClick={() => {
+                    logoutMutation.mutate();
+                    closeDrawer();
+                  }}
+                >
                   Logout
                 </Menu.Item>
               </Menu.Dropdown>
@@ -108,10 +113,21 @@ const LayoutHeader = () => {
         <Divider my="sm" />
 
         <Group justify="center" grow pb="xl" px="md">
-          <Button component={Link} href={routes.ACCOUNT} leftSection={<IconUser size={16} stroke={1.5} />}>
+          <Button
+            component={Link}
+            href={routes.ACCOUNT}
+            onClick={closeDrawer}
+            leftSection={<IconUser size={16} stroke={1.5} />}
+          >
             Account
           </Button>
-          <Button leftSection={<IconLogout size={16} stroke={1.5} />} onClick={() => logoutMutation.mutate()}>
+          <Button
+            leftSection={<IconLogout size={16} stroke={1.5} />}
+            onClick={() => {
+              logoutMutation.mutate();
+              closeDrawer();
+            }}
+          >
             Logout
           </Button>
         </Group>
