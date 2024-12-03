@@ -30,7 +30,6 @@ const UseFetchAllEvents = async () => {
 
 export async function generateStaticParams() {
   const eventsPaths = UseFetchAllEvents();
-  console.log(eventsPaths);
   return eventsPaths;
 }
 
