@@ -26,6 +26,7 @@
     "migration:revert": "pnpm typeorm -d ./libs/config/typeorm.config.ts migration:revert"
   },
   "dependencies": {
+    "@ag-media/react-pdf-table": "^1.0.1",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.3.0",
     "@nestjs/core": "^10.0.0",

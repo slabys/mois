@@ -22,7 +22,19 @@ interface PriceTotalProps {
 
 export const PriceTotal = (props: PriceTotalProps) => {
   return (
-    <View style={[styles.row, styles.background, { padding: 15, width: 350, paddingRight: 30 }]}>
+    <View
+      style={[
+        styles.row,
+        styles.background,
+        {
+          padding: 15,
+          paddingRight: 40,
+          width: "auto",
+          display: "flex",
+          justifyContent: "flex-end",
+        },
+      ]}
+    >
       <EnhancedText bold fontSize={16} style={{ paddingRight: 40 }}>
         Total amount
       </EnhancedText>
