@@ -90,7 +90,9 @@ export class UsersController {
     user.lastName = body.lastName ?? user.lastName;
     user.username = body.username ?? user.username;
 
-    return this.usersService.save(user);
+    const newUser = await this.usersService.save(user);
+    newUser.password = undefined;
+    return newUser;
   }
 
   @ApiOkResponse({ type: User, description: "Current user data" })
