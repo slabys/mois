@@ -10,22 +10,24 @@ import {
   Index,
   ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
 } from "typeorm";
 
 import { hashPassword } from "modules/auth/utilities/crypto";
 import { Photo } from "modules/photo/entities";
 
+@Index(["email", "username"])
 @Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Index()
-  @Column()
+  @Column({ unique: true })
   email: string;
 
-  @Column()
+  @Index()
+  @Column({ unique: true })
   username: string;
 
   @Column()

@@ -9,6 +9,7 @@ import {
 } from "@nestjs/common";
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiTags,
@@ -18,7 +19,7 @@ import type { Response } from "express";
 
 import { CookieGuard, LocalGuard } from "modules/auth/providers/guards";
 import { CurrentUser } from "../decorators";
-import type { LoginUser } from "../models/requests";
+import { LoginUser } from "../models/requests";
 import { AccessToken } from "../models/responses";
 
 import { AuthService } from "modules/auth";
@@ -33,6 +34,7 @@ export class AuthController {
   /**
    * Try to login user with given email and password
    */
+  @ApiBody({ type: LoginUser })
   @ApiUnauthorizedResponse({
     description: "Invalid password or user does not exist",
   })

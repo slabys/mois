@@ -14,12 +14,12 @@ export class AuthService {
 
   /**
    * Validate user email and password in database
-   * @param email User email
+   * @param emailOrUsername User email
    * @param password User password
    * @returns {UserFindByEmailResult | null} Null if password does not match
    */
-  async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await this.usersService.findByEmailWithPassword(email);
+  async validateUser(emailOrUsername: string, password: string): Promise<User | null> {
+    const user = await this.usersService.findByUsernameOrEmailWithPassword(emailOrUsername);
     if (!user) return null;
 
     const result = await verifyPassword(password, user.password);
