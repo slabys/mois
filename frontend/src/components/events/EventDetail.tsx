@@ -12,7 +12,6 @@ interface EventDetailProps {
 
 const EventDetail = ({ id }: EventDetailProps) => {
   const { data: eventDetail } = useGetEvent(id);
-  console.log(eventDetail);
   return eventDetail ? (
     <Grid>
       <Grid.Col span={{ base: 12, md: 9 }} order={{ base: 2, md: 1 }}>
