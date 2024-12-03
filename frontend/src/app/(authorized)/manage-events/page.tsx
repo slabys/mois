@@ -1,8 +1,5 @@
 import type { Event } from "@/utils/api.schemas";
-import routes from "@/utils/routes";
-import EventCard from "@components/events/EventCard";
-import { Anchor, Container, Stack, Text, Title } from "@mantine/core";
-import Link from "next/link";
+import { Button, Container, Image, Stack, Table, TableTbody, TableTd, TableThead, TableTr, Title } from "@mantine/core";
 
 const mockData: Event[] = [
   {
@@ -42,28 +39,59 @@ const mockData: Event[] = [
 ];
 
 const ManageEventsPage = () => {
+  const elements = [
+    { photo: 6, name: 12.011, description: "C" },
+    { photo: 7, name: 14.007, description: "N" },
+    { photo: 39, name: 88.906, description: "Y" },
+    { photo: 56, name: 137.33, description: "Ba" },
+    { photo: 58, name: 140.12, description: "Ce" },
+  ];
+
+  const rows = elements.map((element) => (
+    <tr key={element.name}>
+      <TableThead>
+        <Image
+          src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"
+          h={75}
+          w="auto"
+          fit="contain"
+        />
+      </TableThead>
+      <TableTd>{element.description}</TableTd>
+      <TableTd>{element.description}</TableTd>
+      <TableTd>
+        <Button>Manage Event</Button>
+      </TableTd>
+      <TableTd>
+        <Button>Manage People</Button>
+      </TableTd>
+      <TableTd>
+        <Button>Duplicate</Button>
+      </TableTd>
+      <TableTd>
+        <Button>Delete</Button>
+      </TableTd>
+    </tr>
+  ));
+
   return (
     <Container size="xl">
       <Stack>
         <Title>Manage Events</Title>
-        {mockData && (
-          <Stack>
-            {mockData?.length >= 0 ? (
-              mockData?.map((event, index) => (
-                <Anchor
-                  component={Link}
-                  key={`event-card-${index}-${event.id}`}
-                  href={routes.EVENT_DETAIL({ id: event.id })}
-                  underline="never"
-                >
-                  <EventCard event={event} />
-                </Anchor>
-              ))
-            ) : (
-              <Text>No upcoming events</Text>
-            )}
-          </Stack>
-        )}
+        <Table withTableBorder withColumnBorders withRowBorders>
+          <TableThead>
+            <TableTr>
+              <TableTd>Photo</TableTd>
+              <TableTd>Name</TableTd>
+              <TableTd>Description</TableTd>
+              <TableTd>Manage Event</TableTd>
+              <TableTd>Manage People</TableTd>
+              <TableTd>Duplicate</TableTd>
+              <TableTd>Delete</TableTd>
+            </TableTr>
+          </TableThead>
+          <TableTbody>{rows}</TableTbody>
+        </Table>
       </Stack>
     </Container>
   );
