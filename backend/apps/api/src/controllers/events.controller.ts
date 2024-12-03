@@ -23,9 +23,9 @@ import { isUUID } from "class-validator";
 import { FormDataRequest } from "nestjs-form-data";
 
 import { CookieGuard } from "modules/auth/providers/guards";
-import { Event, type EventsService } from "modules/events";
-import type { OrganizationService } from "modules/organization";
-import type { PhotoService } from "modules/photo";
+import { Event, EventsService } from "modules/events";
+import { OrganizationService } from "modules/organization";
+import { PhotoService } from "modules/photo";
 import { Permission } from "modules/roles";
 import type { User } from "modules/users";
 
