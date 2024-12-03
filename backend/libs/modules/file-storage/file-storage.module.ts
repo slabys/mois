@@ -1,23 +1,34 @@
+import path from "node:path";
 import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { ServeStaticModule } from "@nestjs/serve-static";
+
 import { FileStorageService } from "./providers/services";
 
+// STORAGE_ROUTER_PREFIX
 @Module({
   imports: [
     ConfigModule.forRoot(),
     ServeStaticModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => [
-        {
-          rootPath: process.cwd(),
-          renderPath: configService.getOrThrow("STORAGE_ROOT"),
-          serveStaticOptions: {
-            index: false,
+      useFactory: (configService: ConfigService) => {
+        const routerPrefix = configService.getOrThrow("STORAGE_ROUTER_PREFIX");
+
+        if (!path.isAbsolute(routerPrefix))
+          throw new Error("STORAGE_ROUTER_PREFIX must be absolute");
+
+        const storageRoot = configService.getOrThrow("STORAGE_ROOT");
+
+        return [
+          {
+            rootPath: path.isAbsolute(storageRoot)
+              ? storageRoot
+              : path.join(process.cwd(), storageRoot),
+            serveRoot: routerPrefix,
           },
-        },
-      ],
+        ];
+      },
     }),
   ],
   providers: [FileStorageService],
