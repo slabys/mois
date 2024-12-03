@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@ag-media/react-pdf-table':
+    specifier: ^1.0.1
+    version: 1.0.1(@react-pdf/renderer@3.4.4)(@react-pdf/stylesheet@4.3.0)(react@18.3.1)
   '@nestjs/common':
     specifier: ^10.0.0
     version: 10.4.13(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1)
@@ -150,6 +153,18 @@ devDependencies:
     version: 1.2.1(webpack@5.97.0)
 
 packages:
+
+  /@ag-media/react-pdf-table@1.0.1(@react-pdf/renderer@3.4.4)(@react-pdf/stylesheet@4.3.0)(react@18.3.1):
+    resolution: {integrity: sha512-R5T2oFHq+uGikI0oBgZsLK+sTFUC59+REH564cS0zVpCIF/zOBogann3wyc72LS0uHVx4l/8hVtg9VvXjp2deA==}
+    peerDependencies:
+      '@react-pdf/renderer': ^2.0.2 || ^3.0.0
+      '@react-pdf/stylesheet': ^2.0.0 || ^3.0.0 || ^4.0.0
+      react: ^16.8.6 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@react-pdf/renderer': 3.4.4(react@18.3.1)
+      '@react-pdf/stylesheet': 4.3.0
+      react: 18.3.1
+    dev: false
 
   /@ampproject/remapping@2.3.0:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}

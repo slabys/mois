@@ -39,7 +39,7 @@ export const Dates = (props: DatesProps) => {
     `${date.getDate()}. ${date.getMonth()}. ${date.getFullYear()}`;
 
   return (
-    <View style={{ ...styles.row, padding: 20, paddingRight: 30, width: 300 }}>
+    <View style={{ ...styles.row, padding: 20, paddingRight: 40, width: 300 }}>
       <View style={styles.column}>
         <EnhancedText style={styles.text}>Date of issue</EnhancedText>
         <EnhancedText style={styles.text}>Due date</EnhancedText>

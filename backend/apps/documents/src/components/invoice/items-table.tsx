@@ -2,6 +2,9 @@ import { View, StyleSheet } from "@react-pdf/renderer";
 import React from "react";
 import { EnhancedText } from "../text";
 
+import { TH, TR, TD } from "@ag-media/react-pdf-table";
+import { Table, TableCell, TableHead, TableRow } from "../table";
+
 // Create styles
 const styles = StyleSheet.create({
   row: {
@@ -17,10 +20,23 @@ const styles = StyleSheet.create({
   table: {
     width: "100%",
   },
+  centerCell: {
+    display: "flex",
+    alignContent: "center",
+    justifyContent: "center",
+  },
 });
 
-const TableText = (props: { text: string | number, index: number }) => (
-  <EnhancedText style={{ padding: 2, marginBottom: 2, backgroundColor: (props.index % 2 === 0 ? undefined : "#f8f8f8")}}>{props.text}</EnhancedText>
+const TableText = (props: { text: string | number; index: number }) => (
+  <EnhancedText
+    style={{
+      padding: 2,
+      marginBottom: 2,
+      backgroundColor: props.index % 2 === 0 ? undefined : "#f8f8f8",
+    }}
+  >
+    {props.text}
+  </EnhancedText>
 );
 
 interface Item {
@@ -35,60 +51,36 @@ interface ItemsTableProps {
 }
 
 export const ItemsTable = (props: ItemsTableProps) => {
+  const intl = new Intl.NumberFormat("cs-CZ", { currency: "CZK" });
   return (
     <View style={styles.table}>
-      <View style={styles.row}>
-        <View style={styles.column}>
-          <EnhancedText bold>Amount</EnhancedText>
-          {props.items.map((e, i) => (
-            <TableText index={i} text={e.amount} />
-          ))}
-        </View>
+      <Table trStyle={{ paddingBottom: 2}}>
+        <TableHead>
+          <TableCell>Amount</TableCell>
+          <TableCell>Item name</TableCell>
+          <TableCell style={styles.centerCell}>Unit price</TableCell>
+          <TableCell style={styles.centerCell}>VAT Rate</TableCell>
+          <TableCell style={styles.centerCell}>VAT</TableCell>
+          <TableCell style={styles.centerCell}>Total</TableCell>
+        </TableHead>
 
-        <View style={styles.column}>
-          <EnhancedText bold>Item name</EnhancedText>
-          {props.items.map((e, i) => (
-            <TableText index={i} text={e.name} />
-          ))}
-        </View>
-
-        <View style={styles.column}>
-          <EnhancedText bold>Unit price</EnhancedText>
-          {props.items.map((e, i) => (
-            <TableText index={i} text={e.unitPrice} />
-          ))}
-        </View>
-
-        <View style={styles.column}>
-          <EnhancedText bold style={{ textAlign: "right" }}>
-            VAT Rate
-          </EnhancedText>
-          {props.items.map((e, i ) => (
-            <TableText index={i} text={`${e.vatRate} %`} />
-          ))}
-        </View>
-
-        <View style={styles.column}>
-          <EnhancedText bold style={{ textAlign: "right" }}>
-            VAT
-          </EnhancedText>
-          {props.items.map((e, i) => (
-            <TableText index={i} text={(e.unitPrice * e.amount * e.vatRate) / 100} />
-          ))}
-        </View>
-
-        <View style={styles.column}>
-          <EnhancedText
-            bold
-            style={{ textAlign: "right"}}
-          >
-            Total
-          </EnhancedText>
-          {props.items.map((e, i) => (
-            <TableText index={i} text={e.unitPrice * e.amount} />
-          ))}
-        </View>
-      </View>
+        {props.items.map((e) => (
+          <TableRow key={`item_${e.name}_${e.amount}`}>
+            <TableCell>{e.amount.toString()}</TableCell>
+            <TableCell>{e.name}</TableCell>
+            <TableCell style={styles.centerCell}>
+              {e.unitPrice.toString()}
+            </TableCell>
+            <TableCell style={styles.centerCell}>{e.vatRate}%</TableCell>
+            <TableCell style={styles.centerCell}>
+              {intl.format(e.amount * e.unitPrice * e.vatRate)}
+            </TableCell>
+            <TableCell style={styles.centerCell}>
+              {intl.format(e.amount * e.unitPrice)}
+            </TableCell>
+          </TableRow>
+        ))}
+      </Table>
     </View>
   );
 };
