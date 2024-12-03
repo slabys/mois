@@ -1,9 +1,7 @@
 "use client";
 
 import { useUpcomingEvents } from "@/utils/api";
-import type { Event } from "@/utils/api.schemas";
 import {
-  Anchor,
   Button,
   Container,
   Flex,
@@ -17,6 +15,7 @@ import {
   Title,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
+import Link from "next/link";
 
 const ManageEventsPage = () => {
   const data = useUpcomingEvents();
@@ -59,12 +58,11 @@ const ManageEventsPage = () => {
   return (
     <Container size="xl">
       <Stack>
-        <Title>Manage Events</Title>
-        <Flex justify="end" w="100%">
-          <Anchor display="flex">
-            <IconPlus />
+        <Flex justify="space-between" align="center" w="100%">
+          <Title>Manage Events</Title>
+          <Button component={Link} href="" leftSection={<IconPlus />}>
             Add Event
-          </Anchor>
+          </Button>
         </Flex>
         <Table
           withTableBorder

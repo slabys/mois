@@ -1,18 +1,16 @@
-import type { Event } from "@/utils/api.schemas";
+import { EventSimple } from "@/utils/api.schemas";
 import routes from "@/utils/routes";
 import EventCard from "@components/events/EventCard";
 import { Anchor, Container, Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
 
-const mockData: Event[] = [
+const mockData: EventSimple[] = [
   {
     id: "d6f51ab3-4f5e-4542-9ae8-b0b25084c71a",
-    slug: "na-test",
     title: "NA Test",
     description: "NA Test Description",
     since: "2024-12-06T20:39:11.000Z",
     until: "2024-12-08T20:39:18.000Z",
-    createdAt: "2024-12-01T19:42:48.132Z",
     createdBy: {
       id: "1",
       createdAt: "2024-12-01T19:42:41.274Z",

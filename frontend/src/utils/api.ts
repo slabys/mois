@@ -22,16 +22,26 @@ import type {
 
 import type {
   AccessToken,
-  CreateEvent,
+  AllOrganizationsParams,
+  CreateEventSpot,
   CreateUser,
-  Event,
-  LoginUser,
+  DeleteEventSpot,
+  EventApplication,
+  EventSimple,
+  EventSpotSimple,
+  Function,
+  GetEventSpotsParams,
+  GetUserApplicationsParams,
   Organization,
   OrganizationMemberWithoutOrganization,
   OrganizationMemberWithoutUser,
+  OrganizationMembersParams,
+  UpcomingEventsParams,
+  UpdateEventSpot,
   UpdatePhoto,
   UpdateUser,
   User,
+  UserOrganizationMembershipsParams,
 } from "./api.schemas";
 import { customInstance } from "./customInstance";
 import type { BodyType, ErrorType } from "./customInstance";
@@ -42,12 +52,12 @@ type SecondParameter<T extends (...args: any) => any> = Parameters<T>[1];
  * Try to login user with given email and password
  */
 export const loginUserWithEmail = (
-  loginUser: BodyType<LoginUser>,
+  _function: BodyType<Function>,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
   return customInstance<AccessToken>(
-    { url: `/auth/login`, method: "POST", headers: { "Content-Type": "application/json" }, data: loginUser, signal },
+    { url: `/auth/login`, method: "POST", headers: { "Content-Type": "application/json" }, data: _function, signal },
     options,
   );
 };
@@ -56,19 +66,19 @@ export const getLoginUserWithEmailMutationOptions = <TError = ErrorType<void>, T
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof loginUserWithEmail>>,
     TError,
-    { data: BodyType<LoginUser> },
+    { data: BodyType<Function> },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof loginUserWithEmail>>,
   TError,
-  { data: BodyType<LoginUser> },
+  { data: BodyType<Function> },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginUserWithEmail>>, { data: BodyType<LoginUser> }> = (
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginUserWithEmail>>, { data: BodyType<Function> }> = (
     props,
   ) => {
     const { data } = props ?? {};
@@ -80,21 +90,21 @@ export const getLoginUserWithEmailMutationOptions = <TError = ErrorType<void>, T
 };
 
 export type LoginUserWithEmailMutationResult = NonNullable<Awaited<ReturnType<typeof loginUserWithEmail>>>;
-export type LoginUserWithEmailMutationBody = BodyType<LoginUser>;
+export type LoginUserWithEmailMutationBody = BodyType<Function>;
 export type LoginUserWithEmailMutationError = ErrorType<void>;
 
 export const useLoginUserWithEmail = <TError = ErrorType<void>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof loginUserWithEmail>>,
     TError,
-    { data: BodyType<LoginUser> },
+    { data: BodyType<Function> },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof loginUserWithEmail>>,
   TError,
-  { data: BodyType<LoginUser> },
+  { data: BodyType<Function> },
   TContext
 > => {
   const mutationOptions = getLoginUserWithEmailMutationOptions(options);
@@ -384,17 +394,18 @@ export const useUpdateCurrentUserPhoto = <TError = ErrorType<unknown>, TContext 
 
 export const userOrganizationMemberships = (
   id: string,
+  params?: UserOrganizationMembershipsParams,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
   return customInstance<OrganizationMemberWithoutUser[]>(
-    { url: `/users/${id}/organizations`, method: "GET", signal },
+    { url: `/users/${id}/organizations`, method: "GET", params, signal },
     options,
   );
 };
 
-export const getUserOrganizationMembershipsQueryKey = (id: string) => {
-  return [`/users/${id}/organizations`] as const;
+export const getUserOrganizationMembershipsQueryKey = (id: string, params?: UserOrganizationMembershipsParams) => {
+  return [`/users/${id}/organizations`, ...(params ? [params] : [])] as const;
 };
 
 export const getUserOrganizationMembershipsQueryOptions = <
@@ -402,6 +413,7 @@ export const getUserOrganizationMembershipsQueryOptions = <
   TError = ErrorType<unknown>,
 >(
   id: string,
+  params?: UserOrganizationMembershipsParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof userOrganizationMemberships>>, TError, TData>>;
     request?: SecondParameter<typeof customInstance>;
@@ -409,10 +421,10 @@ export const getUserOrganizationMembershipsQueryOptions = <
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getUserOrganizationMembershipsQueryKey(id);
+  const queryKey = queryOptions?.queryKey ?? getUserOrganizationMembershipsQueryKey(id, params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof userOrganizationMemberships>>> = ({ signal }) =>
-    userOrganizationMemberships(id, requestOptions, signal);
+    userOrganizationMemberships(id, params, requestOptions, signal);
 
   return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof userOrganizationMemberships>>,
@@ -431,6 +443,7 @@ export function useUserOrganizationMemberships<
   TError = ErrorType<unknown>,
 >(
   id: string,
+  params: undefined | UserOrganizationMembershipsParams,
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof userOrganizationMemberships>>, TError, TData>> &
       Pick<
@@ -445,6 +458,7 @@ export function useUserOrganizationMemberships<
   TError = ErrorType<unknown>,
 >(
   id: string,
+  params?: UserOrganizationMembershipsParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof userOrganizationMemberships>>, TError, TData>> &
       Pick<
@@ -459,6 +473,7 @@ export function useUserOrganizationMemberships<
   TError = ErrorType<unknown>,
 >(
   id: string,
+  params?: UserOrganizationMembershipsParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof userOrganizationMemberships>>, TError, TData>>;
     request?: SecondParameter<typeof customInstance>;
@@ -470,12 +485,13 @@ export function useUserOrganizationMemberships<
   TError = ErrorType<unknown>,
 >(
   id: string,
+  params?: UserOrganizationMembershipsParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof userOrganizationMemberships>>, TError, TData>>;
     request?: SecondParameter<typeof customInstance>;
   },
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getUserOrganizationMembershipsQueryOptions(id, options);
+  const queryOptions = getUserOrganizationMembershipsQueryOptions(id, params, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 
@@ -556,27 +572,34 @@ export function useGetPhoto<TData = Awaited<ReturnType<typeof getPhoto>>, TError
   return query;
 }
 
-export const allOrganizations = (options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
-  return customInstance<Organization[]>({ url: `/organizations`, method: "GET", signal }, options);
+export const allOrganizations = (
+  params?: AllOrganizationsParams,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<Organization[]>({ url: `/organizations`, method: "GET", params, signal }, options);
 };
 
-export const getAllOrganizationsQueryKey = () => {
-  return [`/organizations`] as const;
+export const getAllOrganizationsQueryKey = (params?: AllOrganizationsParams) => {
+  return [`/organizations`, ...(params ? [params] : [])] as const;
 };
 
 export const getAllOrganizationsQueryOptions = <
   TData = Awaited<ReturnType<typeof allOrganizations>>,
   TError = ErrorType<unknown>,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof allOrganizations>>, TError, TData>>;
-  request?: SecondParameter<typeof customInstance>;
-}) => {
+>(
+  params?: AllOrganizationsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof allOrganizations>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getAllOrganizationsQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getAllOrganizationsQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof allOrganizations>>> = ({ signal }) =>
-    allOrganizations(requestOptions, signal);
+    allOrganizations(params, requestOptions, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof allOrganizations>>,
@@ -588,38 +611,38 @@ export const getAllOrganizationsQueryOptions = <
 export type AllOrganizationsQueryResult = NonNullable<Awaited<ReturnType<typeof allOrganizations>>>;
 export type AllOrganizationsQueryError = ErrorType<unknown>;
 
-export function useAllOrganizations<
-  TData = Awaited<ReturnType<typeof allOrganizations>>,
-  TError = ErrorType<unknown>,
->(options: {
-  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof allOrganizations>>, TError, TData>> &
-    Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof allOrganizations>>, TError, TData>, "initialData">;
-  request?: SecondParameter<typeof customInstance>;
-}): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useAllOrganizations<
-  TData = Awaited<ReturnType<typeof allOrganizations>>,
-  TError = ErrorType<unknown>,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof allOrganizations>>, TError, TData>> &
-    Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof allOrganizations>>, TError, TData>, "initialData">;
-  request?: SecondParameter<typeof customInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useAllOrganizations<
-  TData = Awaited<ReturnType<typeof allOrganizations>>,
-  TError = ErrorType<unknown>,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof allOrganizations>>, TError, TData>>;
-  request?: SecondParameter<typeof customInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useAllOrganizations<TData = Awaited<ReturnType<typeof allOrganizations>>, TError = ErrorType<unknown>>(
+  params: undefined | AllOrganizationsParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof allOrganizations>>, TError, TData>> &
+      Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof allOrganizations>>, TError, TData>, "initialData">;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useAllOrganizations<TData = Awaited<ReturnType<typeof allOrganizations>>, TError = ErrorType<unknown>>(
+  params?: AllOrganizationsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof allOrganizations>>, TError, TData>> &
+      Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof allOrganizations>>, TError, TData>, "initialData">;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useAllOrganizations<TData = Awaited<ReturnType<typeof allOrganizations>>, TError = ErrorType<unknown>>(
+  params?: AllOrganizationsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof allOrganizations>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 
-export function useAllOrganizations<
-  TData = Awaited<ReturnType<typeof allOrganizations>>,
-  TError = ErrorType<unknown>,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof allOrganizations>>, TError, TData>>;
-  request?: SecondParameter<typeof customInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getAllOrganizationsQueryOptions(options);
+export function useAllOrganizations<TData = Awaited<ReturnType<typeof allOrganizations>>, TError = ErrorType<unknown>>(
+  params?: AllOrganizationsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof allOrganizations>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getAllOrganizationsQueryOptions(params, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 
@@ -630,17 +653,18 @@ export function useAllOrganizations<
 
 export const organizationMembers = (
   id: string,
+  params?: OrganizationMembersParams,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
   return customInstance<OrganizationMemberWithoutOrganization[]>(
-    { url: `/organization/${id}/members`, method: "GET", signal },
+    { url: `/organization/${id}/members`, method: "GET", params, signal },
     options,
   );
 };
 
-export const getOrganizationMembersQueryKey = (id: string) => {
-  return [`/organization/${id}/members`] as const;
+export const getOrganizationMembersQueryKey = (id: string, params?: OrganizationMembersParams) => {
+  return [`/organization/${id}/members`, ...(params ? [params] : [])] as const;
 };
 
 export const getOrganizationMembersQueryOptions = <
@@ -648,6 +672,7 @@ export const getOrganizationMembersQueryOptions = <
   TError = ErrorType<unknown>,
 >(
   id: string,
+  params?: OrganizationMembersParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationMembers>>, TError, TData>>;
     request?: SecondParameter<typeof customInstance>;
@@ -655,10 +680,10 @@ export const getOrganizationMembersQueryOptions = <
 ) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getOrganizationMembersQueryKey(id);
+  const queryKey = queryOptions?.queryKey ?? getOrganizationMembersQueryKey(id, params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof organizationMembers>>> = ({ signal }) =>
-    organizationMembers(id, requestOptions, signal);
+    organizationMembers(id, params, requestOptions, signal);
 
   return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof organizationMembers>>,
@@ -675,6 +700,7 @@ export function useOrganizationMembers<
   TError = ErrorType<unknown>,
 >(
   id: string,
+  params: undefined | OrganizationMembersParams,
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationMembers>>, TError, TData>> &
       Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof organizationMembers>>, TError, TData>, "initialData">;
@@ -686,6 +712,7 @@ export function useOrganizationMembers<
   TError = ErrorType<unknown>,
 >(
   id: string,
+  params?: OrganizationMembersParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationMembers>>, TError, TData>> &
       Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof organizationMembers>>, TError, TData>, "initialData">;
@@ -697,6 +724,7 @@ export function useOrganizationMembers<
   TError = ErrorType<unknown>,
 >(
   id: string,
+  params?: OrganizationMembersParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationMembers>>, TError, TData>>;
     request?: SecondParameter<typeof customInstance>;
@@ -708,12 +736,13 @@ export function useOrganizationMembers<
   TError = ErrorType<unknown>,
 >(
   id: string,
+  params?: OrganizationMembersParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof organizationMembers>>, TError, TData>>;
     request?: SecondParameter<typeof customInstance>;
   },
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getOrganizationMembersQueryOptions(id, options);
+  const queryOptions = getOrganizationMembersQueryOptions(id, params, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 
@@ -822,27 +851,37 @@ export function useUserOrganizationMembership<
   return query;
 }
 
-export const upcomingEvents = (options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
-  return customInstance<Event[]>({ url: `/events/upcoming`, method: "GET", signal }, options);
+/**
+ * Find upcoming visible events
+ */
+export const upcomingEvents = (
+  params?: UpcomingEventsParams,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<EventSimple[]>({ url: `/events/upcoming`, method: "GET", params, signal }, options);
 };
 
-export const getUpcomingEventsQueryKey = () => {
-  return [`/events/upcoming`] as const;
+export const getUpcomingEventsQueryKey = (params?: UpcomingEventsParams) => {
+  return [`/events/upcoming`, ...(params ? [params] : [])] as const;
 };
 
 export const getUpcomingEventsQueryOptions = <
   TData = Awaited<ReturnType<typeof upcomingEvents>>,
   TError = ErrorType<unknown>,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof upcomingEvents>>, TError, TData>>;
-  request?: SecondParameter<typeof customInstance>;
-}) => {
+>(
+  params?: UpcomingEventsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof upcomingEvents>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getUpcomingEventsQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getUpcomingEventsQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof upcomingEvents>>> = ({ signal }) =>
-    upcomingEvents(requestOptions, signal);
+    upcomingEvents(params, requestOptions, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof upcomingEvents>>,
@@ -854,38 +893,113 @@ export const getUpcomingEventsQueryOptions = <
 export type UpcomingEventsQueryResult = NonNullable<Awaited<ReturnType<typeof upcomingEvents>>>;
 export type UpcomingEventsQueryError = ErrorType<unknown>;
 
-export function useUpcomingEvents<
-  TData = Awaited<ReturnType<typeof upcomingEvents>>,
-  TError = ErrorType<unknown>,
->(options: {
-  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof upcomingEvents>>, TError, TData>> &
-    Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof upcomingEvents>>, TError, TData>, "initialData">;
-  request?: SecondParameter<typeof customInstance>;
-}): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useUpcomingEvents<
-  TData = Awaited<ReturnType<typeof upcomingEvents>>,
-  TError = ErrorType<unknown>,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof upcomingEvents>>, TError, TData>> &
-    Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof upcomingEvents>>, TError, TData>, "initialData">;
-  request?: SecondParameter<typeof customInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useUpcomingEvents<
-  TData = Awaited<ReturnType<typeof upcomingEvents>>,
-  TError = ErrorType<unknown>,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof upcomingEvents>>, TError, TData>>;
-  request?: SecondParameter<typeof customInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useUpcomingEvents<TData = Awaited<ReturnType<typeof upcomingEvents>>, TError = ErrorType<unknown>>(
+  params: undefined | UpcomingEventsParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof upcomingEvents>>, TError, TData>> &
+      Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof upcomingEvents>>, TError, TData>, "initialData">;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useUpcomingEvents<TData = Awaited<ReturnType<typeof upcomingEvents>>, TError = ErrorType<unknown>>(
+  params?: UpcomingEventsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof upcomingEvents>>, TError, TData>> &
+      Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof upcomingEvents>>, TError, TData>, "initialData">;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useUpcomingEvents<TData = Awaited<ReturnType<typeof upcomingEvents>>, TError = ErrorType<unknown>>(
+  params?: UpcomingEventsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof upcomingEvents>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 
-export function useUpcomingEvents<
-  TData = Awaited<ReturnType<typeof upcomingEvents>>,
-  TError = ErrorType<unknown>,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof upcomingEvents>>, TError, TData>>;
-  request?: SecondParameter<typeof customInstance>;
-}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getUpcomingEventsQueryOptions(options);
+export function useUpcomingEvents<TData = Awaited<ReturnType<typeof upcomingEvents>>, TError = ErrorType<unknown>>(
+  params?: UpcomingEventsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof upcomingEvents>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getUpcomingEventsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * Find event by ID or slug
+ */
+export const getEvent = (idOrSlug: string, options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
+  return customInstance<EventSimple>({ url: `/events/${idOrSlug}`, method: "GET", signal }, options);
+};
+
+export const getGetEventQueryKey = (idOrSlug: string) => {
+  return [`/events/${idOrSlug}`] as const;
+};
+
+export const getGetEventQueryOptions = <TData = Awaited<ReturnType<typeof getEvent>>, TError = ErrorType<void>>(
+  idOrSlug: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvent>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetEventQueryKey(idOrSlug);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getEvent>>> = ({ signal }) =>
+    getEvent(idOrSlug, requestOptions, signal);
+
+  return { queryKey, queryFn, enabled: !!idOrSlug, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getEvent>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type GetEventQueryResult = NonNullable<Awaited<ReturnType<typeof getEvent>>>;
+export type GetEventQueryError = ErrorType<void>;
+
+export function useGetEvent<TData = Awaited<ReturnType<typeof getEvent>>, TError = ErrorType<void>>(
+  idOrSlug: string,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvent>>, TError, TData>> &
+      Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getEvent>>, TError, TData>, "initialData">;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useGetEvent<TData = Awaited<ReturnType<typeof getEvent>>, TError = ErrorType<void>>(
+  idOrSlug: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvent>>, TError, TData>> &
+      Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof getEvent>>, TError, TData>, "initialData">;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useGetEvent<TData = Awaited<ReturnType<typeof getEvent>>, TError = ErrorType<void>>(
+  idOrSlug: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvent>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+export function useGetEvent<TData = Awaited<ReturnType<typeof getEvent>>, TError = ErrorType<void>>(
+  idOrSlug: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEvent>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getGetEventQueryOptions(idOrSlug, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 
@@ -901,16 +1015,16 @@ Organization permissions required: `create.event`
  */
 export const createEvent = (
   organizationId: string,
-  createEvent: BodyType<CreateEvent>,
+  _function: BodyType<Function>,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<Event>(
+  return customInstance<EventSimple>(
     {
       url: `/events/${organizationId}`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: createEvent,
+      data: _function,
       signal,
     },
     options,
@@ -921,21 +1035,21 @@ export const getCreateEventMutationOptions = <TError = ErrorType<void>, TContext
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createEvent>>,
     TError,
-    { organizationId: string; data: BodyType<CreateEvent> },
+    { organizationId: string; data: BodyType<Function> },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof createEvent>>,
   TError,
-  { organizationId: string; data: BodyType<CreateEvent> },
+  { organizationId: string; data: BodyType<Function> },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof createEvent>>,
-    { organizationId: string; data: BodyType<CreateEvent> }
+    { organizationId: string; data: BodyType<Function> }
   > = (props) => {
     const { organizationId, data } = props ?? {};
 
@@ -946,24 +1060,86 @@ export const getCreateEventMutationOptions = <TError = ErrorType<void>, TContext
 };
 
 export type CreateEventMutationResult = NonNullable<Awaited<ReturnType<typeof createEvent>>>;
-export type CreateEventMutationBody = BodyType<CreateEvent>;
+export type CreateEventMutationBody = BodyType<Function>;
 export type CreateEventMutationError = ErrorType<void>;
 
 export const useCreateEvent = <TError = ErrorType<void>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createEvent>>,
     TError,
-    { organizationId: string; data: BodyType<CreateEvent> },
+    { organizationId: string; data: BodyType<Function> },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof createEvent>>,
   TError,
-  { organizationId: string; data: BodyType<CreateEvent> },
+  { organizationId: string; data: BodyType<Function> },
   TContext
 > => {
   const mutationOptions = getCreateEventMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const updateEvent = (
+  eventId: string,
+  _function: BodyType<Function>,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  return customInstance<EventSimple>(
+    { url: `/events/${eventId}`, method: "PATCH", headers: { "Content-Type": "application/json" }, data: _function },
+    options,
+  );
+};
+
+export const getUpdateEventMutationOptions = <TError = ErrorType<void>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateEvent>>,
+    TError,
+    { eventId: string; data: BodyType<Function> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateEvent>>,
+  TError,
+  { eventId: string; data: BodyType<Function> },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateEvent>>,
+    { eventId: string; data: BodyType<Function> }
+  > = (props) => {
+    const { eventId, data } = props ?? {};
+
+    return updateEvent(eventId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateEventMutationResult = NonNullable<Awaited<ReturnType<typeof updateEvent>>>;
+export type UpdateEventMutationBody = BodyType<Function>;
+export type UpdateEventMutationError = ErrorType<void>;
+
+export const useUpdateEvent = <TError = ErrorType<void>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateEvent>>,
+    TError,
+    { eventId: string; data: BodyType<Function> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateEvent>>,
+  TError,
+  { eventId: string; data: BodyType<Function> },
+  TContext
+> => {
+  const mutationOptions = getUpdateEventMutationOptions(options);
 
   return useMutation(mutationOptions);
 };
@@ -974,14 +1150,18 @@ Organization permissions required: `create.event`
  */
 export const updateEventPhoto = (
   eventId: string,
-  updatePhoto: BodyType<UpdatePhoto>,
+  _function: BodyType<Function>,
   options?: SecondParameter<typeof customInstance>,
 ) => {
   const formData = new FormData();
-  formData.append("file", updatePhoto.file);
 
-  return customInstance<Event>(
-    { url: `/events/${eventId}`, method: "PATCH", headers: { "Content-Type": "multipart/form-data" }, data: formData },
+  return customInstance<void>(
+    {
+      url: `/events/${eventId}/photo`,
+      method: "PATCH",
+      headers: { "Content-Type": "multipart/form-data" },
+      data: formData,
+    },
     options,
   );
 };
@@ -990,21 +1170,21 @@ export const getUpdateEventPhotoMutationOptions = <TError = ErrorType<void>, TCo
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateEventPhoto>>,
     TError,
-    { eventId: string; data: BodyType<UpdatePhoto> },
+    { eventId: string; data: BodyType<Function> },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof updateEventPhoto>>,
   TError,
-  { eventId: string; data: BodyType<UpdatePhoto> },
+  { eventId: string; data: BodyType<Function> },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof updateEventPhoto>>,
-    { eventId: string; data: BodyType<UpdatePhoto> }
+    { eventId: string; data: BodyType<Function> }
   > = (props) => {
     const { eventId, data } = props ?? {};
 
@@ -1015,24 +1195,412 @@ export const getUpdateEventPhotoMutationOptions = <TError = ErrorType<void>, TCo
 };
 
 export type UpdateEventPhotoMutationResult = NonNullable<Awaited<ReturnType<typeof updateEventPhoto>>>;
-export type UpdateEventPhotoMutationBody = BodyType<UpdatePhoto>;
+export type UpdateEventPhotoMutationBody = BodyType<Function>;
 export type UpdateEventPhotoMutationError = ErrorType<void>;
 
 export const useUpdateEventPhoto = <TError = ErrorType<void>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateEventPhoto>>,
     TError,
-    { eventId: string; data: BodyType<UpdatePhoto> },
+    { eventId: string; data: BodyType<Function> },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof updateEventPhoto>>,
   TError,
-  { eventId: string; data: BodyType<UpdatePhoto> },
+  { eventId: string; data: BodyType<Function> },
   TContext
 > => {
   const mutationOptions = getUpdateEventPhotoMutationOptions(options);
 
   return useMutation(mutationOptions);
 };
+
+/**
+ * Find event spots for event
+ */
+export const getEventSpots = (
+  id: string,
+  params?: GetEventSpotsParams,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<EventSpotSimple[]>({ url: `/events/${id}/spots`, method: "GET", params, signal }, options);
+};
+
+export const getGetEventSpotsQueryKey = (id: string, params?: GetEventSpotsParams) => {
+  return [`/events/${id}/spots`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetEventSpotsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getEventSpots>>,
+  TError = ErrorType<unknown>,
+>(
+  id: string,
+  params?: GetEventSpotsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventSpots>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetEventSpotsQueryKey(id, params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getEventSpots>>> = ({ signal }) =>
+    getEventSpots(id, params, requestOptions, signal);
+
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getEventSpots>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type GetEventSpotsQueryResult = NonNullable<Awaited<ReturnType<typeof getEventSpots>>>;
+export type GetEventSpotsQueryError = ErrorType<unknown>;
+
+export function useGetEventSpots<TData = Awaited<ReturnType<typeof getEventSpots>>, TError = ErrorType<unknown>>(
+  id: string,
+  params: undefined | GetEventSpotsParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventSpots>>, TError, TData>> &
+      Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getEventSpots>>, TError, TData>, "initialData">;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useGetEventSpots<TData = Awaited<ReturnType<typeof getEventSpots>>, TError = ErrorType<unknown>>(
+  id: string,
+  params?: GetEventSpotsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventSpots>>, TError, TData>> &
+      Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof getEventSpots>>, TError, TData>, "initialData">;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useGetEventSpots<TData = Awaited<ReturnType<typeof getEventSpots>>, TError = ErrorType<unknown>>(
+  id: string,
+  params?: GetEventSpotsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventSpots>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+export function useGetEventSpots<TData = Awaited<ReturnType<typeof getEventSpots>>, TError = ErrorType<unknown>>(
+  id: string,
+  params?: GetEventSpotsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventSpots>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getGetEventSpotsQueryOptions(id, params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * Create new event spot
+ */
+export const createEventSpot = (
+  id: string,
+  createEventSpot: BodyType<CreateEventSpot>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<EventSpotSimple>(
+    {
+      url: `/events/${id}/spots`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createEventSpot,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getCreateEventSpotMutationOptions = <TError = ErrorType<void>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createEventSpot>>,
+    TError,
+    { id: string; data: BodyType<CreateEventSpot> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createEventSpot>>,
+  TError,
+  { id: string; data: BodyType<CreateEventSpot> },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createEventSpot>>,
+    { id: string; data: BodyType<CreateEventSpot> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return createEventSpot(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateEventSpotMutationResult = NonNullable<Awaited<ReturnType<typeof createEventSpot>>>;
+export type CreateEventSpotMutationBody = BodyType<CreateEventSpot>;
+export type CreateEventSpotMutationError = ErrorType<void>;
+
+export const useCreateEventSpot = <TError = ErrorType<void>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createEventSpot>>,
+    TError,
+    { id: string; data: BodyType<CreateEventSpot> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof createEventSpot>>,
+  TError,
+  { id: string; data: BodyType<CreateEventSpot> },
+  TContext
+> => {
+  const mutationOptions = getCreateEventSpotMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const deleteEventSpot = (
+  id: string,
+  deleteEventSpot: BodyType<DeleteEventSpot>,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  return customInstance<void>(
+    {
+      url: `/events/spots/${id}`,
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      data: deleteEventSpot,
+    },
+    options,
+  );
+};
+
+export const getDeleteEventSpotMutationOptions = <TError = ErrorType<void>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteEventSpot>>,
+    TError,
+    { id: string; data: BodyType<DeleteEventSpot> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteEventSpot>>,
+  TError,
+  { id: string; data: BodyType<DeleteEventSpot> },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteEventSpot>>,
+    { id: string; data: BodyType<DeleteEventSpot> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return deleteEventSpot(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteEventSpotMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEventSpot>>>;
+export type DeleteEventSpotMutationBody = BodyType<DeleteEventSpot>;
+export type DeleteEventSpotMutationError = ErrorType<void>;
+
+export const useDeleteEventSpot = <TError = ErrorType<void>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteEventSpot>>,
+    TError,
+    { id: string; data: BodyType<DeleteEventSpot> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteEventSpot>>,
+  TError,
+  { id: string; data: BodyType<DeleteEventSpot> },
+  TContext
+> => {
+  const mutationOptions = getDeleteEventSpotMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const updateEventSpot = (
+  id: string,
+  updateEventSpot: BodyType<UpdateEventSpot>,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  return customInstance<EventSpotSimple>(
+    {
+      url: `/events/spots/${id}`,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      data: updateEventSpot,
+    },
+    options,
+  );
+};
+
+export const getUpdateEventSpotMutationOptions = <TError = ErrorType<void>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateEventSpot>>,
+    TError,
+    { id: string; data: BodyType<UpdateEventSpot> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateEventSpot>>,
+  TError,
+  { id: string; data: BodyType<UpdateEventSpot> },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateEventSpot>>,
+    { id: string; data: BodyType<UpdateEventSpot> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return updateEventSpot(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateEventSpotMutationResult = NonNullable<Awaited<ReturnType<typeof updateEventSpot>>>;
+export type UpdateEventSpotMutationBody = BodyType<UpdateEventSpot>;
+export type UpdateEventSpotMutationError = ErrorType<void>;
+
+export const useUpdateEventSpot = <TError = ErrorType<void>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateEventSpot>>,
+    TError,
+    { id: string; data: BodyType<UpdateEventSpot> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateEventSpot>>,
+  TError,
+  { id: string; data: BodyType<UpdateEventSpot> },
+  TContext
+> => {
+  const mutationOptions = getUpdateEventSpotMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+/**
+ * Get all user applications
+ */
+export const getUserApplications = (
+  params?: GetUserApplicationsParams,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<EventApplication[]>({ url: `/events/applications`, method: "GET", params, signal }, options);
+};
+
+export const getGetUserApplicationsQueryKey = (params?: GetUserApplicationsParams) => {
+  return [`/events/applications`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetUserApplicationsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getUserApplications>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetUserApplicationsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserApplications>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetUserApplicationsQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserApplications>>> = ({ signal }) =>
+    getUserApplications(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getUserApplications>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type GetUserApplicationsQueryResult = NonNullable<Awaited<ReturnType<typeof getUserApplications>>>;
+export type GetUserApplicationsQueryError = ErrorType<unknown>;
+
+export function useGetUserApplications<
+  TData = Awaited<ReturnType<typeof getUserApplications>>,
+  TError = ErrorType<unknown>,
+>(
+  params: undefined | GetUserApplicationsParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserApplications>>, TError, TData>> &
+      Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getUserApplications>>, TError, TData>, "initialData">;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useGetUserApplications<
+  TData = Awaited<ReturnType<typeof getUserApplications>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetUserApplicationsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserApplications>>, TError, TData>> &
+      Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof getUserApplications>>, TError, TData>, "initialData">;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useGetUserApplications<
+  TData = Awaited<ReturnType<typeof getUserApplications>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetUserApplicationsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserApplications>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+export function useGetUserApplications<
+  TData = Awaited<ReturnType<typeof getUserApplications>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetUserApplicationsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserApplications>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getGetUserApplicationsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
