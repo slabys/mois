@@ -21,7 +21,7 @@ import { CurrentUser } from "../decorators";
 import type { LoginUser } from "../models/requests";
 import { AccessToken } from "../models/responses";
 
-import type { AuthService } from "modules/auth";
+import { AuthService } from "modules/auth";
 import type { User } from "modules/users";
 import { isProduction } from "utilities/env";
 

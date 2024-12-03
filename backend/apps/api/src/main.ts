@@ -23,7 +23,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   app.enableShutdownHooks();
 
-  if (isDevelopment) {
+  if (isDevelopment || process.env.ENABLE_DOCS === "1") {
     const config = new DocumentBuilder()
       .setTitle(`${packageJson.name} API`)
       .setDescription(`The ${packageJson.name} API description`)
