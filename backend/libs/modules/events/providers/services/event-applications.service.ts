@@ -33,4 +33,13 @@ export class EventApplicationsService {
       skip: options?.pagination?.skip,
     });
   }
+
+  /**
+   * Save application data
+   * @param data 
+   * @returns 
+   */
+  save(data: Partial<EventApplication>) {
+    return this.eventApplicationRepository.save(data);
+  }
 }

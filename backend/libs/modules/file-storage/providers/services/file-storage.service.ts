@@ -1,7 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { Injectable, Logger } from "@nestjs/common";
-// biome-ignore lint/style/useImportType: BiomeJS, must be value, not type
 import { ConfigService } from "@nestjs/config";
 
 @Injectable()

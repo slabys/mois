@@ -1,11 +1,12 @@
+import { User } from "modules/users";
 import {
   CreateDateColumn,
+  type DeepPartial,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
 } from "typeorm";
-import { User } from "modules/users";
 import { EventSpot } from "./event-spot.entity";
 import { Event } from "./event.entity";
 
@@ -33,4 +34,8 @@ export class EventApplication {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  constructor(initial?: DeepPartial<EventApplication>) {
+    Object.assign(this, initial);
+  }
 }
