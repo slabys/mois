@@ -41,7 +41,7 @@ export class AuthController {
   @ApiCreatedResponse({ type: AccessToken, description: "User access token" })
   @UseGuards(LocalGuard)
   @Post("login")
-  async loginUserWithEmail(
+  async loginUserWithEmailOrUsername(
     @Body() data: LoginUser,
     @CurrentUser() user: User,
     @Res({ passthrough: true }) response: Response
