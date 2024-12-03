@@ -1,4 +1,4 @@
-import { Allow, IsEmail, MinLength } from "class-validator";
+import { Allow, IsEmail, Matches, MinLength } from "class-validator";
 
 export class CreateUser {
   /**
@@ -25,12 +25,10 @@ export class CreateUser {
   @Allow()
   lastName: string;
 
+  /**
+   * Must not contain special characters
+   */
+  @Matches(/^[a-zA-Z0-9]+$/)
   @MinLength(6)
   username: string;
-
-  /**
-   * University ID
-   */
-  @Allow()
-  universityId: string;
 }

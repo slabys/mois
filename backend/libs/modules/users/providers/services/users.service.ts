@@ -1,7 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { isEmail } from "class-validator";
 import { User } from "modules/users/entities";
-import { Repository } from "typeorm";
+import { FindOptionsWhere, Repository } from "typeorm";
 
 type UserId = User["id"];
 
@@ -31,14 +32,49 @@ export class UsersService {
   }
 
   /**
-   * Find user by email
+   * Find user by email and select password column
    * @param email User email
    * @returns
    */
-  findByEmailWithPassword(email: User["email"]): Promise<User | null> {
+  findByEmaiWithPassword(email: User["email"]): Promise<User | null> {
     return this.UsersRepository.createQueryBuilder("user")
       .addSelect("user.password")
       .where("user.email = :email", { email })
       .getOne();
+  }
+
+  /**
+   * Find user by username and select password column
+   * @param username User username
+   * @returns
+   */
+  findByUsernameWithPasword(username: User["username"]): Promise<User | null> {
+    return this.UsersRepository.createQueryBuilder("user")
+      .addSelect("user.password")
+      .where("user.username = :username", { username })
+      .getOne();
+  }
+
+  /**
+   * Find user by username or password
+   *
+   * Is shorthand to `findByEmaiWithPassword` and `findByUsernameWithPasword` by checking if value is email or username
+   * @param usernameOrEmail
+   * @returns
+   */
+  findByUsernameOrEmailWithPassword(usernameOrEmail: string) {
+    return isEmail(usernameOrEmail)
+      ? this.findByEmaiWithPassword(usernameOrEmail)
+      : this.findByUsernameWithPasword(usernameOrEmail);
+  }
+
+  /**
+   * Checks if user with specific criterial already exist
+   * Is better to index criteria columns
+   * @param criteria Criteria
+   * @returns
+   */
+  exist(criteria: FindOptionsWhere<User> | FindOptionsWhere<User>[]) {
+    return this.UsersRepository.existsBy(criteria);
   }
 }

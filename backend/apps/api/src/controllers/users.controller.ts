@@ -17,7 +17,7 @@ import {
   ApiConsumes,
   ApiCreatedResponse,
   ApiOkResponse,
-  ApiTags
+  ApiTags,
 } from "@nestjs/swagger";
 import { FormDataRequest, MemoryStoredFile } from "nestjs-form-data";
 
@@ -48,8 +48,12 @@ export class UsersController {
   })
   @Post()
   async createUser(@Body() body: CreateUser) {
-    const user = await this.usersService.findByEmailWithPassword(body.email);
-    if (user) throw new ConflictException();
+    const exist = await this.usersService.exist([
+      { email: body.email },
+      { username: body.username },
+    ]);
+    if (exist)
+      throw new ConflictException("User with email or username already exist");
 
     let newUser = new User({
       email: body.email,
