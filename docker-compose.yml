@@ -32,6 +32,7 @@ services:
         - WEB_DOMAIN=${WEB_DOMAIN:-localhost}
       target: production
     environment:
+      - STORAGE_ROOT=/app/storage
       - NODE_ENV=${NODE_ENV:-production}
       - WEB_DOMAIN=${WEB_DOMAIN:-localhost}
       - DB_HOST=${DB_HOST:-database}

@@ -29,6 +29,7 @@ import { CookieGuard } from "modules/auth/providers/guards";
 import { CurrentUser } from "../decorators";
 import { CreateUser, UpdatePhoto, UpdateUser } from "../models/requests";
 import { OrganizationMemberWithoutUser } from "../models/responses";
+import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 
 @ApiTags("Users")
 @Controller("users")
@@ -107,7 +108,10 @@ export class UsersController {
   @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Get(":id/organizations")
-  userOrganizationMemberships(@Param("id", ParseUUIDPipe) userId: string) {
-    return this.organizationService.findUserMemberships(userId);
+  userOrganizationMemberships(
+    @Param("id", ParseUUIDPipe) userId: string,
+    @Pagination() pagination: PaginationOptions
+  ) {
+    return this.organizationService.findUserMemberships(userId, { pagination });
   }
 }

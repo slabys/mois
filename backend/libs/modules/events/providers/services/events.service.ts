@@ -1,8 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Event } from "modules/events/entities";
 import slugify from "slugify";
-import { MoreThan, Repository } from "typeorm";
+import { MoreThan, type Repository } from "typeorm";
+
+import { Event } from "modules/events/entities";
+import { FindManyOptions } from "libs/types";
+
+interface EventFindOptions extends FindManyOptions {
+  visible?: boolean;
+}
 
 @Injectable()
 export class EventsService {
@@ -14,11 +20,30 @@ export class EventsService {
   /**
    * Find event by ID
    * @param id Event ID
-   * @returns {Event | null}
+   * @returns
    */
-  findById(id: string) {
+  findById(id: string, options?: EventFindOptions) {
     return this.eventsRepository.findOne({
-      where: { id },
+      where: { id, visible: options?.visible },
+      relations: {
+        createdBy: {
+          organization: true,
+        },
+      },
+    });
+  }
+
+  /**
+   * Find event by slug
+   * @param slug slug
+   * @returns Event or null
+   */
+  findBySlug(slug: string, options?: EventFindOptions) {
+    return this.eventsRepository.findOne({
+      where: {
+        slug,
+        visible: options?.visible,
+      },
       relations: {
         createdBy: {
           organization: true,
@@ -41,13 +66,14 @@ export class EventsService {
 
   /**
    * TODO: Add pagination
-   * All upcoming events
+   * All upcoming visible events
    * @returns {Event[]} Events
    */
-  getUpcomingEvents() {
+  getUpcomingEvents(options?: EventFindOptions) {
     return this.eventsRepository.find({
       where: {
         since: MoreThan(new Date()),
+        visible: options.visible,
       },
       relations: {
         createdBy: {
@@ -61,6 +87,8 @@ export class EventsService {
       order: {
         since: "DESC",
       },
+      skip: options?.pagination?.skip,
+      take: options?.pagination?.take,
     });
   }
 }

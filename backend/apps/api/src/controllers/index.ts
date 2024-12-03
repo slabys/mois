@@ -1,4 +1,6 @@
 export { AuthController } from "./auth.controller";
+export { EventApplicationsController } from "./event-applications.controller";
+export { EventSpotsController } from "./event-spots.controller";
 export { EventsController } from "./events.controller";
 export { HealthController } from "./health.controller";
 export { OrganizationMembersController } from "./organization-members.controller";

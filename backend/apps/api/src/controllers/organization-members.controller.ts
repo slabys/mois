@@ -15,6 +15,8 @@ import {
 import { CookieGuard } from "modules/auth/providers/guards";
 import { OrganizationService } from "modules/organization";
 import { User } from "modules/users";
+import { Pagination, PaginationOptions } from "utilities/nest/decorators";
+
 import { CurrentUser } from "../decorators";
 import { OrganizationMemberWithoutOrganization } from "../models/responses";
 
@@ -28,8 +30,13 @@ export class OrganizationMembersController {
     description: "All members within organization",
   })
   @Get("members")
-  organizationMembers(@Param("id") organizationId: string) {
-    return this.organizationService.findMembersOf(organizationId);
+  organizationMembers(
+    @Param("id") organizationId: string,
+    @Pagination() pagination: PaginationOptions
+  ) {
+    return this.organizationService.findMembersOf(organizationId, {
+      pagination,
+    });
   }
 
   @ApiOkResponse({
