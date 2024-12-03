@@ -1,3 +1,4 @@
+export * from "./create-event-application.dto";
 export * from "./create-event-spot.dto";
 export * from "./create-event.dto";
 export * from "./create-user.dto";

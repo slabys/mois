@@ -1,7 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { Injectable, Logger } from "@nestjs/common";
-// biome-ignore lint/style/useImportType: BiomeJS, must be value, not type
 import { ConfigService } from "@nestjs/config";
 
 @Injectable()
@@ -12,15 +11,18 @@ export class FileStorageService {
   private readonly BaseUrl: string;
 
   constructor(private readonly configService: ConfigService) {
+    const storageRouterPrefix = configService.getOrThrow("STORAGE_ROUTER_PREFIX")
     this.BasePath = this.configService.getOrThrow("STORAGE_ROOT");
-    this.BaseUrl = this.configService.getOrThrow("BASE_URL");
+    this.BaseUrl = `${this.configService.getOrThrow(
+      "BASE_URL"
+    )}${storageRouterPrefix}`;
 
     this.BasePath = path.isAbsolute(this.BasePath)
       ? this.BasePath
       : path.join(process.cwd(), this.BasePath);
     fs.mkdir(this.BasePath, { recursive: true });
 
-    this.logger.log(`Storage is located at: ${this.BasePath}`);
+    this.logger.log(`Storage is located at: ${this.BasePath} and mapped to ${storageRouterPrefix}`);
   }
 
   /**
@@ -71,6 +73,6 @@ export class FileStorageService {
   }
 
   getPublicUrl(filePath: string) {
-    return `${this.BaseUrl}/${path.join(this.BasePath, filePath)}`;
+    return `${this.BaseUrl}/${filePath}`;
   }
 }
