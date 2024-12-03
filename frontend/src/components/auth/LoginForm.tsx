@@ -1,78 +1,60 @@
 "use client";
 
-import { apiFetch } from "@/utils/apiFetch";
-import { Button, Flex, Stack, Text, TextInput } from "@mantine/core";
-import { isNotEmpty, useForm } from "@mantine/form";
+import { useLoginUserWithEmail } from "@/utils/api";
+import { LoginUser } from "@/utils/api.schemas";
+import routes from "@/utils/routes";
+import { Box, Button, Flex, Text, TextInput } from "@mantine/core";
+import { Form, isNotEmpty, useForm } from "@mantine/form";
+import { useRouter } from "next/navigation";
 import React from "react";
 
-export interface LoginFormType {
-  username: string;
-  password: string;
-}
+const LoginForm = () => {
+  const router = useRouter();
+  const loginUserMutation = useLoginUserWithEmail({
+    mutation: {
+      onSuccess: (data) => {
+        console.log("Login successful, redirecting...", data);
+        router.push(routes.DASHBOARD);
+      },
+      onError: (error) => {
+        console.error("Login failed:", error);
+      },
+    },
+  });
 
-interface LoginFormProps {}
-
-const LoginForm = ({}: LoginFormProps) => {
-  const form = useForm<LoginFormType>({
+  const form = useForm<LoginUser>({
     initialValues: {
-      username: "",
+      email: "",
       password: "",
     },
     validate: {
-      username: isNotEmpty("Username can not be empty."),
+      email: isNotEmpty("Username can not be empty."),
       password: isNotEmpty("Password can not be empty."),
     },
   });
 
-  const loginUser = async (values: LoginFormType) => {
-    const res = await apiFetch("/auth/login", {
-      method: "POST",
-      data: {
-        email: "info@slabys.cz",
-        password: "password",
-      },
-      withCredentials: true,
+  const loginUser = async (values: LoginUser) => {
+    loginUserMutation.mutate({
+      data: values,
     });
-    console.log(res);
-  };
-
-  const testMe = async () => {
-    const res = await apiFetch("/users", {
-      method: "GET",
-    });
-    console.log(res);
   };
 
   return (
-    <>
-      <form
-        onSubmit={form.onSubmit((values) => {
-          loginUser(values);
-        })}
-      >
+    <Box maw="32rem" w="100%">
+      <Form form={form} onSubmit={loginUser}>
         <Flex direction="column" gap={12}>
-          <TextInput label="Username" {...form.getInputProps("username")} />
+          <TextInput label="Email" {...form.getInputProps("email")} />
           <TextInput label="Password" type="password" {...form.getInputProps("password")} />
         </Flex>
         <Flex direction="column" gap={16} mt={16}>
-          {/*TODO loading*/}
-          <Button loading={false} type="submit">
+          <Button loading={loginUserMutation.isPending} type="submit">
             Log In
           </Button>
           {/* LOGIN ERROR */}
-          <Text c="bfiRed.6">Something went wrong! Please try again.</Text>
-          <Stack gap={8}>
-            <Text c="bfiPositive.8" fw={700}>
-              Password reset has been requested.
-            </Text>
-            <Text c="bfiPositive.8">Email with instructions has been sent to the associated email address. </Text>
-          </Stack>
+          {loginUserMutation.isError && <Text c="red">Something went wrong! Please try again.</Text>}
         </Flex>
-      </form>
-      <Button loading={false} onClick={() => testMe()}>
-        Funguj
-      </Button>
-    </>
+      </Form>
+    </Box>
   );
 };
 

@@ -17,7 +17,7 @@ import {
   ApiConsumes,
   ApiCreatedResponse,
   ApiOkResponse,
-  ApiTags,
+  ApiTags
 } from "@nestjs/swagger";
 import { FormDataRequest, MemoryStoredFile } from "nestjs-form-data";
 

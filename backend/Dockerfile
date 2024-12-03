@@ -4,6 +4,10 @@
 FROM node:22-alpine AS builder
 
 ARG PROJECT_NAME
+ARG NODE_ENV
+ARG WEB_DOMAIN
+ENV NODE_ENV=$NODE_ENV
+ENV WEB_DOMAIN=$WEB_DOMAIN
 # Set working directory
 WORKDIR /app
 
@@ -22,6 +26,11 @@ RUN pnpm run build ${PROJECT_NAME}
 FROM node:22-alpine AS production
 
 ARG PROJECT_NAME
+ARG PORT_APP1
+ARG NODE_ENV
+ARG WEB_DOMAIN
+ENV NODE_ENV=$NODE_ENV
+ENV WEB_DOMAIN=$WEB_DOMAIN
 # Set working directory
 WORKDIR /app
 
@@ -34,6 +43,8 @@ COPY --from=builder /app/pnpm-lock.yaml ./
 
 # Install prod dependencies
 RUN pnpm install --frozen-lockfile --prod=true
+
+EXPOSE $PORT_APP1
 
 # Start the server
 ENTRYPOINT ["npm", "run", "start:prod"]

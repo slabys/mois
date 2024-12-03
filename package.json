@@ -2,5 +2,20 @@
   "name": "@mois/root",
   "version": "1.0.0",
   "private": true,
-  "workspaces": ["backend/*", "frontend/*"]
+  "workspaces": [
+    "database/*",
+    "backend/*",
+    "frontend/*",
+    "nginx/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm:dev:app1\" \"npm:dev:web\"",
+    "dev:app1": "cd backend && pnpm start:dev",
+    "dev:web": "cd frontend && yarn dev"
+  },
+  "dependencies": {
+    "concurrently": "^8.2.2",
+    "yarn": "^1.22.22",
+    "pnpm": "^9.14.3"
+  }
 }

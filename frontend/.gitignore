@@ -42,3 +42,10 @@ jspm_packages
 # Optional REPL history
 .node_repl_history
 .next
+certificates
+
+# Public folder
+public/sw.js
+public/sw*.js.map
+public/workbox-*.js
+public/workbox-*.js.map

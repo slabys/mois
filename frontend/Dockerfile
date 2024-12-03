@@ -11,13 +11,20 @@ RUN yarn install
 # Copy all project files
 COPY . .
 
+ARG NEXT_PUBLIC_APP1_URL
+RUN echo "NEXT_PUBLIC_APP1_URL=${NEXT_PUBLIC_APP1_URL}" >> .env.production
+
+ENV NODE_ENV=production
+
 # Build the Next.js application
 RUN yarn build
 
 # Production image
-FROM node:20-alpine as runner
+FROM node:20-alpine AS runner
 
 ARG PORT_FE
+ARG NEXT_PUBLIC_APP1_URL
+RUN echo "NEXT_PUBLIC_APP1_URL=${NEXT_PUBLIC_APP1_URL}" >> .env.production
 
 # Set working directory
 WORKDIR /frontend/app
