@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   ConflictException,
   Controller,
@@ -40,7 +41,9 @@ export class UsersController {
     private readonly organizationService: OrganizationService
   ) {}
 
-  @ApiConflictResponse({ description: "User with email or username already exist" })
+  @ApiConflictResponse({
+    description: "User with email or username already exist",
+  })
   @ApiCreatedResponse({ type: User, description: "User has been created" })
   @ApiBadRequestResponse({
     description:
@@ -68,10 +71,19 @@ export class UsersController {
     return newUser;
   }
 
+  /**
+   * Update user data
+   */
+  @ApiBadRequestResponse({ description: "Username is already taken" })
   @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Patch()
   async updateCurrentUser(@Body() body: UpdateUser, @CurrentUser() user: User) {
+    if (body.username && body.username !== user.username) {
+      const exists = await this.usersService.exist({ username: body.username });
+      if (exists) throw new BadRequestException("Username is already taken");
+    }
+
     // For safety reasons set each property individually
     user.password = body.password ?? user.password;
     user.firstName = body.firstName ?? user.firstName;
