@@ -2,6 +2,7 @@
 
 import { useGetCurrentUser, useUpdateCurrentUser, useUpdateCurrentUserPhoto } from "@/utils/api";
 import type { UpdateUser } from "@/utils/api.schemas";
+import { apiImageURL } from "@/utils/apiImageURL";
 import { Dropzone } from "@components/Dropzone/Dropzone";
 import ImageEditor from "@components/ImageEditor/ImageEditor";
 import getCroppedImg from "@components/ImageEditor/imageEdit";
@@ -10,12 +11,11 @@ import { Form, isNotEmpty, useForm } from "@mantine/form";
 import { useHover } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconMoodEdit } from "@tabler/icons-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FileWithPath } from "react-dropzone-esm";
 import { Area } from "react-easy-crop";
 
 const AccountPage = () => {
-  const dropzoneRef = useRef<() => void>(null);
   const { hovered, ref: hoverRef } = useHover();
 
   const [croppedArea, setCroppedArea] = useState<{ croppedArea: Area; croppedAreaPixels: Area } | null>(null);
@@ -200,7 +200,7 @@ const AccountPage = () => {
           Account Page
         </Text>
         <Box pos="relative" w={100} h={100} ref={hoverRef}>
-          <Avatar src="" alt="Avatar" radius="50%" size={100} />
+          <Avatar src={apiImageURL(currentUser?.photo.id)} alt="Avatar" radius="50%" size={100} />
           {hovered && (
             <Overlay radius="50%">
               <Button
@@ -255,7 +255,6 @@ const AccountPage = () => {
         </Group>
         {isUpdatingUserPhoto && (
           <Dropzone
-            openRef={dropzoneRef}
             handleOnDrop={(files) => {
               setNewUserPhoto(files[0]);
               setUpdatingUserPhoto(false);

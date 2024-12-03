@@ -5,29 +5,143 @@
  * The backend API description
  * OpenAPI spec version: 0.0.1
  */
-export interface CreateEvent {
-  /** @minLength 30 */
-  description: string;
-  since: string;
-  /** @minLength 6 */
-  title: string;
-  until: string;
-}
+export type GetUserApplicationsParams = {
+  /**
+   * Pagination number of results
+   */
+  take?: number;
+  /**
+   * Pagination number of skipped results
+   */
+  skip?: number;
+};
+
+export type GetEventSpotsParams = {
+  /**
+   * Pagination number of results
+   */
+  take?: number;
+  /**
+   * Pagination number of skipped results
+   */
+  skip?: number;
+};
+
+export type UpcomingEventsParams = {
+  /**
+   * Pagination number of results
+   */
+  take?: number;
+  /**
+   * Pagination number of skipped results
+   */
+  skip?: number;
+};
+
+export type OrganizationMembersParams = {
+  /**
+   * Pagination number of results
+   */
+  take?: number;
+  /**
+   * Pagination number of skipped results
+   */
+  skip?: number;
+};
+
+export type AllOrganizationsParams = {
+  /**
+   * Pagination number of results
+   */
+  take?: number;
+  /**
+   * Pagination number of skipped results
+   */
+  skip?: number;
+};
+
+export type UserOrganizationMembershipsParams = {
+  /**
+   * Pagination number of results
+   */
+  take?: number;
+  /**
+   * Pagination number of skipped results
+   */
+  skip?: number;
+};
 
 /**
  * @nullable
  */
 export type EventPhoto = Photo | null;
 
-export interface Event {
+export interface EventSpot {
+  /** @nullable */
+  capacity: number | null;
+  event: Event;
+  id: string;
+  name: string;
+  price: number;
+}
+
+/**
+ * @nullable
+ */
+export type EventApplicationSpotType = EventSpot | null;
+
+export interface EventApplication {
   createdAt: string;
+  event: Event;
+  id: string;
+  /** @nullable */
+  spotType: EventApplicationSpotType;
+  user: User;
+}
+
+export interface UpdateEventSpot {
+  /** @minimum 1 */
+  capacity?: number;
+  /** @minLength 6 */
+  name?: string;
+  /** @minimum 0 */
+  price?: number;
+}
+
+export interface DeleteEventSpot {
+  /** In case of valid value it replaces assigned users with new spot otherwise unset their spot */
+  replaceWithSpotId?: string;
+}
+
+export interface CreateEventSpot {
+  /** @minimum 1 */
+  capacity: number;
+  /** @minLength 6 */
+  name: string;
+  /** @minimum 0 */
+  price: number;
+}
+
+export interface EventSpotSimple {
+  /** @nullable */
+  capacity: number | null;
+  id: string;
+  name: string;
+  price: number;
+}
+
+/**
+ * @nullable
+ */
+export type EventSimplePhoto = Photo | null;
+
+export interface EventSimple {
   createdBy: OrganizationMember;
   description: string;
   id: string;
   /** @nullable */
-  photo: EventPhoto;
+  photo: EventSimplePhoto;
   since: string;
-  slug: string;
   title: string;
   until: string;
 }
@@ -46,17 +160,34 @@ export interface OrganizationMember {
   user: User;
 }
 
-export type RolePermissions = (typeof RolePermissions)[keyof typeof RolePermissions];
+export interface Event {
+  applications: EventApplication[];
+  createdAt: string;
+  createdBy: OrganizationMember;
+  description: string;
+  id: string;
+  /** @nullable */
+  photo: EventPhoto;
+  since: string;
+  slug: string;
+  spotTypes: EventSpot[];
+  title: string;
+  until: string;
+  visible: boolean;
+}
+
+export type RolePermissionsItem = (typeof RolePermissionsItem)[keyof typeof RolePermissionsItem];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const RolePermissions = {
+export const RolePermissionsItem = {
   createevent: "create.event",
+  eventspotmanage: "event.spot.manage",
 } as const;
 
 export interface Role {
   id: string;
   name: string;
-  permissions: RolePermissions;
+  permissions: RolePermissionsItem[];
 }
 
 export interface OrganizationMemberWithoutOrganization {
@@ -131,12 +262,6 @@ export interface AccessToken {
   accessToken: string;
 }
 
-export interface LoginUser {
-  /** User email */
-  email: string;
-  /**
-   * User password
-   * @minLength 6
-   */
-  password: string;
+export interface Function {
+  [key: string]: unknown;
 }

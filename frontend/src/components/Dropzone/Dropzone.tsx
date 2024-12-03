@@ -1,44 +1,65 @@
-import { Group, Text, rem } from "@mantine/core";
+import styles from "@components/Dropzone/Dropzone.module.css";
+import { Button, Group, Text } from "@mantine/core";
 import {
   Dropzone as DropzoneMantine,
   FileWithPath,
   IMAGE_MIME_TYPE,
   DropzoneProps as MantineDropzoneProps,
 } from "@mantine/dropzone";
-import { IconPhoto, IconUpload, IconX } from "@tabler/icons-react";
+import { IconCloudUpload, IconDownload, IconX } from "@tabler/icons-react";
+import { useRef, useState } from "react";
 
 interface DropzoneProps extends Partial<MantineDropzoneProps> {
+  maxSize?: number;
   handleOnDrop: (files: FileWithPath[]) => void;
 }
 
-export function Dropzone({ handleOnDrop, ...props }: DropzoneProps) {
-  return (
-    <DropzoneMantine
-      onDrop={(files) => {
-        handleOnDrop(files);
-      }}
-      onReject={(files) => console.log("rejected files", files)}
-      maxSize={5 * 1024 ** 2}
-      accept={IMAGE_MIME_TYPE}
-      {...props}
-    >
-      <Group justify="center" gap="xl" mih={220} style={{ pointerEvents: "none" }}>
-        <DropzoneMantine.Accept>
-          <IconUpload style={{ width: rem(52), height: rem(52), color: "var(--mantine-color-blue-6)" }} stroke={1.5} />
-        </DropzoneMantine.Accept>
-        <DropzoneMantine.Reject>
-          <IconX style={{ width: rem(52), height: rem(52), color: "var(--mantine-color-red-6)" }} stroke={1.5} />
-        </DropzoneMantine.Reject>
-        <DropzoneMantine.Idle>
-          <IconPhoto style={{ width: rem(52), height: rem(52), color: "var(--mantine-color-dimmed)" }} stroke={1.5} />
-        </DropzoneMantine.Idle>
+export function Dropzone({ handleOnDrop, maxSize, ...props }: DropzoneProps) {
+  const openRef = useRef<() => void>(null);
+  const [defaultSize] = useState<number>(maxSize ?? 5);
 
-        <div>
-          <Text size="xl" inline>
-            Drag images here or click to select file
+  return (
+    <div className={styles.wrapper}>
+      <DropzoneMantine
+        openRef={openRef}
+        onDrop={(files) => {
+          handleOnDrop(files);
+        }}
+        onReject={(files) => console.log("rejected files", files)}
+        className={styles.dropzone}
+        radius="md"
+        accept={props.accept ?? IMAGE_MIME_TYPE}
+        maxSize={defaultSize * 1024 ** 2}
+        {...props}
+      >
+        <div style={{ pointerEvents: "none" }}>
+          <Group justify="center">
+            <DropzoneMantine.Accept>
+              <IconDownload size={50} color="blue" stroke={1.5} />
+            </DropzoneMantine.Accept>
+            <DropzoneMantine.Reject>
+              <IconX size={50} color="red" stroke={1.5} />
+            </DropzoneMantine.Reject>
+            <DropzoneMantine.Idle>
+              <IconCloudUpload size={50} stroke={1.5} />
+            </DropzoneMantine.Idle>
+          </Group>
+
+          <Text ta="center" fw={700} fz="lg" mt="xl">
+            <DropzoneMantine.Accept>Drop files here</DropzoneMantine.Accept>
+            <DropzoneMantine.Reject>File less than {defaultSize}MB</DropzoneMantine.Reject>
+            <DropzoneMantine.Idle>Upload resume</DropzoneMantine.Idle>
+          </Text>
+          <Text ta="center" fz="sm" mt="xs" c="dimmed">
+            Drag&apos;n&apos;drop files here to upload. We can accept only files that are less than {defaultSize}MB in
+            size.
           </Text>
         </div>
-      </Group>
-    </DropzoneMantine>
+      </DropzoneMantine>
+
+      <Button className={styles.control} size="md" radius="xl" onClick={() => openRef.current?.()}>
+        Select files
+      </Button>
+    </div>
   );
 }

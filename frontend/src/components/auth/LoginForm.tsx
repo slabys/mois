@@ -1,7 +1,7 @@
 "use client";
 
-import { useLoginUserWithEmail } from "@/utils/api";
-import { LoginUser } from "@/utils/api.schemas";
+import { LoginUserWithEmailMutationBody, LoginUserWithEmailMutationError, useLoginUserWithEmail } from "@/utils/api";
+import { Function } from "@/utils/api.schemas";
 import routes from "@/utils/routes";
 import { Box, Button, Flex, Text, TextInput } from "@mantine/core";
 import { Form, isNotEmpty, useForm } from "@mantine/form";
@@ -10,10 +10,9 @@ import React from "react";
 
 const LoginForm = () => {
   const router = useRouter();
-  const loginUserMutation = useLoginUserWithEmail({
+  const loginUserMutation = useLoginUserWithEmail<LoginUserWithEmailMutationBody, LoginUserWithEmailMutationError>({
     mutation: {
-      onSuccess: (data) => {
-        console.log("Login successful, redirecting...", data);
+      onSuccess: () => {
         router.push(routes.DASHBOARD);
       },
       onError: (error) => {
@@ -22,7 +21,7 @@ const LoginForm = () => {
     },
   });
 
-  const form = useForm<LoginUser>({
+  const form = useForm<Function>({
     initialValues: {
       email: "",
       password: "",
@@ -33,7 +32,7 @@ const LoginForm = () => {
     },
   });
 
-  const loginUser = async (values: LoginUser) => {
+  const loginUser = async (values: Function) => {
     loginUserMutation.mutate({
       data: values,
     });

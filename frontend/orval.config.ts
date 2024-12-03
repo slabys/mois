@@ -14,7 +14,7 @@ export default defineConfig({
       },
     },
     input: {
-      target: "https://api.slabys.cz/api-json",
+      target: "https://api.slabys.cz/docs-json",
     },
     hooks: {
       afterAllFilesWrite: ["yarn prettier --write ./src/utils/api.ts"],
