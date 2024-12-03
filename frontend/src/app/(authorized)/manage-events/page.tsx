@@ -1,63 +1,45 @@
-import type { Event } from "@/utils/api.schemas";
-import { Button, Container, Image, Stack, Table, TableTbody, TableTd, TableThead, TableTr, Title } from "@mantine/core";
+"use client";
 
-const mockData: Event[] = [
-  {
-    id: "d6f51ab3-4f5e-4542-9ae8-b0b25084c71a",
-    slug: "na-test",
-    title: "NA Test",
-    description: "NA Test Description",
-    since: "2024-12-06T20:39:11.000Z",
-    until: "2024-12-08T20:39:18.000Z",
-    createdAt: "2024-12-01T19:42:48.132Z",
-    createdBy: {
-      id: "1",
-      createdAt: "2024-12-01T19:42:41.274Z",
-      organization: {
-        id: "0",
-        name: "ESN Hradec Králové",
-        createdAt: "2024-12-01T20:27:07.000Z",
-      },
-      user: {
-        id: "a6486560-977d-4eae-8d86-d31a68a8bb21",
-        email: "test@test.cz",
-        username: "string",
-        firstName: "Test",
-        lastName: "string",
-        createdAt: "2024-11-19T20:43:43.048Z",
-        updatedAt: "2024-12-02T00:34:25.196Z",
-        photo: {
-          id: "4666bd02-7678-4c92-989c-669afef39291",
-          filename: "user_photo/4352d323-2ea3-4836-b981-8a1d7dec6e35",
-          createdAt: "2024-12-02T00:15:24.605Z",
-        },
-      },
-      roles: [],
-    },
-    photo: null,
-  },
-];
+import { useUpcomingEvents } from "@/utils/api";
+import type { Event } from "@/utils/api.schemas";
+import {
+  Anchor,
+  Button,
+  Container,
+  Flex,
+  Image,
+  Stack,
+  Table,
+  TableTbody,
+  TableTd,
+  TableThead,
+  TableTr,
+  Title,
+} from "@mantine/core";
+import { IconPlus } from "@tabler/icons-react";
 
 const ManageEventsPage = () => {
+  const data = useUpcomingEvents();
+  console.log("data", data.data);
+
   const elements = [
-    { photo: 6, name: 12.011, description: "C" },
-    { photo: 7, name: 14.007, description: "N" },
-    { photo: 39, name: 88.906, description: "Y" },
-    { photo: 56, name: 137.33, description: "Ba" },
-    { photo: 58, name: 140.12, description: "Ce" },
+    { photo: 6, name: "NA Test", description: "NA Test Description" },
+    { photo: 7, name: "NA Test", description: "NA Test Description" },
+    { photo: 39, name: "NA Test", description: "NA Test Description" },
+    { photo: 56, name: "NA Test", description: "NA Test Description" },
+    { photo: 58, name: "NA Test", description: "NA Test Description" },
   ];
 
   const rows = elements.map((element) => (
-    <tr key={element.name}>
-      <TableThead>
+    <TableTr key={element.name}>
+      <TableTd>
         <Image
           src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"
           h={75}
-          w="auto"
           fit="contain"
         />
-      </TableThead>
-      <TableTd>{element.description}</TableTd>
+      </TableTd>
+      <TableTd>{element.name}</TableTd>
       <TableTd>{element.description}</TableTd>
       <TableTd>
         <Button>Manage Event</Button>
@@ -69,16 +51,29 @@ const ManageEventsPage = () => {
         <Button>Duplicate</Button>
       </TableTd>
       <TableTd>
-        <Button>Delete</Button>
+        <Button color="red">Delete</Button>
       </TableTd>
-    </tr>
+    </TableTr>
   ));
 
   return (
     <Container size="xl">
       <Stack>
         <Title>Manage Events</Title>
-        <Table withTableBorder withColumnBorders withRowBorders>
+        <Flex justify="end" w="100%">
+          <Anchor display="flex">
+            <IconPlus />
+            Add Event
+          </Anchor>
+        </Flex>
+        <Table
+          withTableBorder
+          withColumnBorders
+          withRowBorders
+          striped
+          highlightOnHover={true}
+          style={{ textAlign: "center" }}
+        >
           <TableThead>
             <TableTr>
               <TableTd>Photo</TableTd>
