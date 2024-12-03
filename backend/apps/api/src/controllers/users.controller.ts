@@ -40,7 +40,7 @@ export class UsersController {
     private readonly organizationService: OrganizationService
   ) {}
 
-  @ApiConflictResponse({ description: "User with email already exist" })
+  @ApiConflictResponse({ description: "User with email or username already exist" })
   @ApiCreatedResponse({ type: User, description: "User has been created" })
   @ApiBadRequestResponse({
     description:
