@@ -9,7 +9,7 @@ interface EventDetailPageProps {
 const EventDetailPage = async ({ params }: EventDetailPageProps) => {
   const { id } = await params;
   return (
-    <Container my="md">
+    <Container size="xl">
       <EventDetail id={id} />
     </Container>
   );
@@ -29,8 +29,7 @@ const UseFetchAllEvents = async () => {
 };
 
 export async function generateStaticParams() {
-  const eventsPaths = UseFetchAllEvents();
-  return eventsPaths;
+  return UseFetchAllEvents();
 }
 
 export default EventDetailPage;

@@ -25,7 +25,7 @@ export function Dropzone({ handleOnDrop, maxSize, ...props }: DropzoneProps) {
         onDrop={(files) => {
           handleOnDrop(files);
         }}
-        onReject={(files) => console.log("rejected files", files)}
+        onReject={(files) => console.warn("rejected files", files)}
         className={styles.dropzone}
         radius="md"
         accept={props.accept ?? IMAGE_MIME_TYPE}
