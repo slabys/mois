@@ -1,6 +1,7 @@
 "use client";
 
 import { useUpcomingEvents } from "@/utils/api";
+import { truncate } from "@/utils/truncate";
 import AddEventModal from "@components/AddEventModal/AddEventModal";
 import {
   Button,
@@ -28,11 +29,36 @@ const ManageEventsPage = () => {
   console.log("data", data.data);
 
   const elements = [
-    { photo: 6, name: "NA Test", description: "NA Test Description" },
-    { photo: 7, name: "NA Test", description: "NA Test Description" },
-    { photo: 39, name: "NA Test", description: "NA Test Description" },
-    { photo: 56, name: "NA Test", description: "NA Test Description" },
-    { photo: 58, name: "NA Test", description: "NA Test Description" },
+    {
+      photo: 6,
+      name: "NA Test",
+      description:
+        "This is a very long description fetched from the database. It contains a lot of information that might be irrelevant to show completely.",
+    },
+    {
+      photo: 7,
+      name: "NA Test",
+      description:
+        "This is a very long description fetched from the database. It contains a lot of information that might be irrelevant to show completely.",
+    },
+    {
+      photo: 39,
+      name: "NA Test",
+      description:
+        "This is a very long description fetched from the database. It contains a lot of information that might be irrelevant to show completely.",
+    },
+    {
+      photo: 56,
+      name: "NA Test",
+      description:
+        "This is a very long description fetched from the database. It contains a lot of information that might be irrelevant to show completely.",
+    },
+    {
+      photo: 58,
+      name: "NA Test",
+      description:
+        "This is a very long description fetched from the database. It contains a lot of information that might be irrelevant to show completely.",
+    },
   ];
 
   const rows = elements.map((element) => (
@@ -46,7 +72,7 @@ const ManageEventsPage = () => {
         />
       </TableTd>
       <TableTd>{element.name}</TableTd>
-      <TableTd>{element.description}</TableTd>
+      <TableTd>{truncate(element.description, 50)}</TableTd>
       <TableTd>
         <Button>Manage Event</Button>
       </TableTd>
