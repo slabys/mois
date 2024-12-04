@@ -15,7 +15,7 @@ import {
 } from "@mantine/core";
 import { JSONContent } from "@tiptap/react";
 import Link from "next/link";
-import React, { FC, ReactNode } from "react";
+import React, { FC, ReactNode, useMemo } from "react";
 
 type NodeRendererProps = {
   children?: ReactNode;
@@ -150,7 +150,14 @@ const RichTextRenderer: FC<RichTextRendererProps> = ({ content }) => {
   };
 
   // Parse content and render
-  const parsedContent = content ? (JSON.parse(content) as JSONContent) : null;
+  const parsedContent = useMemo(() => {
+    try {
+      return content ? (JSON.parse(content) as JSONContent) : null;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  }, [content]);
 
   if (!parsedContent?.content) return null;
 
