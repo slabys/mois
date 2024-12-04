@@ -159,7 +159,9 @@ const RichTextRenderer: FC<RichTextRendererProps> = ({ content }) => {
     }
   }, [content]);
 
-  if (!parsedContent?.content) return null;
+  if (!parsedContent?.content) {
+    return content?.toString() ?? null;
+  }
 
   return <Box>{parsedContent.content.map((node, index) => renderNode(node, index))}</Box>;
 };
