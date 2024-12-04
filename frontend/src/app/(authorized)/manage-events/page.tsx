@@ -1,6 +1,7 @@
 "use client";
 
 import { useUpcomingEvents } from "@/utils/api";
+import AddEventModal from "@components/AddEventModal/AddEventModal";
 import {
   Button,
   Container,
@@ -15,9 +16,14 @@ import {
   Title,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import Link from "next/link";
+import { useState } from "react";
 
 const ManageEventsPage = () => {
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+
+  const openModal = () => setModalOpen(true);
+  const closeModal = () => setModalOpen(false);
+
   const data = useUpcomingEvents();
   console.log("data", data.data);
 
@@ -35,6 +41,7 @@ const ManageEventsPage = () => {
         <Image
           src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"
           h={75}
+          alt={element.name}
           fit="contain"
         />
       </TableTd>
@@ -60,9 +67,10 @@ const ManageEventsPage = () => {
       <Stack>
         <Flex justify="space-between" align="center" w="100%">
           <Title>Manage Events</Title>
-          <Button component={Link} href="" leftSection={<IconPlus />}>
+          <Button onClick={openModal} leftSection={<IconPlus />}>
             Add Event
           </Button>
+          <AddEventModal isOpen={modalOpen} onClose={closeModal} />
         </Flex>
         <Table
           withTableBorder
