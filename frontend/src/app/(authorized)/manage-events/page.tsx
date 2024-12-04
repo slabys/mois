@@ -41,6 +41,7 @@ const ManageEventsPage = () => {
         <Image
           src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"
           h={75}
+          alt={element.name}
           fit="contain"
         />
       </TableTd>
