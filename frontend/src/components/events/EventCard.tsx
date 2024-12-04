@@ -15,9 +15,9 @@ const EventCard = ({ event }: EventCardProps) => {
   return (
     <Card withBorder radius="md" p={0} className={styles.card}>
       <Flex direction={{ base: "column", xs: "row" }} gap={0} w="100%">
-        <Box w={{ base: "100%", xs: "100%" }} maw={{ base: "100%", xs: 320 }} h={{ base: 200, sm: "100%" }}>
-          <ApiImage src={event.photo?.id} mah="180px" h="100%" fit="cover" />
-        </Box>
+        <Flex justify="center" align="center" miw={{ base: 240, sm: 320 }}>
+          <ApiImage src={event.photo?.id} mah={224} h="100%" w={{ base: "100%", sm: 320 }} fit="cover" />
+        </Flex>
         <Stack w="100%" justify="center" p={{ base: "2rem 1rem", xs: "1rem 2rem" }}>
           <Stack gap={0}>
             <Title order={1}>{event.title}</Title>
@@ -41,7 +41,7 @@ const EventCard = ({ event }: EventCardProps) => {
               </Text>
             </Box>
           </Stack>
-          <Text size="xs" lineClamp={4}>
+          <Text size="xs" lineClamp={4} span>
             <RichTextRenderer content={event.description} />
           </Text>
         </Stack>
