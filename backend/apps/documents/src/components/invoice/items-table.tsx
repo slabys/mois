@@ -1,9 +1,11 @@
-import { View, StyleSheet } from "@react-pdf/renderer";
+import { StyleSheet, View } from "@react-pdf/renderer";
 import React from "react";
-import { EnhancedText } from "../text";
-
-import { TH, TR, TD } from "@ag-media/react-pdf-table";
-import { Table, TableCell, TableHead, TableRow } from "../table";
+import {
+  Table,
+  TableCell,
+  TableHead,
+  TableRow
+} from "../components";
 
 // Create styles
 const styles = StyleSheet.create({
@@ -27,17 +29,17 @@ const styles = StyleSheet.create({
   },
 });
 
-const TableText = (props: { text: string | number; index: number }) => (
-  <EnhancedText
-    style={{
-      padding: 2,
-      marginBottom: 2,
-      backgroundColor: props.index % 2 === 0 ? undefined : "#f8f8f8",
-    }}
-  >
-    {props.text}
-  </EnhancedText>
-);
+// const TableText = (props: { text: string | number; index: number }) => (
+//   <EnhancedText
+//     style={{
+//       padding: 2,
+//       marginBottom: 2,
+//       backgroundColor: props.index % 2 === 0 ? undefined : "#f8f8f8",
+//     }}
+//   >
+//     {props.text}
+//   </EnhancedText>
+// );
 
 interface Item {
   amount: number;
@@ -54,7 +56,7 @@ export const ItemsTable = (props: ItemsTableProps) => {
   const intl = new Intl.NumberFormat("cs-CZ", { currency: "CZK" });
   return (
     <View style={styles.table}>
-      <Table trStyle={{ paddingBottom: 2}}>
+      <Table trStyle={{ paddingBottom: 2 }}>
         <TableHead>
           <TableCell>Amount</TableCell>
           <TableCell>Item name</TableCell>

@@ -1,7 +1,7 @@
-import { Text as PdfText, TextProps, Font } from "@react-pdf/renderer";
-import type { Style } from "@react-pdf/types";
-import path from "path";
 import React from "react";
+import path from "node:path";
+import { Font, Text as PdfText, type TextProps } from "@react-pdf/renderer";
+import type { Style } from "@react-pdf/types";
 
 // TODO: Resolve main path
 const fontsFolder = path.resolve(process.mainModule.path, "assets/fonts");
@@ -28,7 +28,7 @@ interface EnhancedTextProps extends React.PropsWithChildren<TextProps> {
 }
 
 export const EnhancedText = (props?: EnhancedTextProps) => {
-  const styles = props.style instanceof Array ? props.style : [props.style];
+  const styles = Array.isArray(props.style) ? props.style : [props.style];
 
   return (
     <PdfText
