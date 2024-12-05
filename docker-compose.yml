@@ -17,10 +17,20 @@ services:
       - app-network
     healthcheck:
       test:
-        [ "CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} ${POSTGRES_DB}'" ]
+        ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} ${POSTGRES_DB}'"]
       interval: 30s
       timeout: 10s
       retries: 5
+
+  redis:
+    container_name: redis
+    image: redis
+    env_file:
+      - .env
+    ports:
+      - 6379:6379
+    networks:
+      - app-network
 
   backend:
     container_name: backend_app1
@@ -59,6 +69,7 @@ services:
     depends_on:
       - database
       - database_run_migrations
+      - redis
 
   database_run_migrations:
     container_name: database_migrations

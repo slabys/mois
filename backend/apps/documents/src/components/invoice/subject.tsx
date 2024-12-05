@@ -1,6 +1,6 @@
+import { StyleSheet, Text, View } from "@react-pdf/renderer";
 import React from "react";
-import { Image, View, StyleSheet, Text } from "@react-pdf/renderer";
-import { EnhancedText } from "../text";
+import { EnhancedText } from "../components";
 
 const styles = StyleSheet.create({
   column: {

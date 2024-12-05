@@ -8,7 +8,7 @@ import {
   PriceTotal,
   Subject,
 } from "./invoice";
-import { EnhancedText } from "./text";
+import { EnhancedText } from "./components/text";
 
 const currentYear = new Date().getFullYear();
 

@@ -1,8 +1,9 @@
 import React from "react";
 import { Image, View, StyleSheet } from "@react-pdf/renderer";
-import { EnhancedText } from "../text";
 import { imageSync } from "qr-image";
 import { PaymentCode } from "sepa-payment-code";
+
+import { EnhancedText } from "../components";
 
 const styles = StyleSheet.create({
   column: {

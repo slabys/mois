@@ -1,7 +1,7 @@
 import { Injectable, OnApplicationBootstrap } from "@nestjs/common";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { FileStorageService } from "modules/file-storage";
-import { SampleDocument } from "./components";
+import { SampleDocument } from "./components/components";
 
 @Injectable()
 export class DocumentsService implements OnApplicationBootstrap {
