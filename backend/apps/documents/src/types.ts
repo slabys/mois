@@ -29,3 +29,10 @@ export interface GenerateInvoice {
     };
   };
 }
+
+export type GenerateInvoiceResult =
+  | {
+      success: false;
+      error: string;
+    }
+  | { success: true };

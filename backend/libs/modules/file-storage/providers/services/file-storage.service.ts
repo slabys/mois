@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { exists, existsSync } from "node:fs";
 
 @Injectable()
 export class FileStorageService {
@@ -11,7 +12,9 @@ export class FileStorageService {
   private readonly BaseUrl: string;
 
   constructor(private readonly configService: ConfigService) {
-    const storageRouterPrefix = configService.getOrThrow("STORAGE_ROUTER_PREFIX")
+    const storageRouterPrefix = configService.getOrThrow(
+      "STORAGE_ROUTER_PREFIX"
+    );
     this.BasePath = this.configService.getOrThrow("STORAGE_ROOT");
     this.BaseUrl = `${this.configService.getOrThrow(
       "BASE_URL"
@@ -22,7 +25,9 @@ export class FileStorageService {
       : path.join(process.cwd(), this.BasePath);
     fs.mkdir(this.BasePath, { recursive: true });
 
-    this.logger.log(`Storage is located at: ${this.BasePath} and mapped to ${storageRouterPrefix}`);
+    this.logger.log(
+      `Storage is located at: ${this.BasePath} and mapped to ${storageRouterPrefix}`
+    );
   }
 
   /**
@@ -61,6 +66,15 @@ export class FileStorageService {
    */
   async delete(filePath: string) {
     await fs.rm(this.getFilePath(filePath), { force: true, recursive: true });
+  }
+
+  /**
+   * Check if file exist
+   * @param filePath File path
+   * @returns True, if file exist
+   */
+  async exist(filePath: string) {
+    return existsSync(this.getFilePath(filePath));
   }
 
   /**

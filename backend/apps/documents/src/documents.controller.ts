@@ -5,18 +5,32 @@ import { renderToBuffer } from "@react-pdf/renderer";
 import { FileStorageService } from "modules/file-storage";
 
 import { InvoiceDocument } from "./components/invoice.document";
-import type { GenerateInvoice } from "./types";
+import type { GenerateInvoice, GenerateInvoiceResult } from "./types";
 
 @Controller()
 export class DocumentsController {
   constructor(private readonly storageService: FileStorageService) {}
 
   @EventPattern("invoice.generate")
-  async invoiceGenerate(@Payload() { data, outputPath }: GenerateInvoice) {
-    const document = InvoiceDocument(data);
-    const buffer = await renderToBuffer(document);
+  async invoiceGenerate(
+    @Payload() { data, outputPath }: GenerateInvoice
+  ): Promise<GenerateInvoiceResult> {
+    /**
+     * TODO: Handle errors or create app-wise interceptor
+     */
 
-    await this.storageService.save(outputPath, buffer);
-    return "YO";
+    if (await this.storageService.exist(outputPath)) return { success: true };
+
+    try {
+      const document = InvoiceDocument(data);
+      const buffer = await renderToBuffer(document);
+
+      await this.storageService.save(outputPath, buffer);
+      return { success: true };
+    } catch (e: unknown) {
+      if (e instanceof Error) return { success: false, error: e.message };
+
+      return { success: false, error: "Unknown error" };
+    }
   }
 }
