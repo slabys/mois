@@ -1,5 +1,8 @@
 import { Document, Page, StyleSheet, View } from "@react-pdf/renderer";
 import React from "react";
+
+import type { GenerateInvoice } from "../types";
+import { EnhancedText } from "./components/text";
 import {
   Dates,
   Header,
@@ -8,9 +11,6 @@ import {
   PriceTotal,
   Subject,
 } from "./invoice";
-import { EnhancedText } from "./components/text";
-
-const currentYear = new Date().getFullYear();
 
 // Create styles
 const styles = StyleSheet.create({
@@ -36,20 +36,21 @@ const styles = StyleSheet.create({
   footer: { bottom: 0 },
 });
 
-interface SampleDocumentProps {
-  organization: string;
-  customer: string;
-  text: string;
-}
+type InvoiceDocumentProps = GenerateInvoice["data"];
 
 // Sample document with props
-export const SampleDocument = (props: SampleDocumentProps) => (
+export const InvoiceDocument = ({
+  id,
+  payment,
+  subscriber,
+  supplier,
+}: InvoiceDocumentProps) => (
   <Document>
     <Page size="A4">
       <View style={styles.page}>
         {/* HEADER */}
         <View style={{ paddingBottom: 20 }}>
-          <Header invoiceId={45646456} />
+          <Header invoiceId={id} />
         </View>
         {/* Supplier / subscriber */}
         <View style={styles.row}>
@@ -59,16 +60,16 @@ export const SampleDocument = (props: SampleDocumentProps) => (
             </EnhancedText>
             <Subject
               address={{
-                city: "Hradec Králové",
-                country: "Czech Republic",
-                houseNumber: "977/24",
-                region: "Nové Město",
-                street: "Senovážné náměstí",
-                zip: "110 00",
+                city: supplier.address.city,
+                country: supplier.address.country,
+                houseNumber: supplier.address.houseNumber,
+                region: supplier.address.region,
+                street: supplier.address.street,
+                zip: supplier.address.zip,
               }}
-              name="Erasmus Student Network Česká republika z. s."
-              cin="22678123"
-              vatId="CZ22670874"
+              name={supplier.name}
+              cin={supplier.cin}
+              vatId={supplier.vatId}
             />
           </View>
           <View style={styles.subject}>
@@ -77,14 +78,16 @@ export const SampleDocument = (props: SampleDocumentProps) => (
             </EnhancedText>
             <Subject
               address={{
-                city: "Hradec Králové",
-                country: "Czech Republic",
-                houseNumber: "977/24",
-                region: "Nové Město",
-                street: "Senovážné náměstí",
-                zip: "110 00",
+                city: subscriber.address.city,
+                country: subscriber.address.country,
+                houseNumber: subscriber.address.houseNumber,
+                region: subscriber.address.region,
+                street: subscriber.address.street,
+                zip: subscriber.address.zip,
               }}
-              name="Erasmus Student Network Česká republika z. s."
+              name={subscriber.name}
+              cin={subscriber.cin}
+              vatId={subscriber.vatId}
             />
           </View>
         </View>
@@ -93,12 +96,12 @@ export const SampleDocument = (props: SampleDocumentProps) => (
       <View style={styles.row}>
         <Payment
           amount={1000}
-          receiverName="Hradec Králové"
-          ban="2100063040/2010"
-          paymentMethod="dsa"
-          variableSymbol={2024209}
-          swift="FIOBCZPPXXX"
-          iban="CZ0820100000002100063040"
+          receiverName={supplier.name}
+          ban={payment.ban}
+          paymentMethod="PAYMENT_METHOD"
+          variableSymbol={payment.variableSymbol}
+          swift={payment.swift}
+          iban={payment.iban}
         />
         <Dates dateOfIssue={new Date()} dueDate={new Date()} />
       </View>
@@ -139,11 +142,7 @@ export const SampleDocument = (props: SampleDocumentProps) => (
           ]}
         />
       </View>
-      <PriceTotal total={5000} currency="CZK" />
-      {/* 
-      <Text style={styles.footer} fixed>
-        ESN {currentYear}
-      </Text> */}
+      <PriceTotal total={50} currency="CZK" />
     </Page>
   </Document>
 );
