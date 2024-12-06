@@ -1,1 +1,1 @@
-export { SampleDocument } from "./invoice.document";
+export { InvoiceDocument as SampleDocument } from "./invoice.document";

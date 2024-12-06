@@ -20,7 +20,7 @@ import { OrganizationModule } from "modules/organization";
 import { PhotoModule } from "modules/photo";
 import { UsersModule } from "modules/users";
 import { NestjsFormDataModule } from "nestjs-form-data";
-
+import { InvoiceModule } from "modules/invoice";
 @Module({
   imports: [
     AuthModule,
@@ -29,6 +29,7 @@ import { NestjsFormDataModule } from "nestjs-form-data";
     OrganizationModule,
     EventsModule,
     NestjsFormDataModule.config({}),
+    InvoiceModule,
     TypeOrmModule.forRootAsync({
       useFactory: () => {
         const options = getDataSourceOptions();
