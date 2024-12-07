@@ -7,6 +7,7 @@ import {
   Get,
   NotFoundException,
   Param,
+  ParseIntPipe,
   ParseUUIDPipe,
   Patch,
   Post,
@@ -57,7 +58,7 @@ export class EventSpotsController {
   @ApiEventIdParam()
   @Get("events/:id/spots")
   getEventSpots(
-    @Param("id", ParseUUIDPipe) eventId: string,
+    @Param("id", ParseIntPipe) eventId: number,
     @Pagination() pagination: PaginationOptions
   ) {
     return this.eventSpotsService.findByEventId(eventId, { pagination });
@@ -80,7 +81,7 @@ export class EventSpotsController {
   @UseGuards(CookieGuard)
   @Post("events/:id/spots")
   async createEventSpot(
-    @Param("id", ParseUUIDPipe) eventId: string,
+    @Param("id", ParseIntPipe) eventId: number,
     @Body() body: CreateEventSpot,
     @CurrentUser() user: User
   ) {
@@ -186,6 +187,6 @@ export class EventSpotsController {
     eventSpot.name = body.name ?? eventSpot.name;
     eventSpot.price = body.price ?? eventSpot.price;
 
-    return this.eventsService.save(eventSpot);
+    return this.eventSpotsService.save(eventSpot);
   }
 }

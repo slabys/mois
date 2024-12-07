@@ -13,7 +13,7 @@ export interface PaginationOptions {
 }
 
 /**
- * {ApiQueryOptions} does not expose default by default
+ * {@link ApiQueryOptions} does not expose default by default
  */
 type ApiQueryWithDefault = ApiQueryOptions & {
   default: unknown;

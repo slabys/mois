@@ -4,18 +4,20 @@ import {
   Get,
   NotFoundException,
   Param,
-  ParseUUIDPipe,
+  ParseIntPipe,
   Post,
-  UseGuards,
+  UseGuards
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from "@nestjs/swagger";
+
 import { CookieGuard } from "modules/auth/providers/guards";
 import { EventApplicationsService, EventsService } from "modules/events";
-import { CurrentUser } from "../decorators";
+import { EventApplication } from "modules/events/entities";
 import { User } from "modules/users";
 import { Pagination, PaginationOptions } from "utilities/nest/decorators";
+
+import { CurrentUser } from "../decorators";
 import { CreateEventApplication } from "../models/requests";
-import { EventApplication } from "modules/events/entities";
 import { EventApplicationSimple } from "../models/responses";
 
 @ApiTags("Event applications")
@@ -51,7 +53,7 @@ export class EventApplicationsController {
   @Post(":eventId/applications")
   async createUserApplication(
     @CurrentUser() user: User,
-    @Param("eventId", ParseUUIDPipe) eventId: string,
+    @Param("eventId", ParseIntPipe) eventId: number,
     @Body() body: CreateEventApplication
   ) {
     const event = await this.eventService.findById(eventId);
