@@ -30,13 +30,25 @@ export class EventApplicationsController {
   ) {}
 
   /**
-   * Get all user applications
+   * Get all signed-in user applications
    */
   @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Get("applications")
   getUserApplications(@CurrentUser() user: User) {
     return this.eventApplicationsService.findByUserId(user.id);
+  }
+
+  /**
+   * Gett all event user applications
+   * @param eventId 
+   * @returns 
+   */
+  @ApiBearerAuth()
+  @UseGuards(CookieGuard)
+  @Get(":eventId/applications")
+  async getEventApplications(@Param("eventId", ParseIntPipe) eventId: number) {
+    return this.eventApplicationsService.findByEventId(eventId);
   }
 
   /**
