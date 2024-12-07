@@ -31,6 +31,7 @@ import { CurrentUser } from "../decorators";
 import { CreateUser, UpdatePhoto, UpdateUser } from "../models/requests";
 import { OrganizationMemberWithoutUser } from "../models/responses";
 import { Pagination, PaginationOptions } from "utilities/nest/decorators";
+import { Address } from "modules/addresses";
 
 @ApiTags("Users")
 @Controller("users")
@@ -66,6 +67,17 @@ export class UsersController {
       username: body.username,
       gender: body.gender,
     });
+
+    if (body.personalAddress) {
+      const { personalAddress: address } = body;
+      newUser.personalAddress = new Address({
+        city: address.city,
+        country: address.country,
+        houseNumber: address.houseNumber,
+        street: address.street,
+        zip: address.zip,
+      });
+    }
 
     newUser = await this.usersService.save(newUser);
     newUser.password = undefined;

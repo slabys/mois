@@ -8,5 +8,6 @@ export class UpdateUser extends PartialType(
     "lastName",
     "username",
     "gender",
+    "personalAddress"
   ])
 ) {}

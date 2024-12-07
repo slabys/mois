@@ -1,5 +1,14 @@
-import { Allow, IsEmail, IsEnum, Matches, MinLength } from "class-validator";
+import {
+  Allow,
+  IsEmail,
+  IsEnum,
+  IsOptional,
+  Matches,
+  MinLength,
+} from "class-validator";
 import { UserGender } from "modules/users/enums";
+import { CreateAddress } from "./create-address.dto";
+import { Type } from "class-transformer";
 
 export class CreateUser {
   /**
@@ -38,4 +47,8 @@ export class CreateUser {
    */
   @IsEnum(UserGender)
   gender: UserGender = UserGender.PreferNotToSay;
+
+  @IsOptional()
+  @Type(() => CreateAddress)
+  personalAddress?: CreateAddress | undefined | null;
 }

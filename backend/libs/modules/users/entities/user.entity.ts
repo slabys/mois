@@ -16,6 +16,7 @@ import {
 import { hashPassword } from "modules/auth/utilities/crypto";
 import { Photo } from "modules/photo/entities";
 import { UserGender } from "../enums";
+import { Address } from "modules/addresses";
 
 @Index(["email", "username"])
 @Entity()
@@ -58,6 +59,9 @@ export class User extends BaseEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne(() => Address, { onDelete: "SET NULL", cascade: true })
+  personalAddress: Address;
 
   @BeforeInsert()
   async beforeSave() {

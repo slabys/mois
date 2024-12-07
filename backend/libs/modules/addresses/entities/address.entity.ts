@@ -1,4 +1,9 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  type DeepPartial,
+  Entity,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 
 @Entity()
 export class Address {
@@ -24,4 +29,8 @@ export class Address {
    */
   @Column()
   houseNumber: string;
+
+  constructor(data: DeepPartial<Address>) {
+    Object.assign(this, data);
+  }
 }
