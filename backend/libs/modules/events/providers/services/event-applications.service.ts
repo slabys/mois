@@ -12,6 +12,23 @@ export class EventApplicationsService {
   ) {}
 
   /**
+   * Find event applications by event ID
+   * @param id
+   * @returns
+   */
+  findByEventId(id: number) {
+    return this.eventApplicationRepository.find({
+      where: { event: { id } },
+      relations: {
+        user: {
+          photo: true,
+        },
+        spotType: true
+      },
+    });
+  }
+
+  /**
    * Find applications by user ID
    * @param id User ID
    * @returns Array of user applications

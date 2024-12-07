@@ -38,7 +38,7 @@ export class EventApplication {
   @CreateDateColumn()
   createdAt: Date;
 
-  @Column({ type: "json", default: {} })
+  @Column({ type: "json", default: {}, select: false })
   additionalData: object;
 
   constructor(initial?: DeepPartial<EventApplication>) {
