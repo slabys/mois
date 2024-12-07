@@ -5,14 +5,13 @@ import {
   Entity,
   ManyToOne,
   OneToMany,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import { OrganizationMember } from "./organization-member.entity";
 
 @Entity()
 export class Organization {
-  // Data columns
-  @PrimaryColumn()
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column()

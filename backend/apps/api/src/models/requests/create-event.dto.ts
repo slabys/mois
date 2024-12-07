@@ -1,4 +1,4 @@
-import { Allow, IsOptional, MinLength } from "class-validator";
+import { Allow, IsInt, IsNumber, IsOptional, Min, MinLength } from "class-validator";
 import { IsValidJsonSchema } from "utilities/nest/class-validator";
 
 export class CreateEvent {
@@ -33,4 +33,12 @@ export class CreateEvent {
    */
   @Allow()
   generateInvoices: boolean;
+
+  /**
+   * Event capacity
+   */
+  @Min(0)
+  @IsInt()
+  @IsNumber({ allowNaN: false, allowInfinity: false })
+  capacity: number;
 }
