@@ -12,6 +12,7 @@ import {
 } from "typeorm";
 import { EventSpot } from "./event-spot.entity";
 import { EventApplication } from "./event-application.entity";
+import { EventLink } from "./event-link.entity";
 
 @Entity()
 export class Event extends BaseEntity {
@@ -49,8 +50,33 @@ export class Event extends BaseEntity {
   @OneToMany(() => EventApplication, (application) => application.spotType)
   applications: EventApplication[];
 
+  @OneToMany(() => EventLink, link => link.event)
+  links: EventLink[];
+
   @Column({ default: true })
   visible: boolean;
+
+  @Column()
+  registrationDeadline: Date;
+
+  /**
+   * If true, generate invoices after {@link registrationDeadline}
+   */
+  @Column({ default: true })
+  generateInvoices: boolean;
+
+  /**
+   * Additional registration form
+   * Each event can have different "requirements"
+   */
+  @Column("json", { default: {}})
+  registrationForm: object;
+
+  /**
+   * Event capacity
+   */
+  @Column({ unsigned: true })
+  capacity: number;
 
   constructor(event?: Partial<Event>) {
     super();
