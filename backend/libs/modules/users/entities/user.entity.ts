@@ -15,6 +15,7 @@ import {
 
 import { hashPassword } from "modules/auth/utilities/crypto";
 import { Photo } from "modules/photo/entities";
+import { UserGender } from "../enums";
 
 @Index(["email", "username"])
 @Entity()
@@ -35,6 +36,13 @@ export class User extends BaseEntity {
 
   @Column()
   lastName: string;
+
+  @Column({
+    type: "enum",
+    enum: UserGender,
+    default: UserGender.PreferNotToSay,
+  })
+  gender: UserGender;
 
   // Exclude property from generated docs
   @ApiHideProperty()

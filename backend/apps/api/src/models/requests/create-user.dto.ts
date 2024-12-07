@@ -1,4 +1,5 @@
-import { Allow, IsEmail, Matches, MinLength } from "class-validator";
+import { Allow, IsEmail, IsEnum, Matches, MinLength } from "class-validator";
+import { UserGender } from "modules/users/enums";
 
 export class CreateUser {
   /**
@@ -31,4 +32,10 @@ export class CreateUser {
   @Matches(/^[a-zA-Z0-9]+$/)
   @MinLength(6)
   username: string;
+
+  /**
+   * User gender
+   */
+  @IsEnum(UserGender)
+  gender: UserGender = UserGender.PreferNotToSay;
 }

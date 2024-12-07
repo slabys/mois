@@ -64,6 +64,7 @@ export class UsersController {
       firstName: body.firstName,
       lastName: body.lastName,
       username: body.username,
+      gender: body.gender,
     });
 
     newUser = await this.usersService.save(newUser);
@@ -89,6 +90,7 @@ export class UsersController {
     user.firstName = body.firstName ?? user.firstName;
     user.lastName = body.lastName ?? user.lastName;
     user.username = body.username ?? user.username;
+    user.gender = body.gender ?? user.gender;
 
     const newUser = await this.usersService.save(user);
     newUser.password = undefined;
