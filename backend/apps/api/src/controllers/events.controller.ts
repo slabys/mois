@@ -108,6 +108,7 @@ export class EventsController {
     event.visible = body.visible;
     event.registrationDeadline = body.registrationDeadline;
     event.registrationForm = body.registrationForm;
+    event.capacity = body.capacity;
 
     event = await this.eventsService.save(event);
     event.createdBy = undefined;

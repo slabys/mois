@@ -1,10 +1,14 @@
+import { applyDecorators } from "@nestjs/common";
+import Ajv from "ajv";
+import { Transform, type TransformFnParams } from "class-transformer";
 import {
+  Validate,
+  type ValidationArguments,
   ValidatorConstraint,
   type ValidatorConstraintInterface,
-  type ValidationArguments,
-  Validate,
 } from "class-validator";
-import Ajv from "ajv";
+
+import { isDevelopment } from "utilities/env";
 
 @ValidatorConstraint({ name: "jsonSchemaValidator", async: false })
 export class JsonSchemaValidatorConstraint
@@ -12,7 +16,9 @@ export class JsonSchemaValidatorConstraint
 {
   validate(schema: object, args?: ValidationArguments): boolean {
     try {
-      const ajv = new Ajv();
+      const ajv = new Ajv({
+        validateSchema: isDevelopment ? "log" : true,
+      });
       ajv.compile(schema);
       return true;
     } catch (error) {
@@ -21,10 +27,25 @@ export class JsonSchemaValidatorConstraint
   }
 
   defaultMessage(args?: ValidationArguments): string {
-    return "Invalid JSON schema structure";
+    return `${args.property}: Invalid JSON schema structure`;
   }
 }
 
+const JsonSchemaTransformer = (data: TransformFnParams) => {
+  const schemaKeys = Object.keys(data.value).filter((e) => !e.startsWith("$"));
+  const compl = schemaKeys.reduce(
+    // biome-ignore lint/performance/noAccumulatingSpread: Shorthand to Object.assign
+    (prev, current) => ({ ...prev, [current]: data.value[current] }),
+    {}
+  );
+  return compl;
+};
+
 export function IsValidJsonSchema() {
-  return Validate(JsonSchemaValidatorConstraint);
+  return applyDecorators(
+    // Remove key with $
+    Transform(JsonSchemaTransformer),
+    // Validate modified param
+    Validate(JsonSchemaTransformer)
+  );
 }
