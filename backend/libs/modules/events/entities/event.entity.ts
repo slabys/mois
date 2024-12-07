@@ -20,7 +20,7 @@ export class Event extends BaseEntity {
   id: string;
 
   @Index()
-  @Column()
+  @Column({ unique: true })
   slug: string;
 
   @Column()

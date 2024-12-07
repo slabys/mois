@@ -55,11 +55,14 @@ export class EventsService {
   save(event: Partial<Event>) {
     const newEvent = new Event(event);
 
-    if (!newEvent.hasId())
+    if (!newEvent.hasId()) {
       newEvent.slug = slugify(newEvent.title, {
         lower: true,
         trim: true,
       }).substring(0, 60);
+
+      newEvent.slug = `${newEvent.slug}-${new Date().getTime()}`;
+    }
 
     return this.eventsRepository.save(newEvent);
   }
