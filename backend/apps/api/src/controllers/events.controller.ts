@@ -6,6 +6,7 @@ import {
   InternalServerErrorException,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   UseGuards,
@@ -19,7 +20,6 @@ import {
   ApiOkResponse,
   ApiTags,
 } from "@nestjs/swagger";
-import { isUUID } from "class-validator";
 import { FormDataRequest } from "nestjs-form-data";
 
 import { CookieGuard } from "modules/auth/providers/guards";
@@ -29,7 +29,6 @@ import { PhotoService } from "modules/photo";
 import { Permission } from "modules/roles";
 import type { User } from "modules/users";
 import { Pagination, type PaginationOptions } from "utilities/nest/decorators";
-import { truncateTextWords } from "utilities/node";
 
 import { CurrentUser } from "../decorators";
 import { CreateEvent, UpdateEvent, UpdatePhoto } from "../models/requests";
@@ -58,13 +57,9 @@ export class EventsController {
    */
   @ApiOkResponse({ type: EventSimple, description: "Found event" })
   @ApiNotFoundResponse({ description: "Event not found" })
-  @Get(":idOrSlug")
-  async getEvent(@Param("idOrSlug") idOrSlug: string) {
-    // Must be used different method for searching because postgres throws error if id is not UUID
-    const event = await (isUUID(idOrSlug)
-      ? this.eventsService.findById(idOrSlug, { visible: true })
-      : this.eventsService.findBySlug(idOrSlug, { visible: true }));
-
+  @Get(":id")
+  async getEvent(@Param("id", ParseIntPipe) id: number) {
+    const event = await this.eventsService.findById(id, { visible: true });
     if (!event) throw new NotFoundException("Event not found");
 
     return event;
@@ -103,8 +98,8 @@ export class EventsController {
 
     let event = new Event();
     event.title = body.title;
-    event.longDescription = body.description;
-    event.shortDescription = truncateTextWords(body.description, 950);
+    event.longDescription = body.longDescription;
+    event.shortDescription = body.shortDescription;
     event.since = body.since;
     event.until = body.until;
     event.createdBy = membership;
@@ -127,7 +122,7 @@ export class EventsController {
   @UseGuards(CookieGuard)
   @Patch(":eventId")
   async updateEvent(
-    @Param("eventId") eventId: string,
+    @Param("eventId", ParseIntPipe) eventId: number,
     @CurrentUser() user: User,
     @Body() body: UpdateEvent
   ) {
@@ -147,9 +142,6 @@ export class EventsController {
       );
 
     Object.assign(event, body);
-    event.longDescription = body.description ?? event.longDescription;
-    event.shortDescription = truncateTextWords(event.longDescription, 950);
-
     return this.eventsService.save(event);
   }
 
@@ -168,7 +160,7 @@ export class EventsController {
   @UseGuards(CookieGuard)
   @Patch(":eventId/photo")
   async updateEventPhoto(
-    @Param("eventId") eventId: string,
+    @Param("eventId", ParseIntPipe) eventId: number,
     @CurrentUser() user: User,
     @Body() body: UpdatePhoto
   ) {

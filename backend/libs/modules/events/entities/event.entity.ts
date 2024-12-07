@@ -5,23 +5,18 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { EventSpot } from "./event-spot.entity";
 import { EventApplication } from "./event-application.entity";
 import { EventLink } from "./event-link.entity";
+import { EventSpot } from "./event-spot.entity";
 
 @Entity()
 export class Event extends BaseEntity {
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
-
-  @Index()
-  @Column({ unique: true })
-  slug: string;
+  @PrimaryGeneratedColumn("increment")
+  id: number;
 
   @Column()
   title: string;

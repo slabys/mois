@@ -1,4 +1,11 @@
-import { Allow, IsInt, IsNumber, IsOptional, Min, MinLength } from "class-validator";
+import {
+  Allow,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  Min,
+  MinLength,
+} from "class-validator";
 import { IsValidJsonSchema } from "utilities/nest/class-validator";
 
 export class CreateEvent {
@@ -15,7 +22,10 @@ export class CreateEvent {
   registrationDeadline: Date;
 
   @MinLength(30)
-  description: string;
+  longDescription: string;
+
+  @MinLength(30)
+  shortDescription: string;
 
   @Allow()
   visible?: boolean = true;
