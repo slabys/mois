@@ -5,7 +5,7 @@ import { Event } from "./event.entity";
 @Entity()
 export class EventSpot {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @Column()
   name: string;

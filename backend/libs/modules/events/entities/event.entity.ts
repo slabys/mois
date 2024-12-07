@@ -68,8 +68,8 @@ export class Event extends BaseEntity {
    * Additional registration form
    * Each event can have different "requirements"
    */
-  @Column("json", { default: {}, select: false })
-  registrationForm: object;
+  @Column("json", { nullable: true, select: false })
+  registrationForm: object | null;
 
   /**
    * Event capacity

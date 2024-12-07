@@ -2,5 +2,8 @@ import { Allow } from "class-validator";
 
 export class CreateEventApplication {
   @Allow()
-  spotTypeId: string;
+  spotTypeId: number;
+
+  @Allow()
+  additionalFormData: object = {};
 }

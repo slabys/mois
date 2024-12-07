@@ -1,6 +1,11 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FindOptionsRelations, MoreThan, type Repository } from "typeorm";
+import {
+  FindOptionsRelations,
+  FindOptionsSelect,
+  MoreThan,
+  type Repository,
+} from "typeorm";
 
 import { FindManyOptions } from "libs/types";
 import { Event } from "modules/events/entities";
@@ -8,6 +13,7 @@ import { Event } from "modules/events/entities";
 interface EventFindOptions extends FindManyOptions {
   visible?: boolean;
   relations?: FindOptionsRelations<Event>;
+  select?: FindOptionsSelect<Event>;
 }
 
 @Injectable()
@@ -26,6 +32,7 @@ export class EventsService {
   findById(id: number, options?: EventFindOptions) {
     return this.eventsRepository.findOne({
       where: { id, visible: options?.visible },
+      select: options?.select,
       relations: {
         createdByUser: { photo: true },
         ...(options.relations ?? {}),
