@@ -3,6 +3,7 @@ import {
   IsInt,
   IsNumber,
   IsOptional,
+  IsUrl,
   Min,
   MinLength,
 } from "class-validator";
@@ -51,4 +52,13 @@ export class CreateEvent {
   @IsInt()
   @IsNumber({ allowNaN: false, allowInfinity: false })
   capacity: number;
+
+  @IsUrl()
+  termsAndConditionsLink: string;
+
+  @IsUrl()
+  photoPolicyLink: string;
+
+  @IsUrl()
+  codeOfConductLink: string;
 }
