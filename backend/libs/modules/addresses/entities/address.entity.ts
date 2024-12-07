@@ -33,4 +33,12 @@ export class Address {
   constructor(data: DeepPartial<Address>) {
     Object.assign(this, data);
   }
+
+  /**
+   * Make copy of current entity
+   * @returns 
+   */
+  copy() {
+    return new Address({ ...this, id: undefined });
+  }
 }
