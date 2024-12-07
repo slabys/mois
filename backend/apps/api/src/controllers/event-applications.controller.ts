@@ -15,12 +15,11 @@ import { CookieGuard } from "modules/auth/providers/guards";
 import { EventApplicationsService, EventsService } from "modules/events";
 import { EventApplication } from "modules/events/entities";
 import { User } from "modules/users";
-import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 
+import { ajv } from "utilities/ajv";
 import { CurrentUser } from "../decorators";
 import { CreateEventApplication } from "../models/requests";
 import { EventApplicationSimple } from "../models/responses";
-import { ajv } from "utilities/ajv";
 
 @ApiTags("Event applications")
 @Controller("events")
@@ -36,11 +35,8 @@ export class EventApplicationsController {
   @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Get("applications")
-  getUserApplications(
-    @CurrentUser() user: User,
-    @Pagination() pagination: PaginationOptions
-  ) {
-    return this.eventApplicationsService.findByUserId(user.id, { pagination });
+  getUserApplications(@CurrentUser() user: User) {
+    return this.eventApplicationsService.findByUserId(user.id);
   }
 
   /**
@@ -74,7 +70,10 @@ export class EventApplicationsController {
     });
 
     if (event.registrationForm) {
-      const isFormValid = await ajv.validate(event.registrationForm, body.additionalFormData);
+      const isFormValid = await ajv.validate(
+        event.registrationForm,
+        body.additionalFormData
+      );
 
       if (!isFormValid)
         throw new BadRequestException("Registration form data are not valid");
