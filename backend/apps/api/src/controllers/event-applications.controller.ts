@@ -60,7 +60,7 @@ export class EventApplicationsController {
   ) {
     const event = await this.eventService.findById(eventId, {
       relations: { spotTypes: true },
-      select: { registrationForm: {} },
+      select: { registrationForm: {}, id: true },
     });
     if (!event) throw new NotFoundException("Event not found");
 
@@ -74,8 +74,7 @@ export class EventApplicationsController {
     });
 
     if (event.registrationForm) {
-      const schema = await ajv.compileAsync(event.registrationForm);
-      const isFormValid = schema(body.additionalFormData);
+      const isFormValid = await ajv.validate(event.registrationForm, body.additionalFormData);
 
       if (!isFormValid)
         throw new BadRequestException("Registration form data are not valid");
