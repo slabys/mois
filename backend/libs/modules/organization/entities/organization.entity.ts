@@ -18,6 +18,9 @@ export class Organization {
   @Column()
   name: string;
 
+  @Column()
+  country: string;
+
   // Relations
   @ApiHideProperty()
   @OneToMany(() => OrganizationMember, (member) => member.organization)

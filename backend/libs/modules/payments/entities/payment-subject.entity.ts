@@ -1,7 +1,10 @@
+import { Address } from "modules/addresses";
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
 
@@ -13,24 +16,9 @@ export class PaymentSubject {
   @Column()
   name: string;
 
-  // Address
-  @Column()
-  city: string;
-
-  @Column()
-  country: string;
-
-  @Column()
-  houseNumber: string;
-
-  @Column()
-  region: string;
-
-  @Column()
-  street: string;
-
-  @Column()
-  zip: string;
+  @OneToOne(() => Address, { eager: true, cascade: true })
+  @JoinColumn()
+  address: Address;
 
   // Other data
   @Column({ nullable: true })
