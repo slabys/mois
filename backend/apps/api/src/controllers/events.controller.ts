@@ -147,6 +147,9 @@ export class EventsController {
       );
 
     Object.assign(event, body);
+    event.longDescription = body.description ?? event.longDescription;
+    event.shortDescription = truncateTextWords(event.longDescription, 950);
+
     return this.eventsService.save(event);
   }
 
