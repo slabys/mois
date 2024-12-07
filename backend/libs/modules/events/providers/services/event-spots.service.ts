@@ -16,8 +16,8 @@ export class EventSpotsService {
       where: { id },
       relations: {
         event: {
-          createdBy: {
-            organization: true,
+          createdByUser: {
+            photo: true,
           },
         },
       },

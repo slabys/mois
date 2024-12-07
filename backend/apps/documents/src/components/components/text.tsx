@@ -3,7 +3,7 @@ import path from "node:path";
 import { Font, Text as PdfText, type TextProps } from "@react-pdf/renderer";
 import type { Style } from "@react-pdf/types";
 
-// TODO: Resolve main path
+// FIXME: Resolve main path diffent way to prevent deprecation
 const fontsFolder = path.resolve(process.mainModule.path, "assets/fonts");
 
 Font.register({

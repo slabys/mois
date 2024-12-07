@@ -3,7 +3,6 @@ import {
   Body,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   NotFoundException,
   Param,
@@ -22,20 +21,18 @@ import {
   ApiParam,
   ApiTags,
 } from "@nestjs/swagger";
-import { EventSpotsService, EventsService } from "modules/events";
-import { EventSpotSimple } from "../models/responses";
 import { CookieGuard } from "modules/auth/providers/guards";
+import { EventSpotsService, EventsService } from "modules/events";
+import { EventSpot } from "modules/events/entities";
+import { User } from "modules/users";
+import { Pagination, PaginationOptions } from "utilities/nest/decorators";
+import { CurrentUser } from "../decorators";
 import {
   CreateEventSpot,
   DeleteEventSpot,
   UpdateEventSpot,
 } from "../models/requests";
-import { OrganizationService } from "modules/organization";
-import { CurrentUser } from "../decorators";
-import { User } from "modules/users";
-import { Permission } from "modules/roles";
-import { EventSpot } from "modules/events/entities";
-import { Pagination, PaginationOptions } from "utilities/nest/decorators";
+import { EventSpotSimple } from "../models/responses";
 
 const ApiEventIdParam = () => ApiParam({ name: "id", description: "Event ID" });
 
@@ -44,8 +41,7 @@ const ApiEventIdParam = () => ApiParam({ name: "id", description: "Event ID" });
 export class EventSpotsController {
   constructor(
     private readonly eventSpotsService: EventSpotsService,
-    private readonly eventsService: EventsService,
-    private readonly organizationsService: OrganizationService
+    private readonly eventsService: EventsService
   ) {}
 
   /**
@@ -85,19 +81,10 @@ export class EventSpotsController {
     @Body() body: CreateEventSpot,
     @CurrentUser() user: User
   ) {
+    // TODO: Check user role for modifications
+
     const event = await this.eventsService.findById(eventId);
     if (!event) throw new NotFoundException("Event not found");
-
-    const { organization } = event.createdBy;
-
-    const member = await this.organizationsService.findMemberByUserId(
-      organization.id,
-      user.id
-    );
-
-    if (!member) throw new ForbiddenException("Not member of organization");
-    if (member.hasPermission(Permission.CreateEvent))
-      throw new ForbiddenException("Missing required permissions");
 
     const spot = new EventSpot({
       event,
@@ -123,19 +110,10 @@ export class EventSpotsController {
     @Body() body: DeleteEventSpot,
     @CurrentUser() user: User
   ) {
+    // TODO: Check user role for modifications
+
     const eventSpot = await this.eventSpotsService.findById(eventSpotId);
     if (!eventSpot) throw new NotFoundException("Event spot not found");
-
-    const { organization } = eventSpot.event.createdBy;
-
-    const member = await this.organizationsService.findMemberByUserId(
-      organization.id,
-      user.id
-    );
-
-    if (!member) throw new ForbiddenException("Not member of organization");
-    if (member.hasPermission(Permission.CreateEvent))
-      throw new ForbiddenException("Missing required permissions");
 
     if (body.replaceWithSpotId) {
       const replaceWithSpot = await this.eventSpotsService.findById(
@@ -170,19 +148,10 @@ export class EventSpotsController {
     @Body() body: UpdateEventSpot,
     @CurrentUser() user: User
   ) {
+    // TODO: Check user role for modifications
+
     const eventSpot = await this.eventSpotsService.findById(eventSpotId);
     if (!eventSpot) throw new NotFoundException("Event spot not found");
-
-    const { organization } = eventSpot.event.createdBy;
-
-    const member = await this.organizationsService.findMemberByUserId(
-      organization.id,
-      user.id
-    );
-
-    if (!member) throw new ForbiddenException("Not member of organization");
-    if (member.hasPermission(Permission.CreateEvent))
-      throw new ForbiddenException("Missing required permissions");
 
     eventSpot.name = body.name ?? eventSpot.name;
     eventSpot.price = body.price ?? eventSpot.price;

@@ -23,9 +23,7 @@ export class EventApplicationsService {
       },
       relations: {
         event: {
-          createdBy: {
-            organization: true,
-          },
+          createdByUser: true,
         },
         spotType: true,
       },
@@ -36,8 +34,8 @@ export class EventApplicationsService {
 
   /**
    * Save application data
-   * @param data 
-   * @returns 
+   * @param data
+   * @returns
    */
   save(data: Partial<EventApplication>) {
     return this.eventApplicationRepository.save(data);

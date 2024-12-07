@@ -14,8 +14,7 @@ import { InvoiceService } from "./providers/services";
           useFactory: (configService: ConfigService) => ({
             transport: Transport.REDIS,
             options: {
-              // TODO: SET THIS IN Env
-              db: 0,
+              db: configService.get("REDIS_DB"),
               host: configService.getOrThrow("REDIS_HOST"),
               port: configService.get("REDIS_PORT"),
               username: configService.get("REDIS_USERNAME"),

@@ -1,5 +1,6 @@
 import { User } from "modules/users";
 import {
+  Column,
   CreateDateColumn,
   type DeepPartial,
   Entity,
@@ -25,7 +26,9 @@ export class EventApplication {
   })
   event: Event;
 
-  // Spot, must be one of event spots
+  /**
+   * Spot, must be one of {@link event} spots
+   */
   @ManyToOne(() => EventSpot, {
     nullable: true,
     onDelete: "SET NULL",
@@ -34,6 +37,9 @@ export class EventApplication {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @Column({ type: "json", default: {} })
+  additionalData: object;
 
   constructor(initial?: DeepPartial<EventApplication>) {
     Object.assign(this, initial);
