@@ -107,6 +107,9 @@ export class EventsController {
     event.registrationDeadline = body.registrationDeadline;
     event.registrationForm = body.registrationForm;
     event.capacity = body.capacity;
+    event.codeOfConductLink = body.codeOfConductLink;
+    event.photoPolicyLink = body.photoPolicyLink;
+    event.termsAndConditionsLink = body.termsAndConditionsLink;
 
     event = await this.eventsService.save(event);
     event.createdBy = undefined;

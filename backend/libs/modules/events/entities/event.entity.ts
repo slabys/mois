@@ -61,7 +61,7 @@ export class Event extends BaseEntity {
   /**
    * If true, generate invoices after {@link registrationDeadline}
    */
-  @Column({ default: true })
+  @Column({ default: true, select: false })
   generateInvoices: boolean;
 
   /**
@@ -76,6 +76,17 @@ export class Event extends BaseEntity {
    */
   @Column({ unsigned: true })
   capacity: number;
+
+  /** Links */
+
+  @Column({ select: false })
+  termsAndConditionsLink: string;
+
+  @Column({ select: false })
+  photoPolicyLink: string;
+
+  @Column({ select: false })
+  codeOfConductLink: string;
 
   constructor(event?: Partial<Event>) {
     super();
