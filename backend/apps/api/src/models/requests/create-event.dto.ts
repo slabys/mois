@@ -53,12 +53,21 @@ export class CreateEvent {
   @IsNumber({ allowNaN: false, allowInfinity: false })
   capacity: number;
 
+  /**
+   * @example https://test.cz
+   */
   @IsUrl()
   termsAndConditionsLink: string;
 
+  /**
+   * @example https://test.cz
+   */
   @IsUrl()
   photoPolicyLink: string;
 
+  /**
+   * @example https://test.cz
+   */
   @IsUrl()
   codeOfConductLink: string;
 }

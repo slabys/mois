@@ -1,5 +1,5 @@
-import { OrganizationMember } from "modules/organization/entities";
 import { Photo } from "modules/photo";
+import { User } from "modules/users";
 import {
   BaseEntity,
   Column,
@@ -34,8 +34,8 @@ export class Event extends BaseEntity {
   @Column()
   until: Date;
 
-  @ManyToOne(() => OrganizationMember, { nullable: false })
-  createdBy: OrganizationMember;
+  @ManyToOne(() => User, { nullable: false })
+  createdByUser: User;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -7,6 +7,8 @@ export class EventSimple extends PickType(Event, [
   "since",
   "until",
   "title",
-  "createdBy",
-  "shortDescription"
+  "createdByUser",
+  "shortDescription",
+  "registrationDeadline",
+  "visible"
 ]) {}
