@@ -4,12 +4,15 @@ import {
   CreateDateColumn,
   type DeepPartial,
   Entity,
+  JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   Unique,
 } from "typeorm";
 import { EventSpot } from "./event-spot.entity";
 import { Event } from "./event.entity";
+import { Address } from "modules/addresses";
 
 @Unique(["user", "event"])
 @Entity()
@@ -35,11 +38,22 @@ export class EventApplication {
   })
   spotType: EventSpot | null;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
   @Column({ type: "json", default: {}, select: false })
   additionalData: object;
+
+  @Column()
+  idCard: string;
+
+  @OneToOne(() => Address, { cascade: true })
+  @JoinColumn()
+  personalAddress: Address;
+
+  @OneToOne(() => Address, { cascade: true })
+  @JoinColumn()
+  invoiceAddress: Address;
+
+  @CreateDateColumn()
+  createdAt: Date;
 
   constructor(initial?: DeepPartial<EventApplication>) {
     Object.assign(this, initial);

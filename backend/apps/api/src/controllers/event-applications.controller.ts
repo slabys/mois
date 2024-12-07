@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   Get,
   NotFoundException,
   Param,
@@ -14,19 +15,21 @@ import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from "@nestjs/swagger";
 import { CookieGuard } from "modules/auth/providers/guards";
 import { EventApplicationsService, EventsService } from "modules/events";
 import { EventApplication } from "modules/events/entities";
-import { User } from "modules/users";
+import { User, UsersService } from "modules/users";
 
 import { ajv } from "utilities/ajv";
 import { CurrentUser } from "../decorators";
 import { CreateEventApplication } from "../models/requests";
 import { EventApplicationSimple } from "../models/responses";
+import { Address } from "modules/addresses";
 
 @ApiTags("Event applications")
 @Controller("events")
 export class EventApplicationsController {
   constructor(
     private readonly eventApplicationsService: EventApplicationsService,
-    private readonly eventService: EventsService
+    private readonly eventService: EventsService,
+    private readonly usersService: UsersService
   ) {}
 
   /**
@@ -41,8 +44,8 @@ export class EventApplicationsController {
 
   /**
    * Gett all event user applications
-   * @param eventId 
-   * @returns 
+   * @param eventId
+   * @returns
    */
   @ApiBearerAuth()
   @UseGuards(CookieGuard)
@@ -66,6 +69,13 @@ export class EventApplicationsController {
     @Param("eventId", ParseIntPipe) eventId: number,
     @Body() body: CreateEventApplication
   ) {
+    const currentUser = await this.usersService.findById(user.id, {
+      relations: { personalAddress: true },
+    });
+
+    if (!currentUser.personalAddress)
+      throw new ForbiddenException("User must have valid personal address");
+
     const event = await this.eventService.findById(eventId, {
       relations: { spotTypes: true },
       select: { registrationForm: {}, id: true },
@@ -79,6 +89,8 @@ export class EventApplicationsController {
       event,
       user,
       spotType,
+      personalAddress: currentUser.personalAddress.copy(),
+      invoiceAddress: new Address(body.invoiceAddress),
     });
 
     if (event.registrationForm) {

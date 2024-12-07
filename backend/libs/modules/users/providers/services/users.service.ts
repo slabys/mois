@@ -2,9 +2,13 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { isEmail } from "class-validator";
 import { User } from "modules/users/entities";
-import { FindOptionsWhere, Repository } from "typeorm";
+import { FindOptionsRelations, FindOptionsWhere, Repository } from "typeorm";
 
 type UserId = User["id"];
+
+interface FindUserOptions {
+  relations?: FindOptionsRelations<User>;
+}
 
 @Injectable()
 export class UsersService {
@@ -27,8 +31,11 @@ export class UsersService {
    * @param id ID
    * @returns
    */
-  findById(id: UserId) {
-    return this.UsersRepository.findOneBy({ id });
+  findById(id: UserId, options?: FindUserOptions) {
+    return this.UsersRepository.findOne({
+      where: { id },
+      relations: options?.relations,
+    });
   }
 
   /**
