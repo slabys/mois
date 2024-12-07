@@ -17,7 +17,7 @@ import {
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
-  ApiTags
+  ApiTags,
 } from "@nestjs/swagger";
 import { isUUID } from "class-validator";
 import { FormDataRequest } from "nestjs-form-data";
@@ -28,8 +28,9 @@ import { OrganizationService } from "modules/organization";
 import { PhotoService } from "modules/photo";
 import { Permission } from "modules/roles";
 import type { User } from "modules/users";
-
 import { Pagination, type PaginationOptions } from "utilities/nest/decorators";
+import { truncateTextWords } from "utilities/node";
+
 import { CurrentUser } from "../decorators";
 import { CreateEvent, UpdateEvent, UpdatePhoto } from "../models/requests";
 import { EventSimple } from "../models/responses";
@@ -91,6 +92,7 @@ export class EventsController {
       organizationId,
       user.id
     );
+
     if (!membership)
       throw new ForbiddenException("You are not member of organization");
 
@@ -101,7 +103,8 @@ export class EventsController {
 
     let event = new Event();
     event.title = body.title;
-    event.description = body.description;
+    event.longDescription = body.description;
+    event.shortDescription = truncateTextWords(body.description, 950);
     event.since = body.since;
     event.until = body.until;
     event.createdBy = membership;

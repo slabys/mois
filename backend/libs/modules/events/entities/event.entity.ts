@@ -27,7 +27,11 @@ export class Event extends BaseEntity {
   title: string;
 
   @Column()
-  description: string;
+  shortDescription: string;
+
+  // Select only short description by default
+  @Column({ select: false })
+  longDescription: string;
 
   @Column()
   since: Date;
@@ -50,7 +54,7 @@ export class Event extends BaseEntity {
   @OneToMany(() => EventApplication, (application) => application.spotType)
   applications: EventApplication[];
 
-  @OneToMany(() => EventLink, link => link.event)
+  @OneToMany(() => EventLink, (link) => link.event)
   links: EventLink[];
 
   @Column({ default: true })
@@ -69,7 +73,7 @@ export class Event extends BaseEntity {
    * Additional registration form
    * Each event can have different "requirements"
    */
-  @Column("json", { default: {}})
+  @Column("json", { default: {}, select: false })
   registrationForm: object;
 
   /**
