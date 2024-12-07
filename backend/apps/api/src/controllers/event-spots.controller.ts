@@ -7,7 +7,6 @@ import {
   NotFoundException,
   Param,
   ParseIntPipe,
-  ParseUUIDPipe,
   Patch,
   Post,
   UseGuards,
@@ -106,7 +105,7 @@ export class EventSpotsController {
   @UseGuards(CookieGuard)
   @Delete("events/spots/:id")
   async deleteEventSpot(
-    @Param("id", ParseUUIDPipe) eventSpotId: string,
+    @Param("id", ParseIntPipe) eventSpotId: number,
     @Body() body: DeleteEventSpot,
     @CurrentUser() user: User
   ) {
@@ -144,7 +143,7 @@ export class EventSpotsController {
   @UseGuards(CookieGuard)
   @Patch("events/spots/:id")
   async updateEventSpot(
-    @Param("id", ParseUUIDPipe) eventSpotId: string,
+    @Param("id", ParseIntPipe) eventSpotId: number,
     @Body() body: UpdateEventSpot,
     @CurrentUser() user: User
   ) {

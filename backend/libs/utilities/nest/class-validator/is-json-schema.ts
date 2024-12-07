@@ -1,5 +1,4 @@
 import { applyDecorators } from "@nestjs/common";
-import Ajv from "ajv";
 import { Transform, type TransformFnParams } from "class-transformer";
 import {
   Validate,
@@ -7,8 +6,7 @@ import {
   ValidatorConstraint,
   type ValidatorConstraintInterface,
 } from "class-validator";
-
-import { isDevelopment } from "utilities/env";
+import { ajv } from "utilities/ajv";
 
 @ValidatorConstraint({ name: "jsonSchemaValidator", async: false })
 export class JsonSchemaValidatorConstraint
@@ -16,11 +14,7 @@ export class JsonSchemaValidatorConstraint
 {
   validate(schema: object, args?: ValidationArguments): boolean {
     try {
-      const ajv = new Ajv({
-        validateSchema: isDevelopment ? "log" : true,
-      });
       ajv.compile(schema);
-      return true;
     } catch (error) {
       return false;
     }
