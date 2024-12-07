@@ -1,3 +1,4 @@
+export * from "./create-address.dto";
 export * from "./create-event-application.dto";
 export * from "./create-event-spot.dto";
 export * from "./create-event.dto";
@@ -8,3 +9,4 @@ export * from "./update-event-spot.dto";
 export * from "./update-event.dto";
 export * from "./update-photo.dto";
 export * from "./update-user.dto";
+
