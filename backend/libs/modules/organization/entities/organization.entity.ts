@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { OrganizationMember } from "./organization-member.entity";
+import { User } from "modules/users";
 
 @Entity()
 export class Organization {
@@ -21,6 +22,9 @@ export class Organization {
   @ApiHideProperty()
   @OneToMany(() => OrganizationMember, (member) => member.organization)
   members: OrganizationMember[];
+
+  @ManyToOne(() => User, { nullable: true, onDelete: "SET NULL" })
+  manager: User | null;
 
   @ApiHideProperty()
   @ManyToOne(() => Organization, (organization) => organization.children)
