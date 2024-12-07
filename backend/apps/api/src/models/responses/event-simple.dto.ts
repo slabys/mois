@@ -8,5 +8,5 @@ export class EventSimple extends PickType(Event, [
   "until",
   "title",
   "createdBy",
-  "description",
+  "shortDescription"
 ]) {}
