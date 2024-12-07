@@ -9,11 +9,10 @@ import {
 } from "@nestjs/common";
 import {
   ApiBearerAuth,
-  ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiTags,
-  ApiUnauthorizedResponse,
+  ApiUnauthorizedResponse
 } from "@nestjs/swagger";
 import type { Response } from "express";
 
@@ -34,7 +33,6 @@ export class AuthController {
   /**
    * Try to login user with given email and password
    */
-  @ApiBody({ type: LoginUser })
   @ApiUnauthorizedResponse({
     description: "Invalid password or user does not exist",
   })

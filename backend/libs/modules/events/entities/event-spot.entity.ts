@@ -13,9 +13,6 @@ export class EventSpot {
   @Column({ unsigned: true })
   price: number;
 
-  @Column({ unsigned: true })
-  capacity: number | null;
-
   @ManyToOne(() => Event, (event) => event.spotTypes, {
     nullable: true,
     onDelete: "CASCADE",
