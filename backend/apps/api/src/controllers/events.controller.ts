@@ -17,7 +17,7 @@ import {
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
-  ApiTags,
+  ApiTags
 } from "@nestjs/swagger";
 import { isUUID } from "class-validator";
 import { FormDataRequest } from "nestjs-form-data";
@@ -31,7 +31,7 @@ import type { User } from "modules/users";
 
 import { Pagination, type PaginationOptions } from "utilities/nest/decorators";
 import { CurrentUser } from "../decorators";
-import type { CreateEvent, UpdateEvent, UpdatePhoto } from "../models/requests";
+import { CreateEvent, UpdateEvent, UpdatePhoto } from "../models/requests";
 import { EventSimple } from "../models/responses";
 
 @ApiTags("Events")
@@ -106,6 +106,8 @@ export class EventsController {
     event.until = body.until;
     event.createdBy = membership;
     event.visible = body.visible;
+    event.registrationDeadline = body.registrationDeadline;
+    event.registrationForm = body.registrationForm;
 
     event = await this.eventsService.save(event);
     event.createdBy = undefined;

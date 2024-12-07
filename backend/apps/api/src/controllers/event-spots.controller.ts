@@ -99,11 +99,11 @@ export class EventSpotsController {
       throw new ForbiddenException("Missing required permissions");
 
     const spot = new EventSpot({
-      capacity: body.capacity,
       event,
       name: body.name,
       price: body.price,
     });
+
     return this.eventSpotsService.save(spot);
   }
 
@@ -184,7 +184,6 @@ export class EventSpotsController {
       throw new ForbiddenException("Missing required permissions");
 
     eventSpot.name = body.name ?? eventSpot.name;
-    eventSpot.capacity = body.capacity ?? eventSpot.capacity;
     eventSpot.price = body.price ?? eventSpot.price;
 
     return this.eventsService.save(eventSpot);
