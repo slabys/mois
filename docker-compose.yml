@@ -26,8 +26,8 @@ services:
     container_name: redis
     image: redis
     environment:
-      - REDIS_HOST=127.0.0.1
-      - REDIS_PORT=6379
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
     env_file:
       - .env
     ports:
@@ -56,6 +56,8 @@ services:
       - PORT_APP1=${PORT_APP1:-4000}
       - JWT_SECRET=${JWT_SECRET:-secret}
       - STORAGE_ROOT=${STORAGE_ROOT:-/app/storage}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
     env_file:
       - .env
     ports:
