@@ -17,7 +17,7 @@ services:
       - app-network
     healthcheck:
       test:
-        ["CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} ${POSTGRES_DB}'"]
+        [ "CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} ${POSTGRES_DB}'" ]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -25,10 +25,13 @@ services:
   redis:
     container_name: redis
     image: redis
+    environment:
+      - REDIS_HOST=127.0.0.1
+      - REDIS_HOST=6379
     env_file:
       - .env
     ports:
-      - 6379:6379
+      - ${REDIS_HOST:-6379}:${REDIS_HOST:-6379}
     networks:
       - app-network
 
