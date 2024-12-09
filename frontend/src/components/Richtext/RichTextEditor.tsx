@@ -46,7 +46,6 @@ const RichTextEditor = ({ label, content, onChange, error }: RichTextEditorProps
     content: parsedContent,
 
     onUpdate: ({ editor }) => {
-      console.log(JSON.stringify(editor.getJSON()));
       if (onChange) onChange(JSON.stringify(editor.getJSON()));
     },
   });

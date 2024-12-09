@@ -8,7 +8,7 @@ const LoginPage = () => {
   return (
     <Container h="100vh">
       <Flex direction="column" justify="center" align="center" h="100%" gap={8}>
-        <Flex direction="column" justify="center" align="center" maw={512} w="100%">
+        <Flex direction="column" justify="center" align="center" maw={512} w="100%" gap={16}>
           <Title>Login</Title>
           <LoginForm />
         </Flex>

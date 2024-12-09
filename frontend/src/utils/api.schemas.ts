@@ -5,17 +5,6 @@
  * The backend API description
  * OpenAPI spec version: 0.0.1
  */
-export type GetUserApplicationsParams = {
-  /**
-   * Pagination number of results
-   */
-  take?: number;
-  /**
-   * Pagination number of skipped results
-   */
-  skip?: number;
-};
-
 export type GetEventSpotsParams = {
   /**
    * Pagination number of results
@@ -72,36 +61,102 @@ export type UserOrganizationMembershipsParams = {
 };
 
 /**
+ * Spot, must be one of {@link event} spots
  * @nullable
  */
-export type EventPhoto = Photo | null;
+export type EventApplicationSimpleSpotType = EventSpot | null;
 
-export interface EventSpot {
-  /** @nullable */
-  capacity: number | null;
-  event: Event;
-  id: string;
-  name: string;
-  price: number;
+export type CreateEventApplicationAdditionalFormData = { [key: string]: unknown };
+
+export interface CreateEventApplication {
+  additionalFormData: CreateEventApplicationAdditionalFormData;
+  invoiceAddress: CreateAddress;
+  spotTypeId: number;
 }
+
+/**
+ * Additional registration form
+Each event can have different "requirements"
+ * @nullable
+ */
+export type EventRegistrationForm = { [key: string]: unknown } | null;
 
 /**
  * @nullable
  */
-export type EventApplicationSpotType = EventSpot | null;
+export type EventPhoto = Photo | null;
+
+export interface EventLink {
+  event: Event;
+  id: number;
+  link: string;
+  name: string;
+}
+
+export type EventApplicationAdditionalData = { [key: string]: unknown };
 
 export interface EventApplication {
+  additionalData: EventApplicationAdditionalData;
   createdAt: string;
   event: Event;
   id: string;
-  /** @nullable */
+  idCard: string;
+  invoiceAddress: Address;
+  personalAddress: Address;
+  /**
+   * Spot, must be one of {@link event} spots
+   * @nullable
+   */
   spotType: EventApplicationSpotType;
   user: User;
 }
 
+export interface EventSpot {
+  event: Event;
+  id: number;
+  name: string;
+  price: number;
+}
+
+export interface Event {
+  applications: EventApplication[];
+  /** Event capacity */
+  capacity: number;
+  codeOfConductLink: string;
+  createdAt: string;
+  createdByUser: User;
+  /** If true, generate invoices after {@link registrationDeadline} */
+  generateInvoices: boolean;
+  id: number;
+  links: EventLink[];
+  longDescription: string;
+  /** @nullable */
+  photo: EventPhoto;
+  photoPolicyLink: string;
+  registrationDeadline: string;
+  /**
+   * Additional registration form
+Each event can have different "requirements"
+   * @nullable
+   */
+  registrationForm: EventRegistrationForm;
+  shortDescription: string;
+  since: string;
+  spotTypes: EventSpot[];
+  /** Links */
+  termsAndConditionsLink: string;
+  title: string;
+  until: string;
+  visible: boolean;
+}
+
+/**
+ * Spot, must be one of {@link event} spots
+ * @nullable
+ */
+export type EventApplicationSpotType = EventSpot | null;
+
 export interface UpdateEventSpot {
-  /** @minimum 1 */
-  capacity?: number;
   /** @minLength 6 */
   name?: string;
   /** @minimum 0 */
@@ -110,12 +165,10 @@ export interface UpdateEventSpot {
 
 export interface DeleteEventSpot {
   /** In case of valid value it replaces assigned users with new spot otherwise unset their spot */
-  replaceWithSpotId?: string;
+  replaceWithSpotId?: number;
 }
 
 export interface CreateEventSpot {
-  /** @minimum 1 */
-  capacity: number;
   /** @minLength 6 */
   name: string;
   /** @minimum 0 */
@@ -123,94 +176,134 @@ export interface CreateEventSpot {
 }
 
 export interface EventSpotSimple {
-  /** @nullable */
-  capacity: number | null;
-  id: string;
+  id: number;
   name: string;
   price: number;
 }
 
-/**
- * @nullable
- */
-export type EventSimplePhoto = Photo | null;
+export interface UpdateEvent {
+  /**
+   * Event capacity
+   * @minimum 0
+   */
+  capacity?: number;
+  codeOfConductLink?: string;
+  /** Generate invoices after {@link registrationDeadline} */
+  generateInvoices?: boolean;
+  /** @minLength 30 */
+  longDescription?: string;
+  photoPolicyLink?: string;
+  registrationDeadline?: string;
+  /** @minLength 30 */
+  shortDescription?: string;
+  since?: string;
+  termsAndConditionsLink?: string;
+  /** @minLength 6 */
+  title?: string;
+  until?: string;
+  visible?: boolean;
+}
 
-export interface EventSimple {
-  createdBy: OrganizationMember;
-  description: string;
-  id: string;
-  /** @nullable */
-  photo: EventSimplePhoto;
+/**
+ * Additional registration properties
+! Must be valid JSON schema
+ */
+export type CreateEventRegistrationForm = { [key: string]: unknown };
+
+export interface CreateEvent {
+  /**
+   * Event capacity
+   * @minimum 0
+   */
+  capacity: number;
+  codeOfConductLink: string;
+  /** Generate invoices after {@link registrationDeadline} */
+  generateInvoices: boolean;
+  /** @minLength 30 */
+  longDescription: string;
+  photoPolicyLink: string;
+  registrationDeadline: string;
+  /** Additional registration properties
+! Must be valid JSON schema */
+  registrationForm?: CreateEventRegistrationForm;
+  /** @minLength 30 */
+  shortDescription: string;
   since: string;
+  termsAndConditionsLink: string;
+  /** @minLength 6 */
   title: string;
   until: string;
+  visible?: boolean;
 }
 
-export interface Organization {
-  createdAt: string;
-  id: string;
-  name: string;
-}
-
-export interface OrganizationMember {
-  createdAt: string;
-  id: string;
-  organization: Organization;
-  roles: Role[];
-  user: User;
-}
-
-export interface Event {
-  applications: EventApplication[];
-  createdAt: string;
-  createdBy: OrganizationMember;
-  description: string;
-  id: string;
+export interface EventSimple {
+  createdByUser: User;
+  id: number;
   /** @nullable */
-  photo: EventPhoto;
+  photo: EventSimplePhoto;
+  registrationDeadline: string;
+  shortDescription: string;
   since: string;
-  slug: string;
-  spotTypes: EventSpot[];
   title: string;
   until: string;
   visible: boolean;
 }
 
-export type RolePermissionsItem = (typeof RolePermissionsItem)[keyof typeof RolePermissionsItem];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const RolePermissionsItem = {
-  createevent: "create.event",
-  eventspotmanage: "event.spot.manage",
-} as const;
-
-export interface Role {
+export interface EventApplicationSimple {
+  createdAt: string;
+  event: EventSimple;
   id: string;
-  name: string;
-  permissions: RolePermissionsItem[];
+  /**
+   * Spot, must be one of {@link event} spots
+   * @nullable
+   */
+  spotType: EventApplicationSimpleSpotType;
+  user: User;
 }
 
 export interface OrganizationMemberWithoutOrganization {
   createdAt: string;
   id: string;
-  roles: Role[];
   user: User;
+}
+
+export interface Organization {
+  country: string;
+  createdAt: string;
+  id: string;
+  /** @nullable */
+  manager: OrganizationManager;
+  name: string;
 }
 
 export interface OrganizationMemberWithoutUser {
   createdAt: string;
   id: string;
   organization: Organization;
-  roles: Role[];
 }
 
 export interface UpdatePhoto {
   file: Blob;
 }
 
+/**
+ * User gender
+ */
+export type UpdateUserGender = (typeof UpdateUserGender)[keyof typeof UpdateUserGender];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateUserGender = {
+  male: "male",
+  female: "female",
+  "non-binary": "non-binary",
+  "prefer-not-to-say": "prefer-not-to-say",
+} as const;
+
 export interface UpdateUser {
   /** First name */
   firstName?: string;
+  /** User gender */
+  gender?: UpdateUserGender;
   /** Last name */
   lastName?: string;
   /**
@@ -218,8 +311,33 @@ export interface UpdateUser {
    * @minLength 6
    */
   password?: string;
-  /** @minLength 6 */
+  personalAddress?: CreateAddress;
+  /**
+   * Must not contain special characters
+   * @minLength 6
+   * @pattern /^[a-zA-Z0-9]+$/
+   */
   username?: string;
+}
+
+export type UserGender = (typeof UserGender)[keyof typeof UserGender];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UserGender = {
+  male: "male",
+  female: "female",
+  "non-binary": "non-binary",
+  "prefer-not-to-say": "prefer-not-to-say",
+} as const;
+
+export interface Address {
+  city: string;
+  country: string;
+  /** House number with entrace number */
+  houseNumber: string;
+  id: number;
+  street: string;
+  zip: string;
 }
 
 export interface Photo {
@@ -228,15 +346,52 @@ export interface Photo {
   id: string;
 }
 
+/**
+ * @nullable
+ */
+export type EventSimplePhoto = Photo | null;
+
 export interface User {
   createdAt: string;
   email: string;
   firstName: string;
+  gender: UserGender;
   id: string;
   lastName: string;
+  personalAddress: Address;
   photo: Photo;
   updatedAt: string;
   username: string;
+}
+
+/**
+ * @nullable
+ */
+export type OrganizationManager = User | null;
+
+/**
+ * User gender
+ */
+export type CreateUserGender = (typeof CreateUserGender)[keyof typeof CreateUserGender];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateUserGender = {
+  male: "male",
+  female: "female",
+  "non-binary": "non-binary",
+  "prefer-not-to-say": "prefer-not-to-say",
+} as const;
+
+export interface CreateAddress {
+  city: string;
+  country: string;
+  /**
+   * House number with entrance support
+   * @pattern /^(\d+)(\/\d+)?$/
+   */
+  houseNumber: string;
+  street: string;
+  zip: string;
 }
 
 export interface CreateUser {
@@ -244,6 +399,8 @@ export interface CreateUser {
   email: string;
   /** First name */
   firstName: string;
+  /** User gender */
+  gender: CreateUserGender;
   /** Last name */
   lastName: string;
   /**
@@ -251,9 +408,12 @@ export interface CreateUser {
    * @minLength 6
    */
   password: string;
-  /** University ID */
-  universityId: string;
-  /** @minLength 6 */
+  personalAddress?: CreateAddress;
+  /**
+   * Must not contain special characters
+   * @minLength 6
+   * @pattern /^[a-zA-Z0-9]+$/
+   */
   username: string;
 }
 
@@ -262,6 +422,12 @@ export interface AccessToken {
   accessToken: string;
 }
 
-export interface Function {
-  [key: string]: unknown;
+export interface LoginUser {
+  /** User email or username */
+  email: string;
+  /**
+   * User password
+   * @minLength 6
+   */
+  password: string;
 }
