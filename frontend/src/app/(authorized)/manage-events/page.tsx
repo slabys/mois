@@ -2,7 +2,7 @@
 
 import { useUpcomingEvents } from "@/utils/api";
 import { truncate } from "@/utils/truncate";
-import AddEventModal from "@components/AddEventModal/AddEventModal";
+import CreateEventModal from "@components/CreateEventModal/CreateEventModal";
 import {
   Button,
   Container,
@@ -93,7 +93,7 @@ const ManageEventsPage = () => {
           <Button onClick={openModal} leftSection={<IconPlus />}>
             Add Event
           </Button>
-          <AddEventModal isOpened={isModalOpen} closeModal={closeModal} />
+          <CreateEventModal isOpened={isModalOpen} closeModal={closeModal} />
         </Flex>
         <Table
           withTableBorder

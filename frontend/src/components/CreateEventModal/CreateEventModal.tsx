@@ -13,7 +13,7 @@ interface MyModalProps {
   closeModal: () => void;
 }
 
-const AddEventModal: React.FC<MyModalProps> = ({ isOpened, closeModal }) => {
+const CreateEventModal: React.FC<MyModalProps> = ({ isOpened, closeModal }) => {
   const createEventMutation = useCreateEvent({
     mutation: {
       onMutate: () => {
@@ -145,4 +145,4 @@ const AddEventModal: React.FC<MyModalProps> = ({ isOpened, closeModal }) => {
     </Modal>
   );
 };
-export default AddEventModal;
+export default CreateEventModal;
