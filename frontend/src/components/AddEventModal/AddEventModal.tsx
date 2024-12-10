@@ -1,6 +1,5 @@
 import { Button, Flex, Modal, TextInput, Textarea, Title } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
-import { useForm } from "@mantine/form";
 import React, { useState } from "react";
 
 interface MyModalProps {
@@ -39,8 +38,8 @@ const AddEventModal: React.FC<MyModalProps> = ({ isOpen, onClose }) => {
         <Title>Add Event</Title>
         <Flex mt={16} direction="column">
           <TextInput label="Title" data-autofocus />
-          <DatePickerInput label="Select the date when event starts" value={since} onChange={setSince} />
-          <DatePickerInput label="Select the date when event ends" value={until} onChange={setUntil} />
+          <DatePickerInput label="Index the date when event starts" value={since} onChange={setSince} />
+          <DatePickerInput label="Index the date when event ends" value={until} onChange={setUntil} />
           <Textarea label="Description" />
         </Flex>
         <Flex justify="center">

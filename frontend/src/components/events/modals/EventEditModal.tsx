@@ -2,8 +2,8 @@
 
 import { useUpdateEvent } from "@/utils/api";
 import { EventSimple } from "@/utils/api.schemas";
-import DateInput from "@components/DateInput/DateInput";
 import RichTextEditor from "@components/Richtext/RichTextEditor";
+import DateInput from "@components/primitives/DateInput";
 import { Button, Flex, Group, Modal, SimpleGrid, TextInput } from "@mantine/core";
 import { Form, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
@@ -19,7 +19,7 @@ const EventEditModal = ({ eventDetail, isOpened, close }: EventEditModalProps) =
   const form = useForm<Partial<EventSimple>>({
     initialValues: {
       title: eventDetail.title,
-      description: eventDetail.description,
+      shortDescription: eventDetail.shortDescription,
       since: eventDetail.since,
       until: eventDetail.until,
     },
@@ -111,7 +111,7 @@ const EventEditModal = ({ eventDetail, isOpened, close }: EventEditModalProps) =
           </SimpleGrid>
           <RichTextEditor
             label="Description"
-            content={form.values.description}
+            content={form.values.shortDescription}
             onChange={(value) => {
               form.setFieldValue("description", value);
             }}
