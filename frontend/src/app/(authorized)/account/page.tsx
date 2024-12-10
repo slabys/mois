@@ -1,19 +1,40 @@
 "use client";
 
 import { useGetCurrentUser, useUpdateCurrentUser, useUpdateCurrentUserPhoto } from "@/utils/api";
-import type { UpdateUser } from "@/utils/api.schemas";
+import { CreateAddress, CreateUserGender, UpdateUser } from "@/utils/api.schemas";
 import { apiImageURL } from "@/utils/apiImageURL";
 import { Dropzone } from "@components/Dropzone/Dropzone";
 import ImageEditor from "@components/ImageEditor/ImageEditor";
 import getCroppedImg from "@components/ImageEditor/imageEdit";
-import { Avatar, Box, Button, Container, Flex, Group, Image, Overlay, Stack, Text, TextInput } from "@mantine/core";
+import Select from "@components/primitives/Select";
+import {
+  Accordion,
+  Avatar,
+  Box,
+  Button,
+  Container,
+  Flex,
+  Grid,
+  Group,
+  Image,
+  Overlay,
+  SimpleGrid,
+  Stack,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { Form, isNotEmpty, useForm } from "@mantine/form";
 import { useHover } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconMoodEdit } from "@tabler/icons-react";
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { FileWithPath } from "react-dropzone-esm";
 import { Area } from "react-easy-crop";
+
+interface UpdateUserProps extends Partial<UpdateUser> {
+  confirmPassword?: string;
+  personalAddress?: CreateAddress | undefined;
+}
 
 const AccountPage = () => {
   const { hovered, ref: hoverRef } = useHover();
@@ -40,33 +61,56 @@ const AccountPage = () => {
     ];
   }, [newUserPhoto]);
 
-  const { data: currentUser, refetch: refetchCurrectUser } = useGetCurrentUser();
+  const isPersonalAddress = (address: CreateAddress | undefined) => {
+    return address ? Object.entries(address).some(([_key, value]) => (value as string)?.length > 0) : undefined;
+  };
 
-  const form = useForm<UpdateUser>({
+  const { data: currentUser, refetch: fetchCurrentUser, isFetching } = useGetCurrentUser();
+
+  const form = useForm<UpdateUserProps>({
     initialValues: {
-      username: "",
-      firstName: "",
-      lastName: "",
+      firstName: undefined,
+      lastName: undefined,
+      username: undefined,
+      gender: undefined,
+      password: undefined,
+      confirmPassword: undefined,
+      personalAddress: {
+        street: "",
+        houseNumber: "",
+        zip: "",
+        city: "",
+        country: "",
+      },
     },
     validate: {
-      // username: hasLength({ min: 6 }, "Must be at least 6 characters"),
       firstName: isNotEmpty("This field cannot be empty"),
       lastName: isNotEmpty("This field cannot be empty"),
+      confirmPassword: (value, values) => (values.password === value ? null : "Password does not match"),
+    },
+    transformValues: (values) => {
+      const isAddressActive = isPersonalAddress(values.personalAddress);
+
+      const { personalAddress, ...restValues } = values;
+      return { ...restValues, personalAddress: isAddressActive ? values.personalAddress : undefined };
     },
   });
 
   useEffect(() => {
     if (!currentUser) return;
-
-    form.setInitialValues(currentUser);
-    form.setValues({
-      username: currentUser.username,
-      lastName: currentUser.lastName,
+    const userValues = {
+      ...form.values,
       firstName: currentUser.firstName,
-    });
-    form.resetDirty();
+      lastName: currentUser.lastName,
+      username: currentUser.username,
+      gender: currentUser.gender,
+    };
+
+    form.setInitialValues(userValues);
+    form.setValues(userValues);
+    form.reset();
     form.resetTouched();
-  }, [currentUser]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentUser, isFetching]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateUserMutation = useUpdateCurrentUser({
     mutation: {
@@ -79,7 +123,7 @@ const AccountPage = () => {
           autoClose: false,
         });
       },
-      onSuccess: () => {
+      onSuccess: (data) => {
         notifications.update({
           id: "user-mutation",
           title: "Account Edit",
@@ -88,7 +132,8 @@ const AccountPage = () => {
           loading: false,
           autoClose: true,
         });
-        refetchCurrectUser();
+        form.setInitialValues(data);
+        form.setValues(data);
         setIsEditing(false);
       },
       onError: (error) => {
@@ -100,9 +145,7 @@ const AccountPage = () => {
           loading: false,
           autoClose: true,
         });
-        // @ts-ignore - message
         if (error.response?.data && error.response.data.message) {
-          // @ts-ignore - message
           (error.response.data.message as string[]).forEach((err) => {
             notifications.show({
               title: "Error",
@@ -117,7 +160,7 @@ const AccountPage = () => {
 
   const handleUpdateUser = (values: UpdateUser) => {
     updateUserMutation.mutate({
-      data: form.values,
+      data: values,
     });
   };
 
@@ -127,7 +170,7 @@ const AccountPage = () => {
     mutation: {
       onMutate: () => {
         notifications.show({
-          id: "photo-update-mutation",
+          id: "user-photo-update",
           loading: true,
           title: "Loading! Please wait...",
           message: "We are updating your photo information.",
@@ -136,7 +179,7 @@ const AccountPage = () => {
       },
       onSuccess: () => {
         notifications.update({
-          id: "photo-update-mutation",
+          id: "user-photo-update",
           title: "Update User Photo",
           message: "Account photo updated successfully.",
           color: "green",
@@ -145,28 +188,31 @@ const AccountPage = () => {
         });
         setCroppedArea(null);
         setNewUserPhoto(null);
-        refetchCurrectUser();
+        fetchCurrentUser();
       },
-      onError: (error) => {
+      onError: (mutationError) => {
+        if (!mutationError.response?.data) return;
+        const { statusCode, error, message } = mutationError.response?.data;
+        console.error(statusCode, error, message);
         notifications.update({
-          id: "photo-update-mutation",
+          id: "user-photo-update",
           title: "Something went wrong.",
-          message: "Please, try again.",
+          message: "Please check all information first. Then try again.",
           color: "red",
           loading: false,
           autoClose: true,
         });
-        // @ts-ignore - message
-        if (error.response?.data && error.response.data.message) {
-          // @ts-ignore - message
-          (error.response.data.message as string[]).forEach((err) => {
-            notifications.show({
-              title: "Error",
-              message: err,
-              color: "red",
-            });
-          });
+        let parsedMessage: string[] = [];
+        if (typeof message === "string") {
+          parsedMessage.push(message);
         }
+        parsedMessage.forEach((err) => {
+          notifications.show({
+            title: `${statusCode} ${error}`,
+            message: err,
+            color: "red",
+          });
+        });
       },
     },
   });
@@ -200,7 +246,7 @@ const AccountPage = () => {
           Account Page
         </Text>
         <Box pos="relative" w={100} h={100} ref={hoverRef}>
-          <Avatar src={apiImageURL(currentUser?.photo.id)} alt="Avatar" radius="50%" size={100} />
+          <Avatar src={apiImageURL(currentUser?.photo)} alt="Avatar" radius="50%" size={100} />
           {hovered && (
             <Overlay radius="50%">
               <Button
@@ -266,12 +312,101 @@ const AccountPage = () => {
       </Flex>
 
       <Form form={form} onSubmit={handleUpdateUser}>
-        <TextInput label="First name" {...form.getInputProps("firstName")} disabled={!isEditing} />
-        <TextInput label="Second name" {...form.getInputProps("lastName")} disabled={!isEditing} />
-        <TextInput label="Username" {...form.getInputProps("username")} disabled={!isEditing} />
+        <Flex direction="column" gap={12}>
+          <SimpleGrid cols={2}>
+            <TextInput label="First name" {...form.getInputProps("firstName")} disabled={!isEditing} />
+            <TextInput label="Second name" {...form.getInputProps("lastName")} disabled={!isEditing} />
+          </SimpleGrid>
+          <SimpleGrid cols={2}>
+            <TextInput label="Username" {...form.getInputProps("username")} disabled={!isEditing} />
+            <Select
+              label="Gender"
+              data={Object.entries(CreateUserGender).map(([key, gender]) => {
+                return {
+                  label: gender, // (String(gender).charAt(0).toUpperCase() + String(gender).slice(1)).replaceAll("-", " "),
+                  value: key,
+                };
+              })}
+              {...form.getInputProps("gender")}
+              disabled={!isEditing}
+            />
+          </SimpleGrid>
+          <SimpleGrid cols={2}>
+            <TextInput
+              label="Password"
+              type="password"
+              {...form.getInputProps("password")}
+              onChange={(e) => {
+                form.setFieldValue("password", e.currentTarget.value.length > 0 ? e.currentTarget.value : undefined);
+              }}
+              disabled={!isEditing}
+            />
+            <TextInput
+              label="Confirm Password"
+              type="password"
+              {...form.getInputProps("confirmPassword")}
+              onChange={(e) => {
+                form.setFieldValue("password", e.currentTarget.value.length > 0 ? e.currentTarget.value : undefined);
+              }}
+              disabled={!isEditing}
+            />
+          </SimpleGrid>
+          <Accordion defaultValue="Apples">
+            <Accordion.Item value="Personal Address">
+              <Accordion.Control>Personal Address</Accordion.Control>
+              <Accordion.Panel>
+                <Grid>
+                  <Grid.Col span={8}>
+                    <TextInput
+                      label="Street"
+                      {...form.getInputProps("personalAddress.street")}
+                      disabled={!isEditing}
+                      required={isPersonalAddress(form.values.personalAddress)}
+                    />
+                  </Grid.Col>
+                  <Grid.Col span={4}>
+                    <TextInput
+                      label="House Number"
+                      {...form.getInputProps("personalAddress.houseNumber")}
+                      disabled={!isEditing}
+                      required={isPersonalAddress(form.values.personalAddress)}
+                    />
+                  </Grid.Col>
+                  <Grid.Col span={6}>
+                    <TextInput
+                      label="ZIP code"
+                      {...form.getInputProps("personalAddress.zip")}
+                      disabled={!isEditing}
+                      required={isPersonalAddress(form.values.personalAddress)}
+                    />
+                  </Grid.Col>
+                  <Grid.Col span={6}>
+                    <TextInput
+                      label="City"
+                      {...form.getInputProps("personalAddress.city")}
+                      disabled={!isEditing}
+                      required={isPersonalAddress(form.values.personalAddress)}
+                    />
+                  </Grid.Col>
+                  <Grid.Col span={12}>
+                    <TextInput
+                      label="Country"
+                      {...form.getInputProps("personalAddress.country")}
+                      disabled={!isEditing}
+                      required={isPersonalAddress(form.values.personalAddress)}
+                    />
+                  </Grid.Col>
+                </Grid>
+              </Accordion.Panel>
+            </Accordion.Item>
+          </Accordion>
+        </Flex>
         <Group justify="center" mt="lg">
           <Button
-            onClick={() => setIsEditing(!isEditing)}
+            onClick={() => {
+              form.reset();
+              setIsEditing(!isEditing);
+            }}
             loading={updateUserMutation.isPending}
             color={isEditing ? "red" : "blue"}
           >

@@ -1,14 +1,6 @@
 import { Photo } from "modules/photo";
 import { User } from "modules/users";
-import {
-  BaseEntity,
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { EventApplication } from "./event-application.entity";
 import { EventLink } from "./event-link.entity";
 import { EventSpot } from "./event-spot.entity";
@@ -24,7 +16,7 @@ export class Event extends BaseEntity {
   @Column()
   shortDescription: string;
 
-  // Select only short description by default
+  // Index only short description by default
   @Column({ select: false })
   longDescription: string;
 

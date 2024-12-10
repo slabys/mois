@@ -3,7 +3,8 @@
 import { useCreateUser } from "@/utils/api";
 import { CreateUser, CreateUserGender } from "@/utils/api.schemas";
 import routes from "@/utils/routes";
-import { Box, Button, Flex, Select, SimpleGrid, Text, TextInput } from "@mantine/core";
+import Select from "@components/primitives/Select";
+import { Box, Button, Flex, SimpleGrid, Text, TextInput } from "@mantine/core";
 import { Form, hasLength, isEmail, isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
@@ -117,13 +118,13 @@ const RegistrationForm = () => {
             <TextInput label="Username" {...form.getInputProps("username")} required />
             <Select
               label="Gender"
-              {...form.getInputProps("gender")}
               data={Object.entries(CreateUserGender).map(([key, gender]) => {
                 return {
-                  label: (String(gender).charAt(0).toUpperCase() + String(gender).slice(1)).replaceAll("-", " "),
+                  label: gender, // (String(gender).charAt(0).toUpperCase() + String(gender).slice(1)).replaceAll("-", " "),
                   value: key,
                 };
               })}
+              {...form.getInputProps("gender")}
               required
             />
           </SimpleGrid>

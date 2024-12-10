@@ -42,7 +42,7 @@ const EventCard = ({ event }: EventCardProps) => {
             </Box>
           </Stack>
           <Text size="xs" lineClamp={4} span>
-            <RichTextRenderer content={event.description} />
+            <RichTextRenderer content={event.shortDescription} />
           </Text>
         </Stack>
       </Flex>
