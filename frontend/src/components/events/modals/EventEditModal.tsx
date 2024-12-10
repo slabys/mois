@@ -111,7 +111,7 @@ const EventEditModal = ({ eventDetail, isOpened, close }: EventEditModalProps) =
           </SimpleGrid>
           <RichTextEditor
             label="Description"
-            content={form.values.shortDescription}
+            value={form.values.shortDescription}
             onChange={(value) => {
               form.setFieldValue("description", value);
             }}

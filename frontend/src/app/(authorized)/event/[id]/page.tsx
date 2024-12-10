@@ -3,7 +3,7 @@ import EventDetail from "@components/events/EventDetail";
 import { Container } from "@mantine/core";
 
 interface EventDetailPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: number }>;
 }
 
 const EventDetailPage = async ({ params }: EventDetailPageProps) => {
