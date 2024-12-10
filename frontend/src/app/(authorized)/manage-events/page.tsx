@@ -16,14 +16,11 @@ import {
   TableTr,
   Title,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { IconPlus } from "@tabler/icons-react";
-import { useState } from "react";
 
 const ManageEventsPage = () => {
-  const [modalOpen, setModalOpen] = useState<boolean>(false);
-
-  const openModal = () => setModalOpen(true);
-  const closeModal = () => setModalOpen(false);
+  const [isModalOpen, { open: openModal, close: closeModal }] = useDisclosure(false);
 
   const data = useUpcomingEvents();
   console.log("data", data.data);
@@ -96,7 +93,7 @@ const ManageEventsPage = () => {
           <Button onClick={openModal} leftSection={<IconPlus />}>
             Add Event
           </Button>
-          <AddEventModal isOpen={modalOpen} onClose={closeModal} />
+          <AddEventModal isOpened={isModalOpen} closeModal={closeModal} />
         </Flex>
         <Table
           withTableBorder

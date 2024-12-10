@@ -10,11 +10,11 @@ import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 
 interface EventDetailProps {
-  id: string;
+  id: number;
 }
 
 const EventDetail = ({ id }: EventDetailProps) => {
-  const [opened, { open: openModal, close: closeModal }] = useDisclosure(false);
+  const [isModalOpen, { open: openModal, close: closeModal }] = useDisclosure(false);
   const { data: eventDetail } = useGetEvent(id);
 
   return eventDetail ? (
@@ -34,7 +34,7 @@ const EventDetail = ({ id }: EventDetailProps) => {
                 </Text>
               </Text>
             </Flex>
-            <RichTextRenderer content={eventDetail.description} />
+            <RichTextRenderer content={eventDetail.shortDescription} />
           </Flex>
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 3 }} order={{ base: 1, md: 2 }}>
@@ -68,7 +68,7 @@ const EventDetail = ({ id }: EventDetailProps) => {
           </Flex>
         </Grid.Col>
       </Grid>
-      <EventEditModal eventDetail={eventDetail} isOpened={opened} close={closeModal} />
+      <EventEditModal eventDetail={eventDetail} isOpened={isModalOpen} close={closeModal} />
     </>
   ) : (
     <Grid>
