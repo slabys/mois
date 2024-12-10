@@ -10,7 +10,10 @@ export const routes = {
   MANAGE_EVENTS: "/manage-events",
   SENT_APPLICATIONS: "/sent-applications",
   ACCOUNT: "/account",
+
+  // Events
   EVENT_DETAIL: (props: { id: number }) => `/event/${props.id}`,
+  EVENT_MANAGE: (props: { id: number }) => `/event/manage/${props.id}`,
 
   // Footer
   PRIVACY_POLICY: "/privacy-policy",
