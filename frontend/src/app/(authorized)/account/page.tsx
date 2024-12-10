@@ -65,7 +65,23 @@ const AccountPage = () => {
     return address ? Object.entries(address).some(([_key, value]) => (value as string)?.length > 0) : undefined;
   };
 
-  const { data: currentUser, refetch: fetchCurrentUser, isFetching } = useGetCurrentUser();
+  const { data: currentUser, refetch: fetchCurrentUser, isFetchedAfterMount } = useGetCurrentUser();
+
+  useEffect(() => {
+    if (!currentUser) return;
+    const userValues = {
+      ...form.values,
+      firstName: currentUser.firstName,
+      lastName: currentUser.lastName,
+      username: currentUser.username,
+      gender: currentUser.gender,
+    };
+
+    form.setInitialValues(userValues);
+    form.setValues(userValues);
+    form.reset();
+    form.resetTouched();
+  }, [isFetchedAfterMount]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const form = useForm<UpdateUserProps>({
     initialValues: {
@@ -87,6 +103,10 @@ const AccountPage = () => {
       firstName: isNotEmpty("This field cannot be empty"),
       lastName: isNotEmpty("This field cannot be empty"),
       confirmPassword: (value, values) => (values.password === value ? null : "Password does not match"),
+      personalAddress: {
+        houseNumber: (zipValue: string | undefined) =>
+          zipValue ? (/^(\d+)(\/\d+)?$/.test(zipValue) ? null : "Unable to send format") : null,
+      },
     },
     transformValues: (values) => {
       const isAddressActive = isPersonalAddress(values.personalAddress);
@@ -95,22 +115,6 @@ const AccountPage = () => {
       return { ...restValues, personalAddress: isAddressActive ? values.personalAddress : undefined };
     },
   });
-
-  useEffect(() => {
-    if (!currentUser) return;
-    const userValues = {
-      ...form.values,
-      firstName: currentUser.firstName,
-      lastName: currentUser.lastName,
-      username: currentUser.username,
-      gender: currentUser.gender,
-    };
-
-    form.setInitialValues(userValues);
-    form.setValues(userValues);
-    form.reset();
-    form.resetTouched();
-  }, [currentUser, isFetching]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateUserMutation = useUpdateCurrentUser({
     mutation: {
@@ -134,6 +138,8 @@ const AccountPage = () => {
         });
         form.setInitialValues(data);
         form.setValues(data);
+        form.resetDirty();
+        form.resetTouched();
         setIsEditing(false);
       },
       onError: (error) => {
