@@ -3,3 +3,7 @@ import dayjs from "dayjs";
 export const dayMonthYear = (time: Date | string | undefined) => {
   return dayjs(time).format("MM.DD.YYYY");
 };
+
+export const dateWithTime = (time: Date | string | undefined) => {
+  return dayjs(time).format("MM.DD.YYYY HH:mm");
+};
