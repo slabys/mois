@@ -21,6 +21,7 @@ import { PhotoModule } from "modules/photo";
 import { UsersModule } from "modules/users";
 import { NestjsFormDataModule } from "nestjs-form-data";
 import { InvoiceModule } from "modules/invoice";
+import { ManagementControllers } from "./controllers/management";
 @Module({
   imports: [
     AuthModule,
@@ -51,6 +52,7 @@ import { InvoiceModule } from "modules/invoice";
     EventApplicationsController,
     EventsController,
     EventSpotsController,
+    ...ManagementControllers,
     HealthController,
   ],
   providers: [],

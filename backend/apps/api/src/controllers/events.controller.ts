@@ -18,6 +18,7 @@ import {
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiQuery,
   ApiTags,
 } from "@nestjs/swagger";
 import { FormDataRequest } from "nestjs-form-data";
@@ -57,6 +58,8 @@ export class EventsController {
    * 
    */
   @ApiOkResponse({ type: [EventSimple] })
+  @ApiQuery({ name: "sinceSince", required: false, type: Number })
+  @ApiQuery({ name: "toSince", required: false, type: Number })
   @Get()
   getEvents(
     @Pagination() pagination: PaginationOptions,
