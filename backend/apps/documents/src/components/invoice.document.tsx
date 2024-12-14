@@ -44,6 +44,7 @@ export const InvoiceDocument = ({
   payment,
   subscriber,
   supplier,
+  items,
 }: InvoiceDocumentProps) => (
   <Document>
     <Page size="A4">
@@ -108,41 +109,49 @@ export const InvoiceDocument = ({
 
       <View style={styles.page}>
         <ItemsTable
-          items={[
-            {
-              amount: 10,
-              name: "Položka",
-              unitPrice: 10,
-              vatRate: 21,
-            },
-            {
-              amount: 150,
-              name: "Položka",
-              unitPrice: 10,
-              vatRate: 21,
-            },
-            {
-              amount: 10,
-              name: "Položka",
-              unitPrice: 10,
-              vatRate: 21,
-            },
-            {
-              amount: 200,
-              name: "Položka",
-              unitPrice: 10,
-              vatRate: 21,
-            },
-            {
-              amount: 150,
-              name: "Položka",
-              unitPrice: 10,
-              vatRate: 21,
-            },
-          ]}
+          items={items.map((item) => ({
+            amount: item.amount,
+            name: item.name,
+            unitPrice: item.price,
+            vatRate: 21,
+          }))}
         />
       </View>
       <PriceTotal total={50} currency="CZK" />
     </Page>
   </Document>
 );
+/*
+[
+  {
+    amount: 10,
+    name: "Položka",
+    unitPrice: 10,
+    vatRate: 21,
+  },
+  {
+    amount: 150,
+    name: "Položka",
+    unitPrice: 10,
+    vatRate: 21,
+  },
+  {
+    amount: 10,
+    name: "Položka",
+    unitPrice: 10,
+    vatRate: 21,
+  },
+  {
+    amount: 200,
+    name: "Položka",
+    unitPrice: 10,
+    vatRate: 21,
+  },
+  {
+    amount: 150,
+    name: "Položka",
+    unitPrice: 10,
+    vatRate: 21,
+  },
+]
+  */

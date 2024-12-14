@@ -10,6 +10,7 @@ import type {
   GenerateInvoice,
   GenerateInvoiceResult,
 } from "apps/documents/src/types";
+import { Invoice } from "modules/invoice/entities/invoice.entity";
 
 @Injectable()
 export class InvoiceService
@@ -75,7 +76,7 @@ export class InvoiceService
    * }
    * ```
    */
-  generate(data: GenerateInvoice["data"]) {
+  generatePdf(data: GenerateInvoice["data"]) {
     const outputPath = `invoices/${data.id}.pdf`;
 
     const payload = <GenerateInvoice>{
@@ -87,5 +88,59 @@ export class InvoiceService
       "invoice.generate",
       payload
     );
+  }
+
+  /**
+   * Generate invoice pdf from invoice data
+   * @param invoice Invoice data
+   * @returns
+   */
+  generatePdfFromInvoice(invoice: Invoice) {
+    const totalCost = invoice.items.reduce(
+      (prev, current) => prev + current.price,
+      0
+    );
+
+    return this.generatePdf({
+      id: invoice.id,
+      payment: {
+        amount: totalCost,
+        ban: "BAN",
+        iban: invoice.iban,
+        variableSymbol: invoice.variableSymbol,
+        swift: invoice.swift,
+      },
+      subscriber: {
+        vatId: "ID",
+        address: {
+          city: invoice.subscriber.address.city,
+          country: invoice.subscriber.address.country,
+          houseNumber: invoice.subscriber.address.houseNumber,
+          region: "REGION",
+          street: invoice.subscriber.address.street,
+          zip: invoice.subscriber.address.zip,
+        },
+        cin: invoice.subscriber.cin,
+        name: invoice.subscriber.name,
+      },
+      supplier: {
+        vatId: "ID",
+        address: {
+          city: invoice.supplier.address.city,
+          country: invoice.supplier.address.country,
+          houseNumber: invoice.supplier.address.houseNumber,
+          region: "REGION",
+          street: invoice.supplier.address.street,
+          zip: invoice.supplier.address.zip,
+        },
+        cin: invoice.subscriber.cin,
+        name: invoice.supplier.name,
+      },
+      items: invoice.items.map((item) => ({
+        amount: item.amount,
+        name: item.name,
+        price: item.price,
+      })),
+    });
   }
 }

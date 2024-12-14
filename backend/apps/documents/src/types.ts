@@ -12,10 +12,16 @@ interface PaymentSubject {
   };
 }
 
+interface GenerateInvoiceItem {
+  name: string;
+  price: number;
+  amount: number;
+}
+
 export interface GenerateInvoice {
   outputPath: string;
   data: {
-    id: number;
+    id: string;
 
     supplier: PaymentSubject;
     subscriber: PaymentSubject;
@@ -27,6 +33,8 @@ export interface GenerateInvoice {
       swift?: string;
       amount: number;
     };
+    
+    items: GenerateInvoiceItem[];
   };
 }
 
