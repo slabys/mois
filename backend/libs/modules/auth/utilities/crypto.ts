@@ -18,3 +18,4 @@ export const hashPassword = async (password: string) => {
 export const verifyPassword = (password: string, hash: string) => {
   return bcrypt.compare(password, hash);
 };
+
