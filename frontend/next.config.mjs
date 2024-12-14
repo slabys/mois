@@ -18,6 +18,9 @@ const nextConfig = {
     PORT_FE: process.env.PORT_FE,
   },
   experimental: {
+    turbo: {
+      enabled: process.env.NODE_ENV === "development",
+    },
     optimizePackageImports: ["@mantine/core", "@mantine/hooks", "@mantine/dates"],
   },
 };

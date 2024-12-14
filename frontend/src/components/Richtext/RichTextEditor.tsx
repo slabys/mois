@@ -15,15 +15,15 @@ import { useMemo } from "react";
 
 interface RichTextEditorProps {
   label?: string;
-  content?: string;
+  value?: string;
   onChange?: (value: string) => void;
   error?: any;
 }
 
-const RichTextEditor = ({ label, content, onChange, error }: RichTextEditorProps) => {
+const RichTextEditor = ({ label, value, onChange, error }: RichTextEditorProps) => {
   const parsedContent = useMemo(() => {
     try {
-      return JSON.parse(content ?? "") as JSONContent;
+      return JSON.parse(value ?? "") as JSONContent;
     } catch (e) {
       console.error(e);
       return null;
@@ -46,7 +46,6 @@ const RichTextEditor = ({ label, content, onChange, error }: RichTextEditorProps
     content: parsedContent,
 
     onUpdate: ({ editor }) => {
-      console.log(JSON.stringify(editor.getJSON()));
       if (onChange) onChange(JSON.stringify(editor.getJSON()));
     },
   });

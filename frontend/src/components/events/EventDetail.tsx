@@ -1,20 +1,29 @@
 "use client";
 
 import { useGetEvent } from "@/utils/api";
-import { dayMonthYear } from "@/utils/time";
+import routes from "@/utils/routes";
+import { dateWithTime, dayMonthYear } from "@/utils/time";
 import ApiImage from "@components/ApiImage/ApiImage";
 import RichTextRenderer from "@components/Richtext/RichTextRenderer";
+import UpdateEventPhotoModal from "@components/UpdateEventPhotoModal/UpdateEventPhotoModal";
 import EventEditModal from "@components/events/modals/EventEditModal";
-import { Button, Flex, Grid, Skeleton, Text, Title } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { Button, Collapse, Divider, Flex, Grid, SimpleGrid, Skeleton, Text, Title } from "@mantine/core";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
+import { IconCash, IconChevronDown, IconEdit, IconInvoice, IconPhoto, IconUsersGroup } from "@tabler/icons-react";
 import Link from "next/link";
+import React from "react";
 
 interface EventDetailProps {
-  id: string;
+  id: number;
 }
 
 const EventDetail = ({ id }: EventDetailProps) => {
-  const [opened, { open: openModal, close: closeModal }] = useDisclosure(false);
+  const isPhone = useMediaQuery("(min-width: 62em)");
+  const [opened, { toggle }] = useDisclosure(isPhone);
+
+  const [isModalEditOpen, { open: openModalEdit, close: closeModalEdit }] = useDisclosure(false);
+  const [isModalUploadPhotoOpen, { open: openModalUploadPhoto, close: closeModalUploadPhoto }] = useDisclosure(false);
+
   const { data: eventDetail } = useGetEvent(id);
 
   return eventDetail ? (
@@ -27,6 +36,14 @@ const EventDetail = ({ id }: EventDetailProps) => {
               <Title order={1}>{eventDetail.title}</Title>
               <Text>
                 <Text span fw="bold">
+                  Registration Deadline:
+                </Text>{" "}
+                <Text span c="dark">
+                  {dateWithTime(eventDetail.registrationDeadline)}
+                </Text>
+              </Text>
+              <Text>
+                <Text span fw="bold">
                   Date:
                 </Text>{" "}
                 <Text span c="dark">
@@ -34,41 +51,61 @@ const EventDetail = ({ id }: EventDetailProps) => {
                 </Text>
               </Text>
             </Flex>
-            <RichTextRenderer content={eventDetail.description} />
+            <RichTextRenderer content={eventDetail.shortDescription} />
           </Flex>
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 3 }} order={{ base: 1, md: 2 }}>
           <Flex direction="column" gap={8}>
-            {/*TODO - add real links*/}
-            Mockup data Admin view
-            <Button onClick={openModal}>Edit Event</Button>
-            {[
-              { label: "Applications", href: "" },
-              { label: "Assign Spots", href: "" },
-              { label: "Payments", href: "" },
-            ].map((eventItem, index) => {
-              return (
-                <Button component={Link} href={eventItem.href} key={`event-detail-button-link-${index}`}>
-                  {eventItem.label}
+            <Button
+              maw={{ base: 180, md: "100%" }}
+              mb={8}
+              variant="light"
+              onClick={toggle}
+              justify="space-between"
+              rightSection={
+                <IconChevronDown
+                  style={{ rotate: (isPhone ? !opened : opened) ? "0deg" : "180deg", transition: "rotate 300ms" }}
+                />
+              }
+              size="compact"
+            >
+              Show options
+            </Button>
+            <Collapse in={isPhone ? !opened : opened}>
+              <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 1, xl: 1 }}>
+                <Button onClick={openModalEdit} leftSection={<IconEdit />}>
+                  Edit Event
                 </Button>
-              );
-            })}
-            User view
-            {[
-              { label: "Agenda", href: "" },
-              { label: "Invoice", href: "" },
-              { label: "Payment Confirmation", href: "" },
-            ].map((eventItem, index) => {
-              return (
-                <Button component={Link} href={eventItem.href} key={`event-detail-button-link-${index}`}>
-                  {eventItem.label}
+                <Button onClick={openModalUploadPhoto} leftSection={<IconPhoto />}>
+                  Upload Image
                 </Button>
-              );
-            })}
+                {/* TODO */}
+                <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconUsersGroup />}>
+                  Manage Applications
+                </Button>
+              </SimpleGrid>
+
+              <Divider my={16} />
+              <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 1, xl: 1 }}>
+                {/* TODO */}
+                <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconInvoice />}>
+                  Invoice
+                </Button>
+                {/* TODO */}
+                <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconCash />}>
+                  Payment Confirmation
+                </Button>
+              </SimpleGrid>
+            </Collapse>
           </Flex>
         </Grid.Col>
       </Grid>
-      <EventEditModal eventDetail={eventDetail} isOpened={opened} close={closeModal} />
+      <UpdateEventPhotoModal
+        eventId={eventDetail.id}
+        isOpened={isModalUploadPhotoOpen}
+        closeModal={closeModalUploadPhoto}
+      />
+      <EventEditModal eventDetail={eventDetail} isOpened={isModalEditOpen} close={closeModalEdit} />
     </>
   ) : (
     <Grid>

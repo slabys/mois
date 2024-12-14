@@ -11,6 +11,12 @@ export const customInstance = <T>(config: AxiosRequestConfig, options?: AxiosReq
   }).then(({ data }) => data);
 };
 
-export type ErrorType<Error> = AxiosError<Error>;
+// export type ErrorType<Error> = AxiosError<Error>;
+
+export type ErrorType<Error> = AxiosError<{
+  statusCode: number;
+  error: string;
+  message?: string | string[];
+}>;
 
 export type BodyType<BodyData> = BodyData;

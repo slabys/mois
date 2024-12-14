@@ -1,27 +1,40 @@
 "use client";
 
-import { LoginUserWithEmailMutationBody, LoginUserWithEmailMutationError, useLoginUserWithEmail } from "@/utils/api";
-import { Function } from "@/utils/api.schemas";
+import { useLoginUserWithEmailOrUsername } from "@/utils/api";
+import { LoginUser } from "@/utils/api.schemas";
 import routes from "@/utils/routes";
 import { Box, Button, Flex, Text, TextInput } from "@mantine/core";
 import { Form, isNotEmpty, useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
 import React from "react";
 
 const LoginForm = () => {
   const router = useRouter();
-  const loginUserMutation = useLoginUserWithEmail<LoginUserWithEmailMutationBody, LoginUserWithEmailMutationError>({
+  const loginUserMutation = useLoginUserWithEmailOrUsername({
     mutation: {
       onSuccess: () => {
         router.push(routes.DASHBOARD);
       },
-      onError: (error) => {
-        console.error("Login failed:", error);
+      onError: (mutationError) => {
+        if (!mutationError.response?.data) return;
+        const { statusCode, error, message } = mutationError.response?.data;
+        let parsedMessage: string[] = [];
+        if (typeof message === "string") {
+          parsedMessage.push(message);
+        }
+        parsedMessage.forEach((err) => {
+          notifications.show({
+            title: `${statusCode} ${error}`,
+            message: err,
+            color: "red",
+          });
+        });
       },
     },
   });
 
-  const form = useForm<Function>({
+  const form = useForm<LoginUser>({
     initialValues: {
       email: "",
       password: "",
@@ -32,7 +45,7 @@ const LoginForm = () => {
     },
   });
 
-  const loginUser = async (values: Function) => {
+  const loginUser = async (values: LoginUser) => {
     loginUserMutation.mutate({
       data: values,
     });

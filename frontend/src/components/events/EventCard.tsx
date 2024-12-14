@@ -28,7 +28,7 @@ const EventCard = ({ event }: EventCardProps) => {
                 </Text>{" "}
                 <Text c="dimmed" span>
                   {/*TODO - add Place*/}
-                  Place (maybe link here)
+                  Place (link here)
                 </Text>
               </Text>
               <Text size="sm">
@@ -42,7 +42,7 @@ const EventCard = ({ event }: EventCardProps) => {
             </Box>
           </Stack>
           <Text size="xs" lineClamp={4} span>
-            <RichTextRenderer content={event.description} />
+            <RichTextRenderer content={event.shortDescription} />
           </Text>
         </Stack>
       </Flex>
