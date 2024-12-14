@@ -5,12 +5,15 @@ import {
   type OnApplicationShutdown,
 } from "@nestjs/common";
 import type { ClientProxy } from "@nestjs/microservices";
+import { InjectEntityManager } from "@nestjs/typeorm";
+import dayjs from "dayjs";
 
 import type {
   GenerateInvoice,
   GenerateInvoiceResult,
 } from "apps/documents/src/types";
 import { Invoice } from "modules/invoice/entities/invoice.entity";
+import { Between, EntityManager } from "typeorm";
 
 @Injectable()
 export class InvoiceService
@@ -18,15 +21,62 @@ export class InvoiceService
 {
   constructor(
     @Inject("DOCUMENTS")
-    private readonly clientProxy: ClientProxy
+    private readonly clientProxy: ClientProxy,
+    @InjectEntityManager()
+    private readonly entityManager: EntityManager
   ) {}
 
   async onApplicationBootstrap() {
     await this.clientProxy.connect();
   }
 
-  onApplicationShutdown(signal?: string) {
+  onApplicationShutdown() {
     this.clientProxy.close();
+  }
+
+  /**
+   * Format invoice ID
+   * @param number Invoice ID
+   * @param year Invoice create year
+   * @returns E<year>{0..0}<invoiceId>
+   *
+   * @example E20240001
+   */
+  private formatInvoiceId(number: number, year: number) {
+    const suffix =
+      number.toString().length > 4 ? number : "0".repeat(4 - number) + number;
+    return `E${year}${suffix}`;
+  }
+
+  /**
+   * Create new invoice
+   * @param data Invoice data
+   * @returns Saved invoice
+   */
+  async create(data: Omit<Invoice, "id">) {
+    return this.entityManager.transaction(async (em) => {
+      const start = dayjs().hour(0).minute(0).second(0).millisecond(0);
+      const end = dayjs(start).add(1, "day");
+
+      const todayInvoices = await em.countBy(Invoice, {
+        createdAt: Between(start.toDate(), end.toDate()),
+      });
+
+      const id = this.formatInvoiceId(todayInvoices, start.year());
+
+      const invoice = new Invoice({
+        id,
+        iban: data.iban,
+        items: data.items,
+        subscriber: data.subscriber,
+        constantSymbol: data.constantSymbol,
+        variableSymbol: data.variableSymbol,
+        swift: data.swift,
+        supplier: data.supplier,
+      });
+
+      return em.save(invoice);
+    });
   }
 
   /**

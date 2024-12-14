@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
 import { InvoiceItem } from "./invoice-item.entity";
 import { PaymentSubject } from "modules/payments";
 
@@ -33,4 +33,11 @@ export class Invoice {
 
   @ManyToOne(() => PaymentSubject, { eager: true })
   subscriber: PaymentSubject;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  constructor(data?: Partial<Invoice>) {
+    Object.assign(this, data);
+  }
 }
