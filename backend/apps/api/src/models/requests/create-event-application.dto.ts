@@ -12,4 +12,7 @@ export class CreateEventApplication {
   @Allow()
   @Type(() => CreateAddress)
   invoiceAddress: CreateAddress;
+
+  @Allow()
+  idNumber: string;
 }

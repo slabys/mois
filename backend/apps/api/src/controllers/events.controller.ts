@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -17,6 +18,7 @@ import {
   ApiForbiddenResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiQuery,
   ApiTags,
 } from "@nestjs/swagger";
 import { FormDataRequest } from "nestjs-form-data";
@@ -31,6 +33,8 @@ import { CurrentUser } from "../decorators";
 import { CreateEvent, UpdateEvent, UpdatePhoto } from "../models/requests";
 import { EventSimple } from "../models/responses";
 
+import { ParseDatePipe } from "utilities/nest/pipes";
+
 @ApiTags("Events")
 @Controller("events")
 export class EventsController {
@@ -40,12 +44,35 @@ export class EventsController {
   ) {}
 
   /**
-   * Find upcoming visible events
+   * To filter by `since` use:
+   * 
+   * `sinceSince`: Events with `since` more than entered value 
+   * 
+   * `toSince`: Events with `since` less than entered value
+   * 
+   * 
+   * Examples:
+   * - To filter only future events use `sinceSince` `(new Date().getTime())`
+   * - To filter only past events use `toSince` `(new Date().getTime())`
+   * - To filter only events between two dates use `sinceSince`: `dateA`, `toSince`: `dateB`
+   * 
    */
   @ApiOkResponse({ type: [EventSimple] })
-  @Get("upcoming")
-  upcomingEvents(@Pagination() pagination: PaginationOptions) {
-    return this.eventsService.getUpcomingEvents({ pagination, visible: true });
+  @ApiQuery({ name: "sinceSince", required: false, type: Number })
+  @ApiQuery({ name: "toSince", required: false, type: Number })
+  @Get()
+  getEvents(
+    @Pagination() pagination: PaginationOptions,
+    @Query("sinceSince", ParseDatePipe) since?: Date,
+    @Query("toSince", ParseDatePipe) to?: Date
+  ) {
+    return this.eventsService.findByFilter(
+      { since, to },
+      {
+        pagination,
+        visible: true,
+      }
+    );
   }
 
   /**

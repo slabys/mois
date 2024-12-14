@@ -1,13 +1,16 @@
-import { Allow, Matches } from "class-validator";
+import { Allow, IsNotEmpty, Matches } from "class-validator";
 
 export class CreateAddress {
   @Allow()
+  @IsNotEmpty()
   city: string;
 
   @Allow()
+  @IsNotEmpty()
   country: string;
 
   @Allow()
+  @IsNotEmpty()
   street: string;
 
   /**
@@ -17,8 +20,10 @@ export class CreateAddress {
    * @example 145/5
    */
   @Matches(/^(\d+)(\/\d+)?$/)
+  @IsNotEmpty()
   houseNumber: string;
 
   @Allow()
+  @IsNotEmpty()
   zip: string;
 }

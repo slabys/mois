@@ -31,7 +31,7 @@ export class Address {
   houseNumber: string;
 
   constructor(data: DeepPartial<Address>) {
-    Object.assign(this, data);
+    this.update(data);
   }
 
   /**
@@ -40,5 +40,9 @@ export class Address {
    */
   copy() {
     return new Address({ ...this, id: undefined });
+  }
+
+  update(data: DeepPartial<Address>) {
+    Object.assign(this, data);
   }
 }

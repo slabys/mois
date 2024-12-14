@@ -3,6 +3,7 @@ import { Exclude } from "class-transformer";
 import {
   BaseEntity,
   BeforeInsert,
+  BeforeUpdate,
   Column,
   CreateDateColumn,
   type DeepPartial,
@@ -63,9 +64,10 @@ export class User extends BaseEntity {
   @ManyToOne(() => Address, { onDelete: "SET NULL", cascade: true })
   personalAddress: Address;
 
+  @BeforeUpdate()
   @BeforeInsert()
   async beforeSave() {
-    this.password = await hashPassword(this.password);
+    if (this.password) this.password = await hashPassword(this.password);
   }
 
   constructor(partial?: DeepPartial<User>) {

@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 /**
  * Hashes password
  * @param password Password
@@ -18,3 +18,4 @@ export const hashPassword = async (password: string) => {
 export const verifyPassword = (password: string, hash: string) => {
   return bcrypt.compare(password, hash);
 };
+

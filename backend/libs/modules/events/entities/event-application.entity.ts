@@ -41,9 +41,6 @@ export class EventApplication {
   @Column({ type: "json", default: {}, select: false })
   additionalData: object;
 
-  @Column()
-  idCard: string;
-
   @OneToOne(() => Address, { cascade: true })
   @JoinColumn()
   personalAddress: Address;
@@ -51,6 +48,9 @@ export class EventApplication {
   @OneToOne(() => Address, { cascade: true })
   @JoinColumn()
   invoiceAddress: Address;
+
+  @Column({ select: false })
+  idNumber: string;
 
   @CreateDateColumn()
   createdAt: Date;

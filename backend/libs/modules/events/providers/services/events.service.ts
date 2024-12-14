@@ -1,14 +1,17 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import {
+  Between,
   FindOptionsRelations,
   FindOptionsSelect,
+  LessThan,
   MoreThan,
   type Repository,
 } from "typeorm";
 
 import { FindManyOptions } from "libs/types";
 import { Event } from "modules/events/entities";
+import { EventFilter } from "../../models";
 
 interface EventFindOptions extends FindManyOptions {
   visible?: boolean;
@@ -56,10 +59,30 @@ export class EventsService {
         visible: options.visible,
       },
       relations: {
-        createdByUser: {
-          photo: true,
-        },
-        photo: true,
+        createdByUser: true,
+      },
+      order: {
+        since: "DESC",
+      },
+      skip: options?.pagination?.skip,
+      take: options?.pagination?.take,
+    });
+  }
+
+  findByFilter(filter?: EventFilter, options?: EventFindOptions) {
+    return this.eventsRepository.find({
+      where: {
+        since:
+          filter.since && filter.to
+            ? Between(filter.since, filter.to)
+            : filter.since
+            ? MoreThan(filter.since)
+            : filter.to
+            ? LessThan(filter.to)
+            : undefined,
+      },
+      relations: {
+        createdByUser: true,
       },
       order: {
         since: "DESC",
