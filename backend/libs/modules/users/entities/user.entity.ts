@@ -67,7 +67,7 @@ export class User extends BaseEntity {
   @BeforeUpdate()
   @BeforeInsert()
   async beforeSave() {
-    this.password = await hashPassword(this.password);
+    if (this.password) this.password = await hashPassword(this.password);
   }
 
   constructor(partial?: DeepPartial<User>) {
