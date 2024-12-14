@@ -4,7 +4,6 @@ export class UpdateEventApplicationAddAddresses1733591959562 implements Migratio
     name = 'UpdateEventApplicationAddAddresses1733591959562'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`ALTER TABLE "event_application" ADD "id_card" character varying NOT NULL`);
         await queryRunner.query(`ALTER TABLE "event_application" ADD "personal_address_id" integer`);
         await queryRunner.query(`ALTER TABLE "event_application" ADD CONSTRAINT "UQ_d95eaed3aced256304db27b502d" UNIQUE ("personal_address_id")`);
         await queryRunner.query(`ALTER TABLE "event_application" ADD "invoice_address_id" integer`);
@@ -20,7 +19,6 @@ export class UpdateEventApplicationAddAddresses1733591959562 implements Migratio
         await queryRunner.query(`ALTER TABLE "event_application" DROP COLUMN "invoice_address_id"`);
         await queryRunner.query(`ALTER TABLE "event_application" DROP CONSTRAINT "UQ_d95eaed3aced256304db27b502d"`);
         await queryRunner.query(`ALTER TABLE "event_application" DROP COLUMN "personal_address_id"`);
-        await queryRunner.query(`ALTER TABLE "event_application" DROP COLUMN "id_card"`);
     }
 
 }

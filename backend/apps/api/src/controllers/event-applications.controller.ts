@@ -91,6 +91,7 @@ export class EventApplicationsController {
       spotType,
       personalAddress: currentUser.personalAddress.copy(),
       invoiceAddress: new Address(body.invoiceAddress),
+      idNumber: body.idNumber
     });
 
     if (event.registrationForm) {
