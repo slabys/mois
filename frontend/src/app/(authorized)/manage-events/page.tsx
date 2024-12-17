@@ -17,8 +17,8 @@ const ManageEventsPage = () => {
   // TODO
   const handleDuplicateEvent = (event: EventSimple) => {};
 
-  const rows = upcomingEvents?.map((element) => (
-    <Table.Tr key={element.title}>
+  const rows = upcomingEvents?.map((element, index) => (
+    <Table.Tr key={`event-${index}-${element.id}`}>
       <Table.Td p={0} w={128} h={128}>
         <ApiImage src={element.photo?.id} w="100%" h="100%" fit="cover" />
       </Table.Td>
