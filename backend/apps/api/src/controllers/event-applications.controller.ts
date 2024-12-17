@@ -44,7 +44,7 @@ export class EventApplicationsController {
   @UseGuards(CookieGuard)
   @Get("applications")
   getUserApplications(@CurrentUser() user: User) {
-    return this.eventApplicationsService.findByUserId(user.id);
+    return this.eventApplicationsService.findByUserIdDetailed(user.id);
   }
 
   /**
@@ -56,7 +56,7 @@ export class EventApplicationsController {
   @UseGuards(CookieGuard)
   @Get(":eventId/applications")
   async getEventApplications(@Param("eventId", ParseIntPipe) eventId: number) {
-    return this.eventApplicationsService.findByEventId(eventId);
+    return this.eventApplicationsService.findByEventIdDetailed(eventId);
   }
 
   /**

@@ -23,7 +23,7 @@ export class EventApplicationsService {
         user: {
           photo: true,
         },
-        spotType: true
+        spotType: true,
       },
     });
   }
@@ -46,6 +46,54 @@ export class EventApplicationsService {
       },
       take: options?.pagination?.take,
       skip: options?.pagination?.skip,
+    });
+  }
+
+  /**
+   * @param id User ID
+   * @param options 
+   * @returns 
+   */
+  findByUserIdDetailed(id: string, options?: FindManyOptions) {
+    return this.eventApplicationRepository.find({
+      where: { user: { id } },
+      select: {
+        id: true,
+        additionalData: true as never,
+        createdAt: true,
+        idNumber: true,
+      },
+      relations: {
+        customOrganization: true,
+        organization: true,
+        user: true,
+        spotType: true,
+      },
+      take: options?.pagination?.take,
+      skip: options?.pagination?.skip,
+    });
+  }
+
+  /**
+   * Find applications by event ID detailed (with relations)
+   * @param id Event ID
+   * @returns
+   */
+  findByEventIdDetailed(id: number) {
+    return this.eventApplicationRepository.find({
+      where: { event: { id } },
+      select: {
+        id: true,
+        additionalData: true as never,
+        createdAt: true,
+        idNumber: true,
+      },
+      relations: {
+        customOrganization: true,
+        organization: true,
+        user: true,
+        spotType: true,
+      },
     });
   }
 
