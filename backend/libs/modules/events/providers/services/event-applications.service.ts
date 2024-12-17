@@ -122,4 +122,12 @@ export class EventApplicationsService {
   save(data: Partial<EventApplication>) {
     return this.eventApplicationRepository.save(data);
   }
+
+  /**
+   * Delete event application
+   * @param application Application
+   */
+  async delete(application: EventApplication) {
+    await this.eventApplicationRepository.remove(application);
+  }
 }
