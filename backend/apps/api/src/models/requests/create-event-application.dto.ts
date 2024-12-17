@@ -58,6 +58,7 @@ export class CreateEventApplication {
       CreateEventApplicationCustomOrganization
     ),
   })
+  @Allow()
   @Type(null, {
     keepDiscriminatorProperty: true,
     discriminator: {
