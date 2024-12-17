@@ -1,7 +1,11 @@
 "use client";
 
-import { useGetEventApplications } from "@/utils/api";
-import { Button, Center, Select, Table, Text } from "@mantine/core";
+import { useGetEventApplications, useGetEventSpots } from "@/utils/api";
+import CreateSpotModal from "@components/CreateSpotModal/CreateSpotModal";
+import { Button, ComboboxData, ComboboxItem, Flex, Select, Table, Text, Title } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { IconPlus } from "@tabler/icons-react";
+import { useState } from "react";
 
 interface ManageApplicationsTableProps {
   eventId: number;
@@ -9,15 +13,35 @@ interface ManageApplicationsTableProps {
 
 const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
   const { data: eventApplications } = useGetEventApplications(eventId);
-  //return eventApplications?.length;
+  const [isModalOpen, { open: openModal, close: closeModal }] = useDisclosure(false);
+
+  const { data: eventSpots } = useGetEventSpots(eventId);
+
+  const spots: ComboboxData =
+    eventSpots?.map((spot) => {
+      return { value: spot.id.toString(), label: spot.name };
+    }) ?? [];
+
+  const [value, setValue] = useState<ComboboxItem | null>(null);
+
+  //TODO: update user mutation
+  //const updateUserSpotMutation =
+  //TODO: hanlde spot change
+  //const handleSpotChange = () => {}
 
   const rows = eventApplications?.map((element, index) => (
     <Table.Tr key={`application-${index}-${element.id}`}>
-      <Table.Td>{element.user.firstName + element.user.lastName}</Table.Td>
+      <Table.Td>{element.user.firstName + " " + element.user.lastName}</Table.Td>
       <Table.Td>-</Table.Td>
       <Table.Td>{element.organization?.country}</Table.Td>
       <Table.Td>
-        <Select placeholder={element.spotType?.name} data={["React", "Angular", "Vue", "Svelte"]} />
+        <Select
+          data={spots}
+          searchable
+          nothingFoundMessage="Nothing found..."
+          allowDeselect
+          onChange={(_value, option) => setValue(option)}
+        />
       </Table.Td>
       <Table.Td>{element.spotType?.price}</Table.Td>
       <Table.Td>
@@ -32,6 +56,13 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
 
   return (
     <>
+      <Flex justify="space-between" align="center" w="100%">
+        <Title>Manage Event Applications - {eventId}</Title>
+        <Button onClick={openModal} leftSection={<IconPlus />}>
+          Add Spot
+        </Button>
+        <CreateSpotModal eventId={eventId} isOpened={isModalOpen} closeModal={closeModal} />
+      </Flex>
       {rows && rows?.length > 0 ? (
         <Table
           withTableBorder
@@ -43,13 +74,13 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
         >
           <Table.Thead>
             <Table.Tr>
-              <Table.Td>First and Last Name</Table.Td>
-              <Table.Td>Section</Table.Td>
-              <Table.Td>Country</Table.Td>
-              <Table.Td>Spot type</Table.Td>
-              <Table.Td>Price</Table.Td>
-              <Table.Td>Edit</Table.Td>
-              <Table.Td>Delete</Table.Td>
+              <Table.Th>First and Last Name</Table.Th>
+              <Table.Th>Section</Table.Th>
+              <Table.Th>Country</Table.Th>
+              <Table.Th>Spot type</Table.Th>
+              <Table.Th>Price</Table.Th>
+              <Table.Th>Edit</Table.Th>
+              <Table.Th>Delete</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>{rows}</Table.Tbody>
