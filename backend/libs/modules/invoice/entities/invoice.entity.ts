@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import { InvoiceItem } from "./invoice-item.entity";
 import { PaymentSubject } from "modules/payments";
+import { InvoiceCurrency } from "../enums";
 
 @Entity()
 export class Invoice {
@@ -25,9 +26,13 @@ export class Invoice {
   @Column()
   variableSymbol: number;
 
+  // TODO: Change constantSymbol
   // User ID
   @Column()
   constantSymbol: number;
+
+  @Column({ type: "enum", enum: InvoiceCurrency, default: InvoiceCurrency.CZK })
+  currency: InvoiceCurrency;
 
   @OneToMany(() => InvoiceItem, (item) => item.invoice, {
     cascade: true,

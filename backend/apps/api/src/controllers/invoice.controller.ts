@@ -55,7 +55,10 @@ export class InvoiceController {
     const invoice = await this.invoiceService.findById(id);
     if (!invoice) throw new NotFoundException("Invoice not found");
 
-    const data = await this.invoiceService.generatePdfFromInvoice(invoice);
+    const data = await this.invoiceService.generatePdfFromInvoice(
+      invoice,
+      true
+    );
     const result = await firstValueFrom(data);
 
     if (result.success) {

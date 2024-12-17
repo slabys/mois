@@ -6,12 +6,12 @@ const styles = StyleSheet.create({
   column: {
     display: "flex",
     flexDirection: "column",
-    width: "100%"
+    width: "100%",
   },
   row: {
     display: "flex",
-    flexDirection: "row"
-  }
+    flexDirection: "row",
+  },
 });
 
 interface SubjectProps {
@@ -22,7 +22,6 @@ interface SubjectProps {
     city: string;
     zip: string;
     country: string;
-    region: string; // okres
   };
 
   // ičo
@@ -37,7 +36,7 @@ export const Subject = (props: SubjectProps) => {
     <View style={styles.column}>
       <EnhancedText bold>{props.name}</EnhancedText>
       <EnhancedText>
-        {address.street} {address.houseNumber}, {address.region}
+        {address.street} {address.houseNumber}
       </EnhancedText>
       <EnhancedText>
         {address.zip} {address.city}
@@ -46,12 +45,15 @@ export const Subject = (props: SubjectProps) => {
 
       <View style={styles.row}>
         {props.cin && (
-          <View style={styles.row}>
-            <EnhancedText bold>CIN </EnhancedText>
-            <EnhancedText>{props.cin}</EnhancedText>
-          </View>
+          <>
+            <View style={styles.row}>
+              <EnhancedText bold>CIN </EnhancedText>
+              <EnhancedText>{props.cin}</EnhancedText>
+            </View>
+            <Text> </Text>
+          </>
         )}
-        <Text> </Text>
+
         {props.vatId && (
           <View style={styles.row}>
             <EnhancedText bold>VAT </EnhancedText>

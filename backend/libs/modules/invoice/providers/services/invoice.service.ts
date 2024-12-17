@@ -179,7 +179,6 @@ export class InvoiceService
         id: invoice.id,
         payment: {
           amount: totalCost,
-          ban: "BAN",
           iban: invoice.iban,
           variableSymbol: invoice.variableSymbol,
           swift: invoice.swift,
@@ -190,7 +189,6 @@ export class InvoiceService
             city: invoice.subscriber.address.city,
             country: invoice.subscriber.address.country,
             houseNumber: invoice.subscriber.address.houseNumber,
-            region: "REGION",
             street: invoice.subscriber.address.street,
             zip: invoice.subscriber.address.zip,
           },
@@ -203,7 +201,6 @@ export class InvoiceService
             city: invoice.supplier.address.city,
             country: invoice.supplier.address.country,
             houseNumber: invoice.supplier.address.houseNumber,
-            region: "REGION",
             street: invoice.supplier.address.street,
             zip: invoice.supplier.address.zip,
           },
@@ -215,6 +212,7 @@ export class InvoiceService
           name: item.name,
           price: item.price,
         })),
+        currency: invoice.currency,
       },
       force
     );

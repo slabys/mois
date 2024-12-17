@@ -41,6 +41,9 @@ dependencies:
   '@react-pdf/renderer':
     specifier: ^3.4.4
     version: 3.4.5(react@18.3.1)
+  '@spayd/core':
+    specifier: ^0.0.3
+    version: 0.0.3
   ajv:
     specifier: ^8.17.1
     version: 8.17.1
@@ -95,9 +98,6 @@ dependencies:
   rxjs:
     specifier: ^7.8.1
     version: 7.8.1
-  sepa-payment-code:
-    specifier: ^1.0.3
-    version: 1.0.3
   typeorm:
     specifier: ^0.3.20
     version: 0.3.20(ioredis@5.4.1)(pg@8.13.1)(ts-node@10.9.2)
@@ -1577,6 +1577,12 @@ packages:
     dependencies:
       '@sinonjs/commons': 3.0.1
     dev: true
+
+  /@spayd/core@0.0.3:
+    resolution: {integrity: sha512-TbKb3OMtGHJE21mqB+lWedB4N7jRfQa+TaXAD6YsnrEDH5v8vgyNfCfzzp0TPpBuVE0WeoTrtG5RsNJLQ99rsg==}
+    dependencies:
+      ibantools: 4.5.1
+    dev: false
 
   /@sqltools/formatter@1.2.5:
     resolution: {integrity: sha512-Uy0+khmZqUrUGm5dmMqVlnvufZRSK0FbYzVgp0UMstm+F5+W2/jnEEQyc9vo1ZR/E5ZI/B1WjjoTqBqwJL6Krw==}
@@ -3586,8 +3592,8 @@ packages:
     resolution: {integrity: sha512-fXHXcGFTXOvZTSkPJuGOQf5Lv5T/R2itiiCVPg9LxAje5D00O0pP83yJShFq5V89Ly//Gt6acj7z8pbBr34stw==}
     dev: false
 
-  /iban@0.0.11:
-    resolution: {integrity: sha512-9X0t/S+c6vBdgq3Hrt55HAonXfPmGuO/Vz507lXwQh+F5/0psvZWfh9jD14NvNYAfggk8WrYCWNvLVpCWLWdUQ==}
+  /ibantools@4.5.1:
+    resolution: {integrity: sha512-DfKQpLlFq9yEUIEnFuCJzss3XavD7iHZTU5PyqXiAJ+rmaMp+NFP3hboumHKuK8nZjuOJg93WemTzcQ5b9jOZA==}
     dev: false
 
   /iconv-lite@0.4.24:
@@ -5377,13 +5383,6 @@ packages:
       statuses: 2.0.1
     transitivePeerDependencies:
       - supports-color
-
-  /sepa-payment-code@1.0.3:
-    resolution: {integrity: sha512-6jc2dSU1/AjIp7SlNTLIcLFMyFTOWFTGd6e56LrbZSIu/5D1LRwBDehwDBT2aNmmp3yHZA17Cu2dR4pPqZgatA==}
-    engines: {node: '>=6.0.0'}
-    dependencies:
-      iban: 0.0.11
-    dev: false
 
   /serialize-javascript@6.0.2:
     resolution: {integrity: sha512-Saa1xPByTTq2gdeFZYLLo+RFE35NHZkAbqZeWNd3BpzppeVisAqpDjcp8dyf6uIvEqJRd46jemmyA4iFIeVk8g==}

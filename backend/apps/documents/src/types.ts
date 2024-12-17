@@ -6,7 +6,6 @@ interface PaymentSubject {
     city: string;
     country: string;
     houseNumber: string;
-    region: string;
     street: string;
     zip: string;
   };
@@ -14,6 +13,10 @@ interface PaymentSubject {
 
 interface GenerateInvoiceItem {
   name: string;
+  /**
+   * Price is in pennies, so you must multiply it by 100
+   * VAT must be already included
+   */
   price: number;
   amount: number;
 }
@@ -38,14 +41,18 @@ export interface GenerateInvoice {
     subscriber: PaymentSubject;
 
     payment: {
-      ban: string;
       iban: string;
+      swift: string;
       variableSymbol: number;
-      swift?: string;
       amount: number;
     };
 
     items: GenerateInvoiceItem[];
+
+    /**
+     * ISO 4217
+     */
+    currency: string;
   };
 }
 

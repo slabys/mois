@@ -45,113 +45,90 @@ export const InvoiceDocument = ({
   subscriber,
   supplier,
   items,
-}: InvoiceDocumentProps) => (
-  <Document>
-    <Page size="A4">
-      <View style={styles.page}>
-        {/* HEADER */}
-        <View style={{ paddingBottom: 20 }}>
-          <Header invoiceId={id} />
+  currency,
+}: InvoiceDocumentProps) => {
+  const itemsConvertedPrice = items.map((e) => ({
+    ...e,
+    price: e.price / 100,
+  }));
+
+  const totalPrice = itemsConvertedPrice.reduce(
+    (prev, current) => prev + current.price * current.amount,
+    0
+  );
+
+  return (
+    <Document>
+      <Page size="A4">
+        <View style={styles.page}>
+          {/* HEADER */}
+          <View style={{ paddingBottom: 20 }}>
+            <Header invoiceId={id} />
+          </View>
+          {/* Supplier / subscriber */}
+          <View style={styles.row}>
+            <View style={styles.subject}>
+              <EnhancedText fontSize={12} bold>
+                SUPPLIER
+              </EnhancedText>
+              <Subject
+                address={{
+                  city: supplier.address.city,
+                  country: supplier.address.country,
+                  houseNumber: supplier.address.houseNumber,
+                  street: supplier.address.street,
+                  zip: supplier.address.zip,
+                }}
+                name={supplier.name}
+                cin={supplier.cin}
+                vatId={supplier.vatId}
+              />
+            </View>
+            <View style={styles.subject}>
+              <EnhancedText fontSize={12} bold>
+                SUBSCRIBER
+              </EnhancedText>
+              <Subject
+                address={{
+                  city: subscriber.address.city,
+                  country: subscriber.address.country,
+                  houseNumber: subscriber.address.houseNumber,
+                  street: subscriber.address.street,
+                  zip: subscriber.address.zip,
+                }}
+                name={subscriber.name}
+                cin={subscriber.cin}
+                vatId={subscriber.vatId}
+              />
+            </View>
+          </View>
         </View>
-        {/* Supplier / subscriber */}
+
         <View style={styles.row}>
-          <View style={styles.subject}>
-            <EnhancedText fontSize={12} bold>
-              SUPPLIER
-            </EnhancedText>
-            <Subject
-              address={{
-                city: supplier.address.city,
-                country: supplier.address.country,
-                houseNumber: supplier.address.houseNumber,
-                region: supplier.address.region,
-                street: supplier.address.street,
-                zip: supplier.address.zip,
-              }}
-              name={supplier.name}
-              cin={supplier.cin}
-              vatId={supplier.vatId}
-            />
-          </View>
-          <View style={styles.subject}>
-            <EnhancedText fontSize={12} bold>
-              SUBSCRIBER
-            </EnhancedText>
-            <Subject
-              address={{
-                city: subscriber.address.city,
-                country: subscriber.address.country,
-                houseNumber: subscriber.address.houseNumber,
-                region: subscriber.address.region,
-                street: subscriber.address.street,
-                zip: subscriber.address.zip,
-              }}
-              name={subscriber.name}
-              cin={subscriber.cin}
-              vatId={subscriber.vatId}
-            />
-          </View>
+          <Payment
+            amount={totalPrice}
+            receiverName={supplier.name}
+            variableSymbol={payment.variableSymbol}
+            currency={currency}
+            swift={payment.swift}
+            iban={payment.iban}
+          />
+          <Dates dateOfIssue={new Date()} dueDate={new Date()} />
         </View>
-      </View>
 
-      <View style={styles.row}>
-        <Payment
-          amount={1000}
-          receiverName={supplier.name}
-          ban={payment.ban}
-          paymentMethod="PAYMENT_METHOD"
-          variableSymbol={payment.variableSymbol}
-          swift={payment.swift}
-          iban={payment.iban}
-        />
-        <Dates dateOfIssue={new Date()} dueDate={new Date()} />
-      </View>
-
-      <View style={styles.page}>
-        <ItemsTable
-          items={items.map((item) => ({
-            amount: item.amount,
-            name: item.name,
-            unitPrice: item.price,
-            vatRate: 21,
-          }))}
-        />
-      </View>
-      <PriceTotal total={50} currency="CZK" />
-    </Page>
-  </Document>
-);
-/*
-[
-  {
-    amount: 10,
-    name: "Položka",
-    unitPrice: 10,
-    vatRate: 21,
-  },
-  {
-    amount: 150,
-    name: "Položka",
-    unitPrice: 10,
-    vatRate: 21,
-  },
-  {
-    amount: 10,
-    name: "Položka",
-    unitPrice: 10,
-    vatRate: 21,
-  },
-  {
-    amount: 200,
-    name: "Položka",
-    unitPrice: 10,
-    vatRate: 21,
-  },
-  {
-    amount: 150,
-    name: "Položka",
-    unitPrice: 10,
-    vatRate: 21,
-  },
-]
-  */
+        <View style={styles.page}>
+          <ItemsTable
+            items={itemsConvertedPrice.map((item) => ({
+              amount: item.amount,
+              name: item.name,
+              unitPrice: item.price,
+              vatRate: 21,
+            }))}
+            currency={currency}
+          />
+        </View>
+        <PriceTotal total={totalPrice} currency={currency} />
+      </Page>
+    </Document>
+  );
+};
