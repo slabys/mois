@@ -1,7 +1,7 @@
 import { getGetEventsQueryKey } from "@/utils/api";
 import { EventSimple } from "@/utils/api.schemas";
 import ManageApplicationsTable from "@components/ManageApplicationsTable/ManageApplicationsTable";
-import { Container, Stack, Title } from "@mantine/core";
+import { Container, Stack } from "@mantine/core";
 
 interface ManageEventApplicationsProps {
   params: Promise<{ id: string }>;
@@ -13,7 +13,6 @@ const ManageEventApplications = async ({ params }: ManageEventApplicationsProps)
   return (
     <Container size="xl">
       <Stack>
-        <Title>Manage Event Applications - {id}</Title>
         <ManageApplicationsTable eventId={Number.parseInt(id)} />
       </Stack>
     </Container>

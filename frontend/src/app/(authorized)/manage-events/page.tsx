@@ -61,13 +61,13 @@ const ManageEventsPage = () => {
         >
           <Table.Thead>
             <Table.Tr>
-              <Table.Td>Photo</Table.Td>
-              <Table.Td>Name</Table.Td>
-              <Table.Td>Description</Table.Td>
-              <Table.Td>Manage Event</Table.Td>
-              <Table.Td>Manage People</Table.Td>
-              <Table.Td>Duplicate</Table.Td>
-              <Table.Td>Delete</Table.Td>
+              <Table.Th>Photo</Table.Th>
+              <Table.Th>Name</Table.Th>
+              <Table.Th>Description</Table.Th>
+              <Table.Th>Manage Event</Table.Th>
+              <Table.Th>Manage People</Table.Th>
+              <Table.Th>Duplicate</Table.Th>
+              <Table.Th>Delete</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
