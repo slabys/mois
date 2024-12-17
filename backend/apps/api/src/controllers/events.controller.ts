@@ -78,25 +78,10 @@ export class EventsController {
   /**
    * Find event by ID or slug
    */
-  @ApiOkResponse({ type: EventSimple, description: "Found event" })
+  @ApiOkResponse({ type: EventDetail, description: "Found event" })
   @ApiNotFoundResponse({ description: "Event not found" })
   @Get(":id")
   async getEvent(@Param("id", ParseIntPipe) id: number) {
-    const event = await this.eventsService.findById(id, { visible: true });
-    if (!event) throw new NotFoundException("Event not found");
-
-    return event;
-  }
-
-  /**
-   * Find event detail by ID
-   * @param id Event ID
-   * @returns
-   */
-  @ApiOkResponse({ type: EventDetail })
-  @ApiNotFoundResponse({ description: "Event not found" })
-  @Get(":id/detail")
-  async getEventDetail(@Param("id", ParseIntPipe) id: number) {
     const event = await this.eventsService.findById(id, {
       select: {
         id: true,
