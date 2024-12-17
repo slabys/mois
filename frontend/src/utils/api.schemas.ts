@@ -162,6 +162,11 @@ Each event can have different "requirements"
  */
 export type EventDetailRegistrationForm = { [key: string]: unknown } | null;
 
+/**
+ * @nullable
+ */
+export type EventDetailPhoto = Photo | null;
+
 export interface EventDetailLink {
   id: number;
   link: string;
@@ -177,6 +182,8 @@ export interface EventDetail {
   id: number;
   links: EventDetailLink[];
   longDescription: string;
+  /** @nullable */
+  photo: EventDetailPhoto;
   photoPolicyLink: string;
   registrationDeadline: string;
   /**
