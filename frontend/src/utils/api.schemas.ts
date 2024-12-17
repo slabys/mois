@@ -5,6 +5,19 @@
  * The backend API description
  * OpenAPI spec version: 0.0.1
  */
+export type GetManagementEventsParams = {
+  sinceSince?: number;
+  toSince?: number;
+  /**
+   * Pagination number of results
+   */
+  take?: number;
+  /**
+   * Pagination number of skipped results
+   */
+  skip?: number;
+};
+
 export type GetEventSpotsParams = {
   /**
    * Pagination number of results
@@ -16,7 +29,9 @@ export type GetEventSpotsParams = {
   skip?: number;
 };
 
-export type UpcomingEventsParams = {
+export type GetEventsParams = {
+  sinceSince?: number;
+  toSince?: number;
   /**
    * Pagination number of results
    */
@@ -59,102 +74,6 @@ export type UserOrganizationMembershipsParams = {
    */
   skip?: number;
 };
-
-/**
- * Spot, must be one of {@link event} spots
- * @nullable
- */
-export type EventApplicationSimpleSpotType = EventSpot | null;
-
-export type CreateEventApplicationAdditionalFormData = { [key: string]: unknown };
-
-export interface CreateEventApplication {
-  additionalFormData: CreateEventApplicationAdditionalFormData;
-  invoiceAddress: CreateAddress;
-  spotTypeId: number;
-}
-
-/**
- * Additional registration form
-Each event can have different "requirements"
- * @nullable
- */
-export type EventRegistrationForm = { [key: string]: unknown } | null;
-
-/**
- * @nullable
- */
-export type EventPhoto = Photo | null;
-
-export interface EventLink {
-  event: Event;
-  id: number;
-  link: string;
-  name: string;
-}
-
-export type EventApplicationAdditionalData = { [key: string]: unknown };
-
-export interface EventApplication {
-  additionalData: EventApplicationAdditionalData;
-  createdAt: string;
-  event: Event;
-  id: string;
-  idCard: string;
-  invoiceAddress: Address;
-  personalAddress: Address;
-  /**
-   * Spot, must be one of {@link event} spots
-   * @nullable
-   */
-  spotType: EventApplicationSpotType;
-  user: User;
-}
-
-export interface EventSpot {
-  event: Event;
-  id: number;
-  name: string;
-  price: number;
-}
-
-export interface Event {
-  applications: EventApplication[];
-  /** Event capacity */
-  capacity: number;
-  codeOfConductLink: string;
-  createdAt: string;
-  createdByUser: User;
-  /** If true, generate invoices after {@link registrationDeadline} */
-  generateInvoices: boolean;
-  id: number;
-  links: EventLink[];
-  longDescription: string;
-  /** @nullable */
-  photo: EventPhoto;
-  photoPolicyLink: string;
-  registrationDeadline: string;
-  /**
-   * Additional registration form
-Each event can have different "requirements"
-   * @nullable
-   */
-  registrationForm: EventRegistrationForm;
-  shortDescription: string;
-  since: string;
-  spotTypes: EventSpot[];
-  /** Links */
-  termsAndConditionsLink: string;
-  title: string;
-  until: string;
-  visible: boolean;
-}
-
-/**
- * Spot, must be one of {@link event} spots
- * @nullable
- */
-export type EventApplicationSpotType = EventSpot | null;
 
 export interface UpdateEventSpot {
   /** @minLength 6 */
@@ -236,6 +155,29 @@ export interface CreateEvent {
   visible?: boolean;
 }
 
+/**
+ * Spot, must be one of {@link event} spots
+ * @nullable
+ */
+export type EventApplicationSimpleSpotType = EventSpot | null;
+
+export interface EventApplicationSimple {
+  createdAt: string;
+  event: EventSimple;
+  id: string;
+  /**
+   * Spot, must be one of {@link event} spots
+   * @nullable
+   */
+  spotType: EventApplicationSimpleSpotType;
+  user: User;
+}
+
+/**
+ * @nullable
+ */
+export type EventSimplePhoto = Photo | null;
+
 export interface EventSimple {
   createdByUser: User;
   id: number;
@@ -249,15 +191,94 @@ export interface EventSimple {
   visible: boolean;
 }
 
-export interface EventApplicationSimple {
+export type CreateEventApplicationAdditionalFormData = { [key: string]: unknown };
+
+export interface CreateEventApplication {
+  additionalFormData: CreateEventApplicationAdditionalFormData;
+  idNumber: string;
+  invoiceAddress: CreateAddress;
+  spotTypeId: number;
+}
+
+/**
+ * Additional registration form
+Each event can have different "requirements"
+ * @nullable
+ */
+export type EventRegistrationForm = { [key: string]: unknown } | null;
+
+/**
+ * @nullable
+ */
+export type EventPhoto = Photo | null;
+
+export interface EventLink {
+  event: Event;
+  id: number;
+  link: string;
+  name: string;
+}
+
+export type EventApplicationAdditionalData = { [key: string]: unknown };
+
+export interface EventSpot {
+  event: Event;
+  id: number;
+  name: string;
+  price: number;
+}
+
+export interface Event {
+  applications: EventApplication[];
+  /** Event capacity */
+  capacity: number;
+  codeOfConductLink: string;
   createdAt: string;
-  event: EventSimple;
+  createdByUser: User;
+  /** If true, generate invoices after {@link registrationDeadline} */
+  generateInvoices: boolean;
+  id: number;
+  links: EventLink[];
+  longDescription: string;
+  /** @nullable */
+  photo: EventPhoto;
+  photoPolicyLink: string;
+  registrationDeadline: string;
+  /**
+   * Additional registration form
+Each event can have different "requirements"
+   * @nullable
+   */
+  registrationForm: EventRegistrationForm;
+  shortDescription: string;
+  since: string;
+  spotTypes: EventSpot[];
+  /** Links */
+  termsAndConditionsLink: string;
+  title: string;
+  until: string;
+  visible: boolean;
+}
+
+/**
+ * Spot, must be one of {@link event} spots
+ * @nullable
+ */
+export type EventApplicationSpotType = EventSpot | null;
+
+export interface EventApplication {
+  additionalData: EventApplicationAdditionalData;
+  createdAt: string;
+  event: Event;
   id: string;
+  idNumber: string;
+  invoiceAddress: Address;
+  personalAddress: Address;
   /**
    * Spot, must be one of {@link event} spots
    * @nullable
    */
-  spotType: EventApplicationSimpleSpotType;
+  spotType: EventApplicationSpotType;
   user: User;
 }
 
@@ -345,11 +366,6 @@ export interface Photo {
   filename: string;
   id: string;
 }
-
-/**
- * @nullable
- */
-export type EventSimplePhoto = Photo | null;
 
 export interface User {
   createdAt: string;

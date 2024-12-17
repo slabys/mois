@@ -80,7 +80,7 @@ const CreateEventModal: React.FC<MyModalProps> = ({ isOpened, closeModal }) => {
       title: hasLength({ min: 6 }, "Must be at least 6 characters"),
       shortDescription: hasLength({ min: 30 }, "Must be at least 30 characters"),
       longDescription: hasLength({ min: 30 }, "Must be at least 30 characters"),
-      capacity: (value) => value && (value >= 0 ? null : "Must be larger than or equal to 0"),
+      capacity: (value) => (!!value && value < 0 ? "Must be larger than or equal to 0" : null),
       termsAndConditionsLink: isNotEmpty("This field should not be empty."),
       codeOfConductLink: isNotEmpty("This field should not be empty."),
       photoPolicyLink: isNotEmpty("This field should not be empty."),
@@ -104,7 +104,13 @@ const CreateEventModal: React.FC<MyModalProps> = ({ isOpened, closeModal }) => {
         <Flex direction="column" gap={16}>
           <TextInput label="Title" {...form.getInputProps("title")} />
           <SimpleGrid cols={2}>
-            <NumberInput label="Capacity" min={0} {...form.getInputProps("capacity")} error={form.errors.capacity} />
+            <NumberInput
+              label="Capacity"
+              defaultValue={0}
+              min={0}
+              {...form.getInputProps("capacity")}
+              error={form.errors.capacity}
+            />
             <DateInput
               label="Registration Deadline"
               value={dayjs(form.values.registrationDeadline).toDate()}
