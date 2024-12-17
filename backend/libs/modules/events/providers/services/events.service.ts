@@ -6,6 +6,7 @@ import {
   FindOptionsSelect,
   LessThan,
   MoreThan,
+  TreeLevelColumn,
   type Repository,
 } from "typeorm";
 
@@ -37,8 +38,8 @@ export class EventsService {
       where: { id, visible: options?.visible },
       select: options?.select,
       relations: {
-        createdByUser: { photo: true },
-        ...(options.relations ?? {}),
+        createdByUser: true,
+        ...(options?.relations ?? {}),
       },
     });
   }

@@ -81,7 +81,6 @@ export class EventSpotsController {
     @CurrentUser() user: User
   ) {
     // TODO: Check user role for modifications
-
     const event = await this.eventsService.findById(eventId);
     if (!event) throw new NotFoundException("Event not found");
 
