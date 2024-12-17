@@ -30,6 +30,7 @@ import type {
   DeleteEventSpot,
   EventApplication,
   EventApplicationSimple,
+  EventDetail,
   EventSimple,
   EventSpotSimple,
   GetEventSpotsParams,
@@ -1251,7 +1252,7 @@ export const useCreateEvent = <TError = ErrorType<void>, TContext = unknown>(opt
  * Find event by ID or slug
  */
 export const getEvent = (id: number, options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
-  return customInstance<EventSimple>({ url: `/events/${id}`, method: "GET", signal }, options);
+  return customInstance<EventDetail>({ url: `/events/${id}`, method: "GET", signal }, options);
 };
 
 export const getGetEventQueryKey = (id: number) => {

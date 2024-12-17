@@ -5,6 +5,7 @@ import routes from "@/utils/routes";
 import EventCard from "@components/events/EventCard";
 import { Anchor, Center, Container, Loader, Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
+import React from "react";
 
 const Home = () => {
   const { data: upcomingEvents } = useGetEvents();

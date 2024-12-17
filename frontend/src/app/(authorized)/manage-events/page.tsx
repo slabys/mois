@@ -1,28 +1,12 @@
 "use client";
 
-import { createEvent, useCreateEvent, useGetEvents } from "@/utils/api";
-import { CreateEvent, EventSimple } from "@/utils/api.schemas";
-import { truncate } from "@/utils/truncate";
+import { useGetEvents } from "@/utils/api";
+import { EventSimple } from "@/utils/api.schemas";
+import ApiImage from "@components/ApiImage/ApiImage";
 import CreateEventModal from "@components/CreateEventModal/CreateEventModal";
 import RichTextRenderer from "@components/Richtext/RichTextRenderer";
-import {
-  Button,
-  Center,
-  Container,
-  Flex,
-  Image,
-  Loader,
-  Stack,
-  Table,
-  TableTbody,
-  TableTd,
-  TableThead,
-  TableTr,
-  Title,
-} from "@mantine/core";
-import { hasLength, isNotEmpty, useForm } from "@mantine/form";
+import { Button, Center, Container, Flex, Loader, Stack, Table, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
 import { IconPlus } from "@tabler/icons-react";
 
 const ManageEventsPage = () => {
@@ -30,35 +14,32 @@ const ManageEventsPage = () => {
 
   const { data: upcomingEvents } = useGetEvents();
 
+  // TODO
   const handleDuplicateEvent = (event: EventSimple) => {};
 
-  let rows;
-
-  if (upcomingEvents) {
-    rows = upcomingEvents.map((element) => (
-      <TableTr key={element.title}>
-        <TableTd>
-          <Image src={element.photo} h={75} alt={element.title} fit="contain" />
-        </TableTd>
-        <TableTd>{element.title}</TableTd>
-        <TableTd>
-          <RichTextRenderer content={element.shortDescription} />
-        </TableTd>
-        <TableTd>
-          <Button>Manage Event</Button>
-        </TableTd>
-        <TableTd>
-          <Button>Manage People</Button>
-        </TableTd>
-        <TableTd>
-          <Button onClick={() => handleDuplicateEvent(element)}>Duplicate</Button>
-        </TableTd>
-        <TableTd>
-          <Button color="red">Delete</Button>
-        </TableTd>
-      </TableTr>
-    ));
-  }
+  const rows = upcomingEvents?.map((element) => (
+    <Table.Tr key={element.title}>
+      <Table.Td p={0} w={128} h={128}>
+        <ApiImage src={element.photo?.id} w="100%" h="100%" fit="cover" />
+      </Table.Td>
+      <Table.Td>{element.title}</Table.Td>
+      <Table.Td>
+        <RichTextRenderer content={element.shortDescription} />
+      </Table.Td>
+      <Table.Td>
+        <Button>Manage Event</Button>
+      </Table.Td>
+      <Table.Td>
+        <Button>Manage People</Button>
+      </Table.Td>
+      <Table.Td>
+        <Button onClick={() => handleDuplicateEvent(element)}>Duplicate</Button>
+      </Table.Td>
+      <Table.Td>
+        <Button color="red">Delete</Button>
+      </Table.Td>
+    </Table.Tr>
+  ));
 
   return (
     <Container size="xl">
@@ -78,18 +59,18 @@ const ManageEventsPage = () => {
           highlightOnHover={true}
           style={{ textAlign: "center" }}
         >
-          <TableThead>
-            <TableTr>
-              <TableTd>Photo</TableTd>
-              <TableTd>Name</TableTd>
-              <TableTd>Description</TableTd>
-              <TableTd>Manage Event</TableTd>
-              <TableTd>Manage People</TableTd>
-              <TableTd>Duplicate</TableTd>
-              <TableTd>Delete</TableTd>
-            </TableTr>
-          </TableThead>
-          <TableTbody>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Td>Photo</Table.Td>
+              <Table.Td>Name</Table.Td>
+              <Table.Td>Description</Table.Td>
+              <Table.Td>Manage Event</Table.Td>
+              <Table.Td>Manage People</Table.Td>
+              <Table.Td>Duplicate</Table.Td>
+              <Table.Td>Delete</Table.Td>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
             {rows ? (
               rows
             ) : (
@@ -97,7 +78,7 @@ const ManageEventsPage = () => {
                 <Loader />
               </Center>
             )}
-          </TableTbody>
+          </Table.Tbody>
         </Table>
       </Stack>
     </Container>

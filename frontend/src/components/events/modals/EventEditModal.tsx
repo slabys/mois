@@ -1,7 +1,7 @@
 "use client";
 
 import { useUpdateEvent } from "@/utils/api";
-import { EventSimple } from "@/utils/api.schemas";
+import { EventDetail } from "@/utils/api.schemas";
 import RichTextEditor from "@components/Richtext/RichTextEditor";
 import DateInput from "@components/primitives/DateInput";
 import { Button, Flex, Group, Modal, SimpleGrid, TextInput } from "@mantine/core";
@@ -10,13 +10,13 @@ import { notifications } from "@mantine/notifications";
 import dayjs from "dayjs";
 
 interface EventEditModalProps {
-  eventDetail: EventSimple;
+  eventDetail: EventDetail;
   isOpened: boolean;
   close: () => void;
 }
 
 const EventEditModal = ({ eventDetail, isOpened, close }: EventEditModalProps) => {
-  const form = useForm<Partial<EventSimple>>({
+  const form = useForm<Partial<EventDetail>>({
     initialValues: {
       title: eventDetail.title,
       shortDescription: eventDetail.shortDescription,
@@ -76,11 +76,10 @@ const EventEditModal = ({ eventDetail, isOpened, close }: EventEditModalProps) =
     },
   });
 
-  // TODO - when API is finished
-  const handleEventUpdate = (_values: Partial<EventSimple>) => {
+  const handleEventUpdate = (values: Partial<EventDetail>) => {
     eventUpdateMutation.mutate({
       eventId: eventDetail.id,
-      data: {},
+      data: values,
     });
   };
 
