@@ -1,13 +1,13 @@
 "use client";
 
-import { useUpcomingEvents } from "@/utils/api";
+import { useGetEvents } from "@/utils/api";
 import routes from "@/utils/routes";
 import EventCard from "@components/events/EventCard";
 import { Anchor, Container, Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
 
 const SentApplicationsPage = () => {
-  const { data: upcomingEvents } = useUpcomingEvents();
+  const { data: upcomingEvents } = useGetEvents();
 
   return (
     <Container size="xl">

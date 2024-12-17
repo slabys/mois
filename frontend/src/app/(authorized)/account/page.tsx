@@ -352,7 +352,10 @@ const AccountPage = () => {
               type="password"
               {...form.getInputProps("confirmPassword")}
               onChange={(e) => {
-                form.setFieldValue("password", e.currentTarget.value.length > 0 ? e.currentTarget.value : undefined);
+                form.setFieldValue(
+                  "confirmPassword",
+                  e.currentTarget.value.length > 0 ? e.currentTarget.value : undefined,
+                );
               }}
               disabled={!isEditing}
             />
