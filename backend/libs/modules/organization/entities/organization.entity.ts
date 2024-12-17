@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { OrganizationMember } from "./organization-member.entity";
 import { User } from "modules/users";
+import { Address } from "modules/addresses";
 
 @Entity()
 export class Organization {
@@ -18,8 +19,8 @@ export class Organization {
   @Column()
   name: string;
 
-  @Column()
-  country: string;
+  @ManyToOne(() => Address, { nullable: false, cascade: true, eager: true })
+  address: Address;
 
   // Relations
   @ApiHideProperty()
