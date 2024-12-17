@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FindOneOptions, FindOptionsWhere, Repository } from "typeorm";
+import { FindOneOptions, Repository } from "typeorm";
 
 import { FindManyOptions } from "libs/types";
 import {
@@ -16,6 +16,14 @@ export class OrganizationService {
     @InjectRepository(OrganizationMember)
     private readonly memberRepository: Repository<OrganizationMember>
   ) {}
+
+  findById(id: string) {
+    return this.organizationRepository.findOneBy({ id });
+  }
+
+  save(data: Partial<Organization>) {
+    return this.organizationRepository.save(data);
+  }
 
   /**
    * Find all organizations
