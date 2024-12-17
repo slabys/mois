@@ -1,6 +1,6 @@
 "use client";
 
-import { useUpcomingEvents } from "@/utils/api";
+import { useGetEvents } from "@/utils/api";
 import { truncate } from "@/utils/truncate";
 import CreateEventModal from "@components/CreateEventModal/CreateEventModal";
 import {
@@ -22,7 +22,7 @@ import { IconPlus } from "@tabler/icons-react";
 const ManageEventsPage = () => {
   const [isModalOpen, { open: openModal, close: closeModal }] = useDisclosure(false);
 
-  const data = useUpcomingEvents();
+  const data = useGetEvents();
   console.log("data", data.data);
 
   const elements = [

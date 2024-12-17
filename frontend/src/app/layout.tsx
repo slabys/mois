@@ -7,7 +7,7 @@ import "@mantine/dropzone/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/tiptap/styles.css";
 import type { Metadata } from "next";
-import React from "react";
+import React, { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "ESN Event Registration System",
@@ -50,7 +50,9 @@ export default function RootLayout({
       </head>
       <body style={{ width: "100%", height: "100vh" }}>
         <MantineProvider theme={theme}>
-          <Providers>{children}</Providers>
+          <Suspense fallback="Loading...">
+            <Providers>{children}</Providers>
+          </Suspense>
         </MantineProvider>
       </body>
     </html>
