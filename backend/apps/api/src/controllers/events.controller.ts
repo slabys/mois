@@ -102,6 +102,7 @@ export class EventsController {
       relations: {
         createdByUser: true,
         links: true,
+        spotTypes: true,
       },
     });
     if (!event) throw new NotFoundException("Event not found");
