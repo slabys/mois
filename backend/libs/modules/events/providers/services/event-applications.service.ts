@@ -51,8 +51,8 @@ export class EventApplicationsService {
 
   /**
    * @param id User ID
-   * @param options 
-   * @returns 
+   * @param options
+   * @returns
    */
   findByUserIdDetailed(id: string, options?: FindManyOptions) {
     return this.eventApplicationRepository.find({
@@ -68,6 +68,9 @@ export class EventApplicationsService {
         organization: true,
         user: true,
         spotType: true,
+        event: {
+          photo: true,
+        },
       },
       take: options?.pagination?.take,
       skip: options?.pagination?.skip,

@@ -103,6 +103,7 @@ export class EventsController {
         createdByUser: true,
         links: true,
         spotTypes: true,
+        photo: true,
       },
     });
     if (!event) throw new NotFoundException("Event not found");
