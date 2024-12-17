@@ -22,6 +22,7 @@ export class EventDetail extends PickType(Event, [
   "title",
   "visible",
   "createdByUser",
+  "photo"
 ]) {
   @IsObject({ each: true })
   @Type(() => EventDetailLink)
