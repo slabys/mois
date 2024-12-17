@@ -42,6 +42,8 @@ export type GetEventsParams = {
   skip?: number;
 };
 
+export type UpdateEventApplication200 = { [key: string]: unknown };
+
 export type OrganizationMembersParams = {
   /**
    * Pagination number of results
@@ -52,6 +54,10 @@ export type OrganizationMembersParams = {
    */
   skip?: number;
 };
+
+export type UpdateOrganization201 = { [key: string]: unknown };
+
+export type CreateOrganization201 = { [key: string]: unknown };
 
 export type AllOrganizationsParams = {
   /**
@@ -74,6 +80,49 @@ export type UserOrganizationMembershipsParams = {
    */
   skip?: number;
 };
+
+export interface InvoiceUrl {
+  url: string;
+}
+
+export type InvoiceSimpleCurrency = (typeof InvoiceSimpleCurrency)[keyof typeof InvoiceSimpleCurrency];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const InvoiceSimpleCurrency = {
+  CZK: "CZK",
+  EUR: "EUR",
+} as const;
+
+export interface PaymentSubject {
+  address: Address;
+  /** @nullable */
+  cin: string | null;
+  createdAt: string;
+  id: string;
+  name: string;
+  /** @nullable */
+  vatId: string | null;
+}
+
+export interface InvoiceSimpleItem {
+  amount: number;
+  id: number;
+  name: string;
+  price: number;
+}
+
+export interface InvoiceSimple {
+  constantSymbol: number;
+  createdAt: string;
+  currency: InvoiceSimpleCurrency;
+  iban: string;
+  id: string;
+  items: InvoiceSimpleItem[];
+  subscriber: PaymentSubject;
+  supplier: PaymentSubject;
+  swift: string;
+  variableSymbol: number;
+}
 
 export interface UpdateEventSpot {
   /** @minLength 6 */
@@ -201,11 +250,32 @@ Each event can have different "requirements"
   visible: boolean;
 }
 
+export type UpdateEventApplicationAdditionalFormData = { [key: string]: unknown };
+
+export interface UpdateEventApplication {
+  additionalFormData?: UpdateEventApplicationAdditionalFormData;
+  idNumber?: string;
+  invoiceAddress?: CreateAddress;
+  spotTypeId?: number;
+}
+
 /**
  * Spot, must be one of {@link event} spots
  * @nullable
  */
 export type EventApplicationSimpleSpotType = EventSpot | null;
+
+export interface EventApplicationSimple {
+  createdAt: string;
+  event: EventSimple;
+  id: string;
+  /**
+   * Spot, must be one of {@link event} spots
+   * @nullable
+   */
+  spotType: EventApplicationSimpleSpotType;
+  user: User;
+}
 
 /**
  * @nullable
@@ -227,18 +297,6 @@ export interface EventSimple {
   title: string;
   until: string;
   visible: boolean;
-}
-
-export interface EventApplicationSimple {
-  createdAt: string;
-  event: EventSimple;
-  id: string;
-  /**
-   * Spot, must be one of {@link event} spots
-   * @nullable
-   */
-  spotType: EventApplicationSimpleSpotType;
-  user: User;
 }
 
 export type CreateEventApplicationOrganization =
@@ -302,6 +360,47 @@ export interface EventLink {
   name: string;
 }
 
+/**
+ * Spot, must be one of {@link event} spots
+ * @nullable
+ */
+export type EventApplicationSpotType = EventSpot | null;
+
+export type EventApplicationAdditionalData = { [key: string]: unknown };
+
+export interface EventCustomOrganization {
+  application: EventApplication;
+  country: string;
+  createdAt: string;
+  id: number;
+  name: string;
+}
+
+export interface EventApplication {
+  additionalData: EventApplicationAdditionalData;
+  createdAt: string;
+  customOrganization: EventCustomOrganization;
+  event: Event;
+  id: string;
+  idNumber: string;
+  invoiceAddress: Address;
+  organization: Organization;
+  personalAddress: Address;
+  /**
+   * Spot, must be one of {@link event} spots
+   * @nullable
+   */
+  spotType: EventApplicationSpotType;
+  user: User;
+}
+
+export interface EventSpot {
+  event: Event;
+  id: number;
+  name: string;
+  price: number;
+}
+
 export interface Event {
   applications: EventApplication[];
   /** Event capacity */
@@ -334,28 +433,13 @@ Each event can have different "requirements"
   visible: boolean;
 }
 
-export type EventApplicationAdditionalData = { [key: string]: unknown };
-
-export interface EventCustomOrganization {
-  application: EventApplication;
-  country: string;
-  createdAt: string;
-  id: number;
-  name: string;
+export interface DeleteOrganizationMembers {
+  memberIds: number[];
 }
 
-export interface EventSpot {
-  event: Event;
-  id: number;
-  name: string;
-  price: number;
+export interface AddOrganizationMembers {
+  userIds: string[];
 }
-
-/**
- * Spot, must be one of {@link event} spots
- * @nullable
- */
-export type EventApplicationSpotType = EventSpot | null;
 
 export interface OrganizationMemberWithoutOrganization {
   createdAt: string;
@@ -363,8 +447,18 @@ export interface OrganizationMemberWithoutOrganization {
   user: User;
 }
 
+export interface UpdateOrganization {
+  address?: CreateAddress;
+  name?: string;
+}
+
+export interface CreateOrganization {
+  address: CreateAddress;
+  name: string;
+}
+
 export interface Organization {
-  country: string;
+  address: Address;
   createdAt: string;
   id: string;
   /** @nullable */
@@ -372,21 +466,10 @@ export interface Organization {
   name: string;
 }
 
-export interface EventApplication {
-  additionalData: EventApplicationAdditionalData;
+export interface OrganizationMember {
   createdAt: string;
-  customOrganization: EventCustomOrganization;
-  event: Event;
   id: string;
-  idNumber: string;
-  invoiceAddress: Address;
   organization: Organization;
-  personalAddress: Address;
-  /**
-   * Spot, must be one of {@link event} spots
-   * @nullable
-   */
-  spotType: EventApplicationSpotType;
   user: User;
 }
 
