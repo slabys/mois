@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindManyOptions } from "libs/types";
 import { EventApplication } from "modules/events/entities";
-import { Repository } from "typeorm";
+import { FindOneOptions, Repository } from "typeorm";
 
 @Injectable()
 export class EventApplicationsService {
@@ -12,6 +12,22 @@ export class EventApplicationsService {
   ) {}
 
   /**
+   * Find event application by ID
+   * @param id Event application ID
+   * @returns
+   */
+  findById(id: string, options?: FindOneOptions<EventApplication>) {
+    return this.eventApplicationRepository.findOne({
+      ...(options ?? {}),
+      where: { id },
+      relations: {
+        ...(options.relations ?? {}),
+        user: true,
+        spotType: true,
+      },
+    });
+  }
+  /**
    * Find event applications by event ID
    * @param id
    * @returns
@@ -20,9 +36,7 @@ export class EventApplicationsService {
     return this.eventApplicationRepository.find({
       where: { event: { id } },
       relations: {
-        user: {
-          photo: true,
-        },
+        user: true,
         spotType: true,
       },
     });

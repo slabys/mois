@@ -82,18 +82,4 @@ export class EventApplication extends BaseEntity {
     super();
     Object.assign(this, initial);
   }
-
-  @BeforeUpdate()
-  @BeforeInsert()
-  beforeSave() {
-    if (!this.hasId()) return;
-
-    if (!this.organization && !this.customOrganization)
-      throw new Error("organization or customOrganization must be set");
-
-    if (this.organization && this.customOrganization)
-      throw new Error(
-        "only organization or customOrganization must be set, not both"
-      );
-  }
 }
