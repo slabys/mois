@@ -1,13 +1,17 @@
 "use client";
 
-import { useGetEvents } from "@/utils/api";
+import { createEvent, useCreateEvent, useGetEvents } from "@/utils/api";
+import { CreateEvent, EventSimple } from "@/utils/api.schemas";
 import { truncate } from "@/utils/truncate";
 import CreateEventModal from "@components/CreateEventModal/CreateEventModal";
+import RichTextRenderer from "@components/Richtext/RichTextRenderer";
 import {
   Button,
+  Center,
   Container,
   Flex,
   Image,
+  Loader,
   Stack,
   Table,
   TableTbody,
@@ -16,74 +20,45 @@ import {
   TableTr,
   Title,
 } from "@mantine/core";
+import { hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import { IconPlus } from "@tabler/icons-react";
 
 const ManageEventsPage = () => {
   const [isModalOpen, { open: openModal, close: closeModal }] = useDisclosure(false);
 
-  const data = useGetEvents();
-  console.log("data", data.data);
+  const { data: upcomingEvents } = useGetEvents();
 
-  const elements = [
-    {
-      photo: 6,
-      name: "NA Test",
-      description:
-        "This is a very long description fetched from the database. It contains a lot of information that might be irrelevant to show completely.",
-    },
-    {
-      photo: 7,
-      name: "NA Test",
-      description:
-        "This is a very long description fetched from the database. It contains a lot of information that might be irrelevant to show completely.",
-    },
-    {
-      photo: 39,
-      name: "NA Test",
-      description:
-        "This is a very long description fetched from the database. It contains a lot of information that might be irrelevant to show completely.",
-    },
-    {
-      photo: 56,
-      name: "NA Test",
-      description:
-        "This is a very long description fetched from the database. It contains a lot of information that might be irrelevant to show completely.",
-    },
-    {
-      photo: 58,
-      name: "NA Test",
-      description:
-        "This is a very long description fetched from the database. It contains a lot of information that might be irrelevant to show completely.",
-    },
-  ];
+  const handleDuplicateEvent = (event: EventSimple) => {};
 
-  const rows = elements.map((element) => (
-    <TableTr key={element.name}>
-      <TableTd>
-        <Image
-          src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"
-          h={75}
-          alt={element.name}
-          fit="contain"
-        />
-      </TableTd>
-      <TableTd>{element.name}</TableTd>
-      <TableTd>{truncate(element.description, 50)}</TableTd>
-      <TableTd>
-        <Button>Manage Event</Button>
-      </TableTd>
-      <TableTd>
-        <Button>Manage People</Button>
-      </TableTd>
-      <TableTd>
-        <Button>Duplicate</Button>
-      </TableTd>
-      <TableTd>
-        <Button color="red">Delete</Button>
-      </TableTd>
-    </TableTr>
-  ));
+  let rows;
+
+  if (upcomingEvents) {
+    rows = upcomingEvents.map((element) => (
+      <TableTr key={element.title}>
+        <TableTd>
+          <Image src={element.photo} h={75} alt={element.title} fit="contain" />
+        </TableTd>
+        <TableTd>{element.title}</TableTd>
+        <TableTd>
+          <RichTextRenderer content={element.shortDescription} />
+        </TableTd>
+        <TableTd>
+          <Button>Manage Event</Button>
+        </TableTd>
+        <TableTd>
+          <Button>Manage People</Button>
+        </TableTd>
+        <TableTd>
+          <Button onClick={() => handleDuplicateEvent(element)}>Duplicate</Button>
+        </TableTd>
+        <TableTd>
+          <Button color="red">Delete</Button>
+        </TableTd>
+      </TableTr>
+    ));
+  }
 
   return (
     <Container size="xl">
@@ -114,7 +89,15 @@ const ManageEventsPage = () => {
               <TableTd>Delete</TableTd>
             </TableTr>
           </TableThead>
-          <TableTbody>{rows}</TableTbody>
+          <TableTbody>
+            {rows ? (
+              rows
+            ) : (
+              <Center>
+                <Loader />
+              </Center>
+            )}
+          </TableTbody>
         </Table>
       </Stack>
     </Container>
