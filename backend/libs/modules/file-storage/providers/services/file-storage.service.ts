@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { exists, existsSync } from "node:fs";
+import { createReadStream, existsSync, ReadStream } from "node:fs";
 
 @Injectable()
 export class FileStorageService {
@@ -57,6 +57,19 @@ export class FileStorageService {
       .writeFile(fullFilePath, buffer)
       .then(() => filePath)
       .catch(() => null);
+  }
+
+  /**
+   * Read file to read stream
+   * @param filePath File path
+   * @returns ReadStream
+   */
+  async read(filePath: string): Promise<ReadStream> {
+    const exist = await this.exist(filePath);
+    if (!exist) throw new Error(`File ${filePath} does not exist`);
+
+    const fullFilePath = this.getFilePath(filePath);
+    return createReadStream(fullFilePath);
   }
 
   /**

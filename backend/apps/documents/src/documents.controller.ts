@@ -13,13 +13,14 @@ export class DocumentsController {
 
   @EventPattern("invoice.generate")
   async invoiceGenerate(
-    @Payload() { data, outputPath }: GenerateInvoice
+    @Payload() { data, outputPath, force }: GenerateInvoice
   ): Promise<GenerateInvoiceResult> {
+    
     /**
      * TODO: Handle errors or create app-wise interceptor
      */
-
-    if (await this.storageService.exist(outputPath)) return { success: true };
+    if (!force && (await this.storageService.exist(outputPath)))
+      return { success: true };
 
     try {
       const document = InvoiceDocument(data);

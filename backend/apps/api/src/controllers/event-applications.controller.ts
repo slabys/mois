@@ -7,13 +7,18 @@ import {
   NotFoundException,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   UseGuards,
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from "@nestjs/swagger";
 
 import { CookieGuard } from "modules/auth/providers/guards";
-import { EventApplicationsService, EventsService } from "modules/events";
+import {
+  EventApplicationsService,
+  EventSpotsService,
+  EventsService,
+} from "modules/events";
 import {
   EventApplication,
   EventCustomOrganization,
@@ -22,7 +27,10 @@ import { User, UsersService } from "modules/users";
 
 import { ajv } from "utilities/ajv";
 import { CurrentUser } from "../decorators";
-import { CreateEventApplication } from "../models/requests";
+import {
+  CreateEventApplication,
+  UpdateEventApplication,
+} from "../models/requests";
 import { EventApplicationSimple } from "../models/responses";
 import { Address } from "modules/addresses";
 import { OrganizationService } from "modules/organization";
@@ -34,7 +42,8 @@ export class EventApplicationsController {
     private readonly eventApplicationsService: EventApplicationsService,
     private readonly eventService: EventsService,
     private readonly usersService: UsersService,
-    private readonly organizationService: OrganizationService
+    private readonly organizationService: OrganizationService,
+    private readonly eventSpotsService: EventSpotsService
   ) {}
 
   /**
@@ -129,6 +138,71 @@ export class EventApplicationsController {
         throw new BadRequestException("Registration form data are not valid");
 
       application.additionalData = body.additionalFormData;
+    }
+
+    return this.eventApplicationsService.save(application);
+  }
+
+  /**
+   * Update event application
+   *
+   * @param applicationId Event Application ID
+   * @returns
+   */
+  @ApiCreatedResponse({
+    type: EventApplicationSimple,
+    description: "Update event application",
+  })
+  @ApiBearerAuth()
+  @UseGuards(CookieGuard)
+  @Patch("application/:id")
+  async updateEventApplication(
+    @Param("id") applicationId: string,
+    @Body() body: UpdateEventApplication
+  ) {
+    const application = await this.eventApplicationsService.findById(
+      applicationId,
+      {
+        relations: {
+          personalAddress: true,
+          event: true,
+        },
+      }
+    );
+    if (!application)
+      throw new NotFoundException("Event application not found");
+
+    if (body.spotTypeId) {
+      const eventSpot = await this.eventSpotsService.findById(body.spotTypeId);
+      if (!eventSpot) throw new BadRequestException("Invalid event spot");
+
+      application.spotType = eventSpot;
+    }
+
+    if (body.invoiceAddress)
+      application.personalAddress.update(body.invoiceAddress);
+
+    application.idNumber = body.idNumber ?? application.idNumber;
+
+    if (body.additionalFormData) {
+      const event = await this.eventService.findById(application.event.id, {
+        relations: { spotTypes: true },
+        select: { registrationForm: {}, id: true },
+      });
+      if (!event) throw new NotFoundException("Event not found");
+
+      if (event.registrationForm) {
+        console.log(event.registrationForm);
+        const isFormValid = await ajv.validate(
+          event.registrationForm,
+          body.additionalFormData
+        );
+
+        if (!isFormValid)
+          throw new BadRequestException("Registration form data are not valid");
+
+        application.additionalData = body.additionalFormData;
+      }
     }
 
     return this.eventApplicationsService.save(application);

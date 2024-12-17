@@ -1,7 +1,7 @@
 import React from "react";
 import { Image, View, StyleSheet } from "@react-pdf/renderer";
 import { imageSync } from "qr-image";
-import { PaymentCode } from "sepa-payment-code";
+import { createShortPaymentDescriptor } from "@spayd/core";
 
 import { EnhancedText } from "../components";
 
@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
   background: {
     backgroundColor: "#287cb3",
     color: "white",
-    height: "100%"
+    height: "100%",
   },
   qrImage: {
     width: 96,
@@ -31,66 +31,80 @@ const styles = StyleSheet.create({
   tableColumn: {
     width: "auto",
     flexGrow: 1,
-    justifyContent: "space-around"
+    justifyContent: "space-around",
   },
   tablePaddingColumn: {
     paddingLeft: 5,
-    paddingRight: 5
+    paddingRight: 5,
   },
   table: {
     justifyContent: "space-evenly",
-    flexGrow: 1
-  }
+    flexGrow: 1,
+  },
 });
 
 interface PaymentProps {
   receiverName: string;
-  ban: string;
   iban: string;
   swift: string;
   variableSymbol: number;
-  paymentMethod: string;
   amount: number;
+  paymentId?: string;
+  currency: string;
 }
 
-export const Payment = (props: PaymentProps) => {
-  const content = new PaymentCode(
-    props.receiverName,
-    props.iban,
-    props.amount,
-    "TEXT"
-  );
-  const data = imageSync(content.getPayload(), { type: "png", margin: 2, size: 96 });
+export const Payment = ({
+  amount,
+  iban,
+  receiverName,
+  swift,
+  variableSymbol,
+  paymentId,
+  currency,
+}: PaymentProps) => {
+  const descriptor = createShortPaymentDescriptor({
+    acc: iban,
+    am: amount.toString(),
+    cc: currency,
+    rf: variableSymbol.toString(),
+    rn: receiverName,
+    x: {
+      vs: variableSymbol.toString(),
+      id: paymentId,
+    },
+  });
+
+  const data = imageSync(descriptor, {
+    type: "png",
+    margin: 2,
+    size: 96,
+  });
   const imageSrc = data.toString("base64");
 
   return (
     <View style={[styles.row, styles.background, { padding: 15 }]}>
-      <View style={{...styles.column, height: "100%", padding: 15}}>
-        <EnhancedText color="white" bold style={{ paddingBottom: 10}}>
+      <View style={{ ...styles.column, height: "100%", padding: 15 }}>
+        <EnhancedText color="white" bold style={{ paddingBottom: 10 }}>
           Payment details
         </EnhancedText>
 
         <View style={[styles.row, styles.table]}>
           <View style={[styles.column, styles.tableColumn]}>
-            <EnhancedText>BAN</EnhancedText>
             <EnhancedText>IBAN</EnhancedText>
             <EnhancedText>SWIFT</EnhancedText>
           </View>
           <View style={[styles.column, styles.tableColumn]}>
-            <EnhancedText bold>{props.ban}</EnhancedText>
-            <EnhancedText bold>{props.iban}</EnhancedText>
-            <EnhancedText bold>{props.swift}</EnhancedText>
+            <EnhancedText bold>{iban}</EnhancedText>
+            <EnhancedText bold>{swift}</EnhancedText>
           </View>
 
           <View style={[styles.column, styles.tableColumn]}>
             <EnhancedText>Payment method</EnhancedText>
-            <EnhancedText>Variable symbol</EnhancedText>
-            <EnhancedText>           </EnhancedText>
+            <EnhancedText>Payment identifier</EnhancedText>
           </View>
           <View style={[styles.column, styles.tableColumn]}>
-            <EnhancedText bold>{props.paymentMethod}</EnhancedText>
-            <EnhancedText bold>{props.variableSymbol}</EnhancedText>
-            <EnhancedText bold>       </EnhancedText>
+            <EnhancedText bold>Bank transfer</EnhancedText>
+            <EnhancedText bold>{variableSymbol}</EnhancedText>
           </View>
         </View>
       </View>

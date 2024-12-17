@@ -8,6 +8,7 @@ export * from "./create-user.dto";
 export * from "./delete-event-spot.dto";
 export * from "./delete-organization-members.dto";
 export * from "./login-user.dto";
+export * from "./update-event-application.dto";
 export * from "./update-event-spot.dto";
 export * from "./update-event.dto";
 export * from "./update-organization.dto";
