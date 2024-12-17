@@ -6,7 +6,6 @@ import {
   FindOptionsSelect,
   LessThan,
   MoreThan,
-  TreeLevelColumn,
   type Repository,
 } from "typeorm";
 
@@ -42,6 +41,36 @@ export class EventsService {
         ...(options?.relations ?? {}),
       },
     });
+  }
+
+  findByIdDetailed(id: number, options?: EventFindOptions) {
+    return this.findById(
+      id,
+      {
+        select: {
+          id: true,
+          capacity: true,
+          codeOfConductLink: true,
+          photoPolicyLink: true,
+          termsAndConditionsLink: true,
+          createdAt: true,
+          longDescription: true,
+          shortDescription: true,
+          registrationDeadline: true,
+          registrationForm: {} as never,
+          since: true,
+          until: true,
+          title: true,
+          visible: true,
+        },
+        relations: {
+          createdByUser: true,
+          links: true,
+          spotTypes: true,
+          photo: true,
+        },
+      },
+    );
   }
 
   save(event: Partial<Event>) {

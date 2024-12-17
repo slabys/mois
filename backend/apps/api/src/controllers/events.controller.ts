@@ -82,32 +82,8 @@ export class EventsController {
   @ApiNotFoundResponse({ description: "Event not found" })
   @Get(":id")
   async getEvent(@Param("id", ParseIntPipe) id: number) {
-    const event = await this.eventsService.findById(id, {
-      select: {
-        id: true,
-        capacity: true,
-        codeOfConductLink: true,
-        photoPolicyLink: true,
-        termsAndConditionsLink: true,
-        createdAt: true,
-        longDescription: true,
-        shortDescription: true,
-        registrationDeadline: true,
-        registrationForm: {} as never,
-        since: true,
-        until: true,
-        title: true,
-        visible: true,
-      },
-      relations: {
-        createdByUser: true,
-        links: true,
-        spotTypes: true,
-        photo: true,
-      },
-    });
+    const event = await this.eventsService.findByIdDetailed(id);
     if (!event) throw new NotFoundException("Event not found");
-
     return event;
   }
 
@@ -145,7 +121,7 @@ export class EventsController {
     return this.eventsService.save(event);
   }
 
-  @ApiOkResponse({ type: EventSimple, description: "Updated event" })
+  @ApiOkResponse({ type: EventDetail, description: "Updated event" })
   @ApiForbiddenResponse({
     description:
       "User is not member of event organization or does not have required permissions",
@@ -159,8 +135,7 @@ export class EventsController {
     @Body() body: UpdateEvent
   ) {
     // TODO: Check user role for modifications
-
-    const event = await this.eventsService.findById(eventId, { visible: true });
+    const event = await this.eventsService.findByIdDetailed(eventId, { visible: true });
     if (!event) throw new NotFoundException("Event not found");
 
     Object.assign(event, body);
