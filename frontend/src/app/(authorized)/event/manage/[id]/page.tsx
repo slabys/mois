@@ -1,6 +1,6 @@
 import { getGetEventsQueryKey } from "@/utils/api";
 import { EventSimple } from "@/utils/api.schemas";
-import ManageApplicationsTable from "@components/ManageApplicationsTable";
+import ManageApplicationsTable from "@components/ManageApplicationsTable/ManageApplicationsTable";
 import { Container, Stack, Title } from "@mantine/core";
 
 interface ManageEventApplicationsProps {
