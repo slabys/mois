@@ -24,7 +24,7 @@ const styles = StyleSheet.create({
 });
 
 interface HeaderProps {
-  invoiceId: number;
+  invoiceId: string;
 }
 
 export const Header = (props: HeaderProps) => (

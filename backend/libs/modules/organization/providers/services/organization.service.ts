@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { FindOneOptions, FindOptionsWhere, Repository } from "typeorm";
 
 import { FindManyOptions } from "libs/types";
 import {
@@ -55,7 +55,11 @@ export class OrganizationService {
    * @param userId User ID
    * @returns {OrganizationMember | null} Membership
    */
-  findMemberByUserId(organizationId: string, userId: string) {
+  findMemberByUserId(
+    organizationId: string,
+    userId: string,
+    options?: FindOneOptions<OrganizationMember>
+  ) {
     return this.memberRepository.findOne({
       where: {
         organization: {
@@ -65,6 +69,7 @@ export class OrganizationService {
           id: userId,
         },
       },
+      relations: options?.relations,
     });
   }
 

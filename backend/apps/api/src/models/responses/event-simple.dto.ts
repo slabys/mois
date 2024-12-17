@@ -10,5 +10,8 @@ export class EventSimple extends PickType(Event, [
   "createdByUser",
   "shortDescription",
   "registrationDeadline",
-  "visible"
+  "visible",
+  "termsAndConditionsLink",
+  "photoPolicyLink",
+  "codeOfConductLink",
 ]) {}

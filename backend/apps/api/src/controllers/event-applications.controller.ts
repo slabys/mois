@@ -14,7 +14,10 @@ import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from "@nestjs/swagger";
 
 import { CookieGuard } from "modules/auth/providers/guards";
 import { EventApplicationsService, EventsService } from "modules/events";
-import { EventApplication } from "modules/events/entities";
+import {
+  EventApplication,
+  EventCustomOrganization,
+} from "modules/events/entities";
 import { User, UsersService } from "modules/users";
 
 import { ajv } from "utilities/ajv";
@@ -22,6 +25,7 @@ import { CurrentUser } from "../decorators";
 import { CreateEventApplication } from "../models/requests";
 import { EventApplicationSimple } from "../models/responses";
 import { Address } from "modules/addresses";
+import { OrganizationService } from "modules/organization";
 
 @ApiTags("Event applications")
 @Controller("events")
@@ -29,7 +33,8 @@ export class EventApplicationsController {
   constructor(
     private readonly eventApplicationsService: EventApplicationsService,
     private readonly eventService: EventsService,
-    private readonly usersService: UsersService
+    private readonly usersService: UsersService,
+    private readonly organizationService: OrganizationService
   ) {}
 
   /**
@@ -39,7 +44,7 @@ export class EventApplicationsController {
   @UseGuards(CookieGuard)
   @Get("applications")
   getUserApplications(@CurrentUser() user: User) {
-    return this.eventApplicationsService.findByUserId(user.id);
+    return this.eventApplicationsService.findByUserIdDetailed(user.id);
   }
 
   /**
@@ -51,7 +56,7 @@ export class EventApplicationsController {
   @UseGuards(CookieGuard)
   @Get(":eventId/applications")
   async getEventApplications(@Param("eventId", ParseIntPipe) eventId: number) {
-    return this.eventApplicationsService.findByEventId(eventId);
+    return this.eventApplicationsService.findByEventIdDetailed(eventId);
   }
 
   /**
@@ -76,23 +81,43 @@ export class EventApplicationsController {
     if (!currentUser.personalAddress)
       throw new ForbiddenException("User must have valid personal address");
 
+    const application = new EventApplication({
+      user,
+      personalAddress: currentUser.personalAddress.copy(),
+      invoiceAddress: new Address(body.invoiceAddress),
+      idNumber: body.idNumber,
+    });
+
+    if (body.organization.type === "organization") {
+      const member = await this.organizationService.findMemberByUserId(
+        body.organization.id,
+        user.id,
+        { relations: { organization: true } }
+      );
+
+      if (!member) throw new BadRequestException("Invalid organization given");
+      application.organization = member.organization;
+    } else {
+      application.customOrganization = new EventCustomOrganization({
+        country: body.organization.country,
+        name: body.organization.name,
+      });
+    }
+
     const event = await this.eventService.findById(eventId, {
       relations: { spotTypes: true },
       select: { registrationForm: {}, id: true },
     });
     if (!event) throw new NotFoundException("Event not found");
 
-    const spotType = event.spotTypes.find((e) => e.id === body.spotTypeId);
-    if (!spotType) throw new NotFoundException("Spot type not found");
+    application.event = event;
 
-    const application = new EventApplication({
-      event,
-      user,
-      spotType,
-      personalAddress: currentUser.personalAddress.copy(),
-      invoiceAddress: new Address(body.invoiceAddress),
-      idNumber: body.idNumber
-    });
+    if (body.spotTypeId) {
+      const spotType = event.spotTypes.find((e) => e.id === body.spotTypeId);
+      if (!spotType) throw new NotFoundException("Spot type not found");
+      
+      application.spotType = spotType;
+    }
 
     if (event.registrationForm) {
       const isFormValid = await ajv.validate(
