@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Get,
   NotFoundException,
@@ -11,7 +12,13 @@ import {
   Post,
   UseGuards,
 } from "@nestjs/common";
-import { ApiBearerAuth, ApiCreatedResponse, ApiTags } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+} from "@nestjs/swagger";
 
 import { CookieGuard } from "modules/auth/providers/guards";
 import {
@@ -192,7 +199,6 @@ export class EventApplicationsController {
       if (!event) throw new NotFoundException("Event not found");
 
       if (event.registrationForm) {
-        console.log(event.registrationForm);
         const isFormValid = await ajv.validate(
           event.registrationForm,
           body.additionalFormData
@@ -206,5 +212,23 @@ export class EventApplicationsController {
     }
 
     return this.eventApplicationsService.save(application);
+  }
+
+  /**
+   * Delete event application by ID
+   */
+  @ApiOkResponse({ description: "Event application deleted" })
+  @ApiNotFoundResponse({ description: "Event application not found" })
+  @ApiBearerAuth()
+  @UseGuards(CookieGuard)
+  @Delete("application/:id")
+  async deleteEventApplication(@Param("id") applicationId: string) {
+    const application = await this.eventApplicationsService.findById(
+      applicationId
+    );
+    if (!application)
+      throw new NotFoundException("Event application not found");
+
+    await this.eventApplicationsService.delete(application);
   }
 }
