@@ -8,6 +8,7 @@ import {
   EventSpotsController,
   EventsController,
   HealthController,
+  InvoiceController,
   OrganizationMembersController,
   OrganizationsController,
   PhotoController,
@@ -23,6 +24,7 @@ import { NestjsFormDataModule } from "nestjs-form-data";
 import { InvoiceModule } from "modules/invoice";
 
 import { ManagementControllers } from "./controllers/management";
+import { FileStorageModule } from "modules/file-storage";
 
 @Module({
   imports: [
@@ -44,6 +46,7 @@ import { ManagementControllers } from "./controllers/management";
         };
       },
     }),
+    FileStorageModule,
   ],
   controllers: [
     AuthController,
@@ -54,6 +57,7 @@ import { ManagementControllers } from "./controllers/management";
     EventApplicationsController,
     EventsController,
     EventSpotsController,
+    InvoiceController,
     ...ManagementControllers,
     HealthController,
   ],

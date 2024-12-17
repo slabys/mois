@@ -2,9 +2,12 @@ import { Module } from "@nestjs/common";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { InvoiceService } from "./providers/services";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { Invoice, InvoiceItem } from "./entities";
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([Invoice, InvoiceItem]),
     ClientsModule.registerAsync({
       clients: [
         {

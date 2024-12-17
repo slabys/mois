@@ -1,4 +1,11 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+} from "typeorm";
 import { InvoiceItem } from "./invoice-item.entity";
 import { PaymentSubject } from "modules/payments";
 
@@ -28,10 +35,10 @@ export class Invoice {
   })
   items: InvoiceItem[];
 
-  @ManyToOne(() => PaymentSubject, { eager: true })
+  @ManyToOne(() => PaymentSubject, { eager: true, cascade: true })
   supplier: PaymentSubject;
 
-  @ManyToOne(() => PaymentSubject, { eager: true })
+  @ManyToOne(() => PaymentSubject, { eager: true, cascade: true })
   subscriber: PaymentSubject;
 
   @CreateDateColumn()

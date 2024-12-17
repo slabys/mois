@@ -19,7 +19,18 @@ interface GenerateInvoiceItem {
 }
 
 export interface GenerateInvoice {
+  /**
+   * Force regenerate invoice even if exist
+   */
+  force?: boolean;
+  /**
+   * Storage output path (must be mount to same directory, or it must be rewritten to use buffers instead)
+   */
   outputPath: string;
+
+  /**
+   * Invoice data
+   */
   data: {
     id: string;
 
@@ -33,14 +44,14 @@ export interface GenerateInvoice {
       swift?: string;
       amount: number;
     };
-    
+
     items: GenerateInvoiceItem[];
   };
 }
 
 export type GenerateInvoiceResult =
+  | { success: true }
   | {
       success: false;
       error: string;
-    }
-  | { success: true };
+    };
