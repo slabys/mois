@@ -79,13 +79,13 @@ export class Event extends BaseEntity {
 
   /** Links */
 
-  @Column({ select: false })
+  @Column()
   termsAndConditionsLink: string;
 
-  @Column({ select: false })
+  @Column()
   photoPolicyLink: string;
 
-  @Column({ select: false })
+  @Column()
   codeOfConductLink: string;
 
   constructor(event?: Partial<Event>) {

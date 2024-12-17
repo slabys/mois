@@ -80,6 +80,7 @@ export class EventsService {
             : filter.to
             ? LessThan(filter.to)
             : undefined,
+        visible: options?.visible,
       },
       relations: {
         createdByUser: true,

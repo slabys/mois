@@ -2,7 +2,13 @@ import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
 import { PhotoModule } from "modules/photo";
-import { Event, EventApplication, EventLink, EventSpot } from "./entities";
+import {
+  Event,
+  EventApplication,
+  EventCustomOrganization,
+  EventLink,
+  EventSpot,
+} from "./entities";
 import {
   EventApplicationsService,
   EventSpotsService,
@@ -11,7 +17,13 @@ import {
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Event, EventSpot, EventApplication, EventLink]),
+    TypeOrmModule.forFeature([
+      Event,
+      EventSpot,
+      EventApplication,
+      EventLink,
+      EventCustomOrganization,
+    ]),
     PhotoModule,
   ],
   providers: [EventsService, EventSpotsService, EventApplicationsService],

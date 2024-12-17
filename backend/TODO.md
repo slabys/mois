@@ -11,7 +11,7 @@
     - [ ] Status
       - Completed
       - Cancelled
-  - [ ] Register form
+  - [x] Register form
   - [ ] Payment PDF
   - [ ] Payment confirmation PDF/JPG/PNG
   - [ ] Update
