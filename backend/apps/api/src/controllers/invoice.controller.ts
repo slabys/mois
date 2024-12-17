@@ -78,19 +78,10 @@ export class InvoiceController {
    * Will be generated if does not exist.
    */
   @ApiConsumes()
-  @ApiOkResponse({
-    type: "file",
-    description: "PDF",
-    headers: {
-      ContentType: {
-        description: "PDF Content type",
-        schema: { type: "string", example: "application/pdf" },
-      },
-    },
-  })
+  @ApiOkResponse({ schema: {} })
   @Header("content-type", "application/pdf")
   @Get(":id/stream")
-  async getInvoicePdfStream(@Param("id") id: string) {
+  async getInvoicePdfStream(@Param("id") id: string): Promise<StreamableFile> {
     const invoice = await this.invoiceService.findById(id);
     if (!invoice) throw new NotFoundException("Invoice not found");
 
