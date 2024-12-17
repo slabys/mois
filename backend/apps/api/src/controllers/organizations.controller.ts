@@ -13,4 +13,6 @@ export class OrganizationsController {
   allOrganizations(@Pagination() pagination: PaginationOptions) {
     return this.organizationService.findAll({ pagination });
   }
+
+  
 }

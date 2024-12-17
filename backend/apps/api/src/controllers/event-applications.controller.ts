@@ -115,7 +115,7 @@ export class EventApplicationsController {
     if (body.spotTypeId) {
       const spotType = event.spotTypes.find((e) => e.id === body.spotTypeId);
       if (!spotType) throw new NotFoundException("Spot type not found");
-      
+
       application.spotType = spotType;
     }
 
