@@ -23,9 +23,13 @@ export const revalidate = 60;
 
 const UseFetchEventApplications = async () => {
   const queryKey = getGetEventsQueryKey();
-  const events: EventSimple[] = await fetch(`${process.env.NEXT_PUBLIC_APP1_URL}${queryKey[0]}`).then((res) =>
-    res.json(),
-  );
+  const events: EventSimple[] = await fetch(`${process.env.NEXT_PUBLIC_APP1_URL}${queryKey[0]}`)
+    .then((res) => res.json())
+    .catch((e) => console.error(e));
+
+  if (!events) {
+    return [];
+  }
 
   return events.map((event) => {
     return {
