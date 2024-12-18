@@ -106,7 +106,9 @@ export class EventApplicationsController {
     type: EventApplicationSimple,
     description: "Created new application",
   })
-  @ApiConflictResponse({ description: "Event application for user already exist"})
+  @ApiConflictResponse({
+    description: "Event application for user already exist",
+  })
   @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Post(":eventId/applications")
@@ -178,14 +180,14 @@ export class EventApplicationsController {
     // Hard-coded invoice
     const invoice = await this.invoiceService.create({
       constantSymbol: 123,
-      currency: InvoiceCurrency.CZK,
+      currency: application?.invoice?.currency ?? InvoiceCurrency.CZK,
       iban: "CZ6508000000192000145399",
       items: application.spotType
         ? [
             new InvoiceItem({
               amount: 1,
               name: `Spot: ${application.spotType.name}`,
-              price: application.spotType.price * 100,
+              price: application.spotType.price,
             }),
           ]
         : [],
