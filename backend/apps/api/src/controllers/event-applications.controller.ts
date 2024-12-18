@@ -5,6 +5,7 @@ import {
   Delete,
   ForbiddenException,
   Get,
+  InternalServerErrorException,
   NotFoundException,
   Param,
   ParseIntPipe,
@@ -44,6 +45,12 @@ import {
   UpdateEventApplication,
 } from "../models/requests";
 import { EventApplicationSimple } from "../models/responses";
+import { InvoiceService } from "modules/invoice";
+import { firstValueFrom } from "rxjs";
+import { FileStorageService } from "modules/file-storage";
+import { InvoiceCurrency } from "modules/invoice/enums";
+import { InvoiceItem } from "modules/invoice/entities";
+import { PaymentSubject } from "modules/payments";
 
 @ApiTags("Event applications")
 @Controller("events")
@@ -53,12 +60,14 @@ export class EventApplicationsController {
     private readonly eventService: EventsService,
     private readonly usersService: UsersService,
     private readonly organizationService: OrganizationService,
-    private readonly eventSpotsService: EventSpotsService
+    private readonly eventSpotsService: EventSpotsService,
+    private readonly invoiceService: InvoiceService,
+    private readonly fileStorageService: FileStorageService
   ) {}
 
   /**
    * Get all signed-in user applications
-   * 
+   *
    * For filtering look at {@link EventsController}
    */
   @ApiBearerAuth()
@@ -160,6 +169,39 @@ export class EventApplicationsController {
       application.additionalData = body.additionalFormData;
     }
 
+    // Hard-coded invoice
+    const invoice = await this.invoiceService.create({
+      constantSymbol: 123,
+      currency: InvoiceCurrency.CZK,
+      iban: "CZ6508000000192000145399",
+      items: application.spotType
+        ? [
+            new InvoiceItem({
+              amount: 1,
+              name: `Spot: ${application.spotType.name}`,
+              price: application.spotType.price * 100,
+            }),
+          ]
+        : [],
+      swift: "SWIFT",
+      subscriber: new PaymentSubject({
+        address: currentUser.personalAddress.copy(),
+        name: "Subscriber",
+      }),
+      supplier: new PaymentSubject({
+        address: new Address({
+          city: "CITY",
+          country: "Czech Republic",
+          houseNumber: "50/7",
+          street: "STREET",
+          zip: "111 10",
+        }),
+        name: "SUPPLIER",
+      }),
+      variableSymbol: 123,
+    });
+    application.invoice = invoice;
+
     return this.eventApplicationsService.save(application);
   }
 
@@ -246,5 +288,41 @@ export class EventApplicationsController {
       throw new NotFoundException("Event application not found");
 
     await this.eventApplicationsService.delete(application);
+  }
+
+  @ApiOkResponse({ description: "Event application deleted" })
+  @ApiNotFoundResponse({ description: "Event application not found" })
+  @ApiBearerAuth()
+  @UseGuards(CookieGuard)
+  @Get("application/:id/invoice")
+  async getEventApplicationInvoice(
+    @Param("id", ParseIntPipe) applicationId: number
+  ) {
+    const application = await this.eventApplicationsService.findById(
+      applicationId,
+      {
+        relations: {
+          invoice: {
+            subscriber: { address: true },
+            supplier: { address: true },
+          },
+        },
+      }
+    );
+
+    if (!application?.invoice) throw new NotFoundException("Invoice not found");
+
+    const result = await this.invoiceService.generatePdfFromInvoice(
+      application.invoice
+    );
+    const value = await firstValueFrom(result);
+
+    if (value.success) {
+      return {
+        invoice: application.invoice,
+        url: await this.fileStorageService.getPublicUrl(value.outputPath),
+      };
+    }
+    throw new InternalServerErrorException("Could not generate invoice");
   }
 }

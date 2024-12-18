@@ -62,24 +62,29 @@ export const Payment = ({
   paymentId,
   currency,
 }: PaymentProps) => {
-  const descriptor = createShortPaymentDescriptor({
-    acc: iban,
-    am: amount.toString(),
-    cc: currency,
-    rf: variableSymbol.toString(),
-    rn: receiverName,
-    x: {
-      vs: variableSymbol.toString(),
-      id: paymentId,
-    },
-  });
+  const am = (Math.round(amount * 100) / 100).toFixed(2);
 
-  const data = imageSync(descriptor, {
-    type: "png",
-    margin: 2,
-    size: 96,
-  });
-  const imageSrc = data.toString("base64");
+  let imageSrc: string | undefined;
+  if (amount > 0) {
+    const descriptor = createShortPaymentDescriptor({
+      acc: iban,
+      am: am.toString(),
+      cc: currency,
+      rf: variableSymbol.toString(),
+      rn: receiverName,
+      x: {
+        vs: variableSymbol.toString(),
+        id: paymentId,
+      },
+    });
+
+    const data = imageSync(descriptor, {
+      type: "png",
+      margin: 2,
+      size: 96,
+    });
+    imageSrc = data.toString("base64");
+  }
 
   return (
     <View style={[styles.row, styles.background, { padding: 15 }]}>
@@ -109,10 +114,12 @@ export const Payment = ({
         </View>
       </View>
 
-      <Image
-        style={styles.qrImage}
-        src={`data:image/png;base64, ${imageSrc}`}
-      />
+      {imageSrc && (
+        <Image
+          style={styles.qrImage}
+          src={`data:image/png;base64, ${imageSrc}`}
+        />
+      )}
     </View>
   );
 };
