@@ -7,14 +7,12 @@ import {
   useUpdateEventApplication,
 } from "@/utils/api";
 import { EventApplication } from "@/utils/api.schemas";
-import routes from "@/utils/routes";
 import CreateSpotModal from "@components/CreateSpotModal/CreateSpotModal";
 import UpdateEventApplicationModal from "@components/UpdateEventApplicationModal/UpdateEventApplicationModal";
 import { ActionIcon, Button, ComboboxData, Flex, Select, Table, Text, Title, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { IconCopy, IconEdit, IconFileTypePdf, IconPlus, IconTrash, IconZoom } from "@tabler/icons-react";
-import Link from "next/link";
+import { IconEdit, IconFileTypePdf, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 
 interface ManageApplicationsTableProps {
@@ -83,7 +81,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     },
   });
 
-  const handleSpotChange = (applicationId: string, spotId: string | null) => {
+  const handleSpotChange = (applicationId: number, spotId: string | null) => {
     updateApplicationMutation.mutate({
       id: applicationId,
       data: {
@@ -142,7 +140,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
 
   const handleDeleteApplication = (applicationId: string) => {
     deleteApplicationMutation.mutate({
-      id: applicationId,
+      id: Number.parseInt(applicationId),
     });
   };
 
