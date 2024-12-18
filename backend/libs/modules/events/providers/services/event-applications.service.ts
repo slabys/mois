@@ -140,4 +140,16 @@ export class EventApplicationsService {
   async delete(application: EventApplication) {
     await this.eventApplicationRepository.remove(application);
   }
+
+  /**
+   * @param eventId 
+   * @param userId 
+   * @returns True, if application exist
+   */
+  exist(eventId: number, userId?: string) {
+    return this.eventApplicationRepository.existsBy({
+      event: { id: eventId },
+      user: { id: userId },
+    });
+  }
 }

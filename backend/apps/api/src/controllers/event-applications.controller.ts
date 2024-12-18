@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Body,
+  ConflictException,
   Controller,
   Delete,
   ForbiddenException,
@@ -16,6 +17,7 @@ import {
 } from "@nestjs/common";
 import {
   ApiBearerAuth,
+  ApiConflictResponse,
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
@@ -104,6 +106,7 @@ export class EventApplicationsController {
     type: EventApplicationSimple,
     description: "Created new application",
   })
+  @ApiConflictResponse({ description: "Event application for user already exist"})
   @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Post(":eventId/applications")
@@ -112,6 +115,9 @@ export class EventApplicationsController {
     @Param("eventId", ParseIntPipe) eventId: number,
     @Body() body: CreateEventApplication
   ) {
+    const exist = await this.eventApplicationsService.exist(eventId, user.id);
+    if (exist) throw new ConflictException("Event application already exist");
+
     const currentUser = await this.usersService.findById(user.id, {
       relations: { personalAddress: true },
     });
