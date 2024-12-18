@@ -1,15 +1,24 @@
 "use client";
 
-import { useGetEvent } from "@/utils/api";
+import { useGetCurrentUser, useGetEvent } from "@/utils/api";
 import routes from "@/utils/routes";
 import { dateWithTime, dayMonthYear } from "@/utils/time";
 import ApiImage from "@components/ApiImage/ApiImage";
+import JoinEventModal from "@components/JoinEventModal/JoinEventModal";
 import RichTextRenderer from "@components/Richtext/RichTextRenderer";
 import UpdateEventPhotoModal from "@components/UpdateEventPhotoModal/UpdateEventPhotoModal";
 import EventEditModal from "@components/events/modals/EventEditModal";
 import { Button, Collapse, Divider, Flex, Grid, SimpleGrid, Skeleton, Text, Title } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
-import { IconCash, IconChevronDown, IconEdit, IconInvoice, IconPhoto, IconUsersGroup } from "@tabler/icons-react";
+import {
+  IconCash,
+  IconChevronDown,
+  IconDirectionSign,
+  IconEdit,
+  IconInvoice,
+  IconPhoto,
+  IconUsersGroup,
+} from "@tabler/icons-react";
 import Link from "next/link";
 import React from "react";
 
@@ -23,8 +32,10 @@ const EventDetail = ({ id }: EventDetailProps) => {
 
   const [isModalEditOpen, { open: openModalEdit, close: closeModalEdit }] = useDisclosure(false);
   const [isModalUploadPhotoOpen, { open: openModalUploadPhoto, close: closeModalUploadPhoto }] = useDisclosure(false);
+  const [isModalJoinEventOpen, { open: openModalJoinEvent, close: closeModalJoinEvent }] = useDisclosure(false);
 
   const { data: eventDetail, refetch: refetchEvent } = useGetEvent(id);
+  const { data: userData } = useGetCurrentUser();
 
   return eventDetail ? (
     <>
@@ -94,6 +105,10 @@ const EventDetail = ({ id }: EventDetailProps) => {
                 <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconCash />}>
                   Upload Payment
                 </Button>
+                {/* TODO */}
+                <Button onClick={openModalJoinEvent} leftSection={<IconDirectionSign />}>
+                  Join Event
+                </Button>
               </SimpleGrid>
             </Collapse>
           </Flex>
@@ -112,6 +127,12 @@ const EventDetail = ({ id }: EventDetailProps) => {
         }}
         isOpened={isModalEditOpen}
         close={closeModalEdit}
+      />
+      <JoinEventModal
+        userData={userData!}
+        eventId={eventDetail.id}
+        isOpened={isModalJoinEventOpen}
+        closeModal={closeModalJoinEvent}
       />
     </>
   ) : (
