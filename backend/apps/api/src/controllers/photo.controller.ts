@@ -7,7 +7,7 @@ import {
   StreamableFile,
 } from "@nestjs/common";
 import { ApiPermanentRedirectResponse, ApiTags } from "@nestjs/swagger";
-import { fileTypeFromStream } from "file-type";
+import { fromBuffer } from "file-type";
 
 import { PhotoService } from "modules/photo";
 
@@ -22,9 +22,19 @@ export class PhotoController {
     const photo = await this.photoService.findById(photoId);
     if (!photo) throw new NotFoundException();
 
-    const stream = await this.photoService.read(photo);
-    const { mime } = await fileTypeFromStream(stream);
+    const stream = await this.photoService.read(photo).catch(() => {
+      throw new NotFoundException();
+    });
 
-    return new StreamableFile(stream, { type: mime });
+    // To provide mime type, whole stream must be read (TODO: Save mime type in the future or convert all images to same type)
+    const chunks = [];
+    for await (const chunk of stream) {
+      chunks.push(chunk);
+    }
+    const buffer = Buffer.concat(chunks);
+
+    const { mime } = await fromBuffer(buffer);
+
+    return new StreamableFile(buffer, { type: mime });
   }
 }

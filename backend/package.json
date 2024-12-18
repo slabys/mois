@@ -46,7 +46,7 @@
     "class-validator": "^0.14.1",
     "cookie-parser": "^1.4.7",
     "dayjs": "^1.11.13",
-    "file-type": "^19.6.0",
+    "file-type": "^16.5.4",
     "helmet": "^8.0.0",
     "ioredis": "^5.4.1",
     "nestjs-form-data": "^1.9.92",
