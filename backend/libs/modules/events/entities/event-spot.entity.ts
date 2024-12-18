@@ -1,7 +1,11 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 import { Event } from "./event.entity";
+import { InvoiceCurrency } from "modules/invoice/enums";
 
+/**
+ * TODO: multiple-currencies?
+ */
 @Entity()
 export class EventSpot {
   @PrimaryGeneratedColumn()
@@ -18,6 +22,10 @@ export class EventSpot {
     onDelete: "CASCADE",
   })
   event: Event;
+
+
+  @Column({ type: "enum", enum: InvoiceCurrency, default: InvoiceCurrency.CZK })
+  currency: InvoiceCurrency;
 
   constructor(base?: Partial<EventSpot>) {
     Object.assign(this, base);
