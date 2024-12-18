@@ -16,7 +16,7 @@ export class EventCustomOrganization {
   @OneToOne(
     () => EventApplication,
     (application) => application.customOrganization,
-    { nullable: false }
+    { nullable: false, onDelete: "CASCADE" }
   )
   @JoinColumn()
   application: EventApplication;

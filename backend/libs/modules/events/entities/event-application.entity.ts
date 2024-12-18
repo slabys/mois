@@ -3,8 +3,6 @@ import { Organization } from "modules/organization";
 import { User } from "modules/users";
 import {
   BaseEntity,
-  BeforeInsert,
-  BeforeUpdate,
   Column,
   CreateDateColumn,
   type DeepPartial,
@@ -15,16 +13,16 @@ import {
   PrimaryGeneratedColumn,
   Unique,
 } from "typeorm";
+import { EventCustomOrganization } from "./event-custom-organization.entity";
 import { EventSpot } from "./event-spot.entity";
 import { Event } from "./event.entity";
-import { EventCustomOrganization } from "./event-custom-organization.entity";
 
 /**
  * Event application represents registration to event
- * 
+ *
  * Important things before save or update:
  * - Organization or customOrganization must be set
- * 
+ *
  */
 @Unique(["user", "event"])
 @Entity()
