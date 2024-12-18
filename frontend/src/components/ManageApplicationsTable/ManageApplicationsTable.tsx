@@ -6,13 +6,16 @@ import {
   useGetEventSpots,
   useUpdateEventApplication,
 } from "@/utils/api";
+import { EventApplication } from "@/utils/api.schemas";
 import routes from "@/utils/routes";
 import CreateSpotModal from "@components/CreateSpotModal/CreateSpotModal";
+import UpdateEventApplicationModal from "@components/UpdateEventApplicationModal/UpdateEventApplicationModal";
 import { ActionIcon, Button, ComboboxData, Flex, Select, Table, Text, Title, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconCopy, IconEdit, IconPlus, IconTrash, IconZoom } from "@tabler/icons-react";
 import Link from "next/link";
+import { useState } from "react";
 
 interface ManageApplicationsTableProps {
   eventId: number;
@@ -20,7 +23,9 @@ interface ManageApplicationsTableProps {
 
 const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
   const { data: eventApplications } = useGetEventApplications(eventId);
-  const [isModalOpen, { open: openModal, close: closeModal }] = useDisclosure(false);
+  const [currentApplication, setCurrentApplication] = useState<EventApplication | null>(null);
+  const [isSpotModalOpen, { open: openSpotModal, close: closeSpotModal }] = useDisclosure(false);
+  const [isEditModalOpen, { open: openEditModal, close: closeEditModal }] = useDisclosure(false);
 
   const { data: eventSpots } = useGetEventSpots(eventId);
 
@@ -49,7 +54,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
           loading: false,
           autoClose: true,
         });
-        closeModal();
+        closeSpotModal();
       },
       onError: (mutationError) => {
         if (!mutationError.response?.data) return;
@@ -107,7 +112,6 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
           loading: false,
           autoClose: true,
         });
-        closeModal();
       },
       onError: (mutationError) => {
         if (!mutationError.response?.data) return;
@@ -164,7 +168,15 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
         <Flex justify="space-evenly" gap={16}>
           <Tooltip label="Edit Application">
             {/*TODO - edit EA*/}
-            <ActionIcon variant="subtle" color="blue" size={48}>
+            <ActionIcon
+              variant="subtle"
+              color="blue"
+              size={48}
+              onClick={() => {
+                setCurrentApplication(application);
+                openEditModal();
+              }}
+            >
               <IconEdit width={32} height={32} />
             </ActionIcon>
           </Tooltip>
@@ -188,10 +200,10 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     <>
       <Flex justify="space-between" align="center" w="100%">
         <Title>Manage Event Applications - {eventId}</Title>
-        <Button onClick={openModal} leftSection={<IconPlus />}>
+        <Button onClick={openSpotModal} leftSection={<IconPlus />}>
           Add Spot
         </Button>
-        <CreateSpotModal eventId={eventId} isOpened={isModalOpen} closeModal={closeModal} />
+        <CreateSpotModal eventId={eventId} isOpened={isSpotModalOpen} closeModal={closeSpotModal} />
       </Flex>
       {rows && rows?.length > 0 ? (
         <Table
@@ -217,6 +229,13 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
       ) : (
         <Text>No applications found.</Text>
       )}
+      {currentApplication ? (
+        <UpdateEventApplicationModal
+          currentApplication={currentApplication}
+          isOpened={isEditModalOpen}
+          closeModal={closeEditModal}
+        />
+      ) : null}
     </>
   );
 };
