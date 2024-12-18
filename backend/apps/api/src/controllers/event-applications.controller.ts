@@ -8,8 +8,10 @@ import {
   Get,
   InternalServerErrorException,
   NotFoundException,
+  NotImplementedException,
   Param,
   ParseIntPipe,
+  ParseUUIDPipe,
   Patch,
   Post,
   Query,
@@ -46,7 +48,10 @@ import {
   CreateEventApplication,
   UpdateEventApplication,
 } from "../models/requests";
-import { EventApplicationSimple } from "../models/responses";
+import {
+  EventApplicationInvoice,
+  EventApplicationSimple,
+} from "../models/responses";
 import { InvoiceService } from "modules/invoice";
 import { firstValueFrom } from "rxjs";
 import { FileStorageService } from "modules/file-storage";
@@ -298,7 +303,10 @@ export class EventApplicationsController {
     await this.eventApplicationsService.delete(application);
   }
 
-  @ApiOkResponse({ description: "Event application deleted" })
+  @ApiOkResponse({
+    type: EventApplicationInvoice,
+    description: "Event application deleted",
+  })
   @ApiNotFoundResponse({ description: "Event application not found" })
   @ApiBearerAuth()
   @UseGuards(CookieGuard)
@@ -332,5 +340,31 @@ export class EventApplicationsController {
       };
     }
     throw new InternalServerErrorException("Could not generate invoice");
+  }
+
+  /**
+   * Get event application for user for event
+   */
+  @ApiOkResponse({ type: EventApplication })
+  @ApiNotFoundResponse({ description: "Event application not found" })
+  @ApiBearerAuth()
+  @UseGuards(CookieGuard)
+  @Get(":eventId/applications/user/:userId")
+  async getUserApplicationForEvent(
+    @Param("eventId", ParseIntPipe) eventId: number,
+    @Param("userId", ParseUUIDPipe) userId: string,
+    @CurrentUser() user: User
+  ) {
+    if (user.id !== userId)
+      throw new NotImplementedException(
+        "User cannot get application for another user yet"
+      );
+    const application =
+      await this.eventApplicationsService.findByEventAndUserId(eventId, userId);
+
+    if (!application)
+      throw new NotFoundException("Event application not found");
+
+    return application;
   }
 }

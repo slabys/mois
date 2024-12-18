@@ -8,12 +8,7 @@ import {
   Param,
   StreamableFile,
 } from "@nestjs/common";
-import {
-  ApiConsumes,
-  ApiNotFoundResponse,
-  ApiOkResponse,
-  ApiTags,
-} from "@nestjs/swagger";
+import { ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { FileStorageService } from "modules/file-storage";
 import { InvoiceService } from "modules/invoice";
 
@@ -77,7 +72,6 @@ export class InvoiceController {
    *
    * Will be generated if does not exist.
    */
-  @ApiConsumes()
   @ApiOkResponse({ schema: {} })
   @Header("content-type", "application/pdf")
   @Get(":id/stream")
