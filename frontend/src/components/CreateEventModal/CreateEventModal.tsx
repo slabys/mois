@@ -36,6 +36,7 @@ const CreateEventModal: React.FC<MyModalProps> = ({ onCreateSuccess, isOpened, c
           autoClose: true,
         });
         onCreateSuccess();
+        form.reset();
         closeModal();
       },
       onError: (error) => {
@@ -69,9 +70,9 @@ const CreateEventModal: React.FC<MyModalProps> = ({ onCreateSuccess, isOpened, c
       capacity: 0,
       shortDescription: "",
       longDescription: "",
-      since: undefined,
-      until: undefined,
-      registrationDeadline: undefined,
+      since: new Date().toISOString(),
+      until: new Date().toISOString(),
+      registrationDeadline: new Date().toISOString(),
       termsAndConditionsLink: undefined,
       codeOfConductLink: undefined,
       photoPolicyLink: undefined,
@@ -100,8 +101,13 @@ const CreateEventModal: React.FC<MyModalProps> = ({ onCreateSuccess, isOpened, c
 
   const isTouchedDirty = form.isTouched() && form.isDirty();
 
+  const handleClose = () => {
+    form.reset();
+    closeModal();
+  };
+
   return (
-    <Modal size="xl" opened={isOpened} onClose={closeModal} title="Create Event">
+    <Modal size="xl" opened={isOpened} onClose={handleClose} title="Create Event">
       <Form form={form} onSubmit={handleCreateEvent}>
         <Flex direction="column" gap={16}>
           <Switch
