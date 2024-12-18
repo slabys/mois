@@ -91,7 +91,10 @@ export class UsersController {
   @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Patch()
-  async updateCurrentUser(@Body() body: UpdateUser, @CurrentUser() requestUser: User) {
+  async updateCurrentUser(
+    @Body() body: UpdateUser,
+    @CurrentUser() requestUser: User
+  ) {
     if (body.username && body.username !== requestUser.username) {
       const exists = await this.usersService.exist({ username: body.username });
       if (exists) throw new BadRequestException("Username is already taken");
@@ -101,7 +104,6 @@ export class UsersController {
       relations: { personalAddress: true },
     });
 
-
     // For safety reasons set each property individually
     user.password = body.password ?? user.password;
     user.firstName = body.firstName ?? user.firstName;
@@ -110,10 +112,9 @@ export class UsersController {
     user.gender = body.gender ?? user.gender;
 
     if (body.personalAddress) {
-      if(user.personalAddress)
+      if (user.personalAddress)
         user.personalAddress.update(body.personalAddress);
-      else
-        user.personalAddress = new Address(body.personalAddress);
+      else user.personalAddress = new Address(body.personalAddress);
     }
 
     const newUser = await this.usersService.save(user);
@@ -126,7 +127,9 @@ export class UsersController {
   @UseGuards(CookieGuard)
   @Get()
   async getCurrentUser(@CurrentUser() user: User) {
-    return user;
+    return this.usersService.findById(user.id, {
+      relations: { photo: true, personalAddress: true },
+    });
   }
 
   @ApiConsumes("multipart/form-data")
