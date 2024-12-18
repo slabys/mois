@@ -18,6 +18,7 @@ import { hashPassword } from "modules/auth/utilities/crypto";
 import { Photo } from "modules/photo/entities";
 import { UserGender } from "../enums";
 import { Address } from "modules/addresses";
+import { Role } from "modules/roles";
 
 @Index(["email", "username"])
 @Entity()
@@ -69,6 +70,9 @@ export class User extends BaseEntity {
   async beforeSave() {
     if (this.password) this.password = await hashPassword(this.password);
   }
+
+  @ManyToOne(() => Role, { cascade: true, eager: true, onDelete: "SET NULL" })
+  role: Role;
 
   constructor(partial?: DeepPartial<User>) {
     super();
