@@ -1,10 +1,11 @@
-import { useCreateEvent } from "@/utils/api";
-import { CreateEvent } from "@/utils/api.schemas";
+import { getGetManagementEventsQueryKey, useCreateEvent } from "@/utils/api";
+import { CreateEvent, EventSimple } from "@/utils/api.schemas";
 import RichTextEditor from "@components/Richtext/RichTextEditor";
 import DateInput from "@components/primitives/DateInput";
 import { Button, Flex, Group, Modal, NumberInput, SimpleGrid, Switch, TextInput } from "@mantine/core";
 import { Form, hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
+import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import React from "react";
 
@@ -15,6 +16,8 @@ interface MyModalProps {
 }
 
 const CreateEventModal: React.FC<MyModalProps> = ({ onCreateSuccess, isOpened, closeModal }) => {
+  const queryClient = useQueryClient();
+
   const createEventMutation = useCreateEvent({
     mutation: {
       onMutate: () => {
@@ -26,7 +29,7 @@ const CreateEventModal: React.FC<MyModalProps> = ({ onCreateSuccess, isOpened, c
           autoClose: false,
         });
       },
-      onSuccess: () => {
+      onSuccess: (data) => {
         notifications.update({
           id: "create-event",
           title: "Event Edit",
@@ -35,6 +38,7 @@ const CreateEventModal: React.FC<MyModalProps> = ({ onCreateSuccess, isOpened, c
           loading: false,
           autoClose: true,
         });
+        queryClient.setQueryData(getGetManagementEventsQueryKey(), (oldData: EventSimple[]) => [...oldData, data]);
         onCreateSuccess();
         form.reset();
         closeModal();

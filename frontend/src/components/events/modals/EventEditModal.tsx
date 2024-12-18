@@ -39,12 +39,6 @@ const EventEditModal = ({ eventDetail, isOpened, close, onSuccessEdit }: EventEd
           : "Event end must be larger then beginning of an event.",
     },
   });
-
-  const handleClose = () => {
-    form.reset();
-    close();
-  };
-
   const eventUpdateMutation = useUpdateEvent({
     mutation: {
       onMutate: () => {
@@ -56,7 +50,7 @@ const EventEditModal = ({ eventDetail, isOpened, close, onSuccessEdit }: EventEd
           autoClose: false,
         });
       },
-      onSuccess: () => {
+      onSuccess: (data) => {
         notifications.update({
           id: "edit-event",
           title: "Event Edit",
@@ -65,6 +59,8 @@ const EventEditModal = ({ eventDetail, isOpened, close, onSuccessEdit }: EventEd
           loading: false,
           autoClose: true,
         });
+        form.setInitialValues(data);
+        form.reset();
         onSuccessEdit();
         close();
       },
@@ -93,13 +89,18 @@ const EventEditModal = ({ eventDetail, isOpened, close, onSuccessEdit }: EventEd
   });
 
   const handleEventUpdate = (values: Partial<EventDetail>) => {
-    // eventUpdateMutation.mutate({
-    //   eventId: eventDetail.id,
-    //   data: values,
-    // });
+    eventUpdateMutation.mutate({
+      eventId: eventDetail.id,
+      data: values,
+    });
   };
 
   const isTouchedDirty = form.isTouched() && form.isDirty();
+
+  const handleClose = () => {
+    form.reset();
+    close();
+  };
 
   return (
     <Modal size="lg" opened={isOpened} onClose={handleClose} title="Edit Event">
