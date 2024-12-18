@@ -1,8 +1,5 @@
 import { Type } from "class-transformer";
 import {
-  Allow,
-  IsEnum,
-  IsIn,
   IsNotEmptyObject,
   IsNumber,
   IsObject,
