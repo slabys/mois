@@ -102,6 +102,34 @@ export class EventApplicationsService {
   }
 
   /**
+   * Find event application for user and event id
+   * @param eventId 
+   * @param userId 
+   * @returns 
+   */
+  findByEventAndUserId(eventId: number, userId: string) {
+    return this.eventApplicationRepository.findOne({
+      where: {
+        user: { id: userId },
+        event: { id: eventId },
+      },
+      select: {
+        id: true,
+        additionalData: true as never,
+        createdAt: true,
+        idNumber: true,
+      },
+      relations: {
+        customOrganization: true,
+        organization: true,
+        user: true,
+        spotType: true,
+        event: true,
+      },
+    });
+  }
+
+  /**
    * Find applications by event ID detailed (with relations)
    * @param id Event ID
    * @returns
@@ -142,8 +170,8 @@ export class EventApplicationsService {
   }
 
   /**
-   * @param eventId 
-   * @param userId 
+   * @param eventId
+   * @param userId
    * @returns True, if application exist
    */
   exist(eventId: number, userId?: string) {

@@ -25,7 +25,7 @@ export class PhotoController {
   constructor(private readonly photoService: PhotoService) {}
 
   @ApiHeader({ name: "origin", required: false })
-  @ApiOkResponse({ type: "Image data" })
+  @ApiOkResponse({ description: "Image data" })
   @ApiNotFoundResponse({ description: "Image not found" })
   @Get(":id")
   async getPhoto(
