@@ -1,10 +1,8 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import {
-  Between,
   FindOptionsRelations,
   FindOptionsSelect,
-  LessThan,
   MoreThan,
   type Repository,
 } from "typeorm";
@@ -12,6 +10,7 @@ import {
 import { FindManyOptions } from "libs/types";
 import { Event } from "modules/events/entities";
 import { EventFilter } from "../../models";
+import { filterSince } from "../../utilities";
 
 interface EventFindOptions extends FindManyOptions {
   visible?: boolean;
@@ -44,33 +43,30 @@ export class EventsService {
   }
 
   findByIdDetailed(id: number, options?: EventFindOptions) {
-    return this.findById(
-      id,
-      {
-        select: {
-          id: true,
-          capacity: true,
-          codeOfConductLink: true,
-          photoPolicyLink: true,
-          termsAndConditionsLink: true,
-          createdAt: true,
-          longDescription: true,
-          shortDescription: true,
-          registrationDeadline: true,
-          registrationForm: {} as never,
-          since: true,
-          until: true,
-          title: true,
-          visible: true,
-        },
-        relations: {
-          createdByUser: true,
-          links: true,
-          spotTypes: true,
-          photo: true,
-        },
+    return this.findById(id, {
+      select: {
+        id: true,
+        capacity: true,
+        codeOfConductLink: true,
+        photoPolicyLink: true,
+        termsAndConditionsLink: true,
+        createdAt: true,
+        longDescription: true,
+        shortDescription: true,
+        registrationDeadline: true,
+        registrationForm: {} as never,
+        since: true,
+        until: true,
+        title: true,
+        visible: true,
       },
-    );
+      relations: {
+        createdByUser: true,
+        links: true,
+        spotTypes: true,
+        photo: true,
+      },
+    });
   }
 
   save(event: Partial<Event>) {
@@ -102,14 +98,7 @@ export class EventsService {
   findByFilter(filter?: EventFilter, options?: EventFindOptions) {
     return this.eventsRepository.find({
       where: {
-        since:
-          filter.since && filter.to
-            ? Between(filter.since, filter.to)
-            : filter.since
-            ? MoreThan(filter.since)
-            : filter.to
-            ? LessThan(filter.to)
-            : undefined,
+        ...filterSince(filter),
         visible: options?.visible,
       },
       relations: {
