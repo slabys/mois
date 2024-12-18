@@ -1,9 +1,10 @@
 "use client";
 
-import { useGetEventApplications, useGetEventSpots } from "@/utils/api";
+import {useGetEventApplications, useGetEventSpots, useUpdateEventApplication, useUpdateEventSpot} from "@/utils/api";
 import CreateSpotModal from "@components/CreateSpotModal/CreateSpotModal";
 import { Button, ComboboxData, ComboboxItem, Flex, Select, Table, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 import { IconPlus } from "@tabler/icons-react";
 import { useState } from "react";
 
@@ -25,7 +26,57 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
   const [value, setValue] = useState<ComboboxItem | null>(null);
 
   //TODO: update user mutation
-  //const updateUserSpotMutation =
+  const updateApplicationMutation = useUpdateEventApplication({
+      mutation: {
+          onMutate: () => {
+              notifications.show({
+                  id: "event-photo-update",
+                  loading: true,
+                  title: "Loading! Please wait...",
+                  message: "We are application spots.",
+                  autoClose: false,
+              });
+          },
+          onSuccess: () => {
+              notifications.update({
+                  id: "event-photo-update",
+                  title: "Update User Photo",
+                  message: "Application spot updated successfully.",
+                  color: "green",
+                  loading: false,
+                  autoClose: true,
+              });
+              setFile(null);
+              closeModal();
+          },
+          onError: (mutationError) => {
+              if (!mutationError.response?.data) return;
+              const { statusCode, error, message } = mutationError.response?.data;
+              console.error(statusCode, error, message);
+              notifications.update({
+                  id: "event-photo-update",
+                  title: "Something went wrong.",
+                  message: "Please check all information first. Then try again.",
+                  color: "red",
+                  loading: false,
+                  autoClose: true,
+              });
+              let parsedMessage: string[] = [];
+              if (typeof message === "string") {
+                  parsedMessage.push(message);
+              }
+              parsedMessage.forEach((err) => {
+                  notifications.show({
+                      title: `${statusCode} ${error}`,
+                      message: err,
+                      color: "red",
+                  });
+              });
+          },
+      },
+  });
+  })
+
   //TODO: hanlde spot change
   //const handleSpotChange = () => {}
 
@@ -33,9 +84,10 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     <Table.Tr key={`application-${index}-${element.id}`}>
       <Table.Td>{element.user.firstName + " " + element.user.lastName}</Table.Td>
       <Table.Td>-</Table.Td>
-      <Table.Td>{element.organization?.country}</Table.Td>
+      <Table.Td>{element.organization?.address.country}</Table.Td>
       <Table.Td>
         <Select
+          defaultValue={element.spotType?.name}
           data={spots}
           searchable
           nothingFoundMessage="Nothing found..."
