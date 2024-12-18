@@ -1,6 +1,6 @@
-import { useCreateUserApplication, useGetCurrentUser, useGetEventSpots } from "@/utils/api";
-import { CreateAddress, CreateEventApplication, CreateUser, User } from "@/utils/api.schemas";
-import { Button, ComboboxData, Flex, Group, Modal, Select, Text, TextInput } from "@mantine/core";
+import { useCreateUserApplication, useGetEventSpots } from "@/utils/api";
+import { CreateAddress, CreateEventApplication, User } from "@/utils/api.schemas";
+import { Button, ComboboxData, Flex, Group, Modal, Text, TextInput, Title } from "@mantine/core";
 import { Form, isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import React from "react";
@@ -23,7 +23,7 @@ const JoinEventModal = ({ userData, eventId, isOpened, closeModal }: JoinEventMo
         country: "",
       },
       additionalFormData: {},
-      spotTypeId: 0,
+      spotTypeId: null,
       invoiceAddress: {
         country: userData?.personalAddress.country ?? "",
         city: userData?.personalAddress.city ?? "",
@@ -120,17 +120,18 @@ const JoinEventModal = ({ userData, eventId, isOpened, closeModal }: JoinEventMo
     <Modal size="xl" opened={isOpened} onClose={handleClose} title="Create Event">
       <Form form={form} onSubmit={handleCreateEvent}>
         <Flex direction="column" gap={16}>
-          <TextInput label="Name" {...form.getInputProps("organization.name")} required />
-          <TextInput label="Country" {...form.getInputProps("organization.country")} required />
-          <Select
-            label="Select spot"
-            data={spots}
-            searchable
-            nothingFoundMessage="Nothing found..."
-            allowDeselect
-            required
-          />
-          <TextInput label="ID Number" {...form.getInputProps("organization.idNumber")} required />
+          <Title order={3}>Organisation Info</Title>
+          <TextInput label="Organisation Name" {...form.getInputProps("organization.name")} required />
+          <TextInput label="Organisation Country" {...form.getInputProps("organization.country")} required />
+          {/*<Select*/}
+          {/*  label="Select spot"*/}
+          {/*  data={spots}*/}
+          {/*  searchable*/}
+          {/*  nothingFoundMessage="Nothing found..."*/}
+          {/*  allowDeselect*/}
+          {/*  required*/}
+          {/*/>*/}
+          <TextInput label="Person ID Number / Passport Number" {...form.getInputProps("idNumber")} required />
           <Flex direction="column" gap={16}>
             <Text>Invoice address</Text>
             <TextInput

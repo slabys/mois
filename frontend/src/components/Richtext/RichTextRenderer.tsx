@@ -181,7 +181,7 @@ const RichTextRenderer = ({ content, ...props }: RichTextRendererProps) => {
   }
 
   return (
-    <Text span {...props}>
+    <Text span style={{ wordWrap: "break-word" }} {...props}>
       {parsedContent.content.map((node, index) => renderNode(node, index))}
     </Text>
   );

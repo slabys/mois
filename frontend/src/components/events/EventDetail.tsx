@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetCurrentUser, useGetEvent } from "@/utils/api";
+import { useGetCurrentUser, useGetEvent, useGetUserApplications } from "@/utils/api";
 import routes from "@/utils/routes";
 import { dateWithTime, dayMonthYear } from "@/utils/time";
 import ApiImage from "@components/ApiImage/ApiImage";
@@ -13,11 +13,11 @@ import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import {
   IconCash,
   IconChevronDown,
-  IconDirectionSign,
   IconEdit,
   IconInvoice,
   IconPhoto,
   IconUsersGroup,
+  IconWritingSign,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import React from "react";
@@ -34,8 +34,11 @@ const EventDetail = ({ id }: EventDetailProps) => {
   const [isModalUploadPhotoOpen, { open: openModalUploadPhoto, close: closeModalUploadPhoto }] = useDisclosure(false);
   const [isModalJoinEventOpen, { open: openModalJoinEvent, close: closeModalJoinEvent }] = useDisclosure(false);
 
+  const { data: userApplicationList } = useGetUserApplications();
   const { data: eventDetail, refetch: refetchEvent } = useGetEvent(id);
   const { data: userData } = useGetCurrentUser();
+
+  const isUserRegistered = userApplicationList?.some((f) => f.event.id === id);
 
   return eventDetail ? (
     <>
@@ -105,9 +108,14 @@ const EventDetail = ({ id }: EventDetailProps) => {
                 <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconCash />}>
                   Upload Payment
                 </Button>
-                {/* TODO */}
-                <Button onClick={openModalJoinEvent} leftSection={<IconDirectionSign />}>
-                  Join Event
+                <Divider my={16} />
+                <Button
+                  onClick={openModalJoinEvent}
+                  disabled={isUserRegistered}
+                  color="green"
+                  leftSection={<IconWritingSign />}
+                >
+                  {isUserRegistered ? "Already registered" : "Register to Event"}
                 </Button>
               </SimpleGrid>
             </Collapse>
@@ -128,12 +136,14 @@ const EventDetail = ({ id }: EventDetailProps) => {
         isOpened={isModalEditOpen}
         close={closeModalEdit}
       />
-      <JoinEventModal
-        userData={userData!}
-        eventId={eventDetail.id}
-        isOpened={isModalJoinEventOpen}
-        closeModal={closeModalJoinEvent}
-      />
+      {!!userData ? (
+        <JoinEventModal
+          userData={userData}
+          eventId={eventDetail.id}
+          isOpened={isModalJoinEventOpen}
+          closeModal={closeModalJoinEvent}
+        />
+      ) : null}
     </>
   ) : (
     <Grid>
