@@ -51,6 +51,7 @@ const parseComponents: Record<string, FC<NodeRendererProps>> = {
   ),
   listItem: ({ children }) => <ListItem>{children}</ListItem>,
   image: ({ attrs }) => <Image src={attrs?.src} alt={attrs?.alt || "Image"} radius="md" />,
+  codeBlock: ({ children }) => <Code>{children}</Code>, // Basic text, marks handled separately
   text: ({ text }) => <>{text}</>, // Basic text, marks handled separately
 };
 

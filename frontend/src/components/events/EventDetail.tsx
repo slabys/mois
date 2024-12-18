@@ -51,7 +51,7 @@ const EventDetail = ({ id }: EventDetailProps) => {
                 </Text>
               </Text>
             </Flex>
-            <RichTextRenderer content={eventDetail.shortDescription} />
+            <RichTextRenderer content={eventDetail.longDescription} />
           </Flex>
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 3 }} order={{ base: 1, md: 2 }}>
@@ -107,7 +107,9 @@ const EventDetail = ({ id }: EventDetailProps) => {
       />
       <EventEditModal
         eventDetail={eventDetail}
-        onSuccessEdit={refetchEvent}
+        onSuccessEdit={() => {
+          refetchEvent();
+        }}
         isOpened={isModalEditOpen}
         close={closeModalEdit}
       />

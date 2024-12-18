@@ -23,15 +23,6 @@ const EventCard = ({ event }: EventCardProps) => {
             <Title order={1}>{event.title}</Title>
             <Box mt={8}>
               <Text size="sm">
-                <Text fw={700} span>
-                  Place:
-                </Text>{" "}
-                <Text c="dimmed" span>
-                  {/*TODO - add Place*/}
-                  Place (link here)
-                </Text>
-              </Text>
-              <Text size="sm">
                 <Text span fw={700}>
                   Date:
                 </Text>{" "}
