@@ -24,7 +24,7 @@ const EventDetail = ({ id }: EventDetailProps) => {
   const [isModalEditOpen, { open: openModalEdit, close: closeModalEdit }] = useDisclosure(false);
   const [isModalUploadPhotoOpen, { open: openModalUploadPhoto, close: closeModalUploadPhoto }] = useDisclosure(false);
 
-  const { data: eventDetail } = useGetEvent(id);
+  const { data: eventDetail, refetch: refetchEvent } = useGetEvent(id);
 
   return eventDetail ? (
     <>
@@ -79,7 +79,6 @@ const EventDetail = ({ id }: EventDetailProps) => {
                 <Button onClick={openModalUploadPhoto} leftSection={<IconPhoto />}>
                   Upload Image
                 </Button>
-                {/* TODO */}
                 <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconUsersGroup />}>
                   Manage Applications
                 </Button>
@@ -89,11 +88,11 @@ const EventDetail = ({ id }: EventDetailProps) => {
               <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 1, xl: 1 }}>
                 {/* TODO */}
                 <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconInvoice />}>
-                  Invoice
+                  Show Invoice
                 </Button>
                 {/* TODO */}
                 <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconCash />}>
-                  Payment Confirmation
+                  Upload Payment
                 </Button>
               </SimpleGrid>
             </Collapse>
@@ -102,10 +101,16 @@ const EventDetail = ({ id }: EventDetailProps) => {
       </Grid>
       <UpdateEventPhotoModal
         eventId={eventDetail.id}
+        onSuccessUpdate={refetchEvent}
         isOpened={isModalUploadPhotoOpen}
         closeModal={closeModalUploadPhoto}
       />
-      <EventEditModal eventDetail={eventDetail} isOpened={isModalEditOpen} close={closeModalEdit} />
+      <EventEditModal
+        eventDetail={eventDetail}
+        onSuccessEdit={refetchEvent}
+        isOpened={isModalEditOpen}
+        close={closeModalEdit}
+      />
     </>
   ) : (
     <Grid>

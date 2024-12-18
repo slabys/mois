@@ -1,29 +1,43 @@
 "use client";
 
 import { useUpdateEvent } from "@/utils/api";
-import { EventSimple } from "@/utils/api.schemas";
+import { EventDetail } from "@/utils/api.schemas";
 import RichTextEditor from "@components/Richtext/RichTextEditor";
 import DateInput from "@components/primitives/DateInput";
-import { Button, Flex, Group, Modal, SimpleGrid, TextInput } from "@mantine/core";
+import { Button, Flex, Group, Modal, NumberInput, SimpleGrid, Switch, TextInput } from "@mantine/core";
 import { Form, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import dayjs from "dayjs";
+import React from "react";
 
 interface EventEditModalProps {
-  eventDetail: EventSimple;
+  eventDetail: EventDetail;
   isOpened: boolean;
   close: () => void;
+  onSuccessEdit: () => void;
 }
 
-const EventEditModal = ({ eventDetail, isOpened, close }: EventEditModalProps) => {
-  const form = useForm<Partial<EventSimple>>({
+const EventEditModal = ({ eventDetail, isOpened, close, onSuccessEdit }: EventEditModalProps) => {
+  const form = useForm<Partial<EventDetail>>({
     initialValues: {
       title: eventDetail.title,
+      visible: eventDetail.visible,
+      registrationDeadline: eventDetail.registrationDeadline,
+      capacity: eventDetail.capacity,
       shortDescription: eventDetail.shortDescription,
+      longDescription: eventDetail.longDescription,
       since: eventDetail.since,
       until: eventDetail.until,
+      codeOfConductLink: eventDetail.codeOfConductLink,
+      photoPolicyLink: eventDetail.photoPolicyLink,
+      termsAndConditionsLink: eventDetail.termsAndConditionsLink,
     },
-    validate: {},
+    validate: {
+      until: (value, values) =>
+        dayjs(value).isSame(dayjs(values.since)) || dayjs(value).isAfter(dayjs(values.since))
+          ? null
+          : "Event end must be larger then beginning of an event.",
+    },
   });
 
   const handleClose = () => {
@@ -51,6 +65,8 @@ const EventEditModal = ({ eventDetail, isOpened, close }: EventEditModalProps) =
           loading: false,
           autoClose: true,
         });
+        onSuccessEdit();
+        close();
       },
       onError: (error) => {
         notifications.update({
@@ -76,12 +92,11 @@ const EventEditModal = ({ eventDetail, isOpened, close }: EventEditModalProps) =
     },
   });
 
-  // TODO - when API is finished
-  const handleEventUpdate = (_values: Partial<EventSimple>) => {
-    eventUpdateMutation.mutate({
-      eventId: eventDetail.id,
-      data: {},
-    });
+  const handleEventUpdate = (values: Partial<EventDetail>) => {
+    // eventUpdateMutation.mutate({
+    //   eventId: eventDetail.id,
+    //   data: values,
+    // });
   };
 
   const isTouchedDirty = form.isTouched() && form.isDirty();
@@ -90,7 +105,29 @@ const EventEditModal = ({ eventDetail, isOpened, close }: EventEditModalProps) =
     <Modal size="lg" opened={isOpened} onClose={handleClose} title="Edit Event">
       <Form form={form} onSubmit={handleEventUpdate}>
         <Flex direction="column" gap={8}>
+          <Switch
+            label={`Is published: ${form.values.visible}`}
+            defaultChecked={form.values.visible}
+            {...form.getInputProps("visible")}
+          />
           <TextInput label="Title" {...form.getInputProps("title")} />
+          <SimpleGrid cols={2}>
+            <NumberInput
+              label="Capacity"
+              defaultValue={0}
+              min={0}
+              {...form.getInputProps("capacity")}
+              error={form.errors.capacity}
+            />
+            <DateInput
+              label="Registration Deadline"
+              value={dayjs(form.values.since).toDate()}
+              onChange={(value) => {
+                value && form.setFieldValue("registrationDeadline", value.toISOString());
+              }}
+              error={form.errors.since}
+            />
+          </SimpleGrid>
           <SimpleGrid cols={2}>
             <DateInput
               label="Date Since"
@@ -110,10 +147,17 @@ const EventEditModal = ({ eventDetail, isOpened, close }: EventEditModalProps) =
             />
           </SimpleGrid>
           <RichTextEditor
-            label="Description"
+            label="Short Description"
             value={form.values.shortDescription}
             onChange={(value) => {
-              form.setFieldValue("description", value);
+              form.setFieldValue("shortDescription", value);
+            }}
+          />
+          <RichTextEditor
+            label="Long Description"
+            value={form.values.longDescription}
+            onChange={(value) => {
+              form.setFieldValue("longDescription", value);
             }}
           />
         </Flex>

@@ -1,64 +1,56 @@
 "use client";
 
-import { createEvent, useCreateEvent, useGetEvents } from "@/utils/api";
-import { CreateEvent, EventSimple } from "@/utils/api.schemas";
-import { truncate } from "@/utils/truncate";
+import { useGetManagementEvents } from "@/utils/api";
+import { EventSimple } from "@/utils/api.schemas";
+import routes from "@/utils/routes";
+import ApiImage from "@components/ApiImage/ApiImage";
 import CreateEventModal from "@components/CreateEventModal/CreateEventModal";
 import RichTextRenderer from "@components/Richtext/RichTextRenderer";
-import {
-  Button,
-  Center,
-  Container,
-  Flex,
-  Image,
-  Loader,
-  Stack,
-  Table,
-  TableTbody,
-  TableTd,
-  TableThead,
-  TableTr,
-  Title,
-} from "@mantine/core";
-import { hasLength, isNotEmpty, useForm } from "@mantine/form";
+import { ActionIcon, Button, Container, Flex, ScrollArea, Stack, Table, Text, Title, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { IconPlus } from "@tabler/icons-react";
+import { IconCopy, IconPlus, IconTrash, IconZoom } from "@tabler/icons-react";
+import Link from "next/link";
 
 const ManageEventsPage = () => {
   const [isModalOpen, { open: openModal, close: closeModal }] = useDisclosure(false);
 
-  const { data: upcomingEvents } = useGetEvents();
+  const { data: eventList, refetch } = useGetManagementEvents();
 
-  const handleDuplicateEvent = (event: EventSimple) => {};
+  // TODO
+  const handleDuplicateEvent = (_event: EventSimple) => {};
 
-  let rows;
-
-  if (upcomingEvents) {
-    rows = upcomingEvents.map((element) => (
-      <TableTr key={element.title}>
-        <TableTd>
-          <Image src={element.photo} h={75} alt={element.title} fit="contain" />
-        </TableTd>
-        <TableTd>{element.title}</TableTd>
-        <TableTd>
-          <RichTextRenderer content={element.shortDescription} />
-        </TableTd>
-        <TableTd>
-          <Button>Manage Event</Button>
-        </TableTd>
-        <TableTd>
-          <Button>Manage People</Button>
-        </TableTd>
-        <TableTd>
-          <Button onClick={() => handleDuplicateEvent(element)}>Duplicate</Button>
-        </TableTd>
-        <TableTd>
-          <Button color="red">Delete</Button>
-        </TableTd>
-      </TableTr>
-    ));
-  }
+  const rows = eventList?.map((event, index) => (
+    <Table.Tr key={`event-${index}-${event.id}`}>
+      <Table.Td p={0}>
+        <ApiImage src={event.photo?.id} w="100%" h="100%" fit="cover" />
+      </Table.Td>
+      <Table.Td>{event.title}</Table.Td>
+      <Table.Td>
+        <RichTextRenderer content={event.shortDescription} lineClamp={2} />
+      </Table.Td>
+      <Table.Td>
+        <Flex justify="space-between" gap={16}>
+          <Tooltip label="Event Detail">
+            <ActionIcon component={Link} href={routes.EVENT_DETAIL({ id: event.id })} variant="subtle" size={48}>
+              <IconZoom width={32} height={32} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Duplicate Event">
+            {/*TODO - duplicate EP*/}
+            <ActionIcon variant="subtle" color="purple" size={48} onClick={() => handleDuplicateEvent(event)}>
+              <IconCopy width={32} height={32} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Delete Event">
+            {/*TODO - Delete EP*/}
+            <ActionIcon variant="subtle" size={48} color="red">
+              <IconTrash width={32} height={32} />
+            </ActionIcon>
+          </Tooltip>
+        </Flex>
+      </Table.Td>
+    </Table.Tr>
+  ));
 
   return (
     <Container size="xl">
@@ -68,37 +60,38 @@ const ManageEventsPage = () => {
           <Button onClick={openModal} leftSection={<IconPlus />}>
             Add Event
           </Button>
-          <CreateEventModal isOpened={isModalOpen} closeModal={closeModal} />
+          <CreateEventModal onCreateSuccess={refetch} isOpened={isModalOpen} closeModal={closeModal} />
         </Flex>
-        <Table
-          withTableBorder
-          withColumnBorders
-          withRowBorders
-          striped
-          highlightOnHover={true}
-          style={{ textAlign: "center" }}
-        >
-          <TableThead>
-            <TableTr>
-              <TableTd>Photo</TableTd>
-              <TableTd>Name</TableTd>
-              <TableTd>Description</TableTd>
-              <TableTd>Manage Event</TableTd>
-              <TableTd>Manage People</TableTd>
-              <TableTd>Duplicate</TableTd>
-              <TableTd>Delete</TableTd>
-            </TableTr>
-          </TableThead>
-          <TableTbody>
-            {rows ? (
-              rows
-            ) : (
-              <Center>
-                <Loader />
-              </Center>
-            )}
-          </TableTbody>
-        </Table>
+        <ScrollArea w="100%">
+          {rows && rows.length > 0 ? (
+            <Table
+              withTableBorder
+              withColumnBorders
+              withRowBorders
+              striped
+              highlightOnHover={true}
+              style={{ textAlign: "center" }}
+            >
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th h="100%" maw={64} w={64}>
+                    Photo
+                  </Table.Th>
+                  <Table.Th w={148} miw={148}>
+                    Event Name
+                  </Table.Th>
+                  <Table.Th w="60%" h={64}>
+                    Short Description
+                  </Table.Th>
+                  <Table.Th w={200}>Operations</Table.Th>
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+          ) : (
+            <Text>No Events...</Text>
+          )}
+        </ScrollArea>
       </Stack>
     </Container>
   );
