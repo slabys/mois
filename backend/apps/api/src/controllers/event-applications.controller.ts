@@ -185,6 +185,7 @@ export class EventApplicationsController {
 
       application.spotType = eventSpot;
     }
+    if (body.spotTypeId === null) application.spotType = null;
 
     if (body.invoiceAddress)
       application.personalAddress.update(body.invoiceAddress);

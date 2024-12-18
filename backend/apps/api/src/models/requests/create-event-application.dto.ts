@@ -39,7 +39,7 @@ export class CreateEventApplicationCustomOrganization {
 )
 export class CreateEventApplication {
   @Allow()
-  spotTypeId?: number;
+  spotTypeId?: number | null;
 
   @Allow()
   additionalFormData: object = {};
