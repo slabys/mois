@@ -14,4 +14,8 @@ export class EventLink {
 
   @ManyToOne(() => Event, (event) => event.links, { onDelete: "CASCADE" })
   event: Event;
+
+  constructor(init?: Partial<EventLink>) {
+    Object.assign(this, init);
+  }
 }
