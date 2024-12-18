@@ -8,3 +8,4 @@ export { OrganizationMembersController } from "./organization-members.controller
 export { OrganizationsController } from "./organizations.controller";
 export { PhotoController } from "./photo.controller";
 export { UsersController } from "./users.controller";
+export { RolesController } from "./roles.controller";

@@ -11,6 +11,14 @@ export class RolesService {
   ) {}
 
   /**
+   * Find all roles
+   * @returns 
+   */
+  findAll() {
+    return this.roleRepository.find({});
+  }
+
+  /**
    * Find role by ID
    * @param id Role ID
    * @returns {Role} role or null

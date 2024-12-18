@@ -12,6 +12,7 @@ import {
   OrganizationMembersController,
   OrganizationsController,
   PhotoController,
+  RolesController,
   UsersController,
 } from "./controllers";
 
@@ -25,6 +26,7 @@ import { InvoiceModule } from "modules/invoice";
 
 import { ManagementControllers } from "./controllers/management";
 import { FileStorageModule } from "modules/file-storage";
+import { RolesModule } from "modules/roles";
 
 @Module({
   imports: [
@@ -47,6 +49,7 @@ import { FileStorageModule } from "modules/file-storage";
       },
     }),
     FileStorageModule,
+    RolesModule,
   ],
   controllers: [
     AuthController,
@@ -58,6 +61,7 @@ import { FileStorageModule } from "modules/file-storage";
     EventsController,
     EventSpotsController,
     InvoiceController,
+    RolesController,
     ...ManagementControllers,
     HealthController,
   ],
