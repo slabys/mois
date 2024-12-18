@@ -13,7 +13,7 @@ import UpdateEventApplicationModal from "@components/UpdateEventApplicationModal
 import { ActionIcon, Button, ComboboxData, Flex, Select, Table, Text, Title, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { IconCopy, IconEdit, IconPlus, IconTrash, IconZoom } from "@tabler/icons-react";
+import { IconCopy, IconEdit, IconFileTypePdf, IconPlus, IconTrash, IconZoom } from "@tabler/icons-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -146,6 +146,8 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     });
   };
 
+  const generatePDF = () => {};
+
   const rows = eventApplications?.map((application, index) => (
     <Table.Tr key={`application-${index}-${application.id}`}>
       <Table.Td>{application.user.firstName + " " + application.user.lastName}</Table.Td>
@@ -166,6 +168,12 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
       <Table.Td>{application.spotType?.price}</Table.Td>
       <Table.Td>
         <Flex justify="space-evenly" gap={16}>
+          <Tooltip label="Generate Invoice">
+            {/*TODO - Generate Invoice*/}
+            <ActionIcon variant="subtle" size={48} color="black" onClick={generatePDF}>
+              <IconFileTypePdf width={32} height={32} />
+            </ActionIcon>
+          </Tooltip>
           <Tooltip label="Edit Application">
             {/*TODO - edit EA*/}
             <ActionIcon
