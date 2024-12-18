@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from "@nestjs/common";
 import {
@@ -17,6 +18,7 @@ import {
   ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
+  ApiQuery,
   ApiTags,
 } from "@nestjs/swagger";
 
@@ -32,15 +34,16 @@ import {
 } from "modules/events/entities";
 import { User, UsersService } from "modules/users";
 
+import { Address } from "modules/addresses";
+import { OrganizationService } from "modules/organization";
 import { ajv } from "utilities/ajv";
+import { ParseDatePipe } from "utilities/nest/pipes";
 import { CurrentUser } from "../decorators";
 import {
   CreateEventApplication,
   UpdateEventApplication,
 } from "../models/requests";
 import { EventApplicationSimple } from "../models/responses";
-import { Address } from "modules/addresses";
-import { OrganizationService } from "modules/organization";
 
 @ApiTags("Event applications")
 @Controller("events")
@@ -55,12 +58,22 @@ export class EventApplicationsController {
 
   /**
    * Get all signed-in user applications
+   * 
+   * For filtering look at {@link EventsController}
    */
   @ApiBearerAuth()
+  @ApiQuery({ name: "sinceSince", required: false, type: Number })
+  @ApiQuery({ name: "toSince", required: false, type: Number })
   @UseGuards(CookieGuard)
   @Get("applications")
-  getUserApplications(@CurrentUser() user: User) {
-    return this.eventApplicationsService.findByUserIdDetailed(user.id);
+  getUserApplications(
+    @CurrentUser() user: User,
+    @Query("sinceSince", ParseDatePipe) since?: Date,
+    @Query("toSince", ParseDatePipe) to?: Date
+  ) {
+    return this.eventApplicationsService.findByUserIdDetailed(user.id, {
+      filter: { to, since },
+    });
   }
 
   /**
@@ -164,7 +177,7 @@ export class EventApplicationsController {
   @UseGuards(CookieGuard)
   @Patch("application/:id")
   async updateEventApplication(
-    @Param("id") applicationId: string,
+    @Param("id", ParseIntPipe) applicationId: number,
     @Body() body: UpdateEventApplication
   ) {
     const application = await this.eventApplicationsService.findById(
@@ -223,7 +236,9 @@ export class EventApplicationsController {
   @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Delete("application/:id")
-  async deleteEventApplication(@Param("id") applicationId: string) {
+  async deleteEventApplication(
+    @Param("id", ParseIntPipe) applicationId: number
+  ) {
     const application = await this.eventApplicationsService.findById(
       applicationId
     );

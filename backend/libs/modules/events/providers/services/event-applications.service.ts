@@ -2,7 +2,13 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindManyOptions } from "libs/types";
 import { EventApplication } from "modules/events/entities";
+import { EventFilter } from "modules/events/models";
+import { filterSince } from "modules/events/utilities";
 import { FindOneOptions, Repository } from "typeorm";
+
+interface FindEventOptions extends FindManyOptions {
+  filter: EventFilter;
+}
 
 @Injectable()
 export class EventApplicationsService {
@@ -16,12 +22,12 @@ export class EventApplicationsService {
    * @param id Event application ID
    * @returns
    */
-  findById(id: string, options?: FindOneOptions<EventApplication>) {
+  findById(id: number, options?: FindOneOptions<EventApplication>) {
     return this.eventApplicationRepository.findOne({
       ...(options ?? {}),
       where: { id },
       relations: {
-        ...(options.relations ?? {}),
+        ...(options?.relations ?? {}),
         user: true,
         spotType: true,
       },
@@ -47,10 +53,12 @@ export class EventApplicationsService {
    * @param id User ID
    * @returns Array of user applications
    */
-  findByUserId(id: string, options?: FindManyOptions) {
+  findByUserId(id: string, options?: FindEventOptions) {
     return this.eventApplicationRepository.find({
       where: {
         user: { id },
+        // Apply event filters
+        ...(options?.filter ? { event: filterSince(options.filter) } : {}),
       },
       relations: {
         event: {
@@ -68,9 +76,13 @@ export class EventApplicationsService {
    * @param options
    * @returns
    */
-  findByUserIdDetailed(id: string, options?: FindManyOptions) {
+  findByUserIdDetailed(id: string, options?: FindEventOptions) {
     return this.eventApplicationRepository.find({
-      where: { user: { id } },
+      where: {
+        user: { id },
+        // Apply event filters
+        ...(options?.filter ? { event: filterSince(options.filter) } : {}),
+      },
       select: {
         id: true,
         additionalData: true as never,
@@ -82,9 +94,7 @@ export class EventApplicationsService {
         organization: true,
         user: true,
         spotType: true,
-        event: {
-          photo: true,
-        },
+        event: true,
       },
       take: options?.pagination?.take,
       skip: options?.pagination?.skip,

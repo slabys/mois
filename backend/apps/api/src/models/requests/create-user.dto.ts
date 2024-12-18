@@ -1,8 +1,9 @@
 import {
-  Allow,
   IsEmail,
   IsEnum,
+  IsObject,
   IsOptional,
+  IsString,
   Matches,
   MinLength,
 } from "class-validator";
@@ -21,23 +22,25 @@ export class CreateUser {
    * User password
    */
   @MinLength(6)
+  @IsString()
   password: string;
 
   /**
    * First name
    */
-  @Allow()
+  @IsString()
   firstName: string;
 
   /**
    * Last name
    */
-  @Allow()
+  @IsString()
   lastName: string;
 
   /**
    * Must not contain special characters
    */
+  @IsString()
   @Matches(/^[a-zA-Z0-9]+$/)
   @MinLength(6)
   username: string;
@@ -48,6 +51,7 @@ export class CreateUser {
   @IsEnum(UserGender)
   gender: UserGender = UserGender.PreferNotToSay;
 
+  @IsObject()
   @IsOptional()
   @Type(() => CreateAddress)
   personalAddress?: CreateAddress | undefined | null;
