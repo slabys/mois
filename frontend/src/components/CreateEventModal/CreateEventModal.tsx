@@ -135,7 +135,7 @@ const CreateEventModal: React.FC<MyModalProps> = ({ onCreateSuccess, isOpened, c
               error={form.errors.since}
             />
             <DateInput
-              label="Event Date Since"
+              label="Event Date Until"
               value={dayjs(form.values.until).toDate()}
               onChange={(value) => {
                 value && form.setFieldValue("until", value.toISOString());
