@@ -34,6 +34,7 @@ import { CreateEvent, UpdateEvent, UpdatePhoto } from "../models/requests";
 import { EventDetail, EventSimple } from "../models/responses";
 
 import { ParseDatePipe } from "utilities/nest/pipes";
+import { EventLink, EventSpot } from "modules/events/entities";
 
 @ApiTags("Events")
 @Controller("events")
@@ -121,6 +122,45 @@ export class EventsController {
     return this.eventsService.save(event);
   }
 
+  /**
+   * Duplicate event by ID
+   */
+  @ApiCreatedResponse({ type: EventDetail, description: "Duplicated event" })
+  @ApiBearerAuth()
+  @UseGuards(CookieGuard)
+  @Post(":id")
+  async duplicateEvent(
+    @Param("id", ParseIntPipe) id: number,
+    @CurrentUser() user: User
+  ) {
+    const event = await this.eventsService.findByIdDetailed(id);
+
+    const newEvent = new Event({
+      title: event.title,
+      since: event.since,
+      until: event.until,
+      capacity: event.capacity,
+      longDescription: event.longDescription,
+      shortDescription: event.shortDescription,
+      codeOfConductLink: event.codeOfConductLink,
+      photoPolicyLink: event.photoPolicyLink,
+      termsAndConditionsLink: event.termsAndConditionsLink,
+      createdByUser: user,
+      visible: false,
+      registrationForm: event.registrationForm,
+      registrationDeadline: event.registrationDeadline,
+      generateInvoices: event.generateInvoices,
+      spotTypes: event.spotTypes.map(
+        (e) => new EventSpot({ name: e.name, price: e.price })
+      ),
+      links: event.links.map(
+        (e) => new EventLink({ link: e.link, name: e.name })
+      ),
+    });
+
+    return this.eventsService.save(newEvent);
+  }
+
   @ApiOkResponse({ type: EventDetail, description: "Updated event" })
   @ApiForbiddenResponse({
     description:
@@ -135,7 +175,9 @@ export class EventsController {
     @Body() body: UpdateEvent
   ) {
     // TODO: Check user role for modifications
-    const event = await this.eventsService.findByIdDetailed(eventId, { visible: true });
+    const event = await this.eventsService.findByIdDetailed(eventId, {
+      visible: true,
+    });
     if (!event) throw new NotFoundException("Event not found");
 
     Object.assign(event, body);
@@ -163,7 +205,7 @@ export class EventsController {
   ) {
     // TODO: Check user role for modifications
 
-    const event = await this.eventsService.findById(eventId, { visible: true });
+    const event = await this.eventsService.findById(eventId);
     if (!event) throw new NotFoundException("Event not found");
 
     const photo = await this.photoService.save(body.file.buffer, "event_photo");
