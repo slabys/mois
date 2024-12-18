@@ -3,7 +3,6 @@
 import {
   Anchor,
   Blockquote,
-  Box,
   CSSProperties,
   Code,
   Divider,
@@ -11,6 +10,7 @@ import {
   List,
   ListItem,
   Text,
+  TextProps,
   Title,
 } from "@mantine/core";
 import { JSONContent } from "@tiptap/react";
@@ -54,11 +54,11 @@ const parseComponents: Record<string, FC<NodeRendererProps>> = {
   text: ({ text }) => <>{text}</>, // Basic text, marks handled separately
 };
 
-type RichTextRendererProps = {
+interface RichTextRendererProps extends TextProps {
   content?: string;
-};
+}
 
-const RichTextRenderer: FC<RichTextRendererProps> = ({ content }) => {
+const RichTextRenderer = ({ content, ...props }: RichTextRendererProps) => {
   const renderMarks = (text: string, marks?: JSONContent["marks"]): ReactNode => {
     if (!marks || marks.length === 0) return text;
 
@@ -155,7 +155,23 @@ const RichTextRenderer: FC<RichTextRendererProps> = ({ content }) => {
       return content ? (JSON.parse(content) as JSONContent) : null;
     } catch (e) {
       console.error(e);
-      return null;
+      return {
+        type: "doc",
+        content: [
+          {
+            type: "paragraph",
+            attrs: {
+              textAlign: "left",
+            },
+            content: [
+              {
+                type: "text",
+                text: content,
+              },
+            ],
+          },
+        ],
+      };
     }
   }, [content]);
 
@@ -163,7 +179,11 @@ const RichTextRenderer: FC<RichTextRendererProps> = ({ content }) => {
     return content?.toString() ?? null;
   }
 
-  return <Box>{parsedContent.content.map((node, index) => renderNode(node, index))}</Box>;
+  return (
+    <Text span {...props}>
+      {parsedContent.content.map((node, index) => renderNode(node, index))}
+    </Text>
+  );
 };
 
 export default RichTextRenderer;

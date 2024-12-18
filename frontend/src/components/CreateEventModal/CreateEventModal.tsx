@@ -2,7 +2,7 @@ import { useCreateEvent } from "@/utils/api";
 import { CreateEvent } from "@/utils/api.schemas";
 import RichTextEditor from "@components/Richtext/RichTextEditor";
 import DateInput from "@components/primitives/DateInput";
-import { Button, Flex, Group, Modal, NumberInput, SimpleGrid, TextInput } from "@mantine/core";
+import { Button, Flex, Group, Modal, NumberInput, SimpleGrid, Switch, TextInput } from "@mantine/core";
 import { Form, hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import dayjs from "dayjs";
@@ -11,9 +11,10 @@ import React from "react";
 interface MyModalProps {
   isOpened: boolean;
   closeModal: () => void;
+  onCreateSuccess: () => void;
 }
 
-const CreateEventModal: React.FC<MyModalProps> = ({ isOpened, closeModal }) => {
+const CreateEventModal: React.FC<MyModalProps> = ({ onCreateSuccess, isOpened, closeModal }) => {
   const createEventMutation = useCreateEvent({
     mutation: {
       onMutate: () => {
@@ -34,6 +35,7 @@ const CreateEventModal: React.FC<MyModalProps> = ({ isOpened, closeModal }) => {
           loading: false,
           autoClose: true,
         });
+        onCreateSuccess();
         closeModal();
       },
       onError: (error) => {
@@ -62,6 +64,7 @@ const CreateEventModal: React.FC<MyModalProps> = ({ isOpened, closeModal }) => {
 
   const form = useForm<Partial<CreateEvent>>({
     initialValues: {
+      visible: false,
       title: undefined,
       capacity: 0,
       shortDescription: "",
@@ -73,7 +76,6 @@ const CreateEventModal: React.FC<MyModalProps> = ({ isOpened, closeModal }) => {
       codeOfConductLink: undefined,
       photoPolicyLink: undefined,
       generateInvoices: false,
-      visible: false,
       registrationForm: {},
     },
     validate: {
@@ -102,6 +104,11 @@ const CreateEventModal: React.FC<MyModalProps> = ({ isOpened, closeModal }) => {
     <Modal size="xl" opened={isOpened} onClose={closeModal} title="Create Event">
       <Form form={form} onSubmit={handleCreateEvent}>
         <Flex direction="column" gap={16}>
+          <Switch
+            label={`Is published: ${form.values.visible}`}
+            defaultChecked={form.values.visible}
+            {...form.getInputProps("visible")}
+          />
           <TextInput label="Title" {...form.getInputProps("title")} />
           <SimpleGrid cols={2}>
             <NumberInput

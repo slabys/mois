@@ -14,12 +14,12 @@ interface EventEditModalProps {
   eventDetail: EventDetail;
   isOpened: boolean;
   close: () => void;
+  onSuccessEdit: () => void;
 }
 
-const EventEditModal = ({ eventDetail, isOpened, close }: EventEditModalProps) => {
+const EventEditModal = ({ eventDetail, isOpened, close, onSuccessEdit }: EventEditModalProps) => {
   const form = useForm<Partial<EventDetail>>({
     initialValues: {
-      ...eventDetail,
       title: eventDetail.title,
       visible: eventDetail.visible,
       registrationDeadline: eventDetail.registrationDeadline,
@@ -65,6 +65,8 @@ const EventEditModal = ({ eventDetail, isOpened, close }: EventEditModalProps) =
           loading: false,
           autoClose: true,
         });
+        onSuccessEdit();
+        close();
       },
       onError: (error) => {
         notifications.update({
@@ -91,7 +93,6 @@ const EventEditModal = ({ eventDetail, isOpened, close }: EventEditModalProps) =
   });
 
   const handleEventUpdate = (values: Partial<EventDetail>) => {
-    console.log(values);
     // eventUpdateMutation.mutate({
     //   eventId: eventDetail.id,
     //   data: values,
@@ -149,7 +150,7 @@ const EventEditModal = ({ eventDetail, isOpened, close }: EventEditModalProps) =
             label="Short Description"
             value={form.values.shortDescription}
             onChange={(value) => {
-              form.setFieldValue("description", value);
+              form.setFieldValue("shortDescription", value);
             }}
           />
           <RichTextEditor

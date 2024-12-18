@@ -1,12 +1,11 @@
 "use client";
 
-import {useGetEventApplications, useGetEventSpots, useUpdateEventApplication, useUpdateEventSpot} from "@/utils/api";
+import { useGetEventApplications, useGetEventSpots, useUpdateEventApplication } from "@/utils/api";
 import CreateSpotModal from "@components/CreateSpotModal/CreateSpotModal";
-import { Button, ComboboxData, ComboboxItem, Flex, Select, Table, Text, Title } from "@mantine/core";
+import { Button, ComboboxData, Flex, Select, Table, Text, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconPlus } from "@tabler/icons-react";
-import { useState } from "react";
 
 interface ManageApplicationsTableProps {
   eventId: number;
@@ -23,79 +22,83 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
       return { value: spot.id.toString(), label: spot.name };
     }) ?? [];
 
-  const [value, setValue] = useState<ComboboxItem | null>(null);
-
   //TODO: update user mutation
   const updateApplicationMutation = useUpdateEventApplication({
-      mutation: {
-          onMutate: () => {
-              notifications.show({
-                  id: "event-photo-update",
-                  loading: true,
-                  title: "Loading! Please wait...",
-                  message: "We are application spots.",
-                  autoClose: false,
-              });
-          },
-          onSuccess: () => {
-              notifications.update({
-                  id: "event-photo-update",
-                  title: "Update User Photo",
-                  message: "Application spot updated successfully.",
-                  color: "green",
-                  loading: false,
-                  autoClose: true,
-              });
-              setFile(null);
-              closeModal();
-          },
-          onError: (mutationError) => {
-              if (!mutationError.response?.data) return;
-              const { statusCode, error, message } = mutationError.response?.data;
-              console.error(statusCode, error, message);
-              notifications.update({
-                  id: "event-photo-update",
-                  title: "Something went wrong.",
-                  message: "Please check all information first. Then try again.",
-                  color: "red",
-                  loading: false,
-                  autoClose: true,
-              });
-              let parsedMessage: string[] = [];
-              if (typeof message === "string") {
-                  parsedMessage.push(message);
-              }
-              parsedMessage.forEach((err) => {
-                  notifications.show({
-                      title: `${statusCode} ${error}`,
-                      message: err,
-                      color: "red",
-                  });
-              });
-          },
+    mutation: {
+      onMutate: () => {
+        notifications.show({
+          id: "event-application-update",
+          loading: true,
+          title: "Loading! Please wait...",
+          message: "We are application spots.",
+          autoClose: false,
+        });
       },
+      onSuccess: () => {
+        notifications.update({
+          id: "event-application-update",
+          title: "Update User Photo",
+          message: "Application spot updated successfully.",
+          color: "green",
+          loading: false,
+          autoClose: true,
+        });
+        closeModal();
+      },
+      onError: (mutationError) => {
+        if (!mutationError.response?.data) return;
+        const { statusCode, error, message } = mutationError.response?.data;
+        console.error(statusCode, error, message);
+        notifications.update({
+          id: "event-application-update",
+          title: "Something went wrong.",
+          message: "Please check all information first. Then try again.",
+          color: "red",
+          loading: false,
+          autoClose: true,
+        });
+        let parsedMessage: string[] = [];
+        if (typeof message === "string") {
+          parsedMessage.push(message);
+        }
+        parsedMessage.forEach((err) => {
+          notifications.show({
+            title: `${statusCode} ${error}`,
+            message: err,
+            color: "red",
+          });
+        });
+      },
+    },
   });
-  })
 
-  //TODO: hanlde spot change
-  //const handleSpotChange = () => {}
+  const handleSpotChange = (applicationId: string, spotId: string | null) => {
+    updateApplicationMutation.mutate({
+      id: applicationId,
+      data: {
+        spotTypeId: Number.parseInt(spotId ?? ""),
+      },
+    });
+  };
 
-  const rows = eventApplications?.map((element, index) => (
-    <Table.Tr key={`application-${index}-${element.id}`}>
-      <Table.Td>{element.user.firstName + " " + element.user.lastName}</Table.Td>
+  const rows = eventApplications?.map((application, index) => (
+    <Table.Tr key={`application-${index}-${application.id}`}>
+      <Table.Td>{application.user.firstName + " " + application.user.lastName}</Table.Td>
       <Table.Td>-</Table.Td>
-      <Table.Td>{element.organization?.address.country}</Table.Td>
+      <Table.Td>{application.organization?.address.country}</Table.Td>
       <Table.Td>
         <Select
-          defaultValue={element.spotType?.name}
+          defaultValue={application.spotType?.id.toString()}
           data={spots}
           searchable
           nothingFoundMessage="Nothing found..."
           allowDeselect
-          onChange={(_value, option) => setValue(option)}
+          onChange={(value) => {
+            handleSpotChange(application.id, value);
+          }}
         />
       </Table.Td>
-      <Table.Td>{element.spotType?.price}</Table.Td>
+      <Table.Td>{application.spotType?.price}</Table.Td>
       <Table.Td>
         <Button>Edit</Button>
       </Table.Td>

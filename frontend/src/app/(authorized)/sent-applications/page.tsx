@@ -15,8 +15,10 @@ const SentApplicationsPage = () => {
         <Title>Sent Applications</Title>
         {upcomingEvents && (
           <Stack>
-            <Text size="xl">Upcomming Events</Text>
-            {upcomingEvents?.length >= 0 ? (
+            <Title order={2} size="xl">
+              Upcoming Events
+            </Title>
+            {upcomingEvents?.length >= 1 ? (
               upcomingEvents?.map((event, index) => (
                 <Anchor
                   component={Link}
@@ -28,14 +30,16 @@ const SentApplicationsPage = () => {
                 </Anchor>
               ))
             ) : (
-              <Text>No upcoming events</Text>
+              <Text>No upcoming events...</Text>
             )}
           </Stack>
         )}
         {upcomingEvents && (
           <Stack>
-            <Text size="xl">Past Events</Text>
-            {upcomingEvents?.length >= 0 ? (
+            <Title order={2} size="xl">
+              Past Events
+            </Title>
+            {upcomingEvents?.length >= 1 ? (
               upcomingEvents?.map((event, index) => (
                 <Anchor
                   component={Link}
@@ -47,7 +51,7 @@ const SentApplicationsPage = () => {
                 </Anchor>
               ))
             ) : (
-              <Text>No upcoming events</Text>
+              <Text>No past events...</Text>
             )}
           </Stack>
         )}
