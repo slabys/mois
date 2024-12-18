@@ -75,12 +75,12 @@ const ManageEventsPage = () => {
       </Table.Td>
       <Table.Td>
         {event.visible ? (
-          <Tooltip label="Unpublished">
-            <IconX color="red" />
-          </Tooltip>
-        ) : (
           <Tooltip label="Published">
             <IconCheck color="green" />
+          </Tooltip>
+        ) : (
+          <Tooltip label="Unpublished">
+            <IconX color="red" />
           </Tooltip>
         )}
       </Table.Td>
