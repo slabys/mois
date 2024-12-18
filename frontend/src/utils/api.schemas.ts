@@ -256,7 +256,8 @@ export interface UpdateEventApplication {
   additionalFormData?: UpdateEventApplicationAdditionalFormData;
   idNumber?: string;
   invoiceAddress?: CreateAddress;
-  spotTypeId?: number;
+  /** @nullable */
+  spotTypeId?: number | null;
 }
 
 /**
@@ -310,7 +311,8 @@ export interface CreateEventApplication {
   idNumber: string;
   invoiceAddress: CreateAddress;
   organization: CreateEventApplicationOrganization;
-  spotTypeId?: number;
+  /** @nullable */
+  spotTypeId?: number | null;
 }
 
 export type CreateEventApplicationCustomOrganizationType =

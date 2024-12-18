@@ -76,7 +76,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     updateApplicationMutation.mutate({
       id: applicationId,
       data: {
-        spotTypeId: Number.parseInt(spotId ?? ""),
+        spotTypeId: spotId ? Number.parseInt(spotId) : null,
       },
     });
   };
@@ -107,7 +107,6 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
       </Table.Td>
     </Table.Tr>
   ));
-  console.log(rows);
 
   return (
     <>

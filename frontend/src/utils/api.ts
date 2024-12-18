@@ -1620,6 +1620,41 @@ export function useGetEvent<TData = Awaited<ReturnType<typeof getEvent>>, TError
   return query;
 }
 
+/**
+ * Duplicate event by ID
+ */
+export const duplicateEvent = (id: number, options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
+  return customInstance<EventDetail>({ url: `/events/${id}`, method: "POST", signal }, options);
+};
+
+export const getDuplicateEventMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof duplicateEvent>>, TError, { id: number }, TContext>;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<Awaited<ReturnType<typeof duplicateEvent>>, TError, { id: number }, TContext> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof duplicateEvent>>, { id: number }> = (props) => {
+    const { id } = props ?? {};
+
+    return duplicateEvent(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DuplicateEventMutationResult = NonNullable<Awaited<ReturnType<typeof duplicateEvent>>>;
+
+export type DuplicateEventMutationError = ErrorType<unknown>;
+
+export const useDuplicateEvent = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof duplicateEvent>>, TError, { id: number }, TContext>;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationResult<Awaited<ReturnType<typeof duplicateEvent>>, TError, { id: number }, TContext> => {
+  const mutationOptions = getDuplicateEventMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
 export const updateEvent = (
   eventId: number,
   updateEvent: BodyType<UpdateEvent>,
