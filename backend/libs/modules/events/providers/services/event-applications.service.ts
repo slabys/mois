@@ -16,12 +16,12 @@ export class EventApplicationsService {
    * @param id Event application ID
    * @returns
    */
-  findById(id: string, options?: FindOneOptions<EventApplication>) {
+  findById(id: number, options?: FindOneOptions<EventApplication>) {
     return this.eventApplicationRepository.findOne({
       ...(options ?? {}),
       where: { id },
       relations: {
-        ...(options.relations ?? {}),
+        ...(options?.relations ?? {}),
         user: true,
         spotType: true,
       },

@@ -1,8 +1,11 @@
 import {
   Allow,
+  IsBoolean,
+  IsDate,
   IsInt,
   IsNumber,
   IsOptional,
+  IsString,
   IsUrl,
   Min,
   MinLength,
@@ -11,24 +14,27 @@ import { IsValidJsonSchema } from "utilities/nest/class-validator";
 
 export class CreateEvent {
   @MinLength(6)
+  @IsString()
   title: string;
 
-  @Allow()
+  @IsDate()
   since: Date;
 
-  @Allow()
+  @IsDate()
   until: Date;
 
-  @Allow()
+  @IsDate()
   registrationDeadline: Date;
 
+  @IsString()
   @MinLength(30)
   longDescription: string;
 
+  @IsString()
   @MinLength(30)
   shortDescription: string;
 
-  @Allow()
+  @IsBoolean()
   visible?: boolean = true;
 
   /**
@@ -43,6 +49,7 @@ export class CreateEvent {
    * Generate invoices after {@link registrationDeadline}
    */
   @Allow()
+  @IsBoolean()
   generateInvoices: boolean;
 
   /**

@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { Allow } from "class-validator";
+import { Allow, IsNotEmptyObject, IsNumber, IsObject, IsOptional, IsString } from "class-validator";
 import { CreateAddress } from "./create-address.dto";
 import { ApiExtraModels, ApiProperty, refs } from "@nestjs/swagger";
 
@@ -38,17 +38,20 @@ export class CreateEventApplicationCustomOrganization {
   CreateEventApplicationCustomOrganization
 )
 export class CreateEventApplication {
-  @Allow()
+  @IsNumber()
+  @IsOptional()
   spotTypeId?: number | null;
 
-  @Allow()
+  @IsOptional()
+  @IsObject()
   additionalFormData: object = {};
 
-  @Allow()
+  @IsObject()
+  @IsNotEmptyObject({ nullable: false })
   @Type(() => CreateAddress)
   invoiceAddress: CreateAddress;
 
-  @Allow()
+  @IsString()
   idNumber: string;
 
   @ApiProperty({
@@ -58,7 +61,8 @@ export class CreateEventApplication {
       CreateEventApplicationCustomOrganization
     ),
   })
-  @Allow()
+  @IsObject()
+  @IsNotEmptyObject()
   @Type(null, {
     keepDiscriminatorProperty: true,
     discriminator: {

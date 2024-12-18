@@ -1,6 +1,6 @@
-import { Allow } from "class-validator";
+import { IsInt } from "class-validator";
 
 export class DeleteOrganizationMembers {
-  @Allow()
+  @IsInt({ each: true })
   memberIds: number[];
 }

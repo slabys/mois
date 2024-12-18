@@ -1,16 +1,16 @@
-import { Allow, MinLength } from "class-validator";
+import { IsString, MinLength } from "class-validator";
 
 export class LoginUser {
   /**
    * User email or username
    */
-  @Allow()
+  @IsString()
   email: string;
-  
+
   /**
    * User password
    */
-  @Allow()
+  @IsString()
   @MinLength(6)
   password: string;
 }

@@ -30,7 +30,7 @@ import { EventCustomOrganization } from "./event-custom-organization.entity";
 @Entity()
 export class EventApplication extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id: string;
+  id: number;
 
   @ManyToOne(() => User, { nullable: false, onDelete: "CASCADE" })
   user: User;
