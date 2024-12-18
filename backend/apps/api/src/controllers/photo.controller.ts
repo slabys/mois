@@ -4,9 +4,17 @@ import {
   NotFoundException,
   Param,
   ParseUUIDPipe,
+  Req,
+  Res,
   StreamableFile,
 } from "@nestjs/common";
-import { ApiPermanentRedirectResponse, ApiTags } from "@nestjs/swagger";
+import {
+  ApiHeader,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiTags,
+} from "@nestjs/swagger";
+import { Request, Response } from "express";
 import { fromBuffer } from "file-type";
 
 import { PhotoService } from "modules/photo";
@@ -16,9 +24,15 @@ import { PhotoService } from "modules/photo";
 export class PhotoController {
   constructor(private readonly photoService: PhotoService) {}
 
-  @ApiPermanentRedirectResponse({ description: "Redirect to photo" })
+  @ApiHeader({ name: "origin", required: false })
+  @ApiOkResponse({ type: "Image data" })
+  @ApiNotFoundResponse({ description: "Image not found" })
   @Get(":id")
-  async getPhoto(@Param("id", ParseUUIDPipe) photoId: string) {
+  async getPhoto(
+    @Param("id", ParseUUIDPipe) photoId: string,
+    @Req() request: Request,
+    @Res({ passthrough: true }) res: Response
+  ) {
     const photo = await this.photoService.findById(photoId);
     if (!photo) throw new NotFoundException();
 
@@ -33,7 +47,10 @@ export class PhotoController {
     }
     const buffer = Buffer.concat(chunks);
 
+    const host = request.get("host");
     const { mime } = await fromBuffer(buffer);
+    res.setHeader("Access-Control-Allow-Origin", host);
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
 
     return new StreamableFile(buffer, { type: mime });
   }
