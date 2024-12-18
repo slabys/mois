@@ -4,10 +4,10 @@ import {
   NotFoundException,
   Param,
   ParseUUIDPipe,
-  Response,
+  StreamableFile,
 } from "@nestjs/common";
 import { ApiPermanentRedirectResponse, ApiTags } from "@nestjs/swagger";
-import { Response as ExpressResponse } from "express";
+import { fileTypeFromStream } from "file-type";
 
 import { PhotoService } from "modules/photo";
 
@@ -18,14 +18,13 @@ export class PhotoController {
 
   @ApiPermanentRedirectResponse({ description: "Redirect to photo" })
   @Get(":id")
-  async getPhoto(
-    @Param("id", ParseUUIDPipe) photoId: string,
-    @Response() res: ExpressResponse
-  ) {
+  async getPhoto(@Param("id", ParseUUIDPipe) photoId: string) {
     const photo = await this.photoService.findById(photoId);
     if (!photo) throw new NotFoundException();
 
-    const address = this.photoService.getPublicUrl(photo);
-    res.redirect(address);
+    const stream = await this.photoService.read(photo);
+    const { mime } = await fileTypeFromStream(stream);
+
+    return new StreamableFile(stream, { type: mime });
   }
 }

@@ -42,4 +42,13 @@ export class PhotoService {
   getPublicUrl(photo: Photo) {
     return this.fileStorageService.getPublicUrl(photo.filename);
   }
+
+  /**
+   * Read photo data
+   * @param photo 
+   * @returns 
+   */
+  read(photo: Photo) {
+    return this.fileStorageService.read(photo.filename);
+  }
 }
