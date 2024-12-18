@@ -29,4 +29,8 @@ export class PaymentSubject {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  constructor(init?: Partial<PaymentSubject>) {
+    Object.assign(this, init);
+  }
 }
