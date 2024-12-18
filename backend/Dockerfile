@@ -47,4 +47,4 @@ RUN pnpm install --frozen-lockfile --prod=true
 EXPOSE $PORT_APP1
 
 # Start the server
-ENTRYPOINT ["node", "apps/${PROJECT_NAME}/main.js"]
+ENTRYPOINT ["node", "dist/apps/${PROJECT_NAME}/main.js"]
