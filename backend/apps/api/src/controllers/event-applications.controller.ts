@@ -193,7 +193,7 @@ export class EventApplicationsController {
         : [],
       swift: "SWIFT",
       subscriber: new PaymentSubject({
-        address: currentUser.personalAddress.copy(),
+        address: application.invoiceAddress,
         name: "Subscriber",
       }),
       supplier: new PaymentSubject({
