@@ -64,7 +64,6 @@ const AccountPage = () => {
   const isPersonalAddress = (address: CreateAddress | undefined) => {
     return address ? Object.entries(address).some(([_key, value]) => (value as string)?.length > 0) : undefined;
   };
-
   const { data: currentUser, refetch: fetchCurrentUser, isFetchedAfterMount } = useGetCurrentUser();
 
   useEffect(() => {
