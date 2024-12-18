@@ -1,11 +1,18 @@
 "use client";
 
-import { useGetEventApplications, useGetEventSpots, useUpdateEventApplication } from "@/utils/api";
+import {
+  useDeleteEventApplication,
+  useGetEventApplications,
+  useGetEventSpots,
+  useUpdateEventApplication,
+} from "@/utils/api";
+import routes from "@/utils/routes";
 import CreateSpotModal from "@components/CreateSpotModal/CreateSpotModal";
-import { Button, ComboboxData, Flex, Select, Table, Text, Title } from "@mantine/core";
+import { ActionIcon, Button, ComboboxData, Flex, Select, Table, Text, Title, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { IconPlus } from "@tabler/icons-react";
+import { IconCopy, IconEdit, IconPlus, IconTrash, IconZoom } from "@tabler/icons-react";
+import Link from "next/link";
 
 interface ManageApplicationsTableProps {
   eventId: number;
@@ -22,7 +29,6 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
       return { value: spot.id.toString(), label: spot.name };
     }) ?? [];
 
-  //TODO: update user mutation
   const updateApplicationMutation = useUpdateEventApplication({
     mutation: {
       onMutate: () => {
@@ -81,6 +87,61 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     });
   };
 
+  const deleteApplicationMutation = useDeleteEventApplication({
+    mutation: {
+      onMutate: () => {
+        notifications.show({
+          id: "event-application-delete",
+          loading: true,
+          title: "Loading! Please wait...",
+          message: "We are deleting Event Application.",
+          autoClose: false,
+        });
+      },
+      onSuccess: () => {
+        notifications.update({
+          id: "event-application-delete",
+          title: "Delete Event Application.",
+          message: "Event application deleted succesfully.",
+          color: "green",
+          loading: false,
+          autoClose: true,
+        });
+        closeModal();
+      },
+      onError: (mutationError) => {
+        if (!mutationError.response?.data) return;
+        const { statusCode, error, message } = mutationError.response?.data;
+        console.error(statusCode, error, message);
+        notifications.update({
+          id: "event-application-delete",
+          title: "Something went wrong.",
+          message: "Please try again.",
+          color: "red",
+          loading: false,
+          autoClose: true,
+        });
+        let parsedMessage: string[] = [];
+        if (typeof message === "string") {
+          parsedMessage.push(message);
+        }
+        parsedMessage.forEach((err) => {
+          notifications.show({
+            title: `${statusCode} ${error}`,
+            message: err,
+            color: "red",
+          });
+        });
+      },
+    },
+  });
+
+  const handleDeleteApplication = (applicationId: string) => {
+    deleteApplicationMutation.mutate({
+      id: applicationId,
+    });
+  };
+
   const rows = eventApplications?.map((application, index) => (
     <Table.Tr key={`application-${index}-${application.id}`}>
       <Table.Td>{application.user.firstName + " " + application.user.lastName}</Table.Td>
@@ -100,10 +161,25 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
       </Table.Td>
       <Table.Td>{application.spotType?.price}</Table.Td>
       <Table.Td>
-        <Button>Edit</Button>
-      </Table.Td>
-      <Table.Td>
-        <Button color="red">Delete</Button>
+        <Flex justify="space-evenly" gap={16}>
+          <Tooltip label="Edit Application">
+            {/*TODO - edit EA*/}
+            <ActionIcon variant="subtle" color="blue" size={48}>
+              <IconEdit width={32} height={32} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Delete Application">
+            {/*TODO - Delete EA*/}
+            <ActionIcon
+              variant="subtle"
+              size={48}
+              color="red"
+              onClick={() => handleDeleteApplication(application.id.toString())}
+            >
+              <IconTrash width={32} height={32} />
+            </ActionIcon>
+          </Tooltip>
+        </Flex>
       </Table.Td>
     </Table.Tr>
   ));
@@ -133,8 +209,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
               <Table.Th>Country</Table.Th>
               <Table.Th>Spot type</Table.Th>
               <Table.Th>Price</Table.Th>
-              <Table.Th>Edit</Table.Th>
-              <Table.Th>Delete</Table.Th>
+              <Table.Th w={200}>Operations</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>{rows}</Table.Tbody>
