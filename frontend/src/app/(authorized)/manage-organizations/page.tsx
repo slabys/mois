@@ -4,7 +4,7 @@ import { useAllOrganizations } from "@/utils/api";
 import CreateOrganizationModal from "@components/CreateOrganizationModal/CreateOrganizationModal";
 import { ActionIcon, Button, Container, Flex, ScrollArea, Stack, Table, Text, Title, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconEdit, IconPlus, IconTrash, IconUsersGroup } from "@tabler/icons-react";
 
 const ManageOrganizationsPage = () => {
   const [isAddOrganizationModalOpen, { open: openAddOrganizationModal, close: closeAddOrganizationModal }] =
@@ -38,9 +38,16 @@ const ManageOrganizationsPage = () => {
         </>
       )}
       <Table.Td>
-        <Flex justify="space-around" gap={16}>
+        <Flex justify="space-evenly" gap={16}>
+          <Tooltip label="Organization Members">
+            {/*TODO - Show organizations members*/}
+            <ActionIcon variant="subtle" size={48} color="black">
+              <IconUsersGroup width={32} height={32} />
+            </ActionIcon>
+          </Tooltip>
           <Tooltip label="Edit Organization">
-            <ActionIcon>
+            {/*TODO - edit organization*/}
+            <ActionIcon variant="subtle" size={48} color="blue">
               <IconEdit width={32} height={32} />
             </ActionIcon>
           </Tooltip>
