@@ -180,8 +180,10 @@ export class EventsController {
     });
     if (!event) throw new NotFoundException("Event not found");
     Object.assign(event, body);
+    
 
-    return this.eventsService.save(event as unknown);
+
+    return this.eventsService.save(event);
   }
 
   /**
@@ -212,6 +214,6 @@ export class EventsController {
     if (!photo) new InternalServerErrorException("Could not save photo");
 
     event.photo = photo;
-    await this.eventsService.save(event as unknown);
+    await this.eventsService.save(event);
   }
 }
