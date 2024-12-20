@@ -1,8 +1,10 @@
 import { ApiHideProperty } from "@nestjs/swagger";
 import {
+  Check,
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -12,6 +14,7 @@ import { User } from "modules/users";
 import { Address } from "modules/addresses";
 
 @Entity()
+@Check("(SELECT COUNT(*) FROM organization WHERE parent.id IS NULL) <= 1")
 export class Organization {
   @PrimaryGeneratedColumn("uuid")
   id: string;
@@ -31,6 +34,7 @@ export class Organization {
   manager: User | null;
 
   @ApiHideProperty()
+  @Index()
   @ManyToOne(() => Organization, (organization) => organization.children)
   parent: Organization | null;
 

@@ -108,11 +108,11 @@ export class EventsController {
     event.title = body.title;
     event.longDescription = body.longDescription;
     event.shortDescription = body.shortDescription;
-    event.since = body.since;
-    event.until = body.until;
+    event.since = new Date(body.since);
+    event.until = new Date(body.until);
     event.createdByUser = user;
     event.visible = body.visible;
-    event.registrationDeadline = body.registrationDeadline;
+    event.registrationDeadline = new Date(body.registrationDeadline);
     event.registrationForm = body.registrationForm;
     event.capacity = body.capacity;
     event.codeOfConductLink = body.codeOfConductLink;
@@ -179,8 +179,10 @@ export class EventsController {
       visible: true,
     });
     if (!event) throw new NotFoundException("Event not found");
-
     Object.assign(event, body);
+    
+
+
     return this.eventsService.save(event);
   }
 

@@ -202,6 +202,7 @@ export class EventApplicationsController {
         name: "Subscriber",
       }),
       supplier: new PaymentSubject({
+        // TODO: Hlavní sekce
         address: new Address({
           city: "CITY",
           country: "Czech Republic",

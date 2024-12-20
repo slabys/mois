@@ -1,7 +1,7 @@
+import { Transform } from "class-transformer";
 import {
   Allow,
   IsBoolean,
-  IsDate,
   IsInt,
   IsNumber,
   IsOptional,
@@ -10,21 +10,37 @@ import {
   Min,
   MinLength,
 } from "class-validator";
-import { IsValidJsonSchema } from "utilities/nest/class-validator";
+import {
+  DateTransform,
+  IsValidDate,
+  IsValidJsonSchema,
+} from "utilities/nest/class-validator";
 
 export class CreateEvent {
   @MinLength(6)
   @IsString()
   title: string;
 
-  @IsDate()
+  /**
+   * @example 2024-12-20T16:48:34.681Z
+   */
+  @IsValidDate()
+  @Transform(DateTransform)
   since: Date;
 
-  @IsDate()
+  /**
+   * @example 2024-12-20T16:48:34.681Z
+   */
+  @IsValidDate()
+  @Transform(DateTransform)
   until: Date;
 
-  @IsDate()
-  registrationDeadline: Date;
+  /**
+   * @example 2024-12-20T16:48:34.681Z
+   */
+  @IsValidDate()
+  @Transform(DateTransform)
+  registrationDeadline: string;
 
   @IsString()
   @MinLength(30)
