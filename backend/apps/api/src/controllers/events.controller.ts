@@ -25,23 +25,28 @@ import { FormDataRequest } from "nestjs-form-data";
 
 import { CookieGuard } from "modules/auth/providers/guards";
 import { Event, EventsService } from "modules/events";
+import { EventLink, EventSpot } from "modules/events/entities";
 import { PhotoService } from "modules/photo";
 import type { User } from "modules/users";
 import { Pagination, type PaginationOptions } from "utilities/nest/decorators";
+import { ParseDatePipe } from "utilities/nest/pipes";
 
 import { CurrentUser } from "../decorators";
+import { EventSimpleWithApplicationsMapper } from "../mappers";
 import { CreateEvent, UpdateEvent, UpdatePhoto } from "../models/requests";
-import { EventDetail, EventSimple } from "../models/responses";
-
-import { ParseDatePipe } from "utilities/nest/pipes";
-import { EventLink, EventSpot } from "modules/events/entities";
+import {
+  EventDetail,
+  EventSimple,
+  EventSimpleWithApplications,
+} from "../models/responses";
 
 @ApiTags("Events")
 @Controller("events")
 export class EventsController {
   constructor(
     private readonly eventsService: EventsService,
-    private readonly photoService: PhotoService
+    private readonly photoService: PhotoService,
+    private readonly eventSimpleWithApplicationsMapper: EventSimpleWithApplicationsMapper
   ) {}
 
   /**
@@ -58,22 +63,25 @@ export class EventsController {
    * - To filter only events between two dates use `sinceSince`: `dateA`, `toSince`: `dateB`
    *
    */
-  @ApiOkResponse({ type: [EventSimple] })
+  @ApiOkResponse({ type: [EventSimpleWithApplications] })
   @ApiQuery({ name: "sinceSince", required: false, type: Number })
   @ApiQuery({ name: "toSince", required: false, type: Number })
   @Get()
-  getEvents(
+  async getEvents(
     @Pagination() pagination: PaginationOptions,
     @Query("sinceSince", ParseDatePipe) since?: Date,
     @Query("toSince", ParseDatePipe) to?: Date
   ) {
-    return this.eventsService.findByFilter(
+    const events = await this.eventsService.findByFilter(
       { since, to },
       {
         pagination,
         visible: true,
+        relations: { applications: true },
       }
     );
+
+    return this.eventSimpleWithApplicationsMapper.map(events);
   }
 
   /**
@@ -83,9 +91,14 @@ export class EventsController {
   @ApiNotFoundResponse({ description: "Event not found" })
   @Get(":id")
   async getEvent(@Param("id", ParseIntPipe) id: number) {
-    const event = await this.eventsService.findByIdDetailed(id);
+    const event = await this.eventsService.findByIdDetailed(id, {
+      relations: {
+        applications: true,
+      },
+    });
     if (!event) throw new NotFoundException("Event not found");
-    return event;
+
+    return this.eventSimpleWithApplicationsMapper.map(event);
   }
 
   /**
@@ -104,7 +117,7 @@ export class EventsController {
   async createEvent(@CurrentUser() user: User, @Body() body: CreateEvent) {
     // TODO: Check user role for modifications
 
-    const event = new Event();
+    let event = new Event();
     event.title = body.title;
     event.longDescription = body.longDescription;
     event.shortDescription = body.shortDescription;
@@ -118,8 +131,10 @@ export class EventsController {
     event.codeOfConductLink = body.codeOfConductLink;
     event.photoPolicyLink = body.photoPolicyLink;
     event.termsAndConditionsLink = body.termsAndConditionsLink;
+    event.applications = [];
 
-    return this.eventsService.save(event);
+    event = await this.eventsService.save(event);
+    return this.eventSimpleWithApplicationsMapper.map(event);
   }
 
   /**
@@ -135,7 +150,7 @@ export class EventsController {
   ) {
     const event = await this.eventsService.findByIdDetailed(id);
 
-    const newEvent = new Event({
+    let newEvent = new Event({
       title: event.title,
       since: event.since,
       until: event.until,
@@ -158,7 +173,8 @@ export class EventsController {
       ),
     });
 
-    return this.eventsService.save(newEvent);
+    newEvent = await this.eventsService.save(newEvent);
+    return this.eventSimpleWithApplicationsMapper.map(newEvent);
   }
 
   @ApiOkResponse({ type: EventDetail, description: "Updated event" })
@@ -175,15 +191,14 @@ export class EventsController {
     @Body() body: UpdateEvent
   ) {
     // TODO: Check user role for modifications
-    const event = await this.eventsService.findByIdDetailed(eventId, {
+    let event = await this.eventsService.findByIdDetailed(eventId, {
       visible: true,
     });
     if (!event) throw new NotFoundException("Event not found");
     Object.assign(event, body);
-    
 
-
-    return this.eventsService.save(event);
+    event = await this.eventsService.save(event);
+    return this.eventSimpleWithApplicationsMapper.map(event);
   }
 
   /**
@@ -207,13 +222,14 @@ export class EventsController {
   ) {
     // TODO: Check user role for modifications
 
-    const event = await this.eventsService.findById(eventId);
+    let event = await this.eventsService.findById(eventId);
     if (!event) throw new NotFoundException("Event not found");
 
     const photo = await this.photoService.save(body.file.buffer, "event_photo");
     if (!photo) new InternalServerErrorException("Could not save photo");
 
     event.photo = photo;
-    await this.eventsService.save(event);
+    event = await this.eventsService.save(event);
+    return this.eventSimpleWithApplicationsMapper.map(event);
   }
 }

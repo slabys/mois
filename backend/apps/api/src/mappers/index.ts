@@ -1,0 +1,1 @@
+export * from './event-simple-with-applications.mapper';

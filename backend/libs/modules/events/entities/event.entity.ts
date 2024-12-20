@@ -46,7 +46,7 @@ export class Event extends BaseEntity {
   @OneToMany(() => EventSpot, (spot) => spot.event, { cascade: true })
   spotTypes: EventSpot[];
 
-  @OneToMany(() => EventApplication, (application) => application.spotType)
+  @OneToMany(() => EventApplication, (application) => application.event)
   applications: EventApplication[];
 
   @OneToMany(() => EventLink, (link) => link.event)

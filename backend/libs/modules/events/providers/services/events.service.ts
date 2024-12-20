@@ -3,12 +3,12 @@ import { InjectRepository } from "@nestjs/typeorm";
 import {
   FindOptionsRelations,
   FindOptionsSelect,
-  MoreThan,
   type Repository,
 } from "typeorm";
 
 import { FindManyOptions } from "libs/types";
 import { Event } from "modules/events/entities";
+
 import { EventFilter } from "../../models";
 import { filterSince } from "../../utilities";
 
@@ -36,8 +36,8 @@ export class EventsService {
       where: { id, visible: options?.visible },
       select: options?.select,
       relations: {
+        ...options?.relations,
         createdByUser: true,
-        ...(options?.relations ?? {}),
       },
     });
   }
@@ -59,8 +59,10 @@ export class EventsService {
         until: true,
         title: true,
         visible: true,
+        applications: true,
       },
       relations: {
+        ...options?.relations,
         createdByUser: true,
         links: true,
         spotTypes: true,
@@ -73,28 +75,6 @@ export class EventsService {
     return this.eventsRepository.save(new Event(event));
   }
 
-  /**
-   * TODO: Add pagination
-   * All upcoming visible events
-   * @returns Events
-   */
-  getUpcomingEvents(options?: EventFindOptions) {
-    return this.eventsRepository.find({
-      where: {
-        since: MoreThan(new Date()),
-        visible: options.visible,
-      },
-      relations: {
-        createdByUser: true,
-      },
-      order: {
-        since: "DESC",
-      },
-      skip: options?.pagination?.skip,
-      take: options?.pagination?.take,
-    });
-  }
-
   findByFilter(filter?: EventFilter, options?: EventFindOptions) {
     return this.eventsRepository.find({
       where: {
@@ -102,6 +82,7 @@ export class EventsService {
         visible: options?.visible,
       },
       relations: {
+        ...options?.relations,
         createdByUser: true,
       },
       order: {
