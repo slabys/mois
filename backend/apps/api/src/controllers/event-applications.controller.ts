@@ -54,20 +54,10 @@ import {
   CreateEventApplication,
   UpdateEventApplication,
 } from "../models/requests";
-<<<<<<< Updated upstream
 import {
   EventApplicationInvoice,
   EventApplicationSimple,
 } from "../models/responses";
-import { InvoiceService } from "modules/invoice";
-import { firstValueFrom } from "rxjs";
-import { FileStorageService } from "modules/file-storage";
-import { InvoiceCurrency } from "modules/invoice/enums";
-import { InvoiceItem } from "modules/invoice/entities";
-import { PaymentSubject } from "modules/payments";
-=======
-import { EventApplicationSimple } from "../models/responses";
->>>>>>> Stashed changes
 
 @ApiTags("Event applications")
 @Controller("events")
