@@ -115,7 +115,6 @@ const ManageEventsPage = () => {
           <Button onClick={openModal} leftSection={<IconPlus />}>
             Add Event
           </Button>
-          <CreateEventModal onCreateSuccess={refetchManagementEvents} isOpened={isModalOpen} closeModal={closeModal} />
         </Flex>
         <ScrollArea w="100%">
           {rows && rows.length > 0 ? (
@@ -149,6 +148,7 @@ const ManageEventsPage = () => {
           )}
         </ScrollArea>
       </Stack>
+      <CreateEventModal onCreateSuccess={refetchManagementEvents} isOpened={isModalOpen} closeModal={closeModal} />
     </Container>
   );
 };

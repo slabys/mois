@@ -15,7 +15,7 @@ interface MyModalProps {
   onCreateSuccess: () => void;
 }
 
-const CreateEventModal: React.FC<MyModalProps> = ({ onCreateSuccess, isOpened, closeModal }) => {
+const CreateEventModal = ({ onCreateSuccess, isOpened, closeModal }: MyModalProps) => {
   const queryClient = useQueryClient();
 
   const createEventMutation = useCreateEvent({
