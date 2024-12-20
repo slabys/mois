@@ -22,9 +22,10 @@ export class EventDetail extends PickType(Event, [
   "title",
   "visible",
   "createdByUser",
-  "photo"
+  "photo",
 ]) {
   @IsObject({ each: true })
   @Type(() => EventDetailLink)
   links: EventDetailLink[];
+  applications: number;
 }
