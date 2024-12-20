@@ -10,9 +10,10 @@ interface JoinEventModalProps {
   userData: User;
   isOpened: boolean;
   closeModal: () => void;
+  onSuccess: () => void;
 }
 
-const JoinEventModal = ({ userData, eventId, isOpened, closeModal }: JoinEventModalProps) => {
+const JoinEventModal = ({ userData, eventId, onSuccess, isOpened, closeModal }: JoinEventModalProps) => {
   const { data: eventSpots } = useGetEventSpots(eventId);
 
   const form = useForm<Partial<CreateEventApplication>>({
@@ -70,6 +71,7 @@ const JoinEventModal = ({ userData, eventId, isOpened, closeModal }: JoinEventMo
           loading: false,
           autoClose: true,
         });
+        onSuccess();
         form.reset();
         closeModal();
       },
