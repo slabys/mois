@@ -5,6 +5,7 @@ import type {
   EventSimpleWithApplications,
 } from "../models/responses";
 
+// biome-ignore lint/style/useImportType: <explanation>
 import { EventSimpleWithApplicationsMapper } from "./event-simple-with-applications.mapper";
 
 

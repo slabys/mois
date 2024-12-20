@@ -58,6 +58,7 @@ import {
   EventApplicationSimpleWithApplications,
 } from "../models/responses";
 import { EventApplicationSimpleWithApplicationsMapper } from "../mappers";
+import { EventApplicationDetailedWithApplications } from "../models/responses/event-application-detailed-with-applications.dto";
 
 @ApiTags("Event applications")
 @Controller("events")
@@ -81,7 +82,7 @@ export class EventApplicationsController {
   @ApiBearerAuth()
   @ApiQuery({ name: "sinceSince", required: false, type: Number })
   @ApiQuery({ name: "toSince", required: false, type: Number })
-  @ApiOkResponse({ type: EventApplicationSimpleWithApplications })
+  @ApiOkResponse({ type: [EventApplicationDetailedWithApplications] })
   @UseGuards(CookieGuard)
   @Get("applications")
   async getUserApplications(
@@ -104,7 +105,7 @@ export class EventApplicationsController {
    * @returns
    */
   @ApiBearerAuth()
-  @ApiOkResponse({ type: EventApplicationSimpleWithApplications })
+  @ApiOkResponse({ type: [EventApplicationDetailedWithApplications] })
   @UseGuards(CookieGuard)
   @Get(":eventId/applications")
   async getEventApplications(@Param("eventId", ParseIntPipe) eventId: number) {
@@ -310,17 +311,14 @@ export class EventApplicationsController {
     await this.eventApplicationsService.delete(application);
   }
 
-  @ApiOkResponse({
-    type: EventApplicationInvoice,
-    description: "Event application deleted",
-  })
+  @ApiOkResponse({ description: "Event application deleted" })
   @ApiNotFoundResponse({ description: "Event application not found" })
   @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Get("application/:id/invoice")
   async getEventApplicationInvoice(
     @Param("id", ParseIntPipe) applicationId: number
-  ) {
+  ): Promise<EventApplicationInvoice> {
     const application = await this.eventApplicationsService.findById(
       applicationId,
       {

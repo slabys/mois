@@ -11,9 +11,13 @@ export class EventApplicationDetailed extends PickType(EventApplication, [
   "organization",
   "user",
   "spotType",
+  "invoiceAddress",
 ]) {}
 
+/**
+ * Event applications with event
+ */
 export class EventApplicationDetailedWithApplications extends IntersectionType(
-  EventApplicationSimpleWithApplications,
-  EventApplicationDetailed
+  EventApplicationDetailed,
+  EventApplicationSimpleWithApplications
 ) {}
