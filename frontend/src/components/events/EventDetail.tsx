@@ -100,23 +100,30 @@ const EventDetail = ({ id }: EventDetailProps) => {
 
               <Divider my={16} />
               <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 1, xl: 1 }}>
-                {/* TODO */}
-                <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconInvoice />}>
-                  Show Invoice
-                </Button>
-                {/* TODO */}
-                <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconCash />}>
-                  Upload Payment
-                </Button>
-                <Divider my={16} />
-                <Button
-                  onClick={openModalJoinEvent}
-                  disabled={isUserRegistered}
-                  color="green"
-                  leftSection={<IconWritingSign />}
-                >
-                  {isUserRegistered ? "Already registered" : "Register to Event"}
-                </Button>
+                {isUserRegistered ? (
+                  <>
+                    {" "}
+                    {/* TODO */}
+                    <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconInvoice />}>
+                      Show Invoice
+                    </Button>
+                    {/* TODO */}
+                    <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconCash />}>
+                      Upload Payment
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      onClick={openModalJoinEvent}
+                      disabled={isUserRegistered}
+                      color="green"
+                      leftSection={<IconWritingSign />}
+                    >
+                      {isUserRegistered ? "Already registered" : "Register to Event"}
+                    </Button>
+                  </>
+                )}
               </SimpleGrid>
             </Collapse>
           </Flex>
