@@ -7,7 +7,8 @@ import { filterSince } from "modules/events/utilities";
 import { FindOneOptions, Repository } from "typeorm";
 
 interface FindEventOptions extends FindManyOptions {
-  filter: EventFilter;
+  filter?: EventFilter;
+  relations?: FindOneOptions<EventApplication>["relations"];
 }
 
 @Injectable()
@@ -95,6 +96,7 @@ export class EventApplicationsService {
         user: true,
         spotType: true,
         event: true,
+        ...options?.relations,
       },
       take: options?.pagination?.take,
       skip: options?.pagination?.skip,
@@ -103,11 +105,15 @@ export class EventApplicationsService {
 
   /**
    * Find event application for user and event id
-   * @param eventId 
-   * @param userId 
-   * @returns 
+   * @param eventId
+   * @param userId
+   * @returns
    */
-  findByEventAndUserId(eventId: number, userId: string) {
+  findByEventAndUserId(
+    eventId: number,
+    userId: string,
+    options?: FindEventOptions
+  ) {
     return this.eventApplicationRepository.findOne({
       where: {
         user: { id: userId },
@@ -125,6 +131,7 @@ export class EventApplicationsService {
         user: true,
         spotType: true,
         event: true,
+        ...options?.relations,
       },
     });
   }
@@ -134,7 +141,7 @@ export class EventApplicationsService {
    * @param id Event ID
    * @returns
    */
-  findByEventIdDetailed(id: number) {
+  findByEventIdDetailed(id: number, options?: FindEventOptions) {
     return this.eventApplicationRepository.find({
       where: { event: { id } },
       select: {
@@ -144,6 +151,7 @@ export class EventApplicationsService {
         idNumber: true,
       },
       relations: {
+        ...options?.relations,
         customOrganization: true,
         organization: true,
         user: true,

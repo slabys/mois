@@ -9,3 +9,4 @@ export * from "./invoice-url.dto";
 export * from "./organization-member-without-organization.dto";
 export * from "./organization-member-without-user.dto";
 export * from "./event-simple-with-applications.dto";
+export * from './event-application-simple-with-applications.dto';

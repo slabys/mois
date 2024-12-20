@@ -27,7 +27,10 @@ import { UsersModule } from "modules/users";
 import { NestjsFormDataModule } from "nestjs-form-data";
 
 import { ManagementControllers } from "./controllers/management";
-import { EventSimpleWithApplicationsMapper } from "./mappers";
+import {
+  EventApplicationSimpleWithApplicationsMapper,
+  EventSimpleWithApplicationsMapper,
+} from "./mappers";
 
 @Module({
   imports: [
@@ -66,6 +69,9 @@ import { EventSimpleWithApplicationsMapper } from "./mappers";
     ...ManagementControllers,
     HealthController,
   ],
-  providers: [EventSimpleWithApplicationsMapper],
+  providers: [
+    EventSimpleWithApplicationsMapper,
+    EventApplicationSimpleWithApplicationsMapper,
+  ],
 })
 export class AppModule {}
