@@ -26,7 +26,9 @@ import {
   ApiQuery,
   ApiTags,
 } from "@nestjs/swagger";
+import { firstValueFrom } from "rxjs";
 
+import { Address } from "modules/addresses";
 import { CookieGuard } from "modules/auth/providers/guards";
 import {
   EventApplicationsService,
@@ -37,17 +39,22 @@ import {
   EventApplication,
   EventCustomOrganization,
 } from "modules/events/entities";
-import { User, UsersService } from "modules/users";
-
-import { Address } from "modules/addresses";
+import { FileStorageService } from "modules/file-storage";
+import { InvoiceService } from "modules/invoice";
+import { InvoiceItem } from "modules/invoice/entities";
+import { InvoiceCurrency } from "modules/invoice/enums";
 import { OrganizationService } from "modules/organization";
+import { PaymentSubject } from "modules/payments";
+import { User, UsersService } from "modules/users";
 import { ajv } from "utilities/ajv";
 import { ParseDatePipe } from "utilities/nest/pipes";
+
 import { CurrentUser } from "../decorators";
 import {
   CreateEventApplication,
   UpdateEventApplication,
 } from "../models/requests";
+<<<<<<< Updated upstream
 import {
   EventApplicationInvoice,
   EventApplicationSimple,
@@ -58,6 +65,9 @@ import { FileStorageService } from "modules/file-storage";
 import { InvoiceCurrency } from "modules/invoice/enums";
 import { InvoiceItem } from "modules/invoice/entities";
 import { PaymentSubject } from "modules/payments";
+=======
+import { EventApplicationSimple } from "../models/responses";
+>>>>>>> Stashed changes
 
 @ApiTags("Event applications")
 @Controller("events")

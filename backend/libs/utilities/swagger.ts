@@ -10,8 +10,8 @@ const getTemplate = (openApi: Omit<OpenAPIObject, "paths">, path: string) => `
     <title>${openApi.info.title}</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="https://unpkg.com/@stoplight/elements/styles.min.css">
-    <script src="https://unpkg.com/@stoplight/elements/web-components.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@stoplight/elements@8.5.2/styles.min.css">
+    <script src="https://unpkg.com/@stoplight/elements@8.5.2/web-components.min.js"></script>
     <style>
       body {
         margin: 0;
