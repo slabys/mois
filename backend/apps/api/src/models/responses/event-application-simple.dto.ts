@@ -11,5 +11,5 @@ export class EventApplicationSimple extends PickType(EventApplication, [
   "user",
 ]) {
   event: EventSimple;
-  spotType: SpotTypeSimple;
+  spotType: SpotTypeSimple | null;
 }

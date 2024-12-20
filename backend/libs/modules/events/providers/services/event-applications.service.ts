@@ -96,6 +96,7 @@ export class EventApplicationsService {
         user: true,
         spotType: true,
         event: true,
+        invoiceAddress: true,
         ...options?.relations,
       },
       take: options?.pagination?.take,
@@ -156,6 +157,7 @@ export class EventApplicationsService {
         organization: true,
         user: true,
         spotType: true,
+        invoiceAddress: true,
       },
     });
   }
