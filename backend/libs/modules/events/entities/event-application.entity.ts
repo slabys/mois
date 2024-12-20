@@ -34,7 +34,7 @@ export class EventApplication extends BaseEntity {
   @ManyToOne(() => User, { nullable: false, onDelete: "CASCADE" })
   user: User;
 
-  @ManyToOne(() => Event, (event) => event.applications, {
+  @ManyToOne(() => Event, (event) => event._applications, {
     nullable: false,
     onDelete: "CASCADE",
   })

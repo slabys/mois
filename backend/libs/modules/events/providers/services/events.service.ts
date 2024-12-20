@@ -3,19 +3,21 @@ import { InjectRepository } from "@nestjs/typeorm";
 import {
   FindOptionsRelations,
   FindOptionsSelect,
-  MoreThan,
   type Repository,
 } from "typeorm";
 
 import { FindManyOptions } from "libs/types";
 import { Event } from "modules/events/entities";
 import { EventFilter } from "../../models";
-import { filterSince } from "../../utilities";
 
 interface EventFindOptions extends FindManyOptions {
   visible?: boolean;
   relations?: FindOptionsRelations<Event>;
   select?: FindOptionsSelect<Event>;
+}
+
+interface EventWithApplications extends Omit<Event, "applications"> {
+  applications: number;
 }
 
 @Injectable()
@@ -26,24 +28,45 @@ export class EventsService {
   ) {}
 
   /**
+   * Create new query builder
+   * @param options Filter options
+   * @returns Query builder
+   */
+  private createQueryBuilder(options?: EventFindOptions) {
+    const query = this.eventsRepository
+      .createQueryBuilder("event")
+      .setFindOptions(options)
+      .loadRelationCountAndMap("event.applications", "event._applications");
+
+    if (options.visible !== undefined)
+      query.andWhere("event.visible = :visible", { visible: options.visible });
+
+    query.take(options?.pagination?.take).skip(options?.pagination.skip);
+
+    return query;
+  }
+
+  /**
    * Find event by ID
    * @param id Event ID
    * @param options Find options
    * @returns
    */
-  findById(id: number, options?: EventFindOptions) {
-    return this.eventsRepository.findOne({
-      where: { id, visible: options?.visible },
-      select: options?.select,
-      relations: {
-        createdByUser: true,
-        ...(options?.relations ?? {}),
-      },
-    });
+  findById(
+    id: number,
+    options?: EventFindOptions
+  ): Promise<EventWithApplications> {
+    return this.createQueryBuilder(options)
+      .where("event.id = :id", { id })
+      .getOne() as unknown as Promise<EventWithApplications>;
   }
 
-  findByIdDetailed(id: number, options?: EventFindOptions) {
-    return this.findById(id, {
+  findByIdDetailed(
+    id: number,
+    options?: EventFindOptions
+  ): Promise<EventWithApplications> {
+    return this.createQueryBuilder({
+      ...options,
       select: {
         id: true,
         capacity: true,
@@ -66,49 +89,25 @@ export class EventsService {
         spotTypes: true,
         photo: true,
       },
-    });
+    })
+      .where({ id })
+      .getOne() as unknown as Promise<EventWithApplications>;
   }
 
   save(event: Partial<Event>) {
     return this.eventsRepository.save(new Event(event));
   }
 
-  /**
-   * TODO: Add pagination
-   * All upcoming visible events
-   * @returns Events
-   */
-  getUpcomingEvents(options?: EventFindOptions) {
-    return this.eventsRepository.find({
-      where: {
-        since: MoreThan(new Date()),
-        visible: options.visible,
-      },
-      relations: {
-        createdByUser: true,
-      },
-      order: {
-        since: "DESC",
-      },
-      skip: options?.pagination?.skip,
-      take: options?.pagination?.take,
-    });
-  }
+  findByFilter(
+    filter?: EventFilter,
+    options?: EventFindOptions
+  ): Promise<EventWithApplications[]> {
+    const query = this.createQueryBuilder(options);
 
-  findByFilter(filter?: EventFilter, options?: EventFindOptions) {
-    return this.eventsRepository.find({
-      where: {
-        ...filterSince(filter),
-        visible: options?.visible,
-      },
-      relations: {
-        createdByUser: true,
-      },
-      order: {
-        since: "DESC",
-      },
-      skip: options?.pagination?.skip,
-      take: options?.pagination?.take,
-    });
+    if (filter.since)
+      query.andWhere("event.since > :since", { since: filter.since });
+    if (filter.to) query.andWhere("event.since < :to", { to: filter.to });
+
+    return query.getMany() as unknown as Promise<EventWithApplications[]>;
   }
 }
