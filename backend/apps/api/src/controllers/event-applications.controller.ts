@@ -20,7 +20,6 @@ import {
 import {
   ApiBearerAuth,
   ApiConflictResponse,
-  ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiQuery,
@@ -56,8 +55,9 @@ import {
 } from "../models/requests";
 import {
   EventApplicationInvoice,
-  EventApplicationSimple,
+  EventApplicationSimpleWithApplications,
 } from "../models/responses";
+import { EventApplicationSimpleWithApplicationsMapper } from "../mappers";
 
 @ApiTags("Event applications")
 @Controller("events")
@@ -69,7 +69,8 @@ export class EventApplicationsController {
     private readonly organizationService: OrganizationService,
     private readonly eventSpotsService: EventSpotsService,
     private readonly invoiceService: InvoiceService,
-    private readonly fileStorageService: FileStorageService
+    private readonly fileStorageService: FileStorageService,
+    private readonly eventApplicationSimpleWithApplicationsMapper: EventApplicationSimpleWithApplicationsMapper
   ) {}
 
   /**
@@ -80,16 +81,21 @@ export class EventApplicationsController {
   @ApiBearerAuth()
   @ApiQuery({ name: "sinceSince", required: false, type: Number })
   @ApiQuery({ name: "toSince", required: false, type: Number })
+  @ApiOkResponse({ type: EventApplicationSimpleWithApplications })
   @UseGuards(CookieGuard)
   @Get("applications")
-  getUserApplications(
+  async getUserApplications(
     @CurrentUser() user: User,
     @Query("sinceSince", ParseDatePipe) since?: Date,
     @Query("toSince", ParseDatePipe) to?: Date
   ) {
-    return this.eventApplicationsService.findByUserIdDetailed(user.id, {
-      filter: { to, since },
-    });
+    const applications =
+      await this.eventApplicationsService.findByUserIdDetailed(user.id, {
+        filter: { to, since },
+        relations: { event: { applications: true } },
+      });
+
+    return this.eventApplicationSimpleWithApplicationsMapper.map(applications);
   }
 
   /**
@@ -98,19 +104,20 @@ export class EventApplicationsController {
    * @returns
    */
   @ApiBearerAuth()
+  @ApiOkResponse({ type: EventApplicationSimpleWithApplications })
   @UseGuards(CookieGuard)
   @Get(":eventId/applications")
   async getEventApplications(@Param("eventId", ParseIntPipe) eventId: number) {
-    return this.eventApplicationsService.findByEventIdDetailed(eventId);
+    const application =
+      await this.eventApplicationsService.findByEventIdDetailed(eventId, {
+        relations: { event: { applications: true } },
+      });
+    return this.eventApplicationSimpleWithApplicationsMapper.map(application);
   }
 
   /**
    * Create event application
    */
-  @ApiCreatedResponse({
-    type: EventApplicationSimple,
-    description: "Created new application",
-  })
   @ApiConflictResponse({
     description: "Event application for user already exist",
   })
@@ -121,7 +128,7 @@ export class EventApplicationsController {
     @CurrentUser() user: User,
     @Param("eventId", ParseIntPipe) eventId: number,
     @Body() body: CreateEventApplication
-  ) {
+  ): Promise<EventApplicationSimpleWithApplications> {
     const exist = await this.eventApplicationsService.exist(eventId, user.id);
     if (exist) throw new ConflictException("Event application already exist");
 
@@ -132,7 +139,7 @@ export class EventApplicationsController {
     if (!currentUser.personalAddress)
       throw new ForbiddenException("User must have valid personal address");
 
-    const application = new EventApplication({
+    let application = new EventApplication({
       user,
       personalAddress: currentUser.personalAddress.copy(),
       invoiceAddress: new Address(body.invoiceAddress),
@@ -156,7 +163,7 @@ export class EventApplicationsController {
     }
 
     const event = await this.eventService.findById(eventId, {
-      relations: { spotTypes: true },
+      relations: { spotTypes: true, applications: true },
       select: { registrationForm: {}, id: true },
     });
     if (!event) throw new NotFoundException("Event not found");
@@ -202,6 +209,7 @@ export class EventApplicationsController {
         name: "Subscriber",
       }),
       supplier: new PaymentSubject({
+        // TODO: Hlavní sekce
         address: new Address({
           city: "CITY",
           country: "Czech Republic",
@@ -214,8 +222,8 @@ export class EventApplicationsController {
       variableSymbol: 123,
     });
     application.invoice = invoice;
-
-    return this.eventApplicationsService.save(application);
+    application = await this.eventApplicationsService.save(application);
+    return this.eventApplicationSimpleWithApplicationsMapper.map(application);
   }
 
   /**
@@ -224,23 +232,21 @@ export class EventApplicationsController {
    * @param applicationId Event Application ID
    * @returns
    */
-  @ApiCreatedResponse({
-    type: EventApplicationSimple,
-    description: "Update event application",
-  })
   @ApiBearerAuth()
   @UseGuards(CookieGuard)
   @Patch("application/:id")
   async updateEventApplication(
     @Param("id", ParseIntPipe) applicationId: number,
     @Body() body: UpdateEventApplication
-  ) {
-    const application = await this.eventApplicationsService.findById(
+  ): Promise<EventApplicationSimpleWithApplications> {
+    let application = await this.eventApplicationsService.findById(
       applicationId,
       {
         relations: {
           personalAddress: true,
-          event: true,
+          event: {
+            applications: true,
+          },
         },
       }
     );
@@ -280,7 +286,8 @@ export class EventApplicationsController {
       }
     }
 
-    return this.eventApplicationsService.save(application);
+    application = await this.eventApplicationsService.save(application);
+    return this.eventApplicationSimpleWithApplicationsMapper.map(application);
   }
 
   /**
@@ -345,7 +352,7 @@ export class EventApplicationsController {
   /**
    * Get event application for user for event
    */
-  @ApiOkResponse({ type: EventApplication })
+  @ApiOkResponse({ type: EventApplicationSimpleWithApplications })
   @ApiNotFoundResponse({ description: "Event application not found" })
   @ApiBearerAuth()
   @UseGuards(CookieGuard)
@@ -365,6 +372,6 @@ export class EventApplicationsController {
     if (!application)
       throw new NotFoundException("Event application not found");
 
-    return application;
+    return this.eventApplicationSimpleWithApplicationsMapper.map(application);
   }
 }

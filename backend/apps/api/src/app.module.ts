@@ -18,15 +18,19 @@ import {
 
 import { AuthModule } from "modules/auth";
 import { EventsModule } from "modules/events";
+import { FileStorageModule } from "modules/file-storage";
+import { InvoiceModule } from "modules/invoice";
 import { OrganizationModule } from "modules/organization";
 import { PhotoModule } from "modules/photo";
+import { RolesModule } from "modules/roles";
 import { UsersModule } from "modules/users";
 import { NestjsFormDataModule } from "nestjs-form-data";
-import { InvoiceModule } from "modules/invoice";
 
 import { ManagementControllers } from "./controllers/management";
-import { FileStorageModule } from "modules/file-storage";
-import { RolesModule } from "modules/roles";
+import {
+  EventApplicationSimpleWithApplicationsMapper,
+  EventSimpleWithApplicationsMapper,
+} from "./mappers";
 
 @Module({
   imports: [
@@ -65,6 +69,9 @@ import { RolesModule } from "modules/roles";
     ...ManagementControllers,
     HealthController,
   ],
-  providers: [],
+  providers: [
+    EventSimpleWithApplicationsMapper,
+    EventApplicationSimpleWithApplicationsMapper,
+  ],
 })
 export class AppModule {}

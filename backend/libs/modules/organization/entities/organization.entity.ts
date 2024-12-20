@@ -1,17 +1,20 @@
 import { ApiHideProperty } from "@nestjs/swagger";
+import { Address } from "modules/addresses";
+import { User } from "modules/users";
 import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { OrganizationMember } from "./organization-member.entity";
-import { User } from "modules/users";
-import { Address } from "modules/addresses";
 
+// Should be parent.id but it's not converted to parent_id, so this needs to be "hardcoded"
 @Entity()
+@Index("idx_single_root", ["id"], { unique: true, where: "parent_id IS NULL" })
 export class Organization {
   @PrimaryGeneratedColumn("uuid")
   id: string;
@@ -31,6 +34,7 @@ export class Organization {
   manager: User | null;
 
   @ApiHideProperty()
+  @Index()
   @ManyToOne(() => Organization, (organization) => organization.children)
   parent: Organization | null;
 
