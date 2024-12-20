@@ -31,13 +31,17 @@ ARG NODE_ENV
 ARG WEB_DOMAIN
 ENV NODE_ENV=$NODE_ENV
 ENV WEB_DOMAIN=$WEB_DOMAIN
+ENV PROJECT_NAME=$PROJECT_NAME
+
+ARG PROJECT_DIST="dist/apps/${PROJECT_NAME}"
 # Set working directory
 WORKDIR /app
 
 RUN npm install -g pnpm
 
 # Copy only the built application and necessary files from builder
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/${PROJECT_DIST} .
+#COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
 
@@ -47,4 +51,4 @@ RUN pnpm install --frozen-lockfile --prod=true
 EXPOSE $PORT_APP1
 
 # Start the server
-ENTRYPOINT ["npm", "run", "start:prod"]
+ENTRYPOINT node main.js

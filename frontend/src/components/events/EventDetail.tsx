@@ -1,15 +1,24 @@
 "use client";
 
-import { useGetEvent } from "@/utils/api";
+import { useGetCurrentUser, useGetEvent, useGetUserApplications } from "@/utils/api";
 import routes from "@/utils/routes";
 import { dateWithTime, dayMonthYear } from "@/utils/time";
 import ApiImage from "@components/ApiImage/ApiImage";
+import JoinEventModal from "@components/JoinEventModal/JoinEventModal";
 import RichTextRenderer from "@components/Richtext/RichTextRenderer";
 import UpdateEventPhotoModal from "@components/UpdateEventPhotoModal/UpdateEventPhotoModal";
 import EventEditModal from "@components/events/modals/EventEditModal";
 import { Button, Collapse, Divider, Flex, Grid, SimpleGrid, Skeleton, Text, Title } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
-import { IconCash, IconChevronDown, IconEdit, IconInvoice, IconPhoto, IconUsersGroup } from "@tabler/icons-react";
+import {
+  IconCash,
+  IconChevronDown,
+  IconEdit,
+  IconInvoice,
+  IconPhoto,
+  IconUsersGroup,
+  IconWritingSign,
+} from "@tabler/icons-react";
 import Link from "next/link";
 import React from "react";
 
@@ -23,8 +32,13 @@ const EventDetail = ({ id }: EventDetailProps) => {
 
   const [isModalEditOpen, { open: openModalEdit, close: closeModalEdit }] = useDisclosure(false);
   const [isModalUploadPhotoOpen, { open: openModalUploadPhoto, close: closeModalUploadPhoto }] = useDisclosure(false);
+  const [isModalJoinEventOpen, { open: openModalJoinEvent, close: closeModalJoinEvent }] = useDisclosure(false);
 
+  const { data: userApplicationList } = useGetUserApplications();
   const { data: eventDetail, refetch: refetchEvent } = useGetEvent(id);
+  const { data: userData } = useGetCurrentUser();
+
+  const isUserRegistered = userApplicationList?.some((f) => f.event.id === id);
 
   return eventDetail ? (
     <>
@@ -94,6 +108,15 @@ const EventDetail = ({ id }: EventDetailProps) => {
                 <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconCash />}>
                   Upload Payment
                 </Button>
+                <Divider my={16} />
+                <Button
+                  onClick={openModalJoinEvent}
+                  disabled={isUserRegistered}
+                  color="green"
+                  leftSection={<IconWritingSign />}
+                >
+                  {isUserRegistered ? "Already registered" : "Register to Event"}
+                </Button>
               </SimpleGrid>
             </Collapse>
           </Flex>
@@ -113,6 +136,14 @@ const EventDetail = ({ id }: EventDetailProps) => {
         isOpened={isModalEditOpen}
         close={closeModalEdit}
       />
+      {!!userData ? (
+        <JoinEventModal
+          userData={userData}
+          eventId={eventDetail.id}
+          isOpened={isModalJoinEventOpen}
+          closeModal={closeModalJoinEvent}
+        />
+      ) : null}
     </>
   ) : (
     <Grid>

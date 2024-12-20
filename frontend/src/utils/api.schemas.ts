@@ -18,6 +18,14 @@ export type GetManagementEventsParams = {
   skip?: number;
 };
 
+export type GetRoleAllPermissions200Item =
+  (typeof GetRoleAllPermissions200Item)[keyof typeof GetRoleAllPermissions200Item];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GetRoleAllPermissions200Item = {
+  createevent: "create.event",
+} as const;
+
 export type GetEventSpotsParams = {
   /**
    * Pagination number of results
@@ -43,6 +51,11 @@ export type GetEventsParams = {
 };
 
 export type UpdateEventApplication200 = { [key: string]: unknown };
+
+export type GetUserApplicationsParams = {
+  sinceSince?: number;
+  toSince?: number;
+};
 
 export type OrganizationMembersParams = {
   /**
@@ -93,17 +106,6 @@ export const InvoiceSimpleCurrency = {
   EUR: "EUR",
 } as const;
 
-export interface PaymentSubject {
-  address: Address;
-  /** @nullable */
-  cin: string | null;
-  createdAt: string;
-  id: string;
-  name: string;
-  /** @nullable */
-  vatId: string | null;
-}
-
 export interface InvoiceSimpleItem {
   amount: number;
   id: number;
@@ -124,10 +126,22 @@ export interface InvoiceSimple {
   variableSymbol: number;
 }
 
+export type UpdateEventSpotCurrency = (typeof UpdateEventSpotCurrency)[keyof typeof UpdateEventSpotCurrency];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateEventSpotCurrency = {
+  CZK: "CZK",
+  EUR: "EUR",
+} as const;
+
 export interface UpdateEventSpot {
+  currency?: UpdateEventSpotCurrency;
   /** @minLength 6 */
   name?: string;
-  /** @minimum 0 */
+  /**
+   * Price in format `1000` => `10.00`
+   * @minimum 0
+   */
   price?: number;
 }
 
@@ -136,10 +150,22 @@ export interface DeleteEventSpot {
   replaceWithSpotId?: number;
 }
 
+export type CreateEventSpotCurrency = (typeof CreateEventSpotCurrency)[keyof typeof CreateEventSpotCurrency];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateEventSpotCurrency = {
+  CZK: "CZK",
+  EUR: "EUR",
+} as const;
+
 export interface CreateEventSpot {
+  currency: CreateEventSpotCurrency;
   /** @minLength 6 */
   name: string;
-  /** @minimum 0 */
+  /**
+   * Price in format `1000` => `10.00`
+   * @minimum 0
+   */
   price: number;
 }
 
@@ -250,6 +276,11 @@ Each event can have different "requirements"
   visible: boolean;
 }
 
+export interface EventApplicationInvoice {
+  invoice: Invoice;
+  url: string;
+}
+
 export type UpdateEventApplicationAdditionalFormData = { [key: string]: unknown };
 
 export interface UpdateEventApplication {
@@ -269,7 +300,7 @@ export type EventApplicationSimpleSpotType = EventSpot | null;
 export interface EventApplicationSimple {
   createdAt: string;
   event: EventSimple;
-  id: string;
+  id: number;
   /**
    * Spot, must be one of {@link event} spots
    * @nullable
@@ -362,47 +393,6 @@ export interface EventLink {
   name: string;
 }
 
-/**
- * Spot, must be one of {@link event} spots
- * @nullable
- */
-export type EventApplicationSpotType = EventSpot | null;
-
-export type EventApplicationAdditionalData = { [key: string]: unknown };
-
-export interface EventCustomOrganization {
-  application: EventApplication;
-  country: string;
-  createdAt: string;
-  id: number;
-  name: string;
-}
-
-export interface EventApplication {
-  additionalData: EventApplicationAdditionalData;
-  createdAt: string;
-  customOrganization: EventCustomOrganization;
-  event: Event;
-  id: string;
-  idNumber: string;
-  invoiceAddress: Address;
-  organization: Organization;
-  personalAddress: Address;
-  /**
-   * Spot, must be one of {@link event} spots
-   * @nullable
-   */
-  spotType: EventApplicationSpotType;
-  user: User;
-}
-
-export interface EventSpot {
-  event: Event;
-  id: number;
-  name: string;
-  price: number;
-}
-
 export interface Event {
   applications: EventApplication[];
   /** Event capacity */
@@ -435,8 +425,106 @@ Each event can have different "requirements"
   visible: boolean;
 }
 
+export type EventApplicationAdditionalData = { [key: string]: unknown };
+
+export type InvoiceCurrency = (typeof InvoiceCurrency)[keyof typeof InvoiceCurrency];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const InvoiceCurrency = {
+  CZK: "CZK",
+  EUR: "EUR",
+} as const;
+
+export interface PaymentSubject {
+  address: Address;
+  /** @nullable */
+  cin: string | null;
+  createdAt: string;
+  id: string;
+  name: string;
+  /** @nullable */
+  vatId: string | null;
+}
+
+export interface InvoiceItem {
+  amount: number;
+  id: number;
+  invoice: Invoice;
+  name: string;
+  price: number;
+}
+
+export interface Invoice {
+  constantSymbol: number;
+  createdAt: string;
+  currency: InvoiceCurrency;
+  iban: string;
+  id: string;
+  items: InvoiceItem[];
+  subscriber: PaymentSubject;
+  supplier: PaymentSubject;
+  swift: string;
+  variableSymbol: number;
+}
+
+export interface EventCustomOrganization {
+  application: EventApplication;
+  country: string;
+  createdAt: string;
+  id: number;
+  name: string;
+}
+
+export type EventSpotCurrency = (typeof EventSpotCurrency)[keyof typeof EventSpotCurrency];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const EventSpotCurrency = {
+  CZK: "CZK",
+  EUR: "EUR",
+} as const;
+
+export interface EventSpot {
+  currency: EventSpotCurrency;
+  event: Event;
+  id: number;
+  name: string;
+  price: number;
+}
+
+/**
+ * Spot, must be one of {@link event} spots
+ * @nullable
+ */
+export type EventApplicationSpotType = EventSpot | null;
+
+export interface EventApplication {
+  additionalData: EventApplicationAdditionalData;
+  createdAt: string;
+  customOrganization: EventCustomOrganization;
+  event: Event;
+  id: number;
+  idNumber: string;
+  invoice: Invoice;
+  invoiceAddress: Address;
+  organization: Organization;
+  personalAddress: Address;
+  /**
+   * Spot, must be one of {@link event} spots
+   * @nullable
+   */
+  spotType: EventApplicationSpotType;
+  user: User;
+}
+
 export interface DeleteOrganizationMembers {
   memberIds: number[];
+}
+
+export interface OrganizationMember {
+  createdAt: string;
+  id: string;
+  organization: Organization;
+  user: User;
 }
 
 export interface AddOrganizationMembers {
@@ -459,27 +547,10 @@ export interface CreateOrganization {
   name: string;
 }
 
-export interface Organization {
-  address: Address;
-  createdAt: string;
-  id: string;
-  /** @nullable */
-  manager: OrganizationManager;
-  name: string;
-}
-
-export interface OrganizationMember {
-  createdAt: string;
-  id: string;
-  organization: Organization;
-  user: User;
-}
-
-export interface OrganizationMemberWithoutUser {
-  createdAt: string;
-  id: string;
-  organization: Organization;
-}
+/**
+ * @nullable
+ */
+export type OrganizationManager = User | null;
 
 export interface UpdatePhoto {
   file: Blob;
@@ -529,6 +600,19 @@ export const UserGender = {
   "prefer-not-to-say": "prefer-not-to-say",
 } as const;
 
+export type RolePermissions = (typeof RolePermissions)[keyof typeof RolePermissions];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const RolePermissions = {
+  createevent: "create.event",
+} as const;
+
+export interface Role {
+  id: string;
+  name: string;
+  permissions: RolePermissions;
+}
+
 export interface Address {
   city: string;
   country: string;
@@ -537,6 +621,21 @@ export interface Address {
   id: number;
   street: string;
   zip: string;
+}
+
+export interface Organization {
+  address: Address;
+  createdAt: string;
+  id: string;
+  /** @nullable */
+  manager: OrganizationManager;
+  name: string;
+}
+
+export interface OrganizationMemberWithoutUser {
+  createdAt: string;
+  id: string;
+  organization: Organization;
 }
 
 export interface Photo {
@@ -554,14 +653,10 @@ export interface User {
   lastName: string;
   personalAddress: Address;
   photo: Photo;
+  role: Role;
   updatedAt: string;
   username: string;
 }
-
-/**
- * @nullable
- */
-export type OrganizationManager = User | null;
 
 /**
  * User gender
