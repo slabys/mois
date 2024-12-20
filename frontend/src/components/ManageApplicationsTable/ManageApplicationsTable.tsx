@@ -2,35 +2,69 @@
 
 import {
   useDeleteEventApplication,
+  useDeleteEventSpot,
   useGetEventApplications,
   useGetEventSpots,
   useUpdateEventApplication,
 } from "@/utils/api";
-import { EventApplication } from "@/utils/api.schemas";
+import { type EventApplicationDetailedWithApplications, type EventSpotSimple } from "@/utils/api.schemas";
 import CreateSpotModal from "@components/CreateSpotModal/CreateSpotModal";
 import UpdateEventApplicationModal from "@components/UpdateEventApplicationModal/UpdateEventApplicationModal";
-import { ActionIcon, Button, ComboboxData, Flex, Select, Table, Text, Title, Tooltip } from "@mantine/core";
+import UpdateSpotModal from "@components/UpdateSpotModal/UpdateSpotModal";
+import {
+  ActionIcon,
+  Box,
+  Button,
+  ComboboxData,
+  Flex,
+  List,
+  ListItem,
+  ScrollArea,
+  Select,
+  Table,
+  Text,
+  Title,
+  Tooltip,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconEdit, IconFileTypePdf, IconPlus, IconTrash } from "@tabler/icons-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 interface ManageApplicationsTableProps {
   eventId: number;
 }
 
 const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
-  const { data: eventApplications, refetch: refetchEventApplications } = useGetEventApplications(eventId);
-  const [currentApplication, setCurrentApplication] = useState<EventApplication | null>(null);
-  const [isSpotModalOpen, { open: openSpotModal, close: closeSpotModal }] = useDisclosure(false);
-  const [isEditModalOpen, { open: openEditModal, close: closeEditModal }] = useDisclosure(false);
+  const { data: eventSpotsList, refetch: refetchEventSpots } = useGetEventSpots(eventId);
+  const deleteEventSpotMutation = useDeleteEventSpot();
 
-  const { data: eventSpots } = useGetEventSpots(eventId);
+  const { data: applicationsList, refetch: refetchEventApplications } = useGetEventApplications(eventId);
 
-  const spots: ComboboxData =
-    eventSpots?.map((spot) => {
-      return { value: spot.id.toString(), label: spot.name };
-    }) ?? [];
+  const [currentSpot, setCurrentSpot] = useState<EventSpotSimple | null>(null);
+  const [currentApplication, setCurrentApplication] = useState<EventApplicationDetailedWithApplications | null>(null);
+
+  const [isCreateSpotModalOpen, { open: openCreateSpotModal, close: closeCreateSpotModal }] = useDisclosure(false);
+  const [isUpdateSpotModalOpen, { open: openUpdateSpotModal, close: closeUpdateSpotModal }] = useDisclosure(false);
+
+  const [isEditApplicationModalOpen, { open: openEditApplicationModal, close: closeEditApplicationModal }] =
+    useDisclosure(false);
+
+  const spots: ComboboxData = useMemo(() => {
+    return (
+      eventSpotsList?.map((spot) => {
+        return {
+          value: spot.id.toString(),
+          label: `${spot.name} - ${spot.price} CZK`,
+        };
+      }) ?? []
+    );
+  }, [eventSpotsList]);
+
+  const handleRefetchApplications = () => {
+    refetchEventSpots();
+    refetchEventApplications();
+  };
 
   const updateApplicationMutation = useUpdateEventApplication({
     mutation: {
@@ -53,7 +87,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
           autoClose: true,
         });
         refetchEventApplications();
-        closeSpotModal();
+        closeCreateSpotModal();
       },
       onError: (mutationError) => {
         if (!mutationError.response?.data) return;
@@ -140,6 +174,13 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     },
   });
 
+  const handleDeleteSpot = (spotId: number) => {
+    deleteEventSpotMutation.mutate({
+      id: spotId,
+      data: {},
+    });
+  };
+
   const handleDeleteApplication = (applicationId: number) => {
     deleteApplicationMutation.mutate({
       id: applicationId,
@@ -148,11 +189,15 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
 
   const generatePDF = () => {};
 
-  const rows = eventApplications?.map((application, index) => (
+  const eventApplicationsRows = applicationsList?.map((application, index) => (
     <Table.Tr key={`application-${index}-${application.id}`}>
       <Table.Td>{application.user.firstName + " " + application.user.lastName}</Table.Td>
-      <Table.Td>-</Table.Td>
-      <Table.Td>{application.organization?.address.country}</Table.Td>
+      <Table.Td>
+        {application.organization ? application.organization.name : application.customOrganization.name}
+      </Table.Td>
+      <Table.Td>
+        {application.organization ? application.organization.address.country : application.customOrganization.country}
+      </Table.Td>
       <Table.Td>
         <Select
           defaultValue={application.spotType?.id.toString()}
@@ -165,7 +210,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
           }}
         />
       </Table.Td>
-      <Table.Td>{application.spotType?.price}</Table.Td>
+      <Table.Td>{application.spotType?.price} CZK</Table.Td>
       <Table.Td>
         <Flex justify="space-evenly" gap={16}>
           <Tooltip label="Generate Invoice">
@@ -175,14 +220,13 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Edit Application">
-            {/*TODO - edit EA*/}
             <ActionIcon
               variant="subtle"
               color="blue"
               size={48}
               onClick={() => {
                 setCurrentApplication(application);
-                openEditModal();
+                openEditApplicationModal();
               }}
             >
               <IconEdit width={32} height={32} />
@@ -200,44 +244,107 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
 
   return (
     <>
-      <Flex justify="space-between" align="center" w="100%">
-        <Title>Manage Event Applications - {eventId}</Title>
-        <Button onClick={openSpotModal} leftSection={<IconPlus />}>
+      <Flex justify="space-between" align="center" w="100%" wrap="wrap">
+        <Title>Manage Event Applications</Title>
+        <Button onClick={openCreateSpotModal} leftSection={<IconPlus />}>
           Add Spot
         </Button>
-        <CreateSpotModal eventId={eventId} isOpened={isSpotModalOpen} closeModal={closeSpotModal} />
       </Flex>
-      {rows && rows?.length > 0 ? (
-        <Table
-          withTableBorder
-          withColumnBorders
-          withRowBorders
-          striped
-          highlightOnHover={true}
-          style={{ textAlign: "center" }}
-        >
-          <Table.Thead>
-            <Table.Tr>
-              <Table.Th>First and Last Name</Table.Th>
-              <Table.Th>Section</Table.Th>
-              <Table.Th>Country</Table.Th>
-              <Table.Th>Spot type</Table.Th>
-              <Table.Th>Price</Table.Th>
-              <Table.Th w={200}>Operations</Table.Th>
-            </Table.Tr>
-          </Table.Thead>
-          <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
+      {eventApplicationsRows && eventApplicationsRows?.length > 0 ? (
+        <List w="100%">
+          {eventSpotsList?.map((spot, index) => (
+            <ListItem key={`event-spot-${index}-${spot.id}`}>
+              <Flex direction="row" justify={{ base: "space-between", sm: "start" }} gap={8}>
+                <Box w={172}>
+                  <Text style={{ wordWrap: "break-word" }}>
+                    {spot.name} - {spot.price} CZK
+                  </Text>
+                </Box>
+                <Flex direction="row" gap={8}>
+                  <Tooltip label="Edit Spot">
+                    <ActionIcon
+                      variant="subtle"
+                      color="blue"
+                      size={32}
+                      onClick={() => {
+                        setCurrentSpot(spot);
+                        openUpdateSpotModal();
+                      }}
+                    >
+                      <IconEdit width={24} height={24} />
+                    </ActionIcon>
+                  </Tooltip>
+                  <Tooltip label="Delete Spot">
+                    <ActionIcon
+                      variant="subtle"
+                      size={32}
+                      color="red"
+                      onClick={() => {
+                        handleDeleteSpot(spot.id);
+                      }}
+                    >
+                      <IconTrash width={24} height={24} />
+                    </ActionIcon>
+                  </Tooltip>
+                </Flex>
+              </Flex>
+            </ListItem>
+          ))}
+        </List>
       ) : (
         <Text>No applications found.</Text>
       )}
+
+      <ScrollArea w="100%">
+        {eventApplicationsRows && eventApplicationsRows?.length > 0 ? (
+          <Table
+            withTableBorder
+            withColumnBorders
+            withRowBorders
+            striped
+            highlightOnHover={true}
+            style={{ textAlign: "center" }}
+          >
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th miw={148}>First and Last Name</Table.Th>
+                <Table.Th miw={148}>Section</Table.Th>
+                <Table.Th miw={148}>Country</Table.Th>
+                <Table.Th miw={224}>Spot type</Table.Th>
+                <Table.Th miw={148}>Price</Table.Th>
+                <Table.Th miw={148} w={200}>
+                  Operations
+                </Table.Th>
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>{eventApplicationsRows}</Table.Tbody>
+          </Table>
+        ) : (
+          <Text>No applications found.</Text>
+        )}
+      </ScrollArea>
       {currentApplication ? (
         <UpdateEventApplicationModal
           currentApplication={currentApplication}
-          isOpened={isEditModalOpen}
-          closeModal={closeEditModal}
+          isOpened={isEditApplicationModalOpen}
+          handleSuccess={handleRefetchApplications}
+          closeModal={closeEditApplicationModal}
         />
       ) : null}
+      <CreateSpotModal
+        eventId={eventId}
+        isOpened={isCreateSpotModalOpen}
+        handleSuccess={handleRefetchApplications}
+        closeModal={closeCreateSpotModal}
+      />
+      {currentSpot && (
+        <UpdateSpotModal
+          currentSpot={currentSpot}
+          isOpened={isUpdateSpotModalOpen}
+          handleSuccess={handleRefetchApplications}
+          closeModal={closeUpdateSpotModal}
+        />
+      )}
     </>
   );
 };

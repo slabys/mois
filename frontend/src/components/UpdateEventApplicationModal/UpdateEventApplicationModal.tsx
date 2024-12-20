@@ -1,17 +1,23 @@
 import { useUpdateEventApplication } from "@/utils/api";
-import { CreateAddress, EventApplication, UpdateEventApplication } from "@/utils/api.schemas";
+import { CreateAddress, EventApplicationDetailedWithApplications, UpdateEventApplication } from "@/utils/api.schemas";
 import { Button, Flex, Group, Modal, Text, TextInput } from "@mantine/core";
 import { Form, isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import React from "react";
 
 interface UpdateEventModalProps {
-  currentApplication: EventApplication;
+  currentApplication: EventApplicationDetailedWithApplications;
   isOpened: boolean;
   closeModal: () => void;
+  handleSuccess?: () => void;
 }
 
-const UpdateEventApplicationModal = ({ currentApplication, isOpened, closeModal }: UpdateEventModalProps) => {
+const UpdateEventApplicationModal = ({
+  currentApplication,
+  isOpened,
+  closeModal,
+  handleSuccess = () => {},
+}: UpdateEventModalProps) => {
   const form = useForm<Partial<UpdateEventApplication>>({
     initialValues: {
       invoiceAddress: {
@@ -56,6 +62,7 @@ const UpdateEventApplicationModal = ({ currentApplication, isOpened, closeModal 
           loading: false,
           autoClose: true,
         });
+        handleSuccess();
         closeModal();
       },
       onError: (mutationError) => {

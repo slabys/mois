@@ -39,8 +39,8 @@ const EventDetail = ({ id }: EventDetailProps) => {
   const { data: userData, refetch: refetchCurrentUser } = useGetCurrentUser();
 
   const isUserRegistered = useMemo(() => {
-    return eventApplications?.some((f) => f.event.id === id);
-  }, [eventApplications, id]);
+    return eventApplications?.some((f) => f.user.id === userData?.id);
+  }, [eventApplications, id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleRefetchDetail = () => {
     refetchEventApplications();
@@ -67,7 +67,8 @@ const EventDetail = ({ id }: EventDetailProps) => {
                 <IconUsersGroup />
                 <Text size="sm">
                   <Text c="dimmed" span>
-                    {eventDetail.applications} / {eventDetail.capacity}
+                    {/* TODO - FIXME fix type */}
+                    {"applications" in eventDetail ? `${eventDetail.applications} / ${eventDetail.capacity}` : null}
                   </Text>
                 </Text>
               </Flex>

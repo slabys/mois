@@ -32,7 +32,7 @@ import type {
   CreateUser,
   DeleteEventSpot,
   DeleteOrganizationMembers,
-  EventApplicationInvoice,
+  EventApplicationDetailedWithApplications,
   EventApplicationSimpleWithApplications,
   EventDetail,
   EventSimple,
@@ -1067,7 +1067,7 @@ export const getUserApplications = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<EventApplicationSimpleWithApplications>(
+  return customInstance<EventApplicationDetailedWithApplications[]>(
     { url: `/events/applications`, method: "GET", params, signal },
     options,
   );
@@ -1164,7 +1164,7 @@ export const getEventApplications = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<EventApplicationSimpleWithApplications>(
+  return customInstance<EventApplicationDetailedWithApplications[]>(
     { url: `/events/${eventId}/applications`, method: "GET", signal },
     options,
   );
@@ -1435,10 +1435,7 @@ export const getEventApplicationInvoice = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<EventApplicationInvoice>(
-    { url: `/events/application/${id}/invoice`, method: "GET", signal },
-    options,
-  );
+  return customInstance<void>({ url: `/events/application/${id}/invoice`, method: "GET", signal }, options);
 };
 
 export const getGetEventApplicationInvoiceQueryKey = (id: number) => {

@@ -25,13 +25,16 @@ const JoinEventModal = ({ userData, eventId, isOpened, closeModal, handleSuccess
       },
       additionalFormData: {},
       spotTypeId: null,
-      invoiceAddress: {
-        country: userData?.personalAddress.country ?? "",
-        city: userData?.personalAddress.city ?? "",
-        street: userData?.personalAddress.street ?? "",
-        houseNumber: userData?.personalAddress.houseNumber ?? "",
-        zip: userData?.personalAddress.zip ?? "",
-      },
+      invoiceAddress:
+        userData.personalAddress !== null
+          ? {
+              country: userData?.personalAddress.country ?? "",
+              city: userData?.personalAddress.city ?? "",
+              street: userData?.personalAddress.street ?? "",
+              houseNumber: userData?.personalAddress.houseNumber ?? "",
+              zip: userData?.personalAddress.zip ?? "",
+            }
+          : undefined,
       idNumber: "",
     },
     validate: {

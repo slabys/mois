@@ -54,16 +54,10 @@ const RichTextEditor = ({ label, value, onChange, error, letterLimit }: RichText
     content: parsedContent,
 
     onUpdate: ({ editor }) => {
-      console.log(editor.storage.characterCount.characters());
       if (onChange) onChange(JSON.stringify(editor.getJSON()));
     },
   });
 
-  const percentage =
-    editor && letterLimit ? Math.round((100 / letterLimit) * editor.storage.characterCount.characters()) : 0;
-
-  console.log(percentage);
-  console.log(editor.storage.characterCount.characters().toString());
   return (
     <Input.Wrapper label={label} error={error}>
       <TipTapEditor editor={editor}>

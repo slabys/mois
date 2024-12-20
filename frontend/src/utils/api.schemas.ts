@@ -167,7 +167,16 @@ export interface CreateEventSpot {
   price: number;
 }
 
+export type EventSpotSimpleCurrency = (typeof EventSpotSimpleCurrency)[keyof typeof EventSpotSimpleCurrency];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const EventSpotSimpleCurrency = {
+  CZK: "CZK",
+  EUR: "EUR",
+} as const;
+
 export interface EventSpotSimple {
+  currency: EventSpotSimpleCurrency;
   id: number;
   name: string;
   price: number;
@@ -202,6 +211,8 @@ export interface UpdateEvent {
 export type EventSimplePhoto = Photo | null;
 
 export interface EventSimple {
+  /** Event capacity */
+  capacity: number;
   codeOfConductLink: string;
   createdByUser: User;
   id: number;
@@ -296,52 +307,33 @@ Each event can have different "requirements"
   visible: boolean;
 }
 
-export type InvoiceCurrency = (typeof InvoiceCurrency)[keyof typeof InvoiceCurrency];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const InvoiceCurrency = {
-  CZK: "CZK",
-  EUR: "EUR",
-} as const;
-
-export interface PaymentSubject {
-  address: Address;
-  /** @nullable */
-  cin: string | null;
-  createdAt: string;
-  id: string;
-  name: string;
-  /** @nullable */
-  vatId: string | null;
-}
-
-export interface Invoice {
-  constantSymbol: number;
-  createdAt: string;
-  currency: InvoiceCurrency;
-  iban: string;
-  id: string;
-  items: InvoiceItem[];
-  subscriber: PaymentSubject;
-  supplier: PaymentSubject;
-  swift: string;
-  variableSymbol: number;
-}
-
-export interface EventApplicationInvoice {
-  invoice: Invoice;
-  url: string;
-}
-
-export interface InvoiceItem {
-  amount: number;
-  id: number;
-  invoice: Invoice;
-  name: string;
-  price: number;
-}
-
 export type UpdateEventApplicationAdditionalFormData = { [key: string]: unknown };
+
+export interface UpdateEventApplication {
+  additionalFormData?: UpdateEventApplicationAdditionalFormData;
+  idNumber?: string;
+  invoiceAddress?: CreateAddress;
+  /** @nullable */
+  spotTypeId?: number | null;
+}
+
+/**
+ * @nullable
+ */
+export type EventApplicationSimpleWithApplicationsSpotType = SpotTypeSimple | null;
+
+export interface EventApplicationSimpleWithApplications {
+  createdAt: string;
+  event: EventSimpleWithApplications;
+  id: number;
+  /** @nullable */
+  spotType: EventApplicationSimpleWithApplicationsSpotType;
+  user: User;
+}
+
+export type CreateEventApplicationOrganization =
+  | CreateEventApplicationExistingOrganization
+  | CreateEventApplicationCustomOrganization;
 
 export type CreateEventApplicationAdditionalFormData = { [key: string]: unknown };
 
@@ -382,9 +374,37 @@ export interface CreateEventApplicationExistingOrganization {
   type: CreateEventApplicationExistingOrganizationType;
 }
 
-export type CreateEventApplicationOrganization =
-  | CreateEventApplicationExistingOrganization
-  | CreateEventApplicationCustomOrganization;
+/**
+ * @nullable
+ */
+export type EventApplicationDetailedWithApplicationsSpotType = SpotTypeSimple | null;
+
+export type EventApplicationDetailedWithApplicationsAdditionalData = { [key: string]: unknown };
+
+/**
+ * @nullable
+ */
+export type EventSimpleWithApplicationsPhoto = Photo | null;
+
+export interface EventSimpleWithApplications {
+  applications: number;
+  /** Event capacity */
+  capacity: number;
+  codeOfConductLink: string;
+  createdByUser: User;
+  id: number;
+  /** @nullable */
+  photo: EventSimpleWithApplicationsPhoto;
+  photoPolicyLink: string;
+  registrationDeadline: string;
+  shortDescription: string;
+  since: string;
+  /** Links */
+  termsAndConditionsLink: string;
+  title: string;
+  until: string;
+  visible: boolean;
+}
 
 export type SpotTypeSimpleCurrency = (typeof SpotTypeSimpleCurrency)[keyof typeof SpotTypeSimpleCurrency];
 
@@ -402,21 +422,124 @@ export interface SpotTypeSimple {
 }
 
 /**
+ * Spot, must be one of {@link event} spots
  * @nullable
  */
-export type EventSimpleWithApplicationsPhoto = Photo | null;
+export type EventApplicationSpotType = EventSpot | null;
 
-export interface EventSimpleWithApplications {
-  applications: number;
-  codeOfConductLink: string;
-  createdByUser: User;
+export type EventApplicationAdditionalData = { [key: string]: unknown };
+
+export interface EventApplication {
+  additionalData: EventApplicationAdditionalData;
+  createdAt: string;
+  customOrganization: EventCustomOrganization;
+  event: Event;
   id: number;
+  idNumber: string;
+  invoice: Invoice;
+  invoiceAddress: Address;
+  organization: Organization;
+  personalAddress: Address;
+  /**
+   * Spot, must be one of {@link event} spots
+   * @nullable
+   */
+  spotType: EventApplicationSpotType;
+  user: User;
+}
+
+export interface EventCustomOrganization {
+  application: EventApplication;
+  country: string;
+  createdAt: string;
+  id: number;
+  name: string;
+}
+
+export type InvoiceCurrency = (typeof InvoiceCurrency)[keyof typeof InvoiceCurrency];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const InvoiceCurrency = {
+  CZK: "CZK",
+  EUR: "EUR",
+} as const;
+
+export interface PaymentSubject {
+  address: Address;
   /** @nullable */
-  photo: EventSimpleWithApplicationsPhoto;
+  cin: string | null;
+  createdAt: string;
+  id: string;
+  name: string;
+  /** @nullable */
+  vatId: string | null;
+}
+
+export interface InvoiceItem {
+  amount: number;
+  id: number;
+  invoice: Invoice;
+  name: string;
+  price: number;
+}
+
+export interface Invoice {
+  constantSymbol: number;
+  createdAt: string;
+  currency: InvoiceCurrency;
+  iban: string;
+  id: string;
+  items: InvoiceItem[];
+  subscriber: PaymentSubject;
+  supplier: PaymentSubject;
+  swift: string;
+  variableSymbol: number;
+}
+
+/**
+ * Additional registration form
+Each event can have different "requirements"
+ * @nullable
+ */
+export type EventRegistrationForm = { [key: string]: unknown } | null;
+
+/**
+ * @nullable
+ */
+export type EventPhoto = Photo | null;
+
+export interface EventLink {
+  event: Event;
+  id: number;
+  link: string;
+  name: string;
+}
+
+export interface Event {
+  applications: EventApplication[];
+  /** Event capacity */
+  capacity: number;
+  codeOfConductLink: string;
+  createdAt: string;
+  createdByUser: User;
+  /** If true, generate invoices after {@link registrationDeadline} */
+  generateInvoices: boolean;
+  id: number;
+  links: EventLink[];
+  longDescription: string;
+  /** @nullable */
+  photo: EventPhoto;
   photoPolicyLink: string;
   registrationDeadline: string;
+  /**
+   * Additional registration form
+Each event can have different "requirements"
+   * @nullable
+   */
+  registrationForm: EventRegistrationForm;
   shortDescription: string;
   since: string;
+  spotTypes: EventSpot[];
   /** Links */
   termsAndConditionsLink: string;
   title: string;
@@ -424,12 +547,20 @@ export interface EventSimpleWithApplications {
   visible: boolean;
 }
 
-export interface EventApplicationSimpleWithApplications {
-  createdAt: string;
-  event: EventSimpleWithApplications;
+export type EventSpotCurrency = (typeof EventSpotCurrency)[keyof typeof EventSpotCurrency];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const EventSpotCurrency = {
+  CZK: "CZK",
+  EUR: "EUR",
+} as const;
+
+export interface EventSpot {
+  currency: EventSpotCurrency;
+  event: Event;
   id: number;
-  spotType: SpotTypeSimple;
-  user: User;
+  name: string;
+  price: number;
 }
 
 export interface DeleteOrganizationMembers {
@@ -574,6 +705,20 @@ export interface User {
   username: string;
 }
 
+export interface EventApplicationDetailedWithApplications {
+  additionalData: EventApplicationDetailedWithApplicationsAdditionalData;
+  createdAt: string;
+  customOrganization: EventCustomOrganization;
+  event: EventSimpleWithApplications;
+  id: number;
+  idNumber: string;
+  invoiceAddress: Address;
+  organization: Organization;
+  /** @nullable */
+  spotType: EventApplicationDetailedWithApplicationsSpotType;
+  user: User;
+}
+
 /**
  * User gender
  */
@@ -597,14 +742,6 @@ export interface CreateAddress {
   houseNumber: string;
   street: string;
   zip: string;
-}
-
-export interface UpdateEventApplication {
-  additionalFormData?: UpdateEventApplicationAdditionalFormData;
-  idNumber?: string;
-  invoiceAddress?: CreateAddress;
-  /** @nullable */
-  spotTypeId?: number | null;
 }
 
 export interface CreateUser {

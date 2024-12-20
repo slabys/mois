@@ -98,7 +98,7 @@ const ManageEventsPage = () => {
           </Tooltip>
           <Tooltip label="Delete Event">
             {/*TODO - Delete EP*/}
-            <ActionIcon variant="subtle" size={48} color="red">
+            <ActionIcon variant="subtle" size={48} color="red" disabled>
               <IconTrash width={32} height={32} />
             </ActionIcon>
           </Tooltip>

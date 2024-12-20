@@ -1,34 +1,34 @@
-import { useCreateEventSpot } from "@/utils/api";
-import { CreateEventSpot } from "@/utils/api.schemas";
+import { useUpdateEventSpot } from "@/utils/api";
+import { EventSpotSimple, UpdateEventSpot } from "@/utils/api.schemas";
 import { Button, Flex, Group, Modal, NumberInput, SimpleGrid, TextInput } from "@mantine/core";
 import { Form, hasLength, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import React from "react";
 
-interface CreateSpotModalProps {
+interface UpdateSpotModalProps {
+  currentSpot: EventSpotSimple;
   isOpened: boolean;
   closeModal: () => void;
-  eventId: number;
   handleSuccess: () => void;
 }
 
-const CreateSpotModal = ({ isOpened, closeModal, eventId, handleSuccess = () => {} }: CreateSpotModalProps) => {
-  const createSpotMutation = useCreateEventSpot({
+const UpdateSpotModal = ({ currentSpot, isOpened, closeModal, handleSuccess = () => {} }: UpdateSpotModalProps) => {
+  const updateSpotMutation = useUpdateEventSpot({
     mutation: {
       onMutate: () => {
         notifications.show({
-          id: "create-spot",
+          id: "update-spot",
           loading: true,
           title: "Loading! Please wait...",
-          message: "We are creating spot.",
+          message: "We are updation spot information.",
           autoClose: false,
         });
       },
       onSuccess: () => {
         notifications.update({
-          id: "create-spot",
+          id: "update-spot",
           title: "Spot Edit",
-          message: "Spot created successfully.",
+          message: "Spot updated successfully.",
           color: "green",
           loading: false,
           autoClose: true,
@@ -38,7 +38,7 @@ const CreateSpotModal = ({ isOpened, closeModal, eventId, handleSuccess = () => 
       },
       onError: (error) => {
         notifications.update({
-          id: "create-spot",
+          id: "update-spot",
           title: "Something went wrong.",
           message: "Please check all information first. Then try again.",
           color: "red",
@@ -58,10 +58,10 @@ const CreateSpotModal = ({ isOpened, closeModal, eventId, handleSuccess = () => 
     },
   });
 
-  const form = useForm<Partial<CreateEventSpot>>({
+  const form = useForm<Partial<EventSpotSimple>>({
     initialValues: {
-      name: "",
-      price: 0,
+      name: currentSpot.name,
+      price: currentSpot.price,
     },
     validate: {
       name: hasLength({ min: 6 }, "Must be at least 6 characters."),
@@ -69,12 +69,12 @@ const CreateSpotModal = ({ isOpened, closeModal, eventId, handleSuccess = () => 
     },
   });
 
-  const handleCreateSpot = (submitValues: Partial<CreateEventSpot>) => {
+  const handleUpdateSpot = (submitValues: Partial<UpdateEventSpot>) => {
     form.validate();
     if (form.isValid()) {
-      createSpotMutation.mutate({
-        id: eventId,
-        data: submitValues as CreateEventSpot,
+      updateSpotMutation.mutate({
+        id: currentSpot.id,
+        data: submitValues as UpdateEventSpot,
       });
     }
   };
@@ -83,7 +83,7 @@ const CreateSpotModal = ({ isOpened, closeModal, eventId, handleSuccess = () => 
 
   return (
     <Modal size="lg" opened={isOpened} onClose={closeModal} title="Add Spot type">
-      <Form form={form} onSubmit={handleCreateSpot}>
+      <Form form={form} onSubmit={handleUpdateSpot}>
         <Flex direction="column" gap={16}>
           <SimpleGrid cols={2}>
             <TextInput label="Spot Name" {...form.getInputProps("name")}></TextInput>
@@ -91,12 +91,13 @@ const CreateSpotModal = ({ isOpened, closeModal, eventId, handleSuccess = () => 
           </SimpleGrid>
         </Flex>
         <Group justify="center" mt="lg">
-          <Button type="submit" disabled={!isTouchedDirty} loading={createSpotMutation.isPending}>
-            Create Spot
+          <Button type="submit" disabled={!isTouchedDirty} loading={updateSpotMutation.isPending}>
+            Update Spot
           </Button>
         </Group>
       </Form>
     </Modal>
   );
 };
-export default CreateSpotModal;
+
+export default UpdateSpotModal;

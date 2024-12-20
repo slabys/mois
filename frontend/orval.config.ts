@@ -14,6 +14,7 @@ export default defineConfig({
       },
     },
     input: {
+      // target: "http://localhost:4000/docs-json",
       target: "https://api.slabys.cz/docs-json",
     },
     hooks: {
