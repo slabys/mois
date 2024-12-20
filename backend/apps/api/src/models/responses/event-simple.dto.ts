@@ -14,4 +14,6 @@ export class EventSimple extends PickType(Event, [
   "termsAndConditionsLink",
   "photoPolicyLink",
   "codeOfConductLink",
-]) {}
+]) {
+  applications: number;
+}
