@@ -9,10 +9,10 @@ interface MyModalProps {
   eventId: number;
   isOpened: boolean;
   closeModal: () => void;
-  onSuccessUpdate: () => void;
+  handleSuccess: () => void;
 }
 
-const UpdateEventPhotoModal: React.FC<MyModalProps> = ({ eventId, onSuccessUpdate, isOpened, closeModal }) => {
+const UpdateEventPhotoModal: React.FC<MyModalProps> = ({ eventId, isOpened, closeModal, handleSuccess = () => {} }) => {
   const [file, setFile] = useState<FileWithPath | null>(null);
 
   const uploadEventPhoto = useUpdateEventPhoto({
@@ -35,7 +35,7 @@ const UpdateEventPhotoModal: React.FC<MyModalProps> = ({ eventId, onSuccessUpdat
           loading: false,
           autoClose: true,
         });
-        onSuccessUpdate();
+        handleSuccess();
         setFile(null);
         closeModal();
       },

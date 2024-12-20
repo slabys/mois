@@ -10,10 +10,10 @@ interface JoinEventModalProps {
   userData: User;
   isOpened: boolean;
   closeModal: () => void;
-  onSuccess: () => void;
+  handleSuccess?: () => void;
 }
 
-const JoinEventModal = ({ userData, eventId, onSuccess, isOpened, closeModal }: JoinEventModalProps) => {
+const JoinEventModal = ({ userData, eventId, isOpened, closeModal, handleSuccess = () => {} }: JoinEventModalProps) => {
   const { data: eventSpots } = useGetEventSpots(eventId);
 
   const form = useForm<Partial<CreateEventApplication>>({
@@ -62,7 +62,7 @@ const JoinEventModal = ({ userData, eventId, onSuccess, isOpened, closeModal }: 
           autoClose: false,
         });
       },
-      onSuccess: (data) => {
+      onSuccess: () => {
         notifications.update({
           id: "create-user-application",
           title: "Event Edit",
@@ -71,7 +71,7 @@ const JoinEventModal = ({ userData, eventId, onSuccess, isOpened, closeModal }: 
           loading: false,
           autoClose: true,
         });
-        onSuccess();
+        handleSuccess();
         form.reset();
         closeModal();
       },
@@ -84,9 +84,7 @@ const JoinEventModal = ({ userData, eventId, onSuccess, isOpened, closeModal }: 
           loading: false,
           autoClose: true,
         });
-        // @ts-ignore - message
         if (error.response?.data && error.response.data.message) {
-          // @ts-ignore - message
           (error.response.data.message as string[]).forEach((err) => {
             notifications.show({
               title: "Error",

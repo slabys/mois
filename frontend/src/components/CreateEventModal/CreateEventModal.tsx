@@ -52,9 +52,7 @@ const CreateEventModal: React.FC<MyModalProps> = ({ onCreateSuccess, isOpened, c
           loading: false,
           autoClose: true,
         });
-        // @ts-ignore - message
         if (error.response?.data && error.response.data.message) {
-          // @ts-ignore - message
           (error.response.data.message as string[]).forEach((err) => {
             notifications.show({
               title: "Error",
@@ -153,7 +151,7 @@ const CreateEventModal: React.FC<MyModalProps> = ({ onCreateSuccess, isOpened, c
               error={form.errors.until}
             />
           </SimpleGrid>
-          <RichTextEditor label="Short Description" {...form.getInputProps("shortDescription")} />
+          <RichTextEditor label="Short Description" {...form.getInputProps("shortDescription")} letterLimit={300} />
           <RichTextEditor label="Long Description" {...form.getInputProps("longDescription")} />
           <TextInput label="Terms and Conditions Link" {...form.getInputProps("termsAndConditionsLink")} />
           <TextInput label="Code of Conduct Link" {...form.getInputProps("codeOfConductLink")} />

@@ -32,11 +32,11 @@ import type {
   CreateUser,
   DeleteEventSpot,
   DeleteOrganizationMembers,
-  EventApplication,
   EventApplicationInvoice,
-  EventApplicationSimple,
+  EventApplicationSimpleWithApplications,
   EventDetail,
   EventSimple,
+  EventSimpleWithApplications,
   EventSpotSimple,
   GetEventSpotsParams,
   GetEventsParams,
@@ -54,7 +54,6 @@ import type {
   Role,
   UpdateEvent,
   UpdateEventApplication,
-  UpdateEventApplication200,
   UpdateEventSpot,
   UpdateOrganization,
   UpdateOrganization201,
@@ -1068,7 +1067,10 @@ export const getUserApplications = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<EventApplication[]>({ url: `/events/applications`, method: "GET", params, signal }, options);
+  return customInstance<EventApplicationSimpleWithApplications>(
+    { url: `/events/applications`, method: "GET", params, signal },
+    options,
+  );
 };
 
 export const getGetUserApplicationsQueryKey = (params?: GetUserApplicationsParams) => {
@@ -1162,7 +1164,10 @@ export const getEventApplications = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<EventApplication[]>({ url: `/events/${eventId}/applications`, method: "GET", signal }, options);
+  return customInstance<EventApplicationSimpleWithApplications>(
+    { url: `/events/${eventId}/applications`, method: "GET", signal },
+    options,
+  );
 };
 
 export const getGetEventApplicationsQueryKey = (eventId: number) => {
@@ -1257,7 +1262,7 @@ export const createUserApplication = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<EventApplicationSimple>(
+  return customInstance<EventApplicationSimpleWithApplications>(
     {
       url: `/events/${eventId}/applications`,
       method: "POST",
@@ -1328,7 +1333,7 @@ export const updateEventApplication = (
   updateEventApplication: BodyType<UpdateEventApplication>,
   options?: SecondParameter<typeof customInstance>,
 ) => {
-  return customInstance<UpdateEventApplication200 | EventApplicationSimple>(
+  return customInstance<EventApplicationSimpleWithApplications>(
     {
       url: `/events/application/${id}`,
       method: "PATCH",
@@ -1534,7 +1539,7 @@ export const getUserApplicationForEvent = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<EventApplication>(
+  return customInstance<EventApplicationSimpleWithApplications>(
     { url: `/events/${eventId}/applications/user/${userId}`, method: "GET", signal },
     options,
   );
@@ -1652,7 +1657,7 @@ export const getEvents = (
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
-  return customInstance<EventSimple[]>({ url: `/events`, method: "GET", params, signal }, options);
+  return customInstance<EventSimpleWithApplications[]>({ url: `/events`, method: "GET", params, signal }, options);
 };
 
 export const getGetEventsQueryKey = (params?: GetEventsParams) => {
@@ -1963,7 +1968,7 @@ export const updateEventPhoto = (
   const formData = new FormData();
   formData.append("file", updatePhoto.file);
 
-  return customInstance<void>(
+  return customInstance<EventSimpleWithApplications>(
     {
       url: `/events/${eventId}/photo`,
       method: "PATCH",

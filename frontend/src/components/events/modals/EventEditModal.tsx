@@ -14,10 +14,10 @@ interface EventEditModalProps {
   eventDetail: EventDetail;
   isOpened: boolean;
   close: () => void;
-  onSuccess: () => void;
+  handleSuccess?: () => void;
 }
 
-const EventEditModal = ({ eventDetail, isOpened, close, onSuccess }: EventEditModalProps) => {
+const EventEditModal = ({ eventDetail, isOpened, close, handleSuccess = () => {} }: EventEditModalProps) => {
   const form = useForm<Partial<EventDetail>>({
     initialValues: {
       title: eventDetail.title,
@@ -61,7 +61,7 @@ const EventEditModal = ({ eventDetail, isOpened, close, onSuccess }: EventEditMo
         });
         form.setInitialValues(data);
         form.reset();
-        onSuccess();
+        handleSuccess();
         close();
       },
       onError: (error) => {
@@ -73,9 +73,7 @@ const EventEditModal = ({ eventDetail, isOpened, close, onSuccess }: EventEditMo
           loading: false,
           autoClose: true,
         });
-        // @ts-ignore - message
         if (error.response?.data && error.response.data.message) {
-          // @ts-ignore - message
           (error.response.data.message as string[]).forEach((err) => {
             notifications.show({
               title: "Error",

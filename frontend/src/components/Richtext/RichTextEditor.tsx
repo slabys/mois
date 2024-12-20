@@ -1,7 +1,8 @@
 "use client";
 
-import { Input } from "@mantine/core";
+import { Input, Text } from "@mantine/core";
 import { Link as RichTextLink, RichTextEditor as TipTapEditor } from "@mantine/tiptap";
+import { CharacterCount } from "@tiptap/extension-character-count";
 import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
 import SubScript from "@tiptap/extension-subscript";
@@ -18,12 +19,16 @@ interface RichTextEditorProps {
   value?: string;
   onChange?: (value: string) => void;
   error?: any;
+  letterLimit?: number;
 }
 
-const RichTextEditor = ({ label, value, onChange, error }: RichTextEditorProps) => {
+const RichTextEditor = ({ label, value, onChange, error, letterLimit }: RichTextEditorProps) => {
   const parsedContent = useMemo(() => {
     try {
-      return JSON.parse(value ?? "") as JSONContent;
+      if (value && value?.length > 0) {
+        return JSON.parse(value) as JSONContent;
+      }
+      return null;
     } catch (e) {
       console.error(e);
       return null;
@@ -42,14 +47,23 @@ const RichTextEditor = ({ label, value, onChange, error }: RichTextEditorProps) 
       TextStyle,
       Color,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
+      CharacterCount.configure({
+        limit: letterLimit,
+      }),
     ],
     content: parsedContent,
 
     onUpdate: ({ editor }) => {
+      console.log(editor.storage.characterCount.characters());
       if (onChange) onChange(JSON.stringify(editor.getJSON()));
     },
   });
 
+  const percentage =
+    editor && letterLimit ? Math.round((100 / letterLimit) * editor.storage.characterCount.characters()) : 0;
+
+  console.log(percentage);
+  console.log(editor.storage.characterCount.characters().toString());
   return (
     <Input.Wrapper label={label} error={error}>
       <TipTapEditor editor={editor}>
@@ -61,11 +75,9 @@ const RichTextEditor = ({ label, value, onChange, error }: RichTextEditorProps) 
             <TipTapEditor.Strikethrough />
             <TipTapEditor.Highlight />
           </TipTapEditor.ControlsGroup>
-
           <TipTapEditor.ControlsGroup>
             <TipTapEditor.ClearFormatting />
           </TipTapEditor.ControlsGroup>
-
           <TipTapEditor.ControlsGroup>
             <TipTapEditor.H1 />
             <TipTapEditor.H2 />
@@ -74,7 +86,6 @@ const RichTextEditor = ({ label, value, onChange, error }: RichTextEditorProps) 
             <TipTapEditor.H5 />
             <TipTapEditor.H6 />
           </TipTapEditor.ControlsGroup>
-
           <TipTapEditor.ControlsGroup>
             <TipTapEditor.Blockquote />
             <TipTapEditor.Hr />
@@ -83,19 +94,16 @@ const RichTextEditor = ({ label, value, onChange, error }: RichTextEditorProps) 
             <TipTapEditor.Subscript />
             <TipTapEditor.Superscript />
           </TipTapEditor.ControlsGroup>
-
           <TipTapEditor.ControlsGroup>
             <TipTapEditor.Link />
             <TipTapEditor.Unlink />
           </TipTapEditor.ControlsGroup>
-
           <TipTapEditor.ControlsGroup>
             <TipTapEditor.AlignLeft />
             <TipTapEditor.AlignCenter />
             <TipTapEditor.AlignRight />
             <TipTapEditor.AlignJustify />
           </TipTapEditor.ControlsGroup>
-
           <TipTapEditor.ControlsGroup>
             <TipTapEditor.ColorPicker
               colors={[
@@ -121,9 +129,13 @@ const RichTextEditor = ({ label, value, onChange, error }: RichTextEditorProps) 
             <TipTapEditor.Redo />
           </TipTapEditor.ControlsGroup>
         </TipTapEditor.Toolbar>
-
         <TipTapEditor.Content />
       </TipTapEditor>
+      {letterLimit && (
+        <Text c={editor.getText().length >= letterLimit ? "red" : "black"}>
+          {letterLimit && `${editor.getText().length} / ${letterLimit} characters`}
+        </Text>
+      )}
     </Input.Wrapper>
   );
 };

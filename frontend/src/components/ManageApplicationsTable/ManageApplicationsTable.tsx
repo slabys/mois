@@ -140,9 +140,9 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     },
   });
 
-  const handleDeleteApplication = (applicationId: string) => {
+  const handleDeleteApplication = (applicationId: number) => {
     deleteApplicationMutation.mutate({
-      id: Number.parseInt(applicationId),
+      id: applicationId,
     });
   };
 
@@ -189,13 +189,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Delete Application">
-            {/*TODO - Delete EA*/}
-            <ActionIcon
-              variant="subtle"
-              size={48}
-              color="red"
-              onClick={() => handleDeleteApplication(application.id.toString())}
-            >
+            <ActionIcon variant="subtle" size={48} color="red" onClick={() => handleDeleteApplication(application.id)}>
               <IconTrash width={32} height={32} />
             </ActionIcon>
           </Tooltip>

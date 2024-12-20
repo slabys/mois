@@ -1,5 +1,5 @@
 import { useCreateEventSpot } from "@/utils/api";
-import { CreateEvent, CreateEventSpot, EventDetail } from "@/utils/api.schemas";
+import { CreateEventSpot } from "@/utils/api.schemas";
 import { Button, Flex, Group, Modal, NumberInput, TextInput } from "@mantine/core";
 import { Form, hasLength, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
@@ -43,9 +43,7 @@ const CreateSpotModal = ({ isOpened, closeModal, eventId }: CreateSpotModalProps
           loading: false,
           autoClose: true,
         });
-        // @ts-ignore - message
         if (error.response?.data && error.response.data.message) {
-          // @ts-ignore - message
           (error.response.data.message as string[]).forEach((err) => {
             notifications.show({
               title: "Error",
