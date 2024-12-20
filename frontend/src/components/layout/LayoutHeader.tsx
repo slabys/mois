@@ -17,6 +17,7 @@ interface MainLinksProps {
 const mainLinks: MainLinksProps[] = [
   { link: routes.DASHBOARD, label: "Home" },
   { link: routes.MANAGE_EVENTS, label: "Manage Events" },
+  { link: routes.MANAGE_ORGANIZATIONS, label: "Manage Organizations" },
   { link: routes.SENT_APPLICATIONS, label: "Sent Applications" },
 ];
 

@@ -105,6 +105,9 @@ const AccountPage = () => {
       personalAddress: {
         houseNumber: (zipValue: string | undefined) =>
           zipValue ? (/^(\d+)(\/\d+)?$/.test(zipValue) ? null : "Unable to send format") : null,
+        zip: isNotEmpty("This field should not be empty"),
+        city: isNotEmpty("This field should not be empty"),
+        country: isNotEmpty("This field should not be empty"),
       },
     },
     transformValues: (values) => {
