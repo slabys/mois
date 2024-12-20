@@ -14,10 +14,10 @@ interface EventEditModalProps {
   eventDetail: EventDetail;
   isOpened: boolean;
   close: () => void;
-  onSuccessEdit: () => void;
+  onSuccess: () => void;
 }
 
-const EventEditModal = ({ eventDetail, isOpened, close, onSuccessEdit }: EventEditModalProps) => {
+const EventEditModal = ({ eventDetail, isOpened, close, onSuccess }: EventEditModalProps) => {
   const form = useForm<Partial<EventDetail>>({
     initialValues: {
       title: eventDetail.title,
@@ -61,7 +61,7 @@ const EventEditModal = ({ eventDetail, isOpened, close, onSuccessEdit }: EventEd
         });
         form.setInitialValues(data);
         form.reset();
-        onSuccessEdit();
+        onSuccess();
         close();
       },
       onError: (error) => {

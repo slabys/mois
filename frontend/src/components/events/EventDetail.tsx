@@ -130,7 +130,7 @@ const EventDetail = ({ id }: EventDetailProps) => {
       />
       <EventEditModal
         eventDetail={eventDetail}
-        onSuccessEdit={() => {
+        onSuccess={() => {
           refetchEvent();
         }}
         isOpened={isModalEditOpen}
@@ -139,6 +139,9 @@ const EventDetail = ({ id }: EventDetailProps) => {
       {!!userData ? (
         <JoinEventModal
           userData={userData}
+          onSuccess={() => {
+            refetchEvent();
+          }}
           eventId={eventDetail.id}
           isOpened={isModalJoinEventOpen}
           closeModal={closeModalJoinEvent}

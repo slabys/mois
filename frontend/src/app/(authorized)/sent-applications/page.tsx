@@ -1,13 +1,18 @@
 "use client";
 
-import { useGetEvents } from "@/utils/api";
+import { useGetEventApplications, useGetEvents, useGetUserApplications } from "@/utils/api";
 import routes from "@/utils/routes";
 import EventCard from "@components/events/EventCard";
 import { Anchor, Container, Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
+import { useMemo, useState } from "react";
 
 const SentApplicationsPage = () => {
-  const { data: upcomingEvents } = useGetEvents();
+  const now = useMemo(() => {
+    return new Date().getTime();
+  }, []);
+  const { data: upcomingEvents } = useGetUserApplications({ sinceSince: now });
+  const { data: pastEvents } = useGetUserApplications({ toSince: now });
 
   return (
     <Container size="xl">
@@ -19,14 +24,14 @@ const SentApplicationsPage = () => {
               Upcoming Events
             </Title>
             {upcomingEvents?.length >= 1 ? (
-              upcomingEvents?.map((event, index) => (
+              upcomingEvents?.map((eventApplication, index) => (
                 <Anchor
                   component={Link}
-                  key={`event-card-${index}-${event.id}`}
-                  href={routes.EVENT_DETAIL({ id: event.id })}
+                  key={`event-card-${index}-${eventApplication.id}`}
+                  href={routes.EVENT_DETAIL({ id: eventApplication.id })}
                   underline="never"
                 >
-                  <EventCard event={event} />
+                  <EventCard event={eventApplication.event} />
                 </Anchor>
               ))
             ) : (
@@ -34,20 +39,20 @@ const SentApplicationsPage = () => {
             )}
           </Stack>
         )}
-        {upcomingEvents && (
+        {pastEvents && (
           <Stack>
             <Title order={2} size="xl">
               Past Events
             </Title>
-            {upcomingEvents?.length >= 1 ? (
-              upcomingEvents?.map((event, index) => (
+            {pastEvents?.length >= 1 ? (
+              pastEvents?.map((eventApplication, index) => (
                 <Anchor
                   component={Link}
-                  key={`event-card-${index}-${event.id}`}
-                  href={routes.EVENT_DETAIL({ id: event.id })}
+                  key={`event-card-${index}-${eventApplication.id}`}
+                  href={routes.EVENT_DETAIL({ id: eventApplication.id })}
                   underline="never"
                 >
-                  <EventCard event={event} />
+                  <EventCard event={eventApplication.event} />
                 </Anchor>
               ))
             ) : (

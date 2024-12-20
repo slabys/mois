@@ -20,7 +20,7 @@ interface ManageApplicationsTableProps {
 }
 
 const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
-  const { data: eventApplications } = useGetEventApplications(eventId);
+  const { data: eventApplications, refetch: refetchEventApplications } = useGetEventApplications(eventId);
   const [currentApplication, setCurrentApplication] = useState<EventApplication | null>(null);
   const [isSpotModalOpen, { open: openSpotModal, close: closeSpotModal }] = useDisclosure(false);
   const [isEditModalOpen, { open: openEditModal, close: closeEditModal }] = useDisclosure(false);
@@ -52,6 +52,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
           loading: false,
           autoClose: true,
         });
+        refetchEventApplications();
         closeSpotModal();
       },
       onError: (mutationError) => {
@@ -110,6 +111,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
           loading: false,
           autoClose: true,
         });
+        refetchEventApplications();
       },
       onError: (mutationError) => {
         if (!mutationError.response?.data) return;
