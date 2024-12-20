@@ -1,6 +1,7 @@
 import { ApiHideProperty } from "@nestjs/swagger";
+import { Address } from "modules/addresses";
+import { User } from "modules/users";
 import {
-  Check,
   Column,
   CreateDateColumn,
   Entity,
@@ -10,11 +11,10 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { OrganizationMember } from "./organization-member.entity";
-import { User } from "modules/users";
-import { Address } from "modules/addresses";
 
+// Should be parent.id but it's not converted to parent_id, so this needs to be "hardcoded"
 @Entity()
-@Check("(SELECT COUNT(*) FROM organization WHERE parent.id IS NULL) <= 1")
+@Index("idx_single_root", ["id"], { unique: true, where: "parent_id IS NULL" })
 export class Organization {
   @PrimaryGeneratedColumn("uuid")
   id: string;

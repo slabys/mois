@@ -20,7 +20,6 @@ import {
 import {
   ApiBearerAuth,
   ApiConflictResponse,
-  ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiQuery,
@@ -112,7 +111,6 @@ export class EventApplicationsController {
     const application =
       await this.eventApplicationsService.findByEventIdDetailed(eventId, {
         relations: { event: { applications: true } },
-        
       });
     return this.eventApplicationSimpleWithApplicationsMapper.map(application);
   }
