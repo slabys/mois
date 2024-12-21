@@ -8,6 +8,7 @@ import {
   In,
   Repository,
 } from "typeorm";
+import { PaginationOptions } from "utilities/nest/decorators";
 
 type UserId = User["id"];
 
@@ -46,8 +47,8 @@ export class UsersService {
   /**
    * Find many users by IDs
    * @param ids IDs
-   * @param options Find options 
-   * @returns 
+   * @param options Find options
+   * @returns
    */
   findManyById(ids: string[], options?: FindUserOptions) {
     return this.UsersRepository.find({
@@ -91,6 +92,21 @@ export class UsersService {
     return isEmail(usernameOrEmail)
       ? this.findByEmaiWithPassword(usernameOrEmail)
       : this.findByUsernameWithPasword(usernameOrEmail);
+  }
+
+  /**
+   * Find all users ordered by lastName
+   * @param options Find options
+   * @returns
+   */
+  find(options: { pagination: PaginationOptions }) {
+    return this.UsersRepository.find({
+      take: options.pagination.take,
+      skip: options.pagination.skip,
+      order: {
+        lastName: "ASC",
+      },
+    });
   }
 
   /**
