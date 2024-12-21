@@ -2,14 +2,14 @@
 
 import { Notifications } from "@mantine/notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactNode, useMemo } from "react";
+import { ReactNode, useState } from "react";
 
 interface ProvidersProps {
   children: ReactNode;
 }
 
 const Providers = ({ children }: ProvidersProps) => {
-  const queryClient = useMemo(
+  const [queryClient] = useState(
     () =>
       new QueryClient({
         defaultOptions: {
@@ -18,8 +18,8 @@ const Providers = ({ children }: ProvidersProps) => {
           },
         },
       }),
-    [],
   );
+
   return (
     <QueryClientProvider client={queryClient}>
       <Notifications />

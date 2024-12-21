@@ -1,48 +1,55 @@
 "use client";
 
 import { useAllOrganizations } from "@/utils/api";
+import type { Organization } from "@/utils/api.schemas";
 import routes from "@/utils/routes";
 import CreateOrganizationModal from "@components/CreateOrganizationModal/CreateOrganizationModal";
+import UpdateOrganizationModal from "@components/UpdateOrganizationModal/UpdateOrganizationModal";
 import { ActionIcon, Button, Container, Flex, ScrollArea, Stack, Table, Text, Title, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconEdit, IconPlus, IconTrash, IconUsersGroup } from "@tabler/icons-react";
 import Link from "next/link";
+import { useState } from "react";
 
 const ManageOrganizationsPage = () => {
-  const [isAddOrganizationModalOpen, { open: openAddOrganizationModal, close: closeAddOrganizationModal }] =
+  const [isCreateOrganizationModalOpen, { open: openAddOrganizationModal, close: closeAddOrganizationModal }] =
+    useDisclosure(false);
+  const [isUpdateOrganizationModalOpen, { open: openUpdateOrganizationModal, close: closeUpdateOrganizationModal }] =
     useDisclosure(false);
 
+  const [activeOrganization, setActiveOrganization] = useState<Organization | null>(null);
+
   const { data: organizationsList, refetch: refetchOrganizationsList } = useAllOrganizations();
+
+  const handleRefetch = () => {
+    setActiveOrganization(null);
+    refetchOrganizationsList();
+  };
 
   const rows = organizationsList?.map((organization, index) => (
     <Table.Tr key={`event-${index}-${organization.id}`}>
       <Table.Td>{organization.name}</Table.Td>
       <Table.Td>
-        {organization.address.street +
-          " " +
-          organization.address.houseNumber +
-          ", " +
-          organization.address.zip +
-          " " +
-          organization.address.city +
-          ", " +
-          organization.address.country}
+        <Flex direction="column" justify="start" align="start">
+          <Text>{`${organization.address.street} ${organization.address.houseNumber}`}</Text>
+          <Text>{`${organization.address.zip}, ${organization.address.city}`}</Text>
+          <Text>{organization.address.country}</Text>
+        </Flex>
       </Table.Td>
       {organization.manager ? (
         <>
-          <Table.Td>{organization.manager.firstName + " " + organization.manager.lastName}</Table.Td>
+          <Table.Td>{`${organization.manager.firstName} ${organization.manager.lastName}`}</Table.Td>
           <Table.Td>{organization.manager.username}</Table.Td>
         </>
       ) : (
         <>
-          <Table.Td>-</Table.Td>
-          <Table.Td>-</Table.Td>
+          <Table.Td>N/A</Table.Td>
+          <Table.Td>N/A</Table.Td>
         </>
       )}
       <Table.Td>
         <Flex justify="space-evenly" gap={16}>
           <Tooltip label="Organization Members">
-            {/*TODO - Show organizations members*/}
             <ActionIcon
               component={Link}
               href={routes.ORGANIZATION_MEMBERS({ id: organization.id })}
@@ -54,8 +61,15 @@ const ManageOrganizationsPage = () => {
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Edit Organization">
-            {/*TODO - edit organization*/}
-            <ActionIcon variant="subtle" size={48} color="blue">
+            <ActionIcon
+              variant="subtle"
+              size={48}
+              color="blue"
+              onClick={() => {
+                setActiveOrganization(organization);
+                openUpdateOrganizationModal();
+              }}
+            >
               <IconEdit width={32} height={32} />
             </ActionIcon>
           </Tooltip>
@@ -114,10 +128,18 @@ const ManageOrganizationsPage = () => {
         </ScrollArea>
       </Stack>
       <CreateOrganizationModal
-        onCreateSuccess={refetchOrganizationsList}
-        isOpened={isAddOrganizationModalOpen}
+        handleSuccess={handleRefetch}
+        isOpened={isCreateOrganizationModalOpen}
         closeModal={closeAddOrganizationModal}
       />
+      {activeOrganization && (
+        <UpdateOrganizationModal
+          activeOrganization={activeOrganization}
+          handleSuccess={handleRefetch}
+          isOpened={isUpdateOrganizationModalOpen}
+          closeModal={closeUpdateOrganizationModal}
+        />
+      )}
     </Container>
   );
 };

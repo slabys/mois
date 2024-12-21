@@ -1,27 +1,35 @@
-import { useCreateOrganization } from "@/utils/api";
-import { CreateOrganization } from "@/utils/api.schemas";
+import { useUpdateOrganization } from "@/utils/api";
+import { Organization, UpdateOrganization } from "@/utils/api.schemas";
 import { Button, Grid, Group, Modal, TextInput } from "@mantine/core";
 import { Form, isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import React from "react";
 
 interface CrateOrganizationModalProps {
+  activeOrganization: Organization;
   isOpened: boolean;
   closeModal: () => void;
   handleSuccess: () => void;
 }
 
-const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateOrganizationModalProps) => {
-  const form = useForm<Partial<CreateOrganization>>({
+const UpdateOrganizationModal = ({
+  activeOrganization,
+  isOpened,
+  closeModal,
+  handleSuccess,
+}: CrateOrganizationModalProps) => {
+  const form = useForm<Partial<UpdateOrganization>>({
     initialValues: {
-      name: "",
-      address: {
-        street: "",
-        houseNumber: "",
-        zip: "",
-        city: "",
-        country: "",
-      },
+      name: activeOrganization.name,
+      address: activeOrganization.address
+        ? {
+            street: activeOrganization.address.street,
+            houseNumber: activeOrganization.address.houseNumber,
+            zip: activeOrganization.address.zip,
+            city: activeOrganization.address.city,
+            country: activeOrganization.address.country,
+          }
+        : undefined,
     },
     validate: {
       name: isNotEmpty("This field should not be empty"),
@@ -36,7 +44,7 @@ const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateO
     },
   });
 
-  const createOrganizationMutation = useCreateOrganization({
+  const updateOrganizationMutation = useUpdateOrganization({
     mutation: {
       onMutate: () => {
         notifications.show({
@@ -82,11 +90,12 @@ const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateO
     },
   });
 
-  const handleCreateOrganization = (submitValues: Partial<CreateOrganization>) => {
+  const handleCreateOrganization = (submitValues: Partial<UpdateOrganization>) => {
     form.validate();
     if (form.isValid()) {
-      createOrganizationMutation.mutate({
-        data: submitValues as CreateOrganization,
+      updateOrganizationMutation.mutate({
+        id: activeOrganization.id,
+        data: submitValues as UpdateOrganization,
       });
     }
   };
@@ -99,7 +108,7 @@ const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateO
   };
 
   return (
-    <Modal size="xl" opened={isOpened} onClose={handleClose} title="Create Organization">
+    <Modal size="xl" opened={isOpened} onClose={handleClose} title="Update Organization">
       <Form form={form} onSubmit={handleCreateOrganization}>
         <Grid>
           <Grid.Col span={8}>
@@ -119,7 +128,7 @@ const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateO
           </Grid.Col>
         </Grid>
         <Group justify="center" mt="lg">
-          <Button type="submit" disabled={!isTouchedDirty} loading={createOrganizationMutation.isPending}>
+          <Button type="submit" disabled={!isTouchedDirty} loading={updateOrganizationMutation.isPending}>
             Save changes
           </Button>
         </Group>
@@ -127,4 +136,4 @@ const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateO
     </Modal>
   );
 };
-export default CreateOrganizationModal;
+export default UpdateOrganizationModal;
