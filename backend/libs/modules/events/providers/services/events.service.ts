@@ -11,6 +11,7 @@ import { Event } from "modules/events/entities";
 
 import { EventFilter } from "../../models";
 import { filterSince } from "../../utilities";
+import { PhotoService } from "modules/photo";
 
 interface EventFindOptions extends FindManyOptions {
   visible?: boolean;
@@ -22,7 +23,8 @@ interface EventFindOptions extends FindManyOptions {
 export class EventsService {
   constructor(
     @InjectRepository(Event)
-    private readonly eventsRepository: Repository<Event>
+    private readonly eventsRepository: Repository<Event>,
+    private readonly photoService: PhotoService
   ) {}
 
   /**
@@ -91,5 +93,10 @@ export class EventsService {
       skip: options?.pagination?.skip,
       take: options?.pagination?.take,
     });
+  }
+
+  async delete(event: Event) {
+    await this.photoService.delete(event.photo);
+    await this.eventsRepository.remove(event);
   }
 }

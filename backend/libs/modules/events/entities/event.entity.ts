@@ -40,7 +40,7 @@ export class Event extends BaseEntity {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => Photo, { nullable: true, eager: true })
+  @ManyToOne(() => Photo, { nullable: true, eager: true, onDelete: "SET NULL" })
   photo: Photo | null;
 
   @OneToMany(() => EventSpot, (spot) => spot.event, { cascade: true })

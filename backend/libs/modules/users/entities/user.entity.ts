@@ -53,7 +53,7 @@ export class User extends BaseEntity {
   @Column({ type: "varchar", length: 255, select: false })
   password: string;
 
-  @ManyToOne(() => Photo, { eager: true })
+  @ManyToOne(() => Photo, { eager: true, onDelete: "SET NULL" })
   photo: Photo;
 
   @CreateDateColumn()
