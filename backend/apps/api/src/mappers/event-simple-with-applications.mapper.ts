@@ -12,7 +12,7 @@ export class EventSimpleWithApplicationsMapper {
 
     return <EventSimpleWithApplications>{
       ...event,
-      applications: event.applications.length,
+      applications: event.applications?.length,
     };
   }
 }

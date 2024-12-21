@@ -161,4 +161,14 @@ export class UsersController {
   ) {
     return this.organizationService.findUserMemberships(userId, { pagination });
   }
+
+  /**
+   * Find all users ordered by `lastName`.
+   */
+  @ApiBearerAuth()
+  @UseGuards(CookieGuard)
+  @Get("all")
+  getAllUsers(@Pagination() pagination: PaginationOptions) {
+    return this.usersService.find({ pagination });
+  }
 }

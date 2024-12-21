@@ -45,10 +45,23 @@ export class PhotoService {
 
   /**
    * Read photo data
-   * @param photo 
-   * @returns 
+   * @param photo
+   * @returns
    */
   read(photo: Photo) {
     return this.fileStorageService.read(photo.filename);
+  }
+
+  /**
+   * Delete photo file
+   * @param photo
+   */
+  async delete(photo: Photo) {
+    await this.fileStorageService
+      .delete(photo.filename)
+      .catch(() => null)
+      .finally(async () => {
+        await this.photoRepository.remove(photo);
+      });
   }
 }

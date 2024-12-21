@@ -67,6 +67,9 @@ export const Pagination = (
       take = !Number.isNaN(take) ? take : defaultOptions?.take || 16;
       skip = !Number.isNaN(skip) ? skip : defaultOptions?.skip || 0;
 
+      take = Math.max(take, 0);
+      skip = Math.max(skip, 0);
+
       return <PaginationOptions>{
         take,
         skip,

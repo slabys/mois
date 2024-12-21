@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   InternalServerErrorException,
   NotFoundException,
@@ -210,10 +211,10 @@ export class EventsController {
       "User is not member of event organization or does not have required permissions",
   })
   @ApiNotFoundResponse({ description: "Event not found" })
-  @ApiBearerAuth()
   @ApiConsumes("multipart/form-data")
-  @FormDataRequest()
+  @ApiBearerAuth()
   @UseGuards(CookieGuard)
+  @FormDataRequest()
   @Patch(":eventId/photo")
   async updateEventPhoto(
     @Param("eventId", ParseIntPipe) eventId: number,
@@ -222,14 +223,28 @@ export class EventsController {
   ) {
     // TODO: Check user role for modifications
 
-    let event = await this.eventsService.findById(eventId);
+    const event = await this.eventsService.findByIdDetailed(eventId, {
+      relations: { applications: true },
+    });
     if (!event) throw new NotFoundException("Event not found");
 
     const photo = await this.photoService.save(body.file.buffer, "event_photo");
     if (!photo) new InternalServerErrorException("Could not save photo");
 
     event.photo = photo;
-    event = await this.eventsService.save(event);
+    await this.eventsService.save(event);
     return this.eventSimpleWithApplicationsMapper.map(event);
+  }
+
+  @ApiOkResponse({ description: "Event deleted" })
+  @ApiNotFoundResponse({ description: "Event not found" })
+  @ApiBearerAuth()
+  @UseGuards(CookieGuard)
+  @Delete(":eventId")
+  async deleteEvent(@Param("eventId", ParseIntPipe) eventId: number) {
+    const event = await this.eventsService.findById(eventId);
+    if (!event) throw new NotFoundException("Event not found");
+
+    await this.eventsService.delete(event);
   }
 }
