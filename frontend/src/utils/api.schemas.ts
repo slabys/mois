@@ -81,6 +81,17 @@ export type AllOrganizationsParams = {
   skip?: number;
 };
 
+export type GetAllUsersParams = {
+  /**
+   * Pagination number of results
+   */
+  take?: number;
+  /**
+   * Pagination number of skipped results
+   */
+  skip?: number;
+};
+
 export type UserOrganizationMembershipsParams = {
   /**
    * Pagination number of results
@@ -280,6 +291,7 @@ export interface EventDetailLink {
 }
 
 export interface EventDetail {
+  applications: number;
   /** Event capacity */
   capacity: number;
   codeOfConductLink: string;
@@ -380,6 +392,20 @@ export interface CreateEventApplicationExistingOrganization {
 export type EventApplicationDetailedWithApplicationsSpotType = SpotTypeSimple | null;
 
 export type EventApplicationDetailedWithApplicationsAdditionalData = { [key: string]: unknown };
+
+export interface EventApplicationDetailedWithApplications {
+  additionalData: EventApplicationDetailedWithApplicationsAdditionalData;
+  createdAt: string;
+  customOrganization: EventCustomOrganization;
+  event: EventSimpleWithApplications;
+  id: number;
+  idNumber: string;
+  invoiceAddress: Address;
+  organization: Organization;
+  /** @nullable */
+  spotType: EventApplicationDetailedWithApplicationsSpotType;
+  user: User;
+}
 
 /**
  * @nullable
@@ -703,20 +729,6 @@ export interface User {
   role: Role;
   updatedAt: string;
   username: string;
-}
-
-export interface EventApplicationDetailedWithApplications {
-  additionalData: EventApplicationDetailedWithApplicationsAdditionalData;
-  createdAt: string;
-  customOrganization: EventCustomOrganization;
-  event: EventSimpleWithApplications;
-  id: number;
-  idNumber: string;
-  invoiceAddress: Address;
-  organization: Organization;
-  /** @nullable */
-  spotType: EventApplicationDetailedWithApplicationsSpotType;
-  user: User;
 }
 
 /**

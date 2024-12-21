@@ -1,6 +1,6 @@
 "use client";
 
-import { EventSimple } from "@/utils/api.schemas";
+import { EventSimpleWithApplications } from "@/utils/api.schemas";
 import { dayMonthYear } from "@/utils/time";
 import ApiImage from "@components/ApiImage/ApiImage";
 import RichTextRenderer from "@components/Richtext/RichTextRenderer";
@@ -9,7 +9,7 @@ import { Box, Card, Flex, Stack, Text, Title } from "@mantine/core";
 import { IconUsersGroup } from "@tabler/icons-react";
 
 interface EventCardProps {
-  event: EventSimple;
+  event: EventSimpleWithApplications;
 }
 
 const EventCard = ({ event }: EventCardProps) => {
@@ -35,8 +35,7 @@ const EventCard = ({ event }: EventCardProps) => {
                 <IconUsersGroup />
                 <Text size="sm">
                   <Text c="dimmed" span>
-                    {/*TODO*/}
-                    {event.capacity} / {event.capacity}
+                    {event.applications} / {event.capacity}
                   </Text>
                 </Text>
               </Flex>
