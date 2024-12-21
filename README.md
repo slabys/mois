@@ -24,6 +24,7 @@
 # Table of Content
 
 1. [About this Project](#about-this-project)
+    1. [Main Focus](#main-focus)
 1. [Built With](#built-with)
     1. [Data / Storage](#data--storage)
     1. [Backend](#backend)
@@ -55,6 +56,18 @@ for admins and users alike, the system includes features such as:
 - **Payment Tracking**: Users can upload payment confirmations, ensuring easier financial management.
 - **Organization Management**: Assign users to specific organizations and manage their access in applications
   accordingly.
+
+### Main Focus
+
+The Main Focus based on needs of ESN organisation and its alignment with need for Event Registration System. This
+includes:
+
+- **High-Level Description of the Business Problem**: Current Event Registration System that is in use is deprecated and
+  hard to use. This old system is built on top of Drupal CMS that is kept without updates.
+- **The Big Picture**: "The Big Picture" or the main goal is to create ERS platform in modern, easily accessible
+  technologies, so this project can be kept and updated.
+- **Use Case Design**: Use Case for this project is to create platform for management with easy control regarding
+  creation and event management, but also easy use for members that will participate on these events.
 
 ## Built With
 
@@ -94,6 +107,8 @@ Under the hood, Next.js also abstracts and automatically configures tooling need
 etc...
 
 ## Project Structure
+
+![Next](/readme/architecture.svg)
 
 The project is organized into distinct directories to maintain clarity and ensure modular development. Below is a
 detailed breakdown of the structure:
