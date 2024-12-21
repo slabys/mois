@@ -24,7 +24,7 @@
 # Table of Content
 
 1. [About this Project](#about-this-project)
-1. [Built With](#build-with)
+1. [Built With](#built-with)
     1. [Data / Storage](#data--storage)
     1. [Backend](#backend)
     1. [Frontend](#frontend)
@@ -403,7 +403,7 @@ The roadmap includes future enhancements such as:
 
 [Vavrinek-Petr-github-url]: https://github.com/petrvavrinek
 
-[Vavrinek-Petr-linkedin-url]: https://www.linkedin.com/
+[Vavrinek-Petr-linkedin-url]: https://www.linkedin.com/in/petr-vav%C5%99%C3%ADnek-630297179/
 
 [Mlejnek-Petr]: https://avatars.githubusercontent.com/u/72386535?v=4&s=64
 
