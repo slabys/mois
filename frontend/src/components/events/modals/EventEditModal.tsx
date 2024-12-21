@@ -120,7 +120,7 @@ const EventEditModal = ({ eventDetail, isOpened, close, handleSuccess = () => {}
             />
             <DateInput
               label="Registration Deadline"
-              value={dayjs(form.values.since).toDate()}
+              value={dayjs(form.values.registrationDeadline).toDate()}
               onChange={(value) => {
                 value && form.setFieldValue("registrationDeadline", value.toISOString());
               }}
