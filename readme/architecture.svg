@@ -261,7 +261,7 @@
             </g>
         </g>
         <g id="shape47" transform="matrix(1,0,0,1,596,415.03)">
-            <path d="M0,0L40.318,0.119L40.12,20.671"
+            <path d="M40.12,20.671L40.509,-19.701L40.12,20.671Z"
                   style="fill:none;fill-rule:nonzero;stroke:rgb(83,137,240);stroke-width:2px;"/>
             <g transform="matrix(1,0,0,1,1.27702,6.74015)">
                 <path d="M41.6,14.3L38.8,18.9L36,14.3L41.6,14.3Z"
