@@ -5,10 +5,11 @@ import routes from "@/utils/routes";
 import EventCard from "@components/events/EventCard";
 import { Anchor, Center, Container, Loader, Stack, Text, Title } from "@mantine/core";
 import Link from "next/link";
-import React from "react";
+import React, { useMemo } from "react";
 
 const Home = () => {
-  const { data: upcomingEvents } = useGetEvents();
+  const newTime = useMemo(() => new Date().getTime(), []);
+  const { data: upcomingEvents } = useGetEvents({ sinceSince: newTime });
 
   return (
     <Container size="xl">
