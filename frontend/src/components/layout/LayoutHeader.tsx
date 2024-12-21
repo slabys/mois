@@ -3,7 +3,21 @@
 import { useGetCurrentUser, useLogoutUser } from "@/utils/api";
 import routes from "@/utils/routes";
 import styles from "@components/layout/LayoutHeader.module.css";
-import { Anchor, Box, Burger, Button, Container, Divider, Drawer, Group, Image, Menu, Stack } from "@mantine/core";
+import {
+  Anchor,
+  Box,
+  Burger,
+  Button,
+  Container,
+  Divider,
+  Drawer,
+  Flex,
+  Group,
+  Image,
+  Menu,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconChevronDown, IconLogout, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
@@ -56,8 +70,14 @@ const LayoutHeader = () => {
     <header className={styles.header}>
       <Container size="xl" className={styles.inner}>
         <Anchor component={Link} href={routes.DASHBOARD}>
-          <Image src="/logo_esncz.png" alt="LOGO" height={84} width="100%" />
+          <Flex direction="row" justify="center" align="center" gap={8}>
+            <Image src="/icon.svg" alt="LOGO" height={64} width="100%" />
+            <Text size="xl" c="black" display={{ base: "none", lg: "block" }}>
+              Event Registration System
+            </Text>
+          </Flex>
         </Anchor>
+
         <Box className={styles.links} visibleFrom="sm">
           <Group gap={0} justify="flex-end">
             {mainItems}
