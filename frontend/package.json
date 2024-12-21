@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbo",
+    "dev": "[ -e .env ] && set -a && . ./.env; next dev --port ${PORT_FE-3000} --turbo",
     "devHttps": "next dev --experimental-https",
     "inspect": "NODE_OPTIONS='--inspect' next dev --turbo",
     "build": "next build",
