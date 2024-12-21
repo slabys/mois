@@ -16,6 +16,9 @@ export const routes = {
   EVENT_DETAIL: (props: { id: number }) => `/event/${props.id}`,
   EVENT_MANAGE: (props: { id: number }) => `/event/manage/${props.id}`,
 
+  // Organization
+  ORGANIZATION_MEMBERS: (props: { id: string }) => `/organization/${props.id}/members`,
+
   // Footer
   PRIVACY_POLICY: "/privacy-policy",
   TERMS_AND_CONDITIONS: "/terms-and-conditions",

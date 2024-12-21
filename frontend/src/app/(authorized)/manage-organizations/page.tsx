@@ -1,10 +1,12 @@
 "use client";
 
 import { useAllOrganizations } from "@/utils/api";
+import routes from "@/utils/routes";
 import CreateOrganizationModal from "@components/CreateOrganizationModal/CreateOrganizationModal";
 import { ActionIcon, Button, Container, Flex, ScrollArea, Stack, Table, Text, Title, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconEdit, IconPlus, IconTrash, IconUsersGroup } from "@tabler/icons-react";
+import Link from "next/link";
 
 const ManageOrganizationsPage = () => {
   const [isAddOrganizationModalOpen, { open: openAddOrganizationModal, close: closeAddOrganizationModal }] =
@@ -41,7 +43,13 @@ const ManageOrganizationsPage = () => {
         <Flex justify="space-evenly" gap={16}>
           <Tooltip label="Organization Members">
             {/*TODO - Show organizations members*/}
-            <ActionIcon variant="subtle" size={48} color="black">
+            <ActionIcon
+              component={Link}
+              href={routes.ORGANIZATION_MEMBERS({ id: organization.id })}
+              variant="subtle"
+              size={48}
+              color="black"
+            >
               <IconUsersGroup width={32} height={32} />
             </ActionIcon>
           </Tooltip>
@@ -53,7 +61,7 @@ const ManageOrganizationsPage = () => {
           </Tooltip>
           <Tooltip label="Delete Organization">
             {/*TODO - delete organization*/}
-            <ActionIcon variant="subtle" size={48} color="red">
+            <ActionIcon variant="subtle" size={48} color="red" disabled>
               <IconTrash width={32} height={32} />
             </ActionIcon>
           </Tooltip>
