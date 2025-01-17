@@ -5,6 +5,6 @@ import { Invoice, InvoiceItem } from "modules/invoice/entities";
 export class InvoiceSimpleItem extends OmitType(InvoiceItem, ["invoice"]) {}
 
 export class InvoiceSimple extends OmitType(Invoice, ["items"]) {
-  @Type(() => InvoiceSimpleItem)
-  items: InvoiceSimpleItem[];
+	@Type(() => InvoiceSimpleItem)
+	items: InvoiceSimpleItem[];
 }

@@ -10,28 +10,22 @@ import { JwtModule } from "@nestjs/jwt";
 import { UsersModule } from "modules/users";
 
 @Module({
-  imports: [
-    PassportModule,
-    ConfigModule,
-    UsersModule,
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.getOrThrow("JWT_SECRET"),
-        signOptions: {
-          issuer: "MOIS",
-        },
-      }),
-    }),
-  ],
-  providers: [
-    AuthService,
-    LocalStrategy,
-    CookieStrategy,
-    CookieGuard,
-    LocalGuard,
-  ],
-  exports: [AuthService, CookieGuard],
+	imports: [
+		PassportModule,
+		ConfigModule,
+		UsersModule,
+		JwtModule.registerAsync({
+			imports: [ConfigModule],
+			inject: [ConfigService],
+			useFactory: (configService: ConfigService) => ({
+				secret: configService.getOrThrow("JWT_SECRET"),
+				signOptions: {
+					issuer: "MOIS",
+				},
+			}),
+		}),
+	],
+	providers: [AuthService, LocalStrategy, CookieStrategy, CookieGuard, LocalGuard],
+	exports: [AuthService, CookieGuard],
 })
 export class AuthModule {}

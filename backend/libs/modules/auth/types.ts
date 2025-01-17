@@ -1,3 +1,3 @@
 export type JwtContent = {
-  sub: string
-}
+	sub: string;
+};

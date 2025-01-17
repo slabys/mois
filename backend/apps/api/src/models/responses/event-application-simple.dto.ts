@@ -5,11 +5,7 @@ import { EventApplication } from "modules/events/entities";
 import type { EventSimple } from "./event-simple.dto";
 import type { SpotTypeSimple } from "./spot-type-simple.dto";
 
-export class EventApplicationSimple extends PickType(EventApplication, [
-  "createdAt",
-  "id",
-  "user",
-]) {
-  event: EventSimple;
-  spotType: SpotTypeSimple | null;
+export class EventApplicationSimple extends PickType(EventApplication, ["createdAt", "id", "user"]) {
+	event: EventSimple;
+	spotType: SpotTypeSimple | null;
 }

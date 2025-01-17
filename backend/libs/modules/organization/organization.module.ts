@@ -5,11 +5,8 @@ import { RolesModule } from "modules/roles";
 import { OrganizationService } from "./providers/services";
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Organization, OrganizationMember]),
-    RolesModule,
-  ],
-  providers: [OrganizationService],
-  exports: [OrganizationService],
+	imports: [TypeOrmModule.forFeature([Organization, OrganizationMember]), RolesModule],
+	providers: [OrganizationService],
+	exports: [OrganizationService],
 })
 export class OrganizationModule {}

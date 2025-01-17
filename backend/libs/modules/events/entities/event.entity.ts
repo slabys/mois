@@ -1,96 +1,98 @@
 import { Photo } from "modules/photo";
 import { User } from "modules/users";
-import {
-  BaseEntity,
-  Column,
-  CreateDateColumn,
-  Entity,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { EventApplication } from "./event-application.entity";
 import { EventLink } from "./event-link.entity";
 import { EventSpot } from "./event-spot.entity";
 
 @Entity()
 export class Event extends BaseEntity {
-  @PrimaryGeneratedColumn("increment")
-  id: number;
+	@PrimaryGeneratedColumn("increment")
+	id: number;
 
-  @Column()
-  title: string;
+	@Column()
+	title: string;
 
-  @Column()
-  shortDescription: string;
+	@Column()
+	shortDescription: string;
 
-  // Select only short description by default
-  @Column({ select: false })
-  longDescription: string;
+	// Select only short description by default
+	@Column({ select: false })
+	longDescription: string;
 
-  @Column()
-  since: Date;
+	@Column()
+	since: Date;
 
-  @Column()
-  until: Date;
+	@Column()
+	until: Date;
 
-  @ManyToOne(() => User, { nullable: false, eager: true })
-  createdByUser: User;
+	@ManyToOne(() => User, { nullable: false, eager: true })
+	createdByUser: User;
 
-  @CreateDateColumn()
-  createdAt: Date;
+	@CreateDateColumn()
+	createdAt: Date;
 
-  @ManyToOne(() => Photo, { nullable: true, eager: true, onDelete: "SET NULL" })
-  photo: Photo | null;
+	@ManyToOne(() => Photo, { nullable: true, eager: true, onDelete: "SET NULL" })
+	photo: Photo | null;
 
-  @OneToMany(() => EventSpot, (spot) => spot.event, { cascade: true })
-  spotTypes: EventSpot[];
+	@OneToMany(
+		() => EventSpot,
+		(spot) => spot.event,
+		{ cascade: true },
+	)
+	spotTypes: EventSpot[];
 
-  @OneToMany(() => EventApplication, (application) => application.event)
-  applications: EventApplication[];
+	@OneToMany(
+		() => EventApplication,
+		(application) => application.event,
+	)
+	applications: EventApplication[];
 
-  @OneToMany(() => EventLink, (link) => link.event)
-  links: EventLink[];
+	@OneToMany(
+		() => EventLink,
+		(link) => link.event,
+	)
+	links: EventLink[];
 
-  @Column({ default: true })
-  visible: boolean;
+	@Column({ default: true })
+	visible: boolean;
 
-  @Column()
-  registrationDeadline: Date;
+	@Column()
+	registrationDeadline: Date;
 
-  /**
-   * If true, generate invoices after {@link registrationDeadline}
-   */
-  @Column({ default: true, select: false })
-  generateInvoices: boolean;
+	/**
+	 * If true, generate invoices after {@link registrationDeadline}
+	 */
+	@Column({ default: true, select: false })
+	generateInvoices: boolean;
 
-  /**
-   * Additional registration form
-   * Each event can have different "requirements"
-   */
-  @Column("json", { nullable: true, select: false })
-  registrationForm: object | null;
+	/**
+	 * Additional registration form
+	 * Each event can have different "requirements"
+	 */
+	@Column("json", { nullable: true, select: false })
+	registrationForm: object | null;
 
-  /**
-   * Event capacity
-   */
-  @Column({ unsigned: true })
-  capacity: number;
+	/**
+	 * Event capacity
+	 */
+	@Column({ unsigned: true })
+	capacity: number;
 
-  /** Links */
+	/** Links */
 
-  @Column()
-  termsAndConditionsLink: string;
+	@Column()
+	termsAndConditionsLink: string;
 
-  @Column()
-  photoPolicyLink: string;
+	@Column()
+	photoPolicyLink: string;
 
-  @Column()
-  codeOfConductLink: string;
+	@Column()
+	codeOfConductLink: string;
 
-  constructor(event?: Partial<Event>) {
-    super();
+	constructor(event?: Partial<Event>) {
+		super();
 
-    Object.assign(this, event);
-  }
+		Object.assign(this, event);
+	}
 }

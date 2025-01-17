@@ -1,3 +1,3 @@
 export enum Permission {
-  CreateEvent = "create.event"
+	CreateEvent = "create.event",
 }

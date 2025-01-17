@@ -3,6 +3,6 @@ import { Invoice } from "modules/invoice/entities";
 
 @ApiExtraModels(Invoice)
 export class EventApplicationInvoice {
-  invoice: Invoice;
-  url: string;
+	invoice: Invoice;
+	url: string;
 }

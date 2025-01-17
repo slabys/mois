@@ -7,8 +7,8 @@ import { PhotoService } from "./providers/services";
 import { FileStorageModule } from "modules/file-storage";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Photo]), FileStorageModule],
-  providers: [PhotoService],
-  exports: [PhotoService],
+	imports: [TypeOrmModule.forFeature([Photo]), FileStorageModule],
+	providers: [PhotoService],
+	exports: [PhotoService],
 })
 export class PhotoModule {}

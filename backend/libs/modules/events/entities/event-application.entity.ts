@@ -2,16 +2,16 @@ import { Address } from "modules/addresses";
 import { Organization } from "modules/organization";
 import { User } from "modules/users";
 import {
-  BaseEntity,
-  Column,
-  CreateDateColumn,
-  type DeepPartial,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToOne,
-  PrimaryGeneratedColumn,
-  Unique,
+	BaseEntity,
+	Column,
+	CreateDateColumn,
+	type DeepPartial,
+	Entity,
+	JoinColumn,
+	ManyToOne,
+	OneToOne,
+	PrimaryGeneratedColumn,
+	Unique,
 } from "typeorm";
 import { EventCustomOrganization } from "./event-custom-organization.entity";
 import { EventSpot } from "./event-spot.entity";
@@ -28,60 +28,64 @@ import { Invoice } from "modules/invoice/entities";
 @Unique(["user", "event"])
 @Entity()
 export class EventApplication extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+	@PrimaryGeneratedColumn()
+	id: number;
 
-  @ManyToOne(() => User, { nullable: false, onDelete: "CASCADE" })
-  user: User;
+	@ManyToOne(() => User, { nullable: false, onDelete: "CASCADE" })
+	user: User;
 
-  @ManyToOne(() => Event, (event) => event.applications, {
-    nullable: false,
-    onDelete: "CASCADE",
-  })
-  event: Event;
+	@ManyToOne(
+		() => Event,
+		(event) => event.applications,
+		{
+			nullable: false,
+			onDelete: "CASCADE",
+		},
+	)
+	event: Event;
 
-  @ManyToOne(() => Organization, { nullable: true })
-  organization: Organization;
+	@ManyToOne(() => Organization, { nullable: true })
+	organization: Organization;
 
-  @OneToOne(
-    () => EventCustomOrganization,
-    (organization) => organization.application,
-    { cascade: true }
-  )
-  customOrganization: EventCustomOrganization;
+	@OneToOne(
+		() => EventCustomOrganization,
+		(organization) => organization.application,
+		{ cascade: true },
+	)
+	customOrganization: EventCustomOrganization;
 
-  /**
-   * Spot, must be one of {@link event} spots
-   */
-  @ManyToOne(() => EventSpot, {
-    nullable: true,
-    onDelete: "SET NULL",
-    eager: true,
-  })
-  spotType: EventSpot | null;
+	/**
+	 * Spot, must be one of {@link event} spots
+	 */
+	@ManyToOne(() => EventSpot, {
+		nullable: true,
+		onDelete: "SET NULL",
+		eager: true,
+	})
+	spotType: EventSpot | null;
 
-  @Column({ type: "json", default: {}, select: false })
-  additionalData: object;
+	@Column({ type: "json", default: {}, select: false })
+	additionalData: object;
 
-  @OneToOne(() => Address, { cascade: true })
-  @JoinColumn()
-  personalAddress: Address;
+	@OneToOne(() => Address, { cascade: true })
+	@JoinColumn()
+	personalAddress: Address;
 
-  @OneToOne(() => Address, { cascade: true })
-  @JoinColumn()
-  invoiceAddress: Address;
+	@OneToOne(() => Address, { cascade: true })
+	@JoinColumn()
+	invoiceAddress: Address;
 
-  @Column({ select: false })
-  idNumber: string;
+	@Column({ select: false })
+	idNumber: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
-  
-  @ManyToOne(() => Invoice, { nullable: true })
-  invoice: Invoice;
+	@CreateDateColumn()
+	createdAt: Date;
 
-  constructor(initial?: DeepPartial<EventApplication>) {
-    super();
-    Object.assign(this, initial);
-  }
+	@ManyToOne(() => Invoice, { nullable: true })
+	invoice: Invoice;
+
+	constructor(initial?: DeepPartial<EventApplication>) {
+		super();
+		Object.assign(this, initial);
+	}
 }

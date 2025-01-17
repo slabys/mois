@@ -7,16 +7,16 @@ import type { EventFilter } from "../models";
  * @returns { since: ... }
  */
 export const filterSince = (filter?: EventFilter) => {
-  if (!filter) return {};
+	if (!filter) return {};
 
-  return {
-    since:
-      filter.since && filter.to
-        ? Between(filter.since, filter.to)
-        : filter.since
-        ? MoreThan(filter.since)
-        : filter.to
-        ? LessThan(filter.to)
-        : undefined,
-  };
+	return {
+		since:
+			filter.since && filter.to
+				? Between(filter.since, filter.to)
+				: filter.since
+					? MoreThan(filter.since)
+					: filter.to
+						? LessThan(filter.to)
+						: undefined,
+	};
 };
