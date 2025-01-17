@@ -8,7 +8,12 @@ export class RolesService {
 	constructor(
 		@InjectRepository(Role)
 		private readonly roleRepository: Repository<Role>,
-	) {}
+	) {
+	}
+
+	save(role: Partial<Role>) {
+		return this.roleRepository.save(role);
+	}
 
 	/**
 	 * Find all roles
@@ -23,7 +28,7 @@ export class RolesService {
 	 * @param id Role ID
 	 * @returns {Role} role or null
 	 */
-	findById(id: string) {
+	findById(id: number) {
 		return this.roleRepository.findOneBy({ id });
 	}
 }
