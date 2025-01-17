@@ -1,10 +1,10 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 import { Permission } from "../permissions";
 
 @Entity()
 export class Role {
-	@PrimaryColumn()
-	id: string;
+	@PrimaryGeneratedColumn("increment")
+	id: number;
 
 	@Column()
 	name: string;
@@ -14,5 +14,9 @@ export class Role {
 
 	hasPermission(permission: Permission) {
 		return this.permissions.includes(permission);
+	}
+
+	constructor(role?: Partial<Role>) {
+		Object.assign(this, role);
 	}
 }

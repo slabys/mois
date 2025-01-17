@@ -14,3 +14,4 @@ export * from "./update-event.dto";
 export * from "./update-organization.dto";
 export * from "./update-photo.dto";
 export * from "./update-user.dto";
+export * from "./create-role.dto";
