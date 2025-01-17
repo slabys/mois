@@ -3,16 +3,16 @@ import { Permission } from "../permissions";
 
 @Entity()
 export class Role {
-  @PrimaryColumn()
-  id: string;
+	@PrimaryColumn()
+	id: string;
 
-  @Column()
-  name: string;
+	@Column()
+	name: string;
 
-  @Column({ enum: Permission, array: true, type: "enum" })
-  permissions: Permission[];
+	@Column({ enum: Permission, array: true, type: "enum" })
+	permissions: Permission[];
 
-  hasPermission(permission: Permission) {
-    return this.permissions.includes(permission);
-  }
+	hasPermission(permission: Permission) {
+		return this.permissions.includes(permission);
+	}
 }

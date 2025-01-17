@@ -6,8 +6,8 @@ import { PaymentSubject } from "../../entities";
 
 @Injectable()
 export class PaymentsService {
-  constructor(
-    @InjectRepository(PaymentSubject)
-    private readonly paymentSubjectRepository: Repository<PaymentSubject>
-  ) {}
+	constructor(
+		@InjectRepository(PaymentSubject)
+		private readonly paymentSubjectRepository: Repository<PaymentSubject>,
+	) {}
 }

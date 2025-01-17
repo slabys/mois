@@ -1,24 +1,24 @@
 import {
-  BadRequestException,
-  Body,
-  ConflictException,
-  Controller,
-  Get,
-  InternalServerErrorException,
-  Param,
-  ParseUUIDPipe,
-  Patch,
-  Post,
-  UseGuards,
+	BadRequestException,
+	Body,
+	ConflictException,
+	Controller,
+	Get,
+	InternalServerErrorException,
+	Param,
+	ParseUUIDPipe,
+	Patch,
+	Post,
+	UseGuards,
 } from "@nestjs/common";
 import {
-  ApiBadRequestResponse,
-  ApiBearerAuth,
-  ApiConflictResponse,
-  ApiConsumes,
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiTags,
+	ApiBadRequestResponse,
+	ApiBearerAuth,
+	ApiConflictResponse,
+	ApiConsumes,
+	ApiCreatedResponse,
+	ApiOkResponse,
+	ApiTags,
 } from "@nestjs/swagger";
 import { FormDataRequest, MemoryStoredFile } from "nestjs-form-data";
 
@@ -36,139 +36,124 @@ import { Address } from "modules/addresses";
 @ApiTags("Users")
 @Controller("users")
 export class UsersController {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly photoService: PhotoService,
-    private readonly organizationService: OrganizationService
-  ) {}
+	constructor(
+		private readonly usersService: UsersService,
+		private readonly photoService: PhotoService,
+		private readonly organizationService: OrganizationService,
+	) {}
 
-  @ApiConflictResponse({
-    description: "User with email or username already exist",
-  })
-  @ApiCreatedResponse({ type: User, description: "User has been created" })
-  @ApiBadRequestResponse({
-    description:
-      "Invalid university ID given or payload did not pass validation",
-  })
-  @Post()
-  async createUser(@Body() body: CreateUser) {
-    const exist = await this.usersService.exist([
-      { email: body.email },
-      { username: body.username },
-    ]);
-    if (exist)
-      throw new ConflictException("User with email or username already exist");
+	@ApiConflictResponse({
+		description: "User with email or username already exist",
+	})
+	@ApiCreatedResponse({ type: User, description: "User has been created" })
+	@ApiBadRequestResponse({
+		description: "Invalid university ID given or payload did not pass validation",
+	})
+	@Post()
+	async createUser(@Body() body: CreateUser) {
+		const exist = await this.usersService.exist([{ email: body.email }, { username: body.username }]);
+		if (exist) throw new ConflictException("User with email or username already exist");
 
-    let newUser = new User({
-      email: body.email,
-      password: body.password,
-      firstName: body.firstName,
-      lastName: body.lastName,
-      username: body.username,
-      gender: body.gender,
-    });
+		let newUser = new User({
+			email: body.email,
+			password: body.password,
+			firstName: body.firstName,
+			lastName: body.lastName,
+			username: body.username,
+			gender: body.gender,
+		});
 
-    if (body.personalAddress) {
-      const { personalAddress: address } = body;
-      newUser.personalAddress = new Address({
-        city: address.city,
-        country: address.country,
-        houseNumber: address.houseNumber,
-        street: address.street,
-        zip: address.zip,
-      });
-    }
+		if (body.personalAddress) {
+			const { personalAddress: address } = body;
+			newUser.personalAddress = new Address({
+				city: address.city,
+				country: address.country,
+				houseNumber: address.houseNumber,
+				street: address.street,
+				zip: address.zip,
+			});
+		}
 
-    newUser = await this.usersService.save(newUser);
-    newUser.password = undefined;
-    return newUser;
-  }
+		newUser = await this.usersService.save(newUser);
+		newUser.password = undefined;
+		return newUser;
+	}
 
-  /**
-   * Update user data
-   */
-  @ApiBadRequestResponse({ description: "Username is already taken" })
-  @ApiBearerAuth()
-  @UseGuards(CookieGuard)
-  @Patch()
-  async updateCurrentUser(
-    @Body() body: UpdateUser,
-    @CurrentUser() requestUser: User
-  ) {
-    if (body.username && body.username !== requestUser.username) {
-      const exists = await this.usersService.exist({ username: body.username });
-      if (exists) throw new BadRequestException("Username is already taken");
-    }
+	/**
+	 * Update user data
+	 */
+	@ApiBadRequestResponse({ description: "Username is already taken" })
+	@ApiBearerAuth()
+	@UseGuards(CookieGuard)
+	@Patch()
+	async updateCurrentUser(@Body() body: UpdateUser, @CurrentUser() requestUser: User) {
+		if (body.username && body.username !== requestUser.username) {
+			const exists = await this.usersService.exist({ username: body.username });
+			if (exists) throw new BadRequestException("Username is already taken");
+		}
 
-    const user = await this.usersService.findById(requestUser.id, {
-      relations: { personalAddress: true },
-    });
+		const user = await this.usersService.findById(requestUser.id, {
+			relations: { personalAddress: true },
+		});
 
-    // For safety reasons set each property individually
-    user.password = body.password ?? user.password;
-    user.firstName = body.firstName ?? user.firstName;
-    user.lastName = body.lastName ?? user.lastName;
-    user.username = body.username ?? user.username;
-    user.gender = body.gender ?? user.gender;
+		// For safety reasons set each property individually
+		user.password = body.password ?? user.password;
+		user.firstName = body.firstName ?? user.firstName;
+		user.lastName = body.lastName ?? user.lastName;
+		user.username = body.username ?? user.username;
+		user.gender = body.gender ?? user.gender;
 
-    if (body.personalAddress) {
-      if (user.personalAddress)
-        user.personalAddress.update(body.personalAddress);
-      else user.personalAddress = new Address(body.personalAddress);
-    }
+		if (body.personalAddress) {
+			if (user.personalAddress) user.personalAddress.update(body.personalAddress);
+			else user.personalAddress = new Address(body.personalAddress);
+		}
 
-    const newUser = await this.usersService.save(user);
-    newUser.password = undefined;
-    return newUser;
-  }
+		const newUser = await this.usersService.save(user);
+		newUser.password = undefined;
+		return newUser;
+	}
 
-  @ApiOkResponse({ type: User, description: "Current user data" })
-  @ApiBearerAuth()
-  @UseGuards(CookieGuard)
-  @Get()
-  async getCurrentUser(@CurrentUser() user: User) {
-    return this.usersService.findById(user.id, {
-      relations: { photo: true, personalAddress: true },
-    });
-  }
+	@ApiOkResponse({ type: User, description: "Current user data" })
+	@ApiBearerAuth()
+	@UseGuards(CookieGuard)
+	@Get()
+	async getCurrentUser(@CurrentUser() user: User) {
+		return this.usersService.findById(user.id, {
+			relations: { photo: true, personalAddress: true },
+		});
+	}
 
-  @ApiConsumes("multipart/form-data")
-  @FormDataRequest({ storage: MemoryStoredFile })
-  @ApiBearerAuth()
-  @UseGuards(CookieGuard)
-  @Patch("photo")
-  async updateCurrentUserPhoto(
-    @CurrentUser() user: User,
-    @Body() body: UpdatePhoto
-  ) {
-    const photo = await this.photoService.save(body.file.buffer, "user_photo");
-    if (!photo) throw new InternalServerErrorException();
+	@ApiConsumes("multipart/form-data")
+	@FormDataRequest({ storage: MemoryStoredFile })
+	@ApiBearerAuth()
+	@UseGuards(CookieGuard)
+	@Patch("photo")
+	async updateCurrentUserPhoto(@CurrentUser() user: User, @Body() body: UpdatePhoto) {
+		const photo = await this.photoService.save(body.file.buffer, "user_photo");
+		if (!photo) throw new InternalServerErrorException();
 
-    user.photo = photo;
-    return this.usersService.save(user);
-  }
+		user.photo = photo;
+		return this.usersService.save(user);
+	}
 
-  @ApiOkResponse({
-    type: [OrganizationMemberWithoutUser],
-    description: "All organizations where user is member of",
-  })
-  @ApiBearerAuth()
-  @UseGuards(CookieGuard)
-  @Get(":id/organizations")
-  userOrganizationMemberships(
-    @Param("id", ParseUUIDPipe) userId: string,
-    @Pagination() pagination: PaginationOptions
-  ) {
-    return this.organizationService.findUserMemberships(userId, { pagination });
-  }
+	@ApiOkResponse({
+		type: [OrganizationMemberWithoutUser],
+		description: "All organizations where user is member of",
+	})
+	@ApiBearerAuth()
+	@UseGuards(CookieGuard)
+	@Get(":id/organizations")
+	userOrganizationMemberships(@Param("id", ParseUUIDPipe) userId: string, @Pagination() pagination: PaginationOptions) {
+		return this.organizationService.findUserMemberships(userId, { pagination });
+	}
 
-  /**
-   * Find all users ordered by `lastName`.
-   */
-  @ApiBearerAuth()
-  @UseGuards(CookieGuard)
-  @Get("all")
-  getAllUsers(@Pagination() pagination: PaginationOptions) {
-    return this.usersService.find({ pagination });
-  }
+	/**
+	 * Find all users ordered by `lastName`.
+	 */
+	@ApiBearerAuth()
+	@UseGuards(CookieGuard)
+	@Get("all")
+	getAllUsers(@Pagination() pagination: PaginationOptions) {
+		return this.usersService.find({ pagination });
+	}
 }

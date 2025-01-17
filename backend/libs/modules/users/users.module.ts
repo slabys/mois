@@ -8,8 +8,8 @@ import { User } from "./entities";
 import { UsersService } from "./providers/services";
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User]), PhotoModule, AddressesModule],
-  providers: [UsersService],
-  exports: [UsersService],
+	imports: [TypeOrmModule.forFeature([User]), PhotoModule, AddressesModule],
+	providers: [UsersService],
+	exports: [UsersService],
 })
 export class UsersModule {}

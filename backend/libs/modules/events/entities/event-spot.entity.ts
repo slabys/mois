@@ -8,26 +8,29 @@ import { InvoiceCurrency } from "modules/invoice/enums";
  */
 @Entity()
 export class EventSpot {
-  @PrimaryGeneratedColumn()
-  id: number;
+	@PrimaryGeneratedColumn()
+	id: number;
 
-  @Column()
-  name: string;
+	@Column()
+	name: string;
 
-  @Column({ unsigned: true })
-  price: number;
+	@Column({ unsigned: true })
+	price: number;
 
-  @ManyToOne(() => Event, (event) => event.spotTypes, {
-    nullable: true,
-    onDelete: "CASCADE",
-  })
-  event: Event;
+	@ManyToOne(
+		() => Event,
+		(event) => event.spotTypes,
+		{
+			nullable: true,
+			onDelete: "CASCADE",
+		},
+	)
+	event: Event;
 
+	@Column({ type: "enum", enum: InvoiceCurrency, default: InvoiceCurrency.CZK })
+	currency: InvoiceCurrency;
 
-  @Column({ type: "enum", enum: InvoiceCurrency, default: InvoiceCurrency.CZK })
-  currency: InvoiceCurrency;
-
-  constructor(base?: Partial<EventSpot>) {
-    Object.assign(this, base);
-  }
+	constructor(base?: Partial<EventSpot>) {
+		Object.assign(this, base);
+	}
 }

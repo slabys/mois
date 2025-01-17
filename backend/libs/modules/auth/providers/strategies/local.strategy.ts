@@ -7,19 +7,19 @@ import { AuthService } from "../services";
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly authService: AuthService) {
-    super(<IStrategyOptions>{
-      passwordField: "password",
-      usernameField: "email",
-    });
-  }
+	constructor(private readonly authService: AuthService) {
+		super(<IStrategyOptions>{
+			passwordField: "password",
+			usernameField: "email",
+		});
+	}
 
-  async validate(email: string, password: string): Promise<User> {
-    const user = await this.authService.validateUser(email, password);
-    if (!user) throw new UnauthorizedException();
-    // Do not expose password hash by mistake
+	async validate(email: string, password: string): Promise<User> {
+		const user = await this.authService.validateUser(email, password);
+		if (!user) throw new UnauthorizedException();
+		// Do not expose password hash by mistake
 
-    user.password = undefined;
-    return user;
-  }
+		user.password = undefined;
+		return user;
+	}
 }

@@ -8,32 +8,32 @@ import { Permission, Role, RolesService } from "modules/roles";
 @UseGuards(CookieGuard)
 @Controller("roles")
 export class RolesController {
-  constructor(private readonly rolesService: RolesService) {}
+	constructor(private readonly rolesService: RolesService) {}
 
-  /**
-   * All available roles to assign
-   */
-  @ApiOkResponse({ type: [Role] })
-  @Get()
-  getAllRoles() {
-    return this.rolesService.findAll();
-  }
+	/**
+	 * All available roles to assign
+	 */
+	@ApiOkResponse({ type: [Role] })
+	@Get()
+	getAllRoles() {
+		return this.rolesService.findAll();
+	}
 
-  /**
-   * Get all allowed permissions registered in system
-   */
-  @ApiOkResponse({
-    description: "Returns permissions",
-    schema: {
-      type: "array",
-      items: {
-        type: "string",
-        enum: Object.values(Permission), // Include all enum values
-      },
-    },
-  })
-  @Get("permissions")
-  getRoleAllPermissions() {
-    return Object.values(Permission);
-  }
+	/**
+	 * Get all allowed permissions registered in system
+	 */
+	@ApiOkResponse({
+		description: "Returns permissions",
+		schema: {
+			type: "array",
+			items: {
+				type: "string",
+				enum: Object.values(Permission), // Include all enum values
+			},
+		},
+	})
+	@Get("permissions")
+	getRoleAllPermissions() {
+		return Object.values(Permission);
+	}
 }

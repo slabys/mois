@@ -7,33 +7,33 @@ import { JwtContent } from "modules/auth/types";
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly jwtService: JwtService
-  ) {}
+	constructor(
+		private readonly usersService: UsersService,
+		private readonly jwtService: JwtService,
+	) {}
 
-  /**
-   * Validate user email and password in database
-   * @param emailOrUsername User email
-   * @param password User password
-   * @returns {UserFindByEmailResult | null} Null if password does not match
-   */
-  async validateUser(emailOrUsername: string, password: string): Promise<User | null> {
-    const user = await this.usersService.findByUsernameOrEmailWithPassword(emailOrUsername);
-    if (!user) return null;
+	/**
+	 * Validate user email and password in database
+	 * @param emailOrUsername User email
+	 * @param password User password
+	 * @returns {UserFindByEmailResult | null} Null if password does not match
+	 */
+	async validateUser(emailOrUsername: string, password: string): Promise<User | null> {
+		const user = await this.usersService.findByUsernameOrEmailWithPassword(emailOrUsername);
+		if (!user) return null;
 
-    const result = await verifyPassword(password, user.password);
-    return result ? user : null;
-  }
+		const result = await verifyPassword(password, user.password);
+		return result ? user : null;
+	}
 
-  /**
-   * Create user jwt
-   * @param user User data
-   * @returns Token
-   */
-  createToken(user: User) {
-    return this.jwtService.signAsync(<JwtContent>{
-      sub: user.id,
-    });
-  }
+	/**
+	 * Create user jwt
+	 * @param user User data
+	 * @returns Token
+	 */
+	createToken(user: User) {
+		return this.jwtService.signAsync(<JwtContent>{
+			sub: user.id,
+		});
+	}
 }

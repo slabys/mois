@@ -7,31 +7,28 @@ import { FileStorageService } from "./providers/services";
 
 // STORAGE_ROUTER_PREFIX
 @Module({
-  imports: [
-    ConfigModule.forRoot(),
-    ServeStaticModule.forRootAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => {
-        const routerPrefix = configService.getOrThrow("STORAGE_ROUTER_PREFIX");
+	imports: [
+		ConfigModule.forRoot(),
+		ServeStaticModule.forRootAsync({
+			imports: [ConfigModule],
+			inject: [ConfigService],
+			useFactory: (configService: ConfigService) => {
+				const routerPrefix = configService.getOrThrow("STORAGE_ROUTER_PREFIX");
 
-        if (!path.isAbsolute(routerPrefix))
-          throw new Error("STORAGE_ROUTER_PREFIX must be absolute");
+				if (!path.isAbsolute(routerPrefix)) throw new Error("STORAGE_ROUTER_PREFIX must be absolute");
 
-        const storageRoot = configService.getOrThrow("STORAGE_ROOT");
+				const storageRoot = configService.getOrThrow("STORAGE_ROOT");
 
-        return [
-          {
-            rootPath: path.isAbsolute(storageRoot)
-              ? storageRoot
-              : path.join(process.cwd(), storageRoot),
-            serveRoot: routerPrefix,
-          },
-        ];
-      },
-    }),
-  ],
-  providers: [FileStorageService],
-  exports: [FileStorageService],
+				return [
+					{
+						rootPath: path.isAbsolute(storageRoot) ? storageRoot : path.join(process.cwd(), storageRoot),
+						serveRoot: routerPrefix,
+					},
+				];
+			},
+		}),
+	],
+	providers: [FileStorageService],
+	exports: [FileStorageService],
 })
 export class FileStorageModule {}

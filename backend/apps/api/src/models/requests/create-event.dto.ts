@@ -1,96 +1,82 @@
 import { Transform } from "class-transformer";
-import {
-  Allow,
-  IsBoolean,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsString,
-  IsUrl,
-  Min,
-  MinLength,
-} from "class-validator";
-import {
-  DateTransform,
-  IsValidDate,
-  IsValidJsonSchema,
-} from "utilities/nest/class-validator";
+import { Allow, IsBoolean, IsInt, IsNumber, IsOptional, IsString, IsUrl, Min, MinLength } from "class-validator";
+import { DateTransform, IsValidDate, IsValidJsonSchema } from "utilities/nest/class-validator";
 
 export class CreateEvent {
-  @MinLength(6)
-  @IsString()
-  title: string;
+	@MinLength(6)
+	@IsString()
+	title: string;
 
-  /**
-   * @example 2024-12-20T16:48:34.681Z
-   */
-  @IsValidDate()
-  @Transform(DateTransform)
-  since: Date;
+	/**
+	 * @example 2024-12-20T16:48:34.681Z
+	 */
+	@IsValidDate()
+	@Transform(DateTransform)
+	since: Date;
 
-  /**
-   * @example 2024-12-20T16:48:34.681Z
-   */
-  @IsValidDate()
-  @Transform(DateTransform)
-  until: Date;
+	/**
+	 * @example 2024-12-20T16:48:34.681Z
+	 */
+	@IsValidDate()
+	@Transform(DateTransform)
+	until: Date;
 
-  /**
-   * @example 2024-12-20T16:48:34.681Z
-   */
-  @IsValidDate()
-  @Transform(DateTransform)
-  registrationDeadline: string;
+	/**
+	 * @example 2024-12-20T16:48:34.681Z
+	 */
+	@IsValidDate()
+	@Transform(DateTransform)
+	registrationDeadline: string;
 
-  @IsString()
-  @MinLength(30)
-  longDescription: string;
+	@IsString()
+	@MinLength(30)
+	longDescription: string;
 
-  @IsString()
-  @MinLength(30)
-  shortDescription: string;
+	@IsString()
+	@MinLength(30)
+	shortDescription: string;
 
-  @IsBoolean()
-  visible?: boolean = true;
+	@IsBoolean()
+	visible?: boolean = true;
 
-  /**
-   * Additional registration properties
-   * ! Must be valid JSON schema
-   */
-  @IsOptional()
-  @IsValidJsonSchema()
-  registrationForm?: object;
+	/**
+	 * Additional registration properties
+	 * ! Must be valid JSON schema
+	 */
+	@IsOptional()
+	@IsValidJsonSchema()
+	registrationForm?: object;
 
-  /**
-   * Generate invoices after {@link registrationDeadline}
-   */
-  @Allow()
-  @IsBoolean()
-  generateInvoices: boolean;
+	/**
+	 * Generate invoices after {@link registrationDeadline}
+	 */
+	@Allow()
+	@IsBoolean()
+	generateInvoices: boolean;
 
-  /**
-   * Event capacity
-   */
-  @Min(0)
-  @IsInt()
-  @IsNumber({ allowNaN: false, allowInfinity: false })
-  capacity: number;
+	/**
+	 * Event capacity
+	 */
+	@Min(0)
+	@IsInt()
+	@IsNumber({ allowNaN: false, allowInfinity: false })
+	capacity: number;
 
-  /**
-   * @example https://test.cz
-   */
-  @IsUrl()
-  termsAndConditionsLink: string;
+	/**
+	 * @example https://test.cz
+	 */
+	@IsUrl()
+	termsAndConditionsLink: string;
 
-  /**
-   * @example https://test.cz
-   */
-  @IsUrl()
-  photoPolicyLink: string;
+	/**
+	 * @example https://test.cz
+	 */
+	@IsUrl()
+	photoPolicyLink: string;
 
-  /**
-   * @example https://test.cz
-   */
-  @IsUrl()
-  codeOfConductLink: string;
+	/**
+	 * @example https://test.cz
+	 */
+	@IsUrl()
+	codeOfConductLink: string;
 }
