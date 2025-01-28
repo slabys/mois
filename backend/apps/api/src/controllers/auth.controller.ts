@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, HttpStatus, Post, Res, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import type { Response } from "express";
 
 import { CookieGuard, LocalGuard } from "modules/auth/providers/guards";
@@ -14,14 +14,12 @@ import { isProduction } from "utilities/env";
 @ApiTags("Auth")
 @Controller("auth")
 export class AuthController {
-	constructor(private readonly authService: AuthService) {}
+	constructor(private readonly authService: AuthService) {
+	}
 
 	/**
 	 * Try to login user with given email and password
 	 */
-	@ApiUnauthorizedResponse({
-		description: "Invalid password or user does not exist",
-	})
 	@ApiCreatedResponse({ type: AccessToken, description: "User access token" })
 	@UseGuards(LocalGuard)
 	@Post("login")
@@ -31,6 +29,7 @@ export class AuthController {
 		@Res({ passthrough: true }) response: Response,
 	) {
 		const token = await this.authService.createToken(user);
+
 		response
 			.cookie("AuthCookie", token, {
 				domain: isProduction ? process.env.WEB_DOMAIN : "localhost",

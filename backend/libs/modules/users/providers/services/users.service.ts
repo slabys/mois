@@ -16,7 +16,8 @@ export class UsersService {
 	constructor(
 		@InjectRepository(User)
 		private readonly UsersRepository: Repository<User>,
-	) {}
+	) {
+	}
 
 	/**
 	 * Save user entity
@@ -30,6 +31,7 @@ export class UsersService {
 	/**
 	 * Find user by ID
 	 * @param id ID
+	 * @param options
 	 * @returns
 	 */
 	findById(id: UserId, options?: FindUserOptions) {
@@ -57,7 +59,7 @@ export class UsersService {
 	 * @param email User email
 	 * @returns
 	 */
-	findByEmaiWithPassword(email: User["email"]): Promise<User | null> {
+	findByEmailWithPassword(email: User["email"]): Promise<User | null> {
 		return this.UsersRepository.createQueryBuilder("user")
 			.addSelect("user.password")
 			.where("user.email = :email", { email })
@@ -69,7 +71,7 @@ export class UsersService {
 	 * @param username User username
 	 * @returns
 	 */
-	findByUsernameWithPasword(username: User["username"]): Promise<User | null> {
+	findByUsernameWithPassword(username: User["username"]): Promise<User | null> {
 		return this.UsersRepository.createQueryBuilder("user")
 			.addSelect("user.password")
 			.where("user.username = :username", { username })
@@ -85,8 +87,8 @@ export class UsersService {
 	 */
 	findByUsernameOrEmailWithPassword(usernameOrEmail: string) {
 		return isEmail(usernameOrEmail)
-			? this.findByEmaiWithPassword(usernameOrEmail)
-			: this.findByUsernameWithPasword(usernameOrEmail);
+			? this.findByEmailWithPassword(usernameOrEmail)
+			: this.findByUsernameWithPassword(usernameOrEmail);
 	}
 
 	/**
