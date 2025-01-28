@@ -18,8 +18,6 @@ export class RolesController {
 	@Post("create")
 	async createRole(@CurrentUser() user: User, @Body() body: CreateRole) {
 
-		console.log(body);
-
 		let role = new Role({
 			name: body.name,
 			permissions: body.permissions,

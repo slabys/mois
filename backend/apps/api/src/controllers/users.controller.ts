@@ -14,7 +14,6 @@ import {
 import {
 	ApiBadRequestResponse,
 	ApiBearerAuth,
-	ApiConflictResponse,
 	ApiConsumes,
 	ApiCreatedResponse,
 	ApiOkResponse,
@@ -40,15 +39,10 @@ export class UsersController {
 		private readonly usersService: UsersService,
 		private readonly photoService: PhotoService,
 		private readonly organizationService: OrganizationService,
-	) {}
+	) {
+	}
 
-	@ApiConflictResponse({
-		description: "User with email or username already exist",
-	})
 	@ApiCreatedResponse({ type: User, description: "User has been created" })
-	@ApiBadRequestResponse({
-		description: "Invalid university ID given or payload did not pass validation",
-	})
 	@Post()
 	async createUser(@Body() body: CreateUser) {
 		const exist = await this.usersService.exist([{ email: body.email }, { username: body.username }]);

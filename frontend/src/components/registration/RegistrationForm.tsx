@@ -2,9 +2,10 @@
 
 import { useCreateUser } from "@/utils/api";
 import { CreateUser, CreateUserGender } from "@/utils/api.schemas";
+import { showErrorNotification, updateErrorNotification } from "@/utils/notifications";
 import routes from "@/utils/routes";
 import Select from "@components/primitives/Select";
-import { Box, Button, Flex, SimpleGrid, Text, TextInput } from "@mantine/core";
+import { Box, Button, Flex, PasswordInput, SimpleGrid, Text, TextInput } from "@mantine/core";
 import { Form, hasLength, isEmail, isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
@@ -40,27 +41,8 @@ const RegistrationForm = () => {
       },
       onError: (mutationError) => {
         if (!mutationError.response?.data) return;
-        const { statusCode, error, message } = mutationError.response?.data;
-        console.error(statusCode, error, message);
-        notifications.update({
-          id: "register-event",
-          title: "Something went wrong.",
-          message: "Please check all information first. Then try again.",
-          color: "red",
-          loading: false,
-          autoClose: true,
-        });
-        let parsedMessage: string[] = [];
-        if (typeof message === "string") {
-          parsedMessage.push(message);
-        }
-        parsedMessage.forEach((err) => {
-          notifications.show({
-            title: `${statusCode} ${error}`,
-            message: err,
-            color: "red",
-          });
-        });
+        updateErrorNotification("register-event");
+        showErrorNotification(mutationError);
       },
     },
   });
@@ -129,8 +111,13 @@ const RegistrationForm = () => {
             />
           </SimpleGrid>
           <SimpleGrid cols={2}>
-            <TextInput label="Password" type="password" {...form.getInputProps("password")} required />
-            <TextInput label="Confirm Password" type="password" {...form.getInputProps("confirmPassword")} required />
+            <PasswordInput label="Password" type="password" {...form.getInputProps("password")} required />
+            <PasswordInput
+              label="Confirm Password"
+              type="password"
+              {...form.getInputProps("confirmPassword")}
+              required
+            />
           </SimpleGrid>
         </Flex>
         <Flex direction="column" gap={16} mt={16}>

@@ -2,10 +2,10 @@
 
 import { useLoginUserWithEmailOrUsername } from "@/utils/api";
 import { LoginUser } from "@/utils/api.schemas";
+import { showErrorNotification } from "@/utils/notifications";
 import routes from "@/utils/routes";
-import { Box, Button, Flex, Text, TextInput } from "@mantine/core";
+import { Box, Button, Flex, PasswordInput, Text, TextInput } from "@mantine/core";
 import { Form, isNotEmpty, useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
 import React from "react";
 
@@ -18,18 +18,7 @@ const LoginForm = () => {
       },
       onError: (mutationError) => {
         if (!mutationError.response?.data) return;
-        const { statusCode, error, message } = mutationError.response?.data;
-        let parsedMessage: string[] = [];
-        if (typeof message === "string") {
-          parsedMessage.push(message);
-        }
-        parsedMessage.forEach((err) => {
-          notifications.show({
-            title: `${statusCode} ${error}`,
-            message: err,
-            color: "red",
-          });
-        });
+        showErrorNotification(mutationError);
       },
     },
   });
@@ -56,7 +45,7 @@ const LoginForm = () => {
       <Form form={form} onSubmit={loginUser}>
         <Flex direction="column" gap={12}>
           <TextInput label="Email" {...form.getInputProps("email")} />
-          <TextInput label="Password" type="password" {...form.getInputProps("password")} />
+          <PasswordInput label="Password" type="password" {...form.getInputProps("password")} />
         </Flex>
         <Flex direction="column" gap={16} mt={16}>
           <Button loading={loginUserMutation.isPending} type="submit">

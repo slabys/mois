@@ -23,16 +23,29 @@ import { IconChevronDown, IconLogout, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
-interface MainLinksProps {
+type MainLink = {
   link: string;
   label: string;
-}
+};
 
-const mainLinks: MainLinksProps[] = [
+type GroupedLinks = {
+  label: string;
+  children: MainLink[];
+};
+
+type MainLinksProps = (MainLink | GroupedLinks)[];
+
+const mainLinks: MainLinksProps = [
   { link: routes.DASHBOARD, label: "Home" },
-  { link: routes.MANAGE_EVENTS, label: "Manage Events" },
-  { link: routes.MANAGE_ORGANIZATIONS, label: "Manage Organizations" },
   { link: routes.SENT_APPLICATIONS, label: "Sent Applications" },
+  {
+    label: "Management",
+    children: [
+      { link: routes.MANAGE_EVENTS, label: "Manage Events" },
+      { link: routes.MANAGE_ORGANIZATIONS, label: "Manage Organizations" },
+      { link: routes.MANAGE_PEOPLE, label: "Manage People" },
+    ],
+  },
 ];
 
 const LayoutHeader = () => {
@@ -51,20 +64,58 @@ const LayoutHeader = () => {
 
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
 
-  const mainItems = mainLinks.map((item, index) => (
-    <Anchor
-      component={Link}
-      key={`main-link-${index}-${item.label}`}
-      href={item.link}
-      className={styles.mainLink}
-      data-active={pathname === item.link || undefined}
-      onClick={() => {
-        closeDrawer();
-      }}
-    >
-      {item.label}
-    </Anchor>
-  ));
+  const mainItems = mainLinks.map((item, index) => {
+    if ("children" in item) {
+      return (
+        <Box key={`dropdown-menu-${index}`}>
+          <Menu shadow="md" trigger="hover" position="bottom-start">
+            <Menu.Target>
+              <Button
+                component={Anchor}
+                variant="subtle"
+                className={styles.mainLink}
+                data-active={item.children.some((f) => f.link === pathname) || undefined}
+                rightSection={<IconChevronDown />}
+              >
+                {item.label}
+              </Button>
+            </Menu.Target>
+
+            <Menu.Dropdown>
+              {item.children.map((subItem, jIndex) => {
+                return (
+                  <Menu.Item
+                    key={`dropdown-menu-${index}-item-${jIndex}`}
+                    component={Link}
+                    href={subItem.link}
+                    classNames={{ item: styles.subLink }}
+                    data-active={pathname === subItem.link || undefined}
+                  >
+                    {subItem.label}
+                  </Menu.Item>
+                );
+              })}
+            </Menu.Dropdown>
+          </Menu>
+        </Box>
+      );
+    }
+
+    return (
+      <Anchor
+        component={Link}
+        key={`main-link-${index}-${item.label}`}
+        href={item.link}
+        className={styles.mainLink}
+        data-active={pathname === item.link || undefined}
+        onClick={() => {
+          closeDrawer();
+        }}
+      >
+        {item.label}
+      </Anchor>
+    );
+  });
 
   return (
     <header className={styles.header}>

@@ -8,6 +8,7 @@ export const routes = {
   // --- Authorized ---
   DASHBOARD: "/",
   MANAGE_EVENTS: "/manage-events",
+  MANAGE_PEOPLE: "/manage-people",
   MANAGE_ORGANIZATIONS: "/manage-organizations",
   SENT_APPLICATIONS: "/sent-applications",
   ACCOUNT: "/account",
