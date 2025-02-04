@@ -292,7 +292,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
           ))}
         </List>
       ) : (
-        <Text>No applications found.</Text>
+        <Text>No spots created.</Text>
       )}
 
       <ScrollArea w="100%">

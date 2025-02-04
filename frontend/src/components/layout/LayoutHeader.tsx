@@ -1,8 +1,10 @@
 "use client";
 
 import { useGetCurrentUser, useLogoutUser } from "@/utils/api";
+import { RolePermissionsItem } from "@/utils/api.schemas";
 import routes from "@/utils/routes";
 import styles from "@components/layout/LayoutHeader.module.css";
+import NavigationItemList from "@components/layout/NavigationItemList";
 import {
   Anchor,
   Box,
@@ -23,27 +25,42 @@ import { IconChevronDown, IconLogout, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
-type MainLink = {
+export type MainLink = {
   link: string;
   label: string;
+  permissions: RolePermissionsItem[] | null;
 };
 
-type GroupedLinks = {
+export type GroupedLinks = {
   label: string;
   children: MainLink[];
 };
 
-type MainLinksProps = (MainLink | GroupedLinks)[];
+export type MainLinksProps = (MainLink | GroupedLinks)[];
 
 const mainLinks: MainLinksProps = [
-  { link: routes.DASHBOARD, label: "Home" },
-  { link: routes.SENT_APPLICATIONS, label: "Sent Applications" },
+  { link: routes.DASHBOARD, label: "Home", permissions: null },
+  { link: routes.SENT_APPLICATIONS, label: "Sent Applications", permissions: null },
   {
     label: "Management",
     children: [
-      { link: routes.MANAGE_EVENTS, label: "Manage Events" },
-      { link: routes.MANAGE_ORGANIZATIONS, label: "Manage Organizations" },
-      { link: routes.MANAGE_PEOPLE, label: "Manage People" },
+      {
+        link: routes.MANAGE_EVENTS,
+        label: "Manage Events",
+        permissions: ["event.create", "event.update", "event.duplicate"],
+      },
+      {
+        link: routes.MANAGE_ORGANIZATIONS,
+        label: "Manage Organizations",
+        permissions: [
+          "organisation.create",
+          "organisation.update",
+          "organisation.addUser",
+          "organisation.updateUser",
+          "organisation.deleteUser",
+        ],
+      },
+      { link: routes.MANAGE_PEOPLE, label: "Manage People", permissions: [] },
     ],
   },
 ];
@@ -61,61 +78,13 @@ const LayoutHeader = () => {
   });
 
   const { data: currentUser } = useGetCurrentUser();
+  console.log(currentUser?.role);
 
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
 
-  const mainItems = mainLinks.map((item, index) => {
-    if ("children" in item) {
-      return (
-        <Box key={`dropdown-menu-${index}`}>
-          <Menu shadow="md" trigger="hover" position="bottom-start">
-            <Menu.Target>
-              <Button
-                component={Anchor}
-                variant="subtle"
-                className={styles.mainLink}
-                data-active={item.children.some((f) => f.link === pathname) || undefined}
-                rightSection={<IconChevronDown />}
-              >
-                {item.label}
-              </Button>
-            </Menu.Target>
-
-            <Menu.Dropdown>
-              {item.children.map((subItem, jIndex) => {
-                return (
-                  <Menu.Item
-                    key={`dropdown-menu-${index}-item-${jIndex}`}
-                    component={Link}
-                    href={subItem.link}
-                    classNames={{ item: styles.subLink }}
-                    data-active={pathname === subItem.link || undefined}
-                  >
-                    {subItem.label}
-                  </Menu.Item>
-                );
-              })}
-            </Menu.Dropdown>
-          </Menu>
-        </Box>
-      );
-    }
-
-    return (
-      <Anchor
-        component={Link}
-        key={`main-link-${index}-${item.label}`}
-        href={item.link}
-        className={styles.mainLink}
-        data-active={pathname === item.link || undefined}
-        onClick={() => {
-          closeDrawer();
-        }}
-      >
-        {item.label}
-      </Anchor>
-    );
-  });
+  if (!currentUser) {
+    return null;
+  }
 
   return (
     <header className={styles.header}>
@@ -131,7 +100,12 @@ const LayoutHeader = () => {
 
         <Box className={styles.links} visibleFrom="sm">
           <Group gap={0} justify="flex-end">
-            {mainItems}
+            <NavigationItemList
+              userRole={currentUser?.role}
+              mainLinks={mainLinks}
+              pathname={pathname}
+              closeDrawer={closeDrawer}
+            />
             <Menu width={260} position="bottom-start" withinPortal>
               <Menu.Target>
                 <Button
@@ -179,7 +153,12 @@ const LayoutHeader = () => {
         <Divider my="sm" />
 
         <Stack gap={4} justify="flex-end">
-          {mainItems}
+          <NavigationItemList
+            userRole={currentUser.role}
+            mainLinks={mainLinks}
+            pathname={pathname}
+            closeDrawer={closeDrawer}
+          />
         </Stack>
 
         <Divider my="sm" />

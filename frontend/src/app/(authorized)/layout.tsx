@@ -1,10 +1,10 @@
 import Layout from "@/components/layout/Layout";
-import React from "react";
+import React, { ReactElement } from "react";
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactElement;
 }>) {
   return <Layout>{children}</Layout>;
 }

@@ -29,6 +29,7 @@ import type {
   CreateEventSpot,
   CreateOrganization,
   CreateOrganization201,
+  CreateRole,
   CreateUser,
   DeleteEventSpot,
   DeleteOrganizationMembers,
@@ -82,7 +83,10 @@ export const loginUserWithEmailOrUsername = (
   );
 };
 
-export const getLoginUserWithEmailOrUsernameMutationOptions = <TError = ErrorType<void>, TContext = unknown>(options?: {
+export const getLoginUserWithEmailOrUsernameMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof loginUserWithEmailOrUsername>>,
     TError,
@@ -114,9 +118,9 @@ export type LoginUserWithEmailOrUsernameMutationResult = NonNullable<
   Awaited<ReturnType<typeof loginUserWithEmailOrUsername>>
 >;
 export type LoginUserWithEmailOrUsernameMutationBody = BodyType<LoginUser>;
-export type LoginUserWithEmailOrUsernameMutationError = ErrorType<void>;
+export type LoginUserWithEmailOrUsernameMutationError = ErrorType<unknown>;
 
-export const useLoginUserWithEmailOrUsername = <TError = ErrorType<void>, TContext = unknown>(options?: {
+export const useLoginUserWithEmailOrUsername = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof loginUserWithEmailOrUsername>>,
     TError,
@@ -179,7 +183,7 @@ export const createUser = (
   );
 };
 
-export const getCreateUserMutationOptions = <TError = ErrorType<void>, TContext = unknown>(options?: {
+export const getCreateUserMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createUser>>,
     TError,
@@ -203,9 +207,9 @@ export const getCreateUserMutationOptions = <TError = ErrorType<void>, TContext 
 
 export type CreateUserMutationResult = NonNullable<Awaited<ReturnType<typeof createUser>>>;
 export type CreateUserMutationBody = BodyType<CreateUser>;
-export type CreateUserMutationError = ErrorType<void>;
+export type CreateUserMutationError = ErrorType<unknown>;
 
-export const useCreateUser = <TError = ErrorType<void>, TContext = unknown>(options?: {
+export const useCreateUser = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createUser>>,
     TError,
@@ -2686,6 +2690,57 @@ export function useGetInvoicePdfStream<
 
   return query;
 }
+
+export const createRole = (
+  createRole: BodyType<CreateRole>,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<Role>(
+    { url: `/roles/create`, method: "POST", headers: { "Content-Type": "application/json" }, data: createRole, signal },
+    options,
+  );
+};
+
+export const getCreateRoleMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createRole>>,
+    TError,
+    { data: BodyType<CreateRole> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<Awaited<ReturnType<typeof createRole>>, TError, { data: BodyType<CreateRole> }, TContext> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof createRole>>, { data: BodyType<CreateRole> }> = (
+    props,
+  ) => {
+    const { data } = props ?? {};
+
+    return createRole(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateRoleMutationResult = NonNullable<Awaited<ReturnType<typeof createRole>>>;
+export type CreateRoleMutationBody = BodyType<CreateRole>;
+export type CreateRoleMutationError = ErrorType<unknown>;
+
+export const useCreateRole = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createRole>>,
+    TError,
+    { data: BodyType<CreateRole> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationResult<Awaited<ReturnType<typeof createRole>>, TError, { data: BodyType<CreateRole> }, TContext> => {
+  const mutationOptions = getCreateRoleMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
 
 /**
  * All available roles to assign

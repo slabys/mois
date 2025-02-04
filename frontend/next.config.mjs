@@ -11,7 +11,7 @@ const withPWA = withPWAInit({
 /** @type {import("next").NextConfig} */
 const nextConfig = {
   output: "standalone",
-  reactStrictMode: true,
+  reactStrictMode: false,
   swcMinify: true,
   env: {
     NEXT_PUBLIC_APP1_URL: process.env.NEXT_PUBLIC_APP1_URL,
