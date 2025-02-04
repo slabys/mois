@@ -23,7 +23,17 @@ export type GetRoleAllPermissions200Item =
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetRoleAllPermissions200Item = {
-  createevent: "create.event",
+  eventcreate: "event.create",
+  eventupdate: "event.update",
+  eventduplicate: "event.duplicate",
+  organisationcreate: "organisation.create",
+  organisationupdate: "organisation.update",
+  organisationaddUser: "organisation.addUser",
+  organisationupdateUser: "organisation.updateUser",
+  organisationdeleteUser: "organisation.deleteUser",
+  rolecreate: "role.create",
+  roleupdate: "role.update",
+  roledelete: "role.delete",
 } as const;
 
 export type GetEventSpotsParams = {
@@ -102,6 +112,28 @@ export type UserOrganizationMembershipsParams = {
    */
   skip?: number;
 };
+
+export type CreateRolePermissionsItem = (typeof CreateRolePermissionsItem)[keyof typeof CreateRolePermissionsItem];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateRolePermissionsItem = {
+  eventcreate: "event.create",
+  eventupdate: "event.update",
+  eventduplicate: "event.duplicate",
+  organisationcreate: "organisation.create",
+  organisationupdate: "organisation.update",
+  organisationaddUser: "organisation.addUser",
+  organisationupdateUser: "organisation.updateUser",
+  organisationdeleteUser: "organisation.deleteUser",
+  rolecreate: "role.create",
+  roleupdate: "role.update",
+  roledelete: "role.delete",
+} as const;
+
+export interface CreateRole {
+  name: string;
+  permissions?: CreateRolePermissionsItem[];
+}
 
 export interface InvoiceUrl {
   url: string;
@@ -343,10 +375,6 @@ export interface EventApplicationSimpleWithApplications {
   user: User;
 }
 
-export type CreateEventApplicationOrganization =
-  | CreateEventApplicationExistingOrganization
-  | CreateEventApplicationCustomOrganization;
-
 export type CreateEventApplicationAdditionalFormData = { [key: string]: unknown };
 
 export interface CreateEventApplication {
@@ -385,6 +413,10 @@ export interface CreateEventApplicationExistingOrganization {
   id: string;
   type: CreateEventApplicationExistingOrganizationType;
 }
+
+export type CreateEventApplicationOrganization =
+  | CreateEventApplicationExistingOrganization
+  | CreateEventApplicationCustomOrganization;
 
 /**
  * @nullable
@@ -673,17 +705,27 @@ export const UserGender = {
   "prefer-not-to-say": "prefer-not-to-say",
 } as const;
 
-export type RolePermissions = (typeof RolePermissions)[keyof typeof RolePermissions];
+export type RolePermissionsItem = (typeof RolePermissionsItem)[keyof typeof RolePermissionsItem];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const RolePermissions = {
-  createevent: "create.event",
+export const RolePermissionsItem = {
+  eventcreate: "event.create",
+  eventupdate: "event.update",
+  eventduplicate: "event.duplicate",
+  organisationcreate: "organisation.create",
+  organisationupdate: "organisation.update",
+  organisationaddUser: "organisation.addUser",
+  organisationupdateUser: "organisation.updateUser",
+  organisationdeleteUser: "organisation.deleteUser",
+  rolecreate: "role.create",
+  roleupdate: "role.update",
+  roledelete: "role.delete",
 } as const;
 
 export interface Role {
-  id: string;
+  id: number;
   name: string;
-  permissions: RolePermissions;
+  permissions: RolePermissionsItem[];
 }
 
 export interface Address {

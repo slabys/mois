@@ -1,10 +1,10 @@
 import LayoutFooter from "@components/layout/LayoutFooter";
 import LayoutHeader from "@components/layout/LayoutHeader";
 import { Box } from "@mantine/core";
-import { ReactNode } from "react";
+import { ReactElement } from "react";
 
 interface LayoutProps {
-  children: ReactNode;
+  children: ReactElement;
 }
 
 const Layout = ({ children }: LayoutProps) => {

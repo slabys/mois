@@ -1,19 +1,26 @@
 import { useCreateUserApplication, useGetEventSpots } from "@/utils/api";
-import { CreateAddress, CreateEventApplication, User } from "@/utils/api.schemas";
-import { Button, ComboboxData, Flex, Group, Modal, Text, TextInput, Title } from "@mantine/core";
+import { CreateEventApplication, User } from "@/utils/api.schemas";
+import { showErrorNotification, updateErrorNotification } from "@/utils/notifications";
+import { Box, Button, Code, Flex, Group, Modal, Text, TextInput, Title } from "@mantine/core";
 import { Form, isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import React from "react";
+import React, { useState } from "react";
 
 interface JoinEventModalProps {
   eventId: number;
-  userData: User;
+  currentUser: User;
   isOpened: boolean;
   closeModal: () => void;
   handleSuccess?: () => void;
 }
 
-const JoinEventModal = ({ userData, eventId, isOpened, closeModal, handleSuccess = () => {} }: JoinEventModalProps) => {
+const JoinEventModal = ({
+  currentUser,
+  eventId,
+  isOpened,
+  closeModal,
+  handleSuccess = () => {},
+}: JoinEventModalProps) => {
   const { data: eventSpots } = useGetEventSpots(eventId);
 
   const form = useForm<Partial<CreateEventApplication>>({
@@ -23,19 +30,18 @@ const JoinEventModal = ({ userData, eventId, isOpened, closeModal, handleSuccess
         name: "",
         country: "",
       },
-      additionalFormData: {},
-      spotTypeId: null,
-      invoiceAddress:
-        userData.personalAddress !== null
-          ? {
-              country: userData?.personalAddress.country ?? "",
-              city: userData?.personalAddress.city ?? "",
-              street: userData?.personalAddress.street ?? "",
-              houseNumber: userData?.personalAddress.houseNumber ?? "",
-              zip: userData?.personalAddress.zip ?? "",
-            }
-          : undefined,
       idNumber: "",
+      // invoiceAddress:
+      //   userData.personalAddress !== null
+      //     ? {
+      //         country: userData?.personalAddress.country ?? "",
+      //         city: userData?.personalAddress.city ?? "",
+      //         street: userData?.personalAddress.street ?? "",
+      //         houseNumber: userData?.personalAddress.houseNumber ?? "",
+      //         zip: userData?.personalAddress.zip ?? "",
+      //       }
+      //     : undefined,
+      additionalFormData: {},
     },
     validate: {
       organization: {
@@ -44,6 +50,7 @@ const JoinEventModal = ({ userData, eventId, isOpened, closeModal, handleSuccess
         country: isNotEmpty("This field should not be empty"),
       },
       idNumber: isNotEmpty("This file should not be empty"),
+      invoiceAddress: isNotEmpty("This field should not be empty"),
     },
   });
 
@@ -54,22 +61,22 @@ const JoinEventModal = ({ userData, eventId, isOpened, closeModal, handleSuccess
     closeModal();
   };
 
-  const createEventApplication = useCreateUserApplication({
+  const eventApplicationMutation = useCreateUserApplication({
     mutation: {
       onMutate: () => {
         notifications.show({
-          id: "create-user-application",
+          id: "event-application",
           loading: true,
           title: "Loading! Please wait...",
-          message: "We are create event.",
+          message: "We are processing your event application.",
           autoClose: false,
         });
       },
       onSuccess: () => {
         notifications.update({
-          id: "create-user-application",
-          title: "Event Edit",
-          message: "Event create updated successfully.",
+          id: "event-application",
+          title: "Event Application",
+          message: "Event Application created successfully.",
           color: "green",
           loading: false,
           autoClose: true,
@@ -78,94 +85,67 @@ const JoinEventModal = ({ userData, eventId, isOpened, closeModal, handleSuccess
         form.reset();
         closeModal();
       },
-      onError: (error) => {
-        notifications.update({
-          id: "create-user-application",
-          title: "Something went wrong.",
-          message: "Please check all information first. Then try again.",
-          color: "red",
-          loading: false,
-          autoClose: true,
-        });
-        if (error.response?.data && error.response.data.message) {
-          (error.response.data.message as string[]).forEach((err) => {
-            notifications.show({
-              title: "Error",
-              message: err,
-              color: "red",
-            });
-          });
-        }
+      onError: (mutationError) => {
+        if (!mutationError.response?.data) return;
+        updateErrorNotification("event-application");
+        showErrorNotification(mutationError);
       },
     },
   });
 
-  const handleCreateEvent = (submitValues: Partial<CreateEventApplication>) => {
+  const handleEventApplication = (submitValues: Partial<CreateEventApplication>) => {
     form.validate();
     if (form.isValid()) {
-      createEventApplication.mutate({
+      eventApplicationMutation.mutate({
         eventId: eventId,
         data: submitValues as CreateEventApplication,
       });
     }
   };
 
-  const spots: ComboboxData =
-    eventSpots?.map((spot) => {
-      return { value: spot.id.toString(), label: spot.name };
-    }) ?? [];
-
-  const isInvoiceAdress = (address: CreateAddress | undefined) => {
-    return address ? Object.entries(address).some(([_key, value]) => (value as string)?.length > 0) : undefined;
-  };
+  const [active, setActive] = useState(1);
+  const nextStep = () => setActive((current) => (current < 3 ? current + 1 : current));
+  const prevStep = () => setActive((current) => (current > 0 ? current - 1 : current));
 
   return (
-    <Modal size="xl" opened={isOpened} onClose={handleClose} title="Create Event">
-      <Form form={form} onSubmit={handleCreateEvent}>
+    <Modal size="xl" opened={isOpened} onClose={handleClose} title="Event Application">
+      <Form form={form} onSubmit={handleEventApplication}>
+        {/*<Stepper active={active} onStepClick={setActive}>*/}
+        {/*  <Stepper.Step label="First step" description="Create an account">*/}
+        {/*    Step 1 content: Create an account*/}
+        {/*  </Stepper.Step>*/}
+        {/*  <Stepper.Step label="Second step" description="Verify email">*/}
+        {/*    Step 2 content: Verify email*/}
+        {/*  </Stepper.Step>*/}
+        {/*  <Stepper.Step label="Final step" description="Get full access">*/}
+        {/*    Step 3 content: Get full access*/}
+        {/*  </Stepper.Step>*/}
+        {/*  <Stepper.Completed>Completed, click back button to get to previous step</Stepper.Completed>*/}
+        {/*</Stepper>*/}
         <Flex direction="column" gap={16}>
           <Title order={3}>Organisation Info</Title>
           <TextInput label="Organisation Name" {...form.getInputProps("organization.name")} required />
           <TextInput label="Organisation Country" {...form.getInputProps("organization.country")} required />
-          {/*<Select*/}
-          {/*  label="Select spot"*/}
-          {/*  data={spots}*/}
-          {/*  searchable*/}
-          {/*  nothingFoundMessage="Nothing found..."*/}
-          {/*  allowDeselect*/}
-          {/*  required*/}
-          {/*/>*/}
           <TextInput label="Person ID Number / Passport Number" {...form.getInputProps("idNumber")} required />
+          <Box>
+            <Text fz="sm">Personal address:</Text>
+            <Code block>
+              {`${currentUser.personalAddress.street} ${currentUser.personalAddress.zip}
+${currentUser.personalAddress.zip} ${currentUser.personalAddress.city}
+${currentUser.personalAddress.country}`}
+            </Code>
+          </Box>
           <Flex direction="column" gap={16}>
             <Text>Invoice address</Text>
-            <TextInput
-              label="Country"
-              {...form.getInputProps("invoiceAddress.country")}
-              required={isInvoiceAdress(form.values.invoiceAddress)}
-            />
-            <TextInput
-              label="City"
-              {...form.getInputProps("invoiceAddress.city")}
-              required={isInvoiceAdress(form.values.invoiceAddress)}
-            />
-            <TextInput
-              label="Street"
-              {...form.getInputProps("invoiceAddress.street")}
-              required={isInvoiceAdress(form.values.invoiceAddress)}
-            />
-            <TextInput
-              label="House Number"
-              {...form.getInputProps("invoiceAddress.houseNumber")}
-              required={isInvoiceAdress(form.values.invoiceAddress)}
-            />
-            <TextInput
-              label="zip"
-              {...form.getInputProps("invoiceAddress.zip")}
-              required={isInvoiceAdress(form.values.invoiceAddress)}
-            />
+            <TextInput label="Country" {...form.getInputProps("invoiceAddress.country")} />
+            <TextInput label="City" {...form.getInputProps("invoiceAddress.city")} />
+            <TextInput label="Street" {...form.getInputProps("invoiceAddress.street")} />
+            <TextInput label="House Number" {...form.getInputProps("invoiceAddress.houseNumber")} />
+            <TextInput label="zip" {...form.getInputProps("invoiceAddress.zip")} />
           </Flex>
         </Flex>
         <Group justify="center" mt="lg">
-          <Button type="submit" disabled={!isTouchedDirty} loading={createEventApplication.isPending}>
+          <Button type="submit" disabled={!isTouchedDirty} loading={eventApplicationMutation.isPending}>
             Save changes
           </Button>
         </Group>

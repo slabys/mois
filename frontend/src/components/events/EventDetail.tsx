@@ -1,6 +1,7 @@
 "use client";
 
 import { useGetCurrentUser, useGetEvent, useGetEventApplications } from "@/utils/api";
+import { hasEveryPermissions } from "@/utils/checkPermissions";
 import routes from "@/utils/routes";
 import { dateWithTime, dayMonthYear } from "@/utils/time";
 import ApiImage from "@components/ApiImage/ApiImage";
@@ -8,12 +9,25 @@ import JoinEventModal from "@components/JoinEventModal/JoinEventModal";
 import RichTextRenderer from "@components/Richtext/RichTextRenderer";
 import UpdateEventPhotoModal from "@components/UpdateEventPhotoModal/UpdateEventPhotoModal";
 import EventEditModal from "@components/events/modals/EventEditModal";
-import { Button, Collapse, Divider, Flex, Grid, Paper, SimpleGrid, Skeleton, Text, Title } from "@mantine/core";
+import {
+  Blockquote,
+  Button,
+  Collapse,
+  Divider,
+  Flex,
+  Grid,
+  Paper,
+  SimpleGrid,
+  Skeleton,
+  Text,
+  Title,
+} from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import {
   IconCash,
   IconChevronDown,
   IconEdit,
+  IconInfoCircle,
   IconInvoice,
   IconPhoto,
   IconUsersGroup,
@@ -36,10 +50,10 @@ const EventDetail = ({ id }: EventDetailProps) => {
 
   const { data: eventApplications, refetch: refetchEventApplications } = useGetEventApplications(id);
   const { data: eventDetail, refetch: refetchEvent } = useGetEvent(id);
-  const { data: userData, refetch: refetchCurrentUser } = useGetCurrentUser();
+  const { data: currentUser, refetch: refetchCurrentUser } = useGetCurrentUser();
 
   const isUserRegistered = useMemo(() => {
-    return eventApplications?.some((f) => f.user.id === userData?.id);
+    return eventApplications?.some((f) => f.user.id === currentUser?.id);
   }, [eventApplications, id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleRefetchDetail = () => {
@@ -48,8 +62,8 @@ const EventDetail = ({ id }: EventDetailProps) => {
     refetchCurrentUser();
   };
 
-  if (!eventApplications || !eventDetail || !userData) {
-    return "Loading...";
+  if (!eventApplications || !eventDetail || !currentUser) {
+    return null;
   }
   return eventDetail ? (
     <>
@@ -111,15 +125,21 @@ const EventDetail = ({ id }: EventDetailProps) => {
             </Button>
             <Collapse in={isPhone ? !opened : opened}>
               <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 1, xl: 1 }}>
-                <Button onClick={openModalEdit} leftSection={<IconEdit />}>
-                  Edit Event
-                </Button>
-                <Button onClick={openModalUploadPhoto} leftSection={<IconPhoto />}>
-                  Upload Image
-                </Button>
-                <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconUsersGroup />}>
-                  Manage Applications
-                </Button>
+                {hasEveryPermissions(currentUser.role, ["event.update"]) && (
+                  <Button onClick={openModalEdit} leftSection={<IconEdit />}>
+                    Edit Event
+                  </Button>
+                )}
+                {hasEveryPermissions(currentUser.role, ["event.update"]) && (
+                  <Button onClick={openModalUploadPhoto} leftSection={<IconPhoto />}>
+                    Upload Image
+                  </Button>
+                )}
+                {hasEveryPermissions(currentUser.role, []) && (
+                  <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconUsersGroup />}>
+                    Manage Applications
+                  </Button>
+                )}
               </SimpleGrid>
 
               {isUserRegistered && (
@@ -127,11 +147,16 @@ const EventDetail = ({ id }: EventDetailProps) => {
                   <Divider my={16} />
                   <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 1, xl: 1 }}>
                     {/* TODO */}
-                    <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconInvoice />}>
+                    <Button
+                      component={Link}
+                      href={routes.EVENT_MANAGE({ id: id })}
+                      leftSection={<IconInvoice />}
+                      disabled
+                    >
                       Show Invoice
                     </Button>
                     {/* TODO */}
-                    <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconCash />}>
+                    <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconCash />} disabled>
                       Upload Payment
                     </Button>
                   </SimpleGrid>
@@ -141,14 +166,21 @@ const EventDetail = ({ id }: EventDetailProps) => {
               <Divider my={16} />
 
               <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 1, xl: 1 }}>
-                <Button
-                  onClick={openModalJoinEvent}
-                  disabled={isUserRegistered}
-                  color="green"
-                  leftSection={<IconWritingSign />}
-                >
-                  {isUserRegistered ? "Already registered" : "Register to Event"}
-                </Button>
+                <Flex direction="column" gap={4}>
+                  {currentUser.personalAddress === null && (
+                    <Blockquote color="red" icon={<IconInfoCircle />} p={20}>
+                      Fill your personal address on your profile before registration.
+                    </Blockquote>
+                  )}
+                  <Button
+                    onClick={openModalJoinEvent}
+                    disabled={isUserRegistered || currentUser.personalAddress === null}
+                    color="green"
+                    leftSection={<IconWritingSign />}
+                  >
+                    {isUserRegistered ? "Already registered" : "Register to Event"}
+                  </Button>
+                </Flex>
               </SimpleGrid>
             </Collapse>
           </Flex>
@@ -166,11 +198,11 @@ const EventDetail = ({ id }: EventDetailProps) => {
         isOpened={isModalEditOpen}
         close={closeModalEdit}
       />
-      {!!userData ? (
+      {!!currentUser ? (
         <JoinEventModal
-          userData={userData}
-          handleSuccess={handleRefetchDetail}
+          currentUser={currentUser}
           eventId={eventDetail.id}
+          handleSuccess={handleRefetchDetail}
           isOpened={isModalJoinEventOpen}
           closeModal={() => {
             closeModalJoinEvent();

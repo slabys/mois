@@ -7,7 +7,7 @@ import "@mantine/dropzone/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/tiptap/styles.css";
 import type { Metadata } from "next";
-import React, { Suspense } from "react";
+import React, { ReactElement, Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "ESN Event Registration System",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactElement;
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
