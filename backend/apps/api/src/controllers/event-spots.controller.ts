@@ -1,5 +1,4 @@
 import {
-	BadRequestException,
 	Body,
 	Controller,
 	Delete,
@@ -94,28 +93,15 @@ export class EventSpotsController {
 	@ApiParam({ name: "id", description: "Event spot ID" })
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
-	@Delete("events/spots/:id/:replaceId")
+	@Delete("events/spots/:id")
 	async deleteEventSpot(
 		@Param("id", ParseIntPipe) eventSpotId: number,
-		@Param("replaceId", ParseIntPipe) replaceId: number,
 		@CurrentUser() user: User,
 	) {
 		// TODO: Check user role for modifications
 
 		const eventSpot = await this.eventSpotsService.findById(eventSpotId);
 		if (!eventSpot) throw new NotFoundException("Event spot not found");
-
-		if (replaceId) {
-			const replaceWithSpot = await this.eventSpotsService.findById(replaceId);
-			if (!replaceWithSpot) throw new NotFoundException("Event spot replacement not found");
-
-			// Event spot is for different event
-			if (replaceWithSpot.event.id !== eventSpot.event.id)
-				throw new BadRequestException("Event spot replacement is invalid");
-
-			await this.eventSpotsService.delete(eventSpot, replaceWithSpot);
-			return;
-		}
 
 		await this.eventSpotsService.delete(eventSpot);
 	}

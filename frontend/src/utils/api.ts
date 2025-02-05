@@ -5,7 +5,6 @@
  * The backend API description
  * OpenAPI spec version: 0.0.1
  */
-import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -19,6 +18,7 @@ import type {
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 import type {
   AccessToken,
@@ -31,6 +31,8 @@ import type {
   CreateOrganization201,
   CreateRole,
   CreateUser,
+  DeleteEventSpot,
+  DeleteOrganizationMembers,
   EventApplicationDetailedWithApplications,
   EventApplicationSimpleWithApplications,
   EventDetail,
@@ -62,8 +64,8 @@ import type {
   User,
   UserOrganizationMembershipsParams,
 } from "./api.schemas";
-import { customInstance } from "./customInstance";
 import type { BodyType, ErrorType } from "./customInstance";
+import { customInstance } from "./customInstance";
 
 type SecondParameter<T extends (...args: any) => any> = Parameters<T>[1];
 
@@ -1075,35 +1077,43 @@ export const useAddOrganizationMembers = <TError = ErrorType<unknown>, TContext 
  */
 export const deleteOrganizationMembers = (
   id: string,
-  memberIds: string[],
+  deleteOrganizationMembers: BodyType<DeleteOrganizationMembers>,
   options?: SecondParameter<typeof customInstance>,
 ) => {
-  return customInstance<void>({ url: `/organization/${id}/members/${memberIds}`, method: "DELETE" }, options);
+  return customInstance<void>(
+    {
+      url: `/organization/${id}/members`,
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      data: deleteOrganizationMembers,
+    },
+    options,
+  );
 };
 
 export const getDeleteOrganizationMembersMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteOrganizationMembers>>,
     TError,
-    { id: string; memberIds: string[] },
+    { id: string; data: BodyType<DeleteOrganizationMembers> },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof deleteOrganizationMembers>>,
   TError,
-  { id: string; memberIds: string[] },
+  { id: string; data: BodyType<DeleteOrganizationMembers> },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof deleteOrganizationMembers>>,
-    { id: string; memberIds: string[] }
+    { id: string; data: BodyType<DeleteOrganizationMembers> }
   > = (props) => {
-    const { id, memberIds } = props ?? {};
+    const { id, data } = props ?? {};
 
-    return deleteOrganizationMembers(id, memberIds, requestOptions);
+    return deleteOrganizationMembers(id, data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -1112,21 +1122,21 @@ export const getDeleteOrganizationMembersMutationOptions = <TError = ErrorType<u
 export type DeleteOrganizationMembersMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteOrganizationMembers>>
 >;
-
+export type DeleteOrganizationMembersMutationBody = BodyType<DeleteOrganizationMembers>;
 export type DeleteOrganizationMembersMutationError = ErrorType<unknown>;
 
 export const useDeleteOrganizationMembers = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteOrganizationMembers>>,
     TError,
-    { id: string; memberIds: string[] },
+    { id: string; data: BodyType<DeleteOrganizationMembers> },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof deleteOrganizationMembers>>,
   TError,
-  { id: string; memberIds: string[] },
+  { id: string; data: BodyType<DeleteOrganizationMembers> },
   TContext
 > => {
   const mutationOptions = getDeleteOrganizationMembersMutationOptions(options);
@@ -2296,53 +2306,66 @@ export const useCreateEventSpot = <TError = ErrorType<void>, TContext = unknown>
   return useMutation(mutationOptions);
 };
 
-export const deleteEventSpot = (id: number, replaceId: number, options?: SecondParameter<typeof customInstance>) => {
-  return customInstance<void>({ url: `/events/spots/${id}/${replaceId}`, method: "DELETE" }, options);
+export const deleteEventSpot = (
+  id: number,
+  deleteEventSpot: BodyType<DeleteEventSpot>,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  return customInstance<void>(
+    {
+      url: `/events/spots/${id}`,
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      data: deleteEventSpot,
+    },
+    options,
+  );
 };
 
 export const getDeleteEventSpotMutationOptions = <TError = ErrorType<void>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteEventSpot>>,
     TError,
-    { id: number; replaceId: number },
+    { id: number; data: BodyType<DeleteEventSpot> },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof deleteEventSpot>>,
   TError,
-  { id: number; replaceId: number },
+  { id: number; data: BodyType<DeleteEventSpot> },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEventSpot>>, { id: number; replaceId: number }> = (
-    props,
-  ) => {
-    const { id, replaceId } = props ?? {};
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteEventSpot>>,
+    { id: number; data: BodyType<DeleteEventSpot> }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
-    return deleteEventSpot(id, replaceId, requestOptions);
+    return deleteEventSpot(id, data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
 export type DeleteEventSpotMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEventSpot>>>;
-
+export type DeleteEventSpotMutationBody = BodyType<DeleteEventSpot>;
 export type DeleteEventSpotMutationError = ErrorType<void>;
 
 export const useDeleteEventSpot = <TError = ErrorType<void>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteEventSpot>>,
     TError,
-    { id: number; replaceId: number },
+    { id: number; data: BodyType<DeleteEventSpot> },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof deleteEventSpot>>,
   TError,
-  { id: number; replaceId: number },
+  { id: number; data: BodyType<DeleteEventSpot> },
   TContext
 > => {
   const mutationOptions = getDeleteEventSpotMutationOptions(options);

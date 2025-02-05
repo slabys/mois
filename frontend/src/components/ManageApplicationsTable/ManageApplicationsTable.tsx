@@ -116,12 +116,10 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     },
   });
 
-  const handleSpotChange = (applicationId: number, spotId: string | null) => {
+  const handleSpotChange = (applicationId: number) => {
     updateApplicationMutation.mutate({
       id: applicationId,
-      data: {
-        spotTypeId: spotId ? Number.parseInt(spotId) : null,
-      },
+      data: {},
     });
   };
 
@@ -206,7 +204,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
           nothingFoundMessage="Nothing found..."
           allowDeselect
           onChange={(value) => {
-            handleSpotChange(application.id, value);
+            handleSpotChange(application.id);
           }}
         />
       </Table.Td>
