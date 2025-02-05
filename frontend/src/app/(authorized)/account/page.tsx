@@ -3,6 +3,7 @@
 import { useGetCurrentUser, useUpdateCurrentUser, useUpdateCurrentUserPhoto } from "@/utils/api";
 import { CreateAddress, CreateUserGender, UpdateUser } from "@/utils/api.schemas";
 import { apiImageURL } from "@/utils/apiImageURL";
+import { showErrorNotification, updateErrorNotification } from "@/utils/notifications";
 import { Dropzone } from "@components/Dropzone/Dropzone";
 import ImageEditor from "@components/ImageEditor/ImageEditor";
 import getCroppedImg from "@components/ImageEditor/imageEdit";
@@ -33,7 +34,6 @@ import { Area } from "react-easy-crop";
 
 interface UpdateUserProps extends Partial<UpdateUser> {
   confirmPassword?: string;
-  personalAddress?: CreateAddress | undefined;
 }
 
 const AccountPage = () => {
@@ -61,7 +61,7 @@ const AccountPage = () => {
     ];
   }, [newUserPhoto]);
 
-  const isPersonalAddress = (address: CreateAddress | undefined) => {
+  const isPersonalAddress = (address: CreateAddress | undefined | null) => {
     return address ? Object.entries(address).some(([_key, value]) => (value as string)?.length > 0) : undefined;
   };
   const { data: currentUser, refetch: fetchCurrentUser, isFetchedAfterMount } = useGetCurrentUser();
@@ -74,13 +74,14 @@ const AccountPage = () => {
       lastName: currentUser.lastName,
       username: currentUser.username,
       gender: currentUser.gender,
+      personalAddress: currentUser.personalAddress,
     };
 
     form.setInitialValues(userValues);
     form.setValues(userValues);
     form.reset();
     form.resetTouched();
-  }, [isFetchedAfterMount]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [currentUser, fetchCurrentUser, isFetchedAfterMount]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const form = useForm<UpdateUserProps>({
     initialValues: {
@@ -143,25 +144,12 @@ const AccountPage = () => {
         form.resetDirty();
         form.resetTouched();
         setIsEditing(false);
+        fetchCurrentUser();
       },
-      onError: (error) => {
-        notifications.update({
-          id: "user-mutation",
-          title: "Something went wrong.",
-          message: "Please check all information first. Then try again.",
-          color: "red",
-          loading: false,
-          autoClose: true,
-        });
-        if (error.response?.data && error.response.data.message) {
-          (error.response.data.message as string[]).forEach((err) => {
-            notifications.show({
-              title: "Error",
-              message: err,
-              color: "red",
-            });
-          });
-        }
+      onError: (mutationError) => {
+        if (!mutationError.response?.data) return;
+        updateErrorNotification("event-application");
+        showErrorNotification(mutationError);
       },
     },
   });
@@ -246,6 +234,8 @@ const AccountPage = () => {
     setCroppedArea(null);
     setNewUserPhoto(null);
   };
+
+  console.log(currentUser);
 
   return (
     <Container size="sm" mt="lg">

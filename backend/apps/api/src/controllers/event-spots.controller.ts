@@ -26,7 +26,7 @@ import { EventSpot } from "modules/events/entities";
 import { User } from "modules/users";
 import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 import { CurrentUser } from "../decorators";
-import { CreateEventSpot, DeleteEventSpot, UpdateEventSpot } from "../models/requests";
+import { CreateEventSpot, UpdateEventSpot } from "../models/requests";
 import { EventSpotSimple } from "../models/responses";
 
 const ApiEventIdParam = () => ApiParam({ name: "id", description: "Event ID" });
@@ -37,7 +37,8 @@ export class EventSpotsController {
 	constructor(
 		private readonly eventSpotsService: EventSpotsService,
 		private readonly eventsService: EventsService,
-	) {}
+	) {
+	}
 
 	/**
 	 * Find event spots for event
@@ -93,10 +94,10 @@ export class EventSpotsController {
 	@ApiParam({ name: "id", description: "Event spot ID" })
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
-	@Delete("events/spots/:id")
+	@Delete("events/spots/:id/:replaceId")
 	async deleteEventSpot(
 		@Param("id", ParseIntPipe) eventSpotId: number,
-		@Body() body: DeleteEventSpot,
+		@Param("replaceId", ParseIntPipe) replaceId: number,
 		@CurrentUser() user: User,
 	) {
 		// TODO: Check user role for modifications
@@ -104,8 +105,8 @@ export class EventSpotsController {
 		const eventSpot = await this.eventSpotsService.findById(eventSpotId);
 		if (!eventSpot) throw new NotFoundException("Event spot not found");
 
-		if (body.replaceWithSpotId) {
-			const replaceWithSpot = await this.eventSpotsService.findById(body.replaceWithSpotId);
+		if (replaceId) {
+			const replaceWithSpot = await this.eventSpotsService.findById(replaceId);
 			if (!replaceWithSpot) throw new NotFoundException("Event spot replacement not found");
 
 			// Event spot is for different event

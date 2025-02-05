@@ -78,7 +78,6 @@ const LayoutHeader = () => {
   });
 
   const { data: currentUser } = useGetCurrentUser();
-  console.log(currentUser?.role);
 
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
 

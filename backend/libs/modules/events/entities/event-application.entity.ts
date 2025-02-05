@@ -17,6 +17,7 @@ import { EventCustomOrganization } from "./event-custom-organization.entity";
 import { EventSpot } from "./event-spot.entity";
 import { Event } from "./event.entity";
 import { Invoice } from "modules/invoice/entities";
+import { InvoiceMethods } from "modules/events/invoice-methods";
 
 /**
  * Event application represents registration to event
@@ -70,6 +71,9 @@ export class EventApplication extends BaseEntity {
 	@OneToOne(() => Address, { cascade: true })
 	@JoinColumn()
 	personalAddress: Address;
+
+	@Column({ type: "enum", enum: InvoiceMethods, default: InvoiceMethods.personal, enumName: "InvoiceMethods" })
+	invoiceMethod: InvoiceMethods;
 
 	@OneToOne(() => Address, { cascade: true })
 	@JoinColumn()

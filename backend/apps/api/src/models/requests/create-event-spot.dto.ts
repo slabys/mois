@@ -9,7 +9,6 @@ export class CreateEventSpot {
 	/**
 	 * Price in format `1000` => `10.00`
 	 *
-	 * @example 1000 means 10.00,-
 	 * @example 5090 means 50.90,-
 	 */
 	@IsInt()

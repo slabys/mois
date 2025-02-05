@@ -1,7 +1,8 @@
 import { Type } from "class-transformer";
-import { IsNotEmptyObject, IsNumber, IsObject, IsOptional, IsString } from "class-validator";
+import { IsEnum, IsNotEmptyObject, IsNumber, IsObject, IsOptional, IsString } from "class-validator";
 import { CreateAddress } from "./create-address.dto";
 import { ApiExtraModels, ApiProperty, refs } from "@nestjs/swagger";
+import { InvoiceMethods } from "modules/events/invoice-methods";
 
 export class CreateEventApplicationExistingOrganization {
 	/**
@@ -42,6 +43,9 @@ export class CreateEventApplication {
 	@IsOptional()
 	@IsObject()
 	additionalFormData: object = {};
+
+	@IsEnum(InvoiceMethods)
+	invoiceMethod: InvoiceMethods = InvoiceMethods.personal;
 
 	@IsObject()
 	@IsNotEmptyObject({ nullable: false })

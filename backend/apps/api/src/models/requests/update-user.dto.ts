@@ -11,5 +11,5 @@ export class UpdateUser extends PartialType(
 	@IsOptional()
 	@ValidateNested()
 	@Type(() => CreateAddress)
-	personalAddress?: CreateAddress;
+	personalAddress?: CreateAddress | null;
 }

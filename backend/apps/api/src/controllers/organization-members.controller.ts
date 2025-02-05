@@ -5,7 +5,7 @@ import { OrganizationService } from "modules/organization";
 import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 
 import { CookieGuard } from "modules/auth/providers/guards";
-import { AddOrganizationMembers, DeleteOrganizationMembers } from "../models/requests";
+import { AddOrganizationMembers } from "../models/requests";
 import { OrganizationMemberWithoutOrganization } from "../models/responses";
 import { UsersService } from "modules/users";
 
@@ -15,7 +15,8 @@ export class OrganizationMembersController {
 	constructor(
 		private readonly organizationService: OrganizationService,
 		private readonly usersService: UsersService,
-	) {}
+	) {
+	}
 
 	@ApiOkResponse({
 		type: [OrganizationMemberWithoutOrganization],
@@ -50,11 +51,11 @@ export class OrganizationMembersController {
 	 */
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
-	@Delete("members")
-	async deleteOrganizationMembers(@Param("id") organizationId: string, @Body() body: DeleteOrganizationMembers) {
+	@Delete("members/:memberIds")
+	async deleteOrganizationMembers(@Param("id") organizationId: string, @Param("memberIds") memberIds: number[]) {
 		const organization = await this.organizationService.findById(organizationId);
 		if (!organization) throw new NotFoundException("Organization not found");
 
-		await this.organizationService.deleteMembers(organization, body.memberIds);
+		await this.organizationService.deleteMembers(organization, memberIds);
 	}
 }

@@ -12,9 +12,6 @@ export class CreateAddress {
 
 	/**
 	 * House number with entrance support
-	 *
-	 * @example 145
-	 * @example 145/5
 	 */
 	@IsString()
 	@Matches(/^(\d+)(\/\d+)?$/)
