@@ -62,8 +62,8 @@ export class User extends BaseEntity {
 	@UpdateDateColumn()
 	updatedAt: Date;
 
-	@ManyToOne(() => Address, { onDelete: "SET NULL", cascade: true })
-	personalAddress: Address;
+	@ManyToOne(() => Address, { nullable: true, onDelete: "SET NULL", cascade: true })
+	personalAddress: Address | null;
 
 	@BeforeUpdate()
 	@BeforeInsert()

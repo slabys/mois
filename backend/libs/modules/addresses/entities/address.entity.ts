@@ -18,9 +18,9 @@ export class Address {
 	street: string;
 
 	/**
-	 * House number with entrace number
-	 * @example 123
-	 * @example 124/3
+	 * House number with entrance number
+	 *
+	 * @example 1234/5
 	 */
 	@Column()
 	houseNumber: string;

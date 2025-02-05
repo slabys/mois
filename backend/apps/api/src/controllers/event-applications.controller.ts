@@ -45,7 +45,9 @@ import { CurrentUser } from "../decorators";
 import { CreateEventApplication, UpdateEventApplication } from "../models/requests";
 import { EventApplicationInvoice, EventApplicationSimpleWithApplications } from "../models/responses";
 import { EventApplicationSimpleWithApplicationsMapper } from "../mappers";
-import { EventApplicationDetailedWithApplications } from "../models/responses/event-application-detailed-with-applications.dto";
+import {
+	EventApplicationDetailedWithApplications,
+} from "../models/responses/event-application-detailed-with-applications.dto";
 
 @ApiTags("Event applications")
 @Controller("events")
@@ -59,7 +61,8 @@ export class EventApplicationsController {
 		private readonly invoiceService: InvoiceService,
 		private readonly fileStorageService: FileStorageService,
 		private readonly eventApplicationSimpleWithApplicationsMapper: EventApplicationSimpleWithApplicationsMapper,
-	) {}
+	) {
+	}
 
 	/**
 	 * Get all signed-in user applications
@@ -127,6 +130,7 @@ export class EventApplicationsController {
 		let application = new EventApplication({
 			user,
 			personalAddress: currentUser.personalAddress.copy(),
+			invoiceMethod: body.invoiceMethod,
 			invoiceAddress: new Address(body.invoiceAddress),
 			idNumber: body.idNumber,
 		});
@@ -175,12 +179,12 @@ export class EventApplicationsController {
 			iban: "CZ6508000000192000145399",
 			items: application.spotType
 				? [
-						new InvoiceItem({
-							amount: 1,
-							name: `Spot: ${application.spotType.name}`,
-							price: application.spotType.price,
-						}),
-					]
+					new InvoiceItem({
+						amount: 1,
+						name: `Spot: ${application.spotType.name}`,
+						price: application.spotType.price,
+					}),
+				]
 				: [],
 			swift: "SWIFT",
 			subscriber: new PaymentSubject({
@@ -209,6 +213,7 @@ export class EventApplicationsController {
 	 * Update event application
 	 *
 	 * @param applicationId Event Application ID
+	 * @param body
 	 * @returns
 	 */
 	@ApiBearerAuth()
