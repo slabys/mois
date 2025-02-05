@@ -15,7 +15,7 @@ COPY . .
 
 # Install pnpm and dependencies
 RUN npm install -g pnpm
-RUN npm cache clean --force && rm -rf node_modules && pnpm install --frozen-lockfile --prod=false
+RUN npm cache clean --force && rm -rf node_modules && pnpm install --frozen-lockfile --prod=true
 
 # Build the NestJS project
 RUN pnpm run build ${PROJECT_NAME}
