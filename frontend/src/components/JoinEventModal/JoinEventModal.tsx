@@ -1,9 +1,21 @@
 import { useCreateUserApplication, useUserOrganizationMemberships } from "@/utils/api";
-import { CreateEventApplication, Organization, User } from "@/utils/api.schemas";
+import { CreateEventApplication, CreateEventApplicationInvoiceMethod, Organization, User } from "@/utils/api.schemas";
 import { showErrorNotification, updateErrorNotification } from "@/utils/notifications";
 import AddressCodeBlock from "@components/AddressCodeBlock/AddressCodeBlock";
 import Select from "@components/primitives/Select";
-import { Blockquote, Box, Button, Code, Flex, Grid, Modal, SimpleGrid, Stepper, Text, TextInput } from "@mantine/core";
+import {
+  Blockquote,
+  Box,
+  Button,
+  Flex,
+  Grid,
+  Modal,
+  SimpleGrid,
+  Stepper,
+  Text,
+  TextInput,
+  Textarea,
+} from "@mantine/core";
 import { Form, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import React, { useState } from "react";
@@ -25,8 +37,9 @@ const JoinEventModal = ({
   closeModal,
   handleSuccess = () => {},
 }: JoinEventModalProps) => {
+  const [activeStep, setActiveStep] = useState(0);
   const [selectedOrganisation, setSelectedOrganisation] = useState<Organization | null>(null);
-  const [invoiceMethod, setInvoiceMethod] = useState<InvoiceMethodsType | null>(null);
+  const [invoiceMethod, setInvoiceMethod] = useState<InvoiceMethodsType | undefined>(undefined);
   const { data: userOrganisationMemberships } = useUserOrganizationMemberships(currentUser.id);
 
   const form = useForm<Partial<CreateEventApplication>>({
@@ -34,7 +47,10 @@ const JoinEventModal = ({
       idNumber: undefined,
       organization: undefined,
       spotTypeId: null,
+      invoicedTo: null,
       invoiceAddress: undefined,
+      invoiceMethod: undefined,
+      additionalInformation: "",
       additionalFormData: {},
     },
     validate: (values) => {
@@ -44,7 +60,7 @@ const JoinEventModal = ({
         errors["organization.type"] = "Organization data is required";
       }
 
-      if (active === 0) {
+      if (activeStep === 0) {
         if (!values.idNumber?.trim()) {
           errors["idNumber"] = "ID number is required";
         }
@@ -65,7 +81,7 @@ const JoinEventModal = ({
         }
       }
 
-      if (active === 1) {
+      if (activeStep === 1) {
         if (!values.invoiceAddress) {
           errors["invoiceAddress"] = "Invoice address is required";
         }
@@ -79,6 +95,7 @@ const JoinEventModal = ({
 
   const handleClose = () => {
     form.reset();
+    setActiveStep(0);
     closeModal();
   };
 
@@ -124,28 +141,28 @@ const JoinEventModal = ({
     }
   };
 
-  const [active, setActive] = useState(0);
   const nextStep = () => {
     form.validate();
     if (form.isValid()) {
-      setActive((current) => (current < 3 ? current + 1 : current));
+      setActiveStep((current) => (current < 3 ? current + 1 : current));
     }
   };
   const prevStep = () => {
-    setActive((current) => (current > 0 ? current - 1 : current));
+    setActiveStep((current) => (current > 0 ? current - 1 : current));
   };
 
   if (!userOrganisationMemberships || !currentUser) {
     return null;
   }
 
+  console.log(selectedOrganisation);
   console.log(form.values);
   console.log(form.errors);
 
   return (
     <Modal size="xl" opened={isOpened} onClose={handleClose} title={<Text fz="h3">Event Application</Text>}>
       <Form form={form} onSubmit={handleEventApplication}>
-        <Stepper active={active} onStepClick={setActive}>
+        <Stepper active={activeStep} onStepClick={setActiveStep}>
           <Stepper.Step label="Step 1:" description="General Information">
             <Flex direction="column" gap="md">
               <TextInput label="Person ID Number / Passport Number" {...form.getInputProps("idNumber")} required />
@@ -160,12 +177,18 @@ const JoinEventModal = ({
                 }
                 data={
                   userOrganisationMemberships.length > 0
-                    ? userOrganisationMemberships.map((membership) => {
-                        return {
-                          label: membership.organization.name,
-                          value: membership.organization.id,
-                        };
-                      })
+                    ? [
+                        ...userOrganisationMemberships.map((membership) => {
+                          return {
+                            label: membership.organization.name,
+                            value: membership.organization.id,
+                          };
+                        }),
+                        {
+                          label: "Different Organisation",
+                          value: "null",
+                        },
+                      ]
                     : [{ label: "Different Organisation", value: "null" }]
                 }
                 onChange={(value) => {
@@ -181,11 +204,12 @@ const JoinEventModal = ({
                   }
                   form.setFieldValue("organization", {
                     type: "organization",
-                    id: "",
+                    id: membership.organization.id,
                   });
                   setSelectedOrganisation(membership.organization);
                 }}
                 error={form.errors["organization.type"]}
+                clearable={false}
                 required
               />
               {form.values.organization?.type &&
@@ -218,7 +242,7 @@ const JoinEventModal = ({
                 label="Invoice Method"
                 value={invoiceMethod}
                 data={[
-                  { label: "Personal Address", value: "personal" },
+                  { label: "Personal Address", value: "personal", disabled: !currentUser.personalAddress },
                   {
                     label: "Organisation Address",
                     value: "organisation",
@@ -227,19 +251,70 @@ const JoinEventModal = ({
                   { label: "Different Invoice Address", value: "different" },
                 ]}
                 onChange={(value) => {
-                  setInvoiceMethod(value as InvoiceMethodsType | null);
+                  if (!value) return;
+                  setInvoiceMethod(value as InvoiceMethodsType);
+                  form.setFieldValue("invoiceMethod", value as CreateEventApplicationInvoiceMethod);
+                  switch (value) {
+                    case "personal": {
+                      if (!currentUser.personalAddress) return;
+                      form.setFieldValue("invoicedTo", `${currentUser.firstName} ${currentUser.lastName}`);
+                      form.setFieldValue("invoiceAddress", {
+                        city: currentUser.personalAddress.city,
+                        country: currentUser.personalAddress.country,
+                        houseNumber: currentUser.personalAddress.houseNumber,
+                        street: currentUser.personalAddress.street,
+                        zip: currentUser.personalAddress.zip,
+                      });
+                      break;
+                    }
+                    case "organisation": {
+                      if (!selectedOrganisation) return;
+                      form.setFieldValue("invoicedTo", selectedOrganisation.name);
+                      form.setFieldValue("invoiceAddress", {
+                        city: selectedOrganisation.address.city,
+                        country: selectedOrganisation.address.country,
+                        houseNumber: selectedOrganisation.address.houseNumber,
+                        street: selectedOrganisation.address.street,
+                        zip: selectedOrganisation.address.zip,
+                      });
+                      break;
+                    }
+                    case "different": {
+                      form.setFieldValue("invoiceAddress", undefined);
+                      form.setFieldValue("invoicedTo", null);
+                    }
+                  }
                 }}
                 error={form.errors["invoiceAddress"]}
+                clearable={false}
                 required
               />
               {invoiceMethod && (
                 <Box>
                   {
                     {
-                      personal: <AddressCodeBlock address={currentUser.personalAddress} />,
-                      organisation: <AddressCodeBlock address={selectedOrganisation?.address} />,
+                      personal: (
+                        <Box>
+                          <AddressCodeBlock
+                            beforeAddress={form.values.invoicedTo}
+                            address={currentUser.personalAddress}
+                          />
+                        </Box>
+                      ),
+                      organisation: (
+                        <Box>
+                          <Text>{selectedOrganisation?.name}</Text>
+                          <AddressCodeBlock
+                            beforeAddress={form.values.invoicedTo}
+                            address={selectedOrganisation?.address}
+                          />
+                        </Box>
+                      ),
                       different: (
                         <Grid>
+                          <Grid.Col span={{ base: 12 }}>
+                            <TextInput label="Invoiced To" {...form.getInputProps("invoicedTo")} />
+                          </Grid.Col>
                           <Grid.Col span={{ base: 7, md: 7 }}>
                             <TextInput label="Street" {...form.getInputProps("invoiceAddress.street")} />
                           </Grid.Col>
@@ -263,31 +338,23 @@ const JoinEventModal = ({
               )}
             </Flex>
           </Stepper.Step>
-          <Stepper.Step label="Step 3" description="Additional Information"></Stepper.Step>
+          <Stepper.Step label="Step 3" description="Additional Information">
+            <Textarea label="Additional Information" {...form.getInputProps("additionalInformation")} autosize />
+          </Stepper.Step>
           <Stepper.Completed>Completed, click back button to get to previous step</Stepper.Completed>
         </Stepper>
 
         <Flex mt={16} gap={8} justify="space-between">
-          <Button variant="default" onClick={prevStep} disabled={active === 0}>
+          <Button variant="default" onClick={prevStep} disabled={activeStep === 0}>
             Back
           </Button>
-          {active !== 3 ? (
-            <Button onClick={nextStep}>Next step</Button>
-          ) : (
+          {activeStep === 3 ? (
             <Button type="submit" disabled={!isTouchedDirty} loading={eventApplicationMutation.isPending}>
               Submit application
             </Button>
+          ) : (
+            <Button onClick={nextStep}>Next step</Button>
           )}
-        </Flex>
-        <Flex direction="column" gap={16}>
-          <Box>
-            <Text fz="sm">Personal address:</Text>
-            <Code block>
-              {`${currentUser.personalAddress?.street} ${currentUser.personalAddress?.zip}
-${currentUser.personalAddress?.zip} ${currentUser.personalAddress?.city}
-${currentUser.personalAddress?.country}`}
-            </Code>
-          </Box>
         </Flex>
       </Form>
     </Modal>

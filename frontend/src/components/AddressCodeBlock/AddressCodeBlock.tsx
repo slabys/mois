@@ -1,18 +1,34 @@
 import { Address } from "@/utils/api.schemas";
 import { Code, CodeProps } from "@mantine/core";
-import React from "react";
+import React, { ReactNode } from "react";
 
 interface AddressCodeBlockProps extends CodeProps {
+  beforeAddress?: ReactNode;
+  afterAddress?: ReactNode;
   address?: Address | null;
 }
 
-const AddressCodeBlock = ({ address, ...props }: AddressCodeBlockProps) => {
+const AddressCodeBlock = ({ beforeAddress, address, afterAddress, ...props }: AddressCodeBlockProps) => {
   if (!address) return null;
   return (
     <Code block {...props}>
-      {`${address.street} ${address.zip}
-${address.zip} ${address.city}
+      {beforeAddress ? (
+        <>
+          {beforeAddress}
+          <br />
+        </>
+      ) : null}
+
+      {`${address.street} ${address.houseNumber}
+${address.zip}, ${address.city}
 ${address.country}`}
+      <br />
+      {afterAddress ? (
+        <>
+          <br />
+          {beforeAddress}
+        </>
+      ) : null}
     </Code>
   );
 };

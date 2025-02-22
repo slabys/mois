@@ -47,11 +47,17 @@ export class CreateEventApplication {
 	@IsEnum(InvoiceMethods)
 	invoiceMethod: InvoiceMethods = InvoiceMethods.personal;
 
+	@IsString()
+	invoicedTo: string | null;
+
 	@IsObject()
 	@IsNotEmptyObject({ nullable: false })
 	@Type(() => CreateAddress)
 	invoiceAddress: CreateAddress;
 
+	@IsString()
+	additionalInformation: string;
+	
 	@IsString()
 	idNumber: string;
 

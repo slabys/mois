@@ -12,8 +12,12 @@ export class Role {
 	@Column({ enum: Permission, array: true, type: "enum" })
 	permissions: Permission[];
 
-	hasPermission(permission: Permission) {
-		return this.permissions.includes(permission);
+	hasPermission(userPermission: Permission) {
+		return this.permissions.includes(userPermission);
+	}
+
+	hasOneOfPermissions(userPermissions: Permission[]) {
+		return userPermissions.some((permission) => this.permissions.includes(permission));
 	}
 
 	constructor(role?: Partial<Role>) {

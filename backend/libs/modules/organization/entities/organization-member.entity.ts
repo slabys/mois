@@ -1,5 +1,5 @@
 import { User } from "modules/users";
-import { CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { CreateDateColumn, type DeepPartial, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Organization } from "./organization.entity";
 
 @Entity()
@@ -18,4 +18,12 @@ export class OrganizationMember {
 
 	@CreateDateColumn()
 	createdAt: Date;
+
+	update(data: DeepPartial<OrganizationMember>) {
+		Object.assign(this, data);
+	}
+
+	constructor(partial?: DeepPartial<OrganizationMember>) {
+		Object.assign(this, partial);
+	}
 }

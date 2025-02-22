@@ -80,8 +80,8 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
       onSuccess: () => {
         notifications.update({
           id: "event-application-update",
-          title: "Update User Photo",
-          message: "Application spot updated successfully.",
+          title: "Event Application Update",
+          message: "Event Application updated successfully.",
           color: "green",
           loading: false,
           autoClose: true,
@@ -116,10 +116,12 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     },
   });
 
-  const handleSpotChange = (applicationId: number) => {
+  const handleSpotChange = (applicationId: number, spotId: number | null) => {
     updateApplicationMutation.mutate({
       id: applicationId,
-      data: {},
+      data: {
+        spotTypeId: spotId,
+      },
     });
   };
 
@@ -175,7 +177,6 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
   const handleDeleteSpot = (spotId: number) => {
     deleteEventSpotMutation.mutate({
       id: spotId,
-      data: {},
     });
   };
 
@@ -185,7 +186,9 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     });
   };
 
-  const generatePDF = () => {};
+  const generatePDF = () => {
+    // TODO - implement
+  };
 
   const eventApplicationsRows = applicationsList?.map((application, index) => (
     <Table.Tr key={`application-${index}-${application.id}`}>
@@ -204,7 +207,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
           nothingFoundMessage="Nothing found..."
           allowDeselect
           onChange={(value) => {
-            handleSpotChange(application.id);
+            handleSpotChange(application.id, Number(value));
           }}
         />
       </Table.Td>
@@ -213,7 +216,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
         <Flex justify="space-evenly" gap={16}>
           <Tooltip label="Generate Invoice">
             {/*TODO - Generate Invoice*/}
-            <ActionIcon variant="subtle" size={48} color="black" onClick={generatePDF}>
+            <ActionIcon variant="subtle" size={48} color="black" onClick={generatePDF} disabled>
               <IconFileTypePdf width={32} height={32} />
             </ActionIcon>
           </Tooltip>

@@ -1,7 +1,16 @@
 import { ApiHideProperty } from "@nestjs/swagger";
 import { Address } from "modules/addresses";
 import { User } from "modules/users";
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import {
+	Column,
+	CreateDateColumn,
+	type DeepPartial,
+	Entity,
+	Index,
+	ManyToOne,
+	OneToMany,
+	PrimaryGeneratedColumn,
+} from "typeorm";
 import { OrganizationMember } from "./organization-member.entity";
 
 // Should be parent.id but it's not converted to parent_id, so this needs to be "hardcoded"
@@ -46,4 +55,12 @@ export class Organization {
 	// Metadata
 	@CreateDateColumn()
 	createdAt: Date;
+
+	update(data: DeepPartial<Organization>) {
+		Object.assign(this, data);
+	}
+
+	constructor(partial?: DeepPartial<Organization>) {
+		Object.assign(this, partial);
+	}
 }

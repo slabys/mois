@@ -131,6 +131,8 @@ export class EventApplicationsController {
 			user,
 			personalAddress: currentUser.personalAddress.copy(),
 			invoiceMethod: body.invoiceMethod,
+			invoicedTo: body.invoicedTo,
+			additionalInformation: body.additionalInformation ?? "",
 			invoiceAddress: new Address(body.invoiceAddress),
 			idNumber: body.idNumber,
 		});
@@ -223,6 +225,7 @@ export class EventApplicationsController {
 		@Param("id", ParseIntPipe) applicationId: number,
 		@Body() body: UpdateEventApplication,
 	): Promise<EventApplicationSimpleWithApplications> {
+		console.log(body);
 		let application = await this.eventApplicationsService.findById(applicationId, {
 			relations: {
 				personalAddress: true,
@@ -235,6 +238,7 @@ export class EventApplicationsController {
 
 		if (body.spotTypeId) {
 			const eventSpot = await this.eventSpotsService.findById(body.spotTypeId);
+			console.log(eventSpot);
 			if (!eventSpot) throw new BadRequestException("Invalid event spot");
 
 			application.spotType = eventSpot;

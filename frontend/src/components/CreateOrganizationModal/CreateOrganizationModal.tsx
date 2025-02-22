@@ -102,6 +102,9 @@ const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateO
     <Modal size="xl" opened={isOpened} onClose={handleClose} title="Create Organization">
       <Form form={form} onSubmit={handleCreateOrganization}>
         <Grid>
+          <Grid.Col span={12}>
+            <TextInput label="Organisation Name" {...form.getInputProps("name")} />
+          </Grid.Col>
           <Grid.Col span={8}>
             <TextInput label="Street" {...form.getInputProps("address.street")} />
           </Grid.Col>

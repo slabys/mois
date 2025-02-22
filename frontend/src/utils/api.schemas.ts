@@ -76,6 +76,8 @@ export type OrganizationMembersParams = {
   skip?: number;
 };
 
+export type TransferManager201 = { [key: string]: unknown };
+
 export type UpdateOrganization201 = { [key: string]: unknown };
 
 export type CreateOrganization201 = { [key: string]: unknown };
@@ -184,11 +186,6 @@ export interface UpdateEventSpot {
    * @minimum 0
    */
   price?: number;
-}
-
-export interface DeleteEventSpot {
-  /** In case of valid value it replaces assigned users with new spot otherwise unset their spot */
-  replaceWithSpotId?: number;
 }
 
 export type CreateEventSpotCurrency = (typeof CreateEventSpotCurrency)[keyof typeof CreateEventSpotCurrency];
@@ -351,12 +348,23 @@ Each event can have different "requirements"
   visible: boolean;
 }
 
+export type UpdateEventApplicationInvoiceMethod =
+  (typeof UpdateEventApplicationInvoiceMethod)[keyof typeof UpdateEventApplicationInvoiceMethod];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const UpdateEventApplicationInvoiceMethod = {
+  personal: "personal",
+  organisation: "organisation",
+  different: "different",
+} as const;
+
 export type UpdateEventApplicationAdditionalFormData = { [key: string]: unknown };
 
 export interface UpdateEventApplication {
   additionalFormData?: UpdateEventApplicationAdditionalFormData;
   idNumber?: string;
   invoiceAddress?: CreateAddress;
+  invoiceMethod?: UpdateEventApplicationInvoiceMethod;
   /** @nullable */
   spotTypeId?: number | null;
 }
@@ -375,12 +383,26 @@ export interface EventApplicationSimpleWithApplications {
   user: User;
 }
 
+export type CreateEventApplicationInvoiceMethod =
+  (typeof CreateEventApplicationInvoiceMethod)[keyof typeof CreateEventApplicationInvoiceMethod];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateEventApplicationInvoiceMethod = {
+  personal: "personal",
+  organisation: "organisation",
+  different: "different",
+} as const;
+
 export type CreateEventApplicationAdditionalFormData = { [key: string]: unknown };
 
 export interface CreateEventApplication {
   additionalFormData: CreateEventApplicationAdditionalFormData;
+  additionalInformation: string;
   idNumber: string;
   invoiceAddress: CreateAddress;
+  /** @nullable */
+  invoicedTo: string | null;
+  invoiceMethod: CreateEventApplicationInvoiceMethod;
   organization: CreateEventApplicationOrganization;
   /** @nullable */
   spotTypeId?: number | null;
@@ -485,34 +507,17 @@ export interface SpotTypeSimple {
  */
 export type EventApplicationSpotType = EventSpot | null;
 
+export type EventApplicationInvoiceMethod =
+  (typeof EventApplicationInvoiceMethod)[keyof typeof EventApplicationInvoiceMethod];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const EventApplicationInvoiceMethod = {
+  personal: "personal",
+  organisation: "organisation",
+  different: "different",
+} as const;
+
 export type EventApplicationAdditionalData = { [key: string]: unknown };
-
-export interface EventApplication {
-  additionalData: EventApplicationAdditionalData;
-  createdAt: string;
-  customOrganization: EventCustomOrganization;
-  event: Event;
-  id: number;
-  idNumber: string;
-  invoice: Invoice;
-  invoiceAddress: Address;
-  organization: Organization;
-  personalAddress: Address;
-  /**
-   * Spot, must be one of {@link event} spots
-   * @nullable
-   */
-  spotType: EventApplicationSpotType;
-  user: User;
-}
-
-export interface EventCustomOrganization {
-  application: EventApplication;
-  country: string;
-  createdAt: string;
-  id: number;
-  name: string;
-}
 
 export type InvoiceCurrency = (typeof InvoiceCurrency)[keyof typeof InvoiceCurrency];
 
@@ -621,17 +626,6 @@ export interface EventSpot {
   price: number;
 }
 
-export interface DeleteOrganizationMembers {
-  memberIds: number[];
-}
-
-export interface OrganizationMember {
-  createdAt: string;
-  id: string;
-  organization: Organization;
-  user: User;
-}
-
 export interface AddOrganizationMembers {
   userIds: string[];
 }
@@ -657,9 +651,67 @@ export interface CreateOrganization {
  */
 export type OrganizationManager = User | null;
 
+export interface Organization {
+  address: Address;
+  createdAt: string;
+  id: string;
+  /** @nullable */
+  manager: OrganizationManager;
+  name: string;
+}
+
+export interface EventApplication {
+  additionalData: EventApplicationAdditionalData;
+  additionalInformation: string;
+  createdAt: string;
+  customOrganization: EventCustomOrganization;
+  event: Event;
+  id: number;
+  idNumber: string;
+  invoice: Invoice;
+  invoiceAddress: Address;
+  /** @nullable */
+  invoicedTo: string | null;
+  invoiceMethod: EventApplicationInvoiceMethod;
+  organization: Organization;
+  personalAddress: Address;
+  /**
+   * Spot, must be one of {@link event} spots
+   * @nullable
+   */
+  spotType: EventApplicationSpotType;
+  user: User;
+}
+
+export interface EventCustomOrganization {
+  application: EventApplication;
+  country: string;
+  createdAt: string;
+  id: number;
+  name: string;
+}
+
+export interface OrganizationMember {
+  createdAt: string;
+  id: string;
+  organization: Organization;
+  user: User;
+}
+
+export interface OrganizationMemberWithoutUser {
+  createdAt: string;
+  id: string;
+  organization: Organization;
+}
+
 export interface UpdatePhoto {
   file: Blob;
 }
+
+/**
+ * @nullable
+ */
+export type UpdateUserPersonalAddress = CreateAddress | null;
 
 /**
  * User gender
@@ -686,7 +738,8 @@ export interface UpdateUser {
    * @minLength 6
    */
   password?: string;
-  personalAddress?: CreateAddress;
+  /** @nullable */
+  personalAddress?: UpdateUserPersonalAddress;
   /**
    * Must not contain special characters
    * @minLength 6
@@ -694,6 +747,11 @@ export interface UpdateUser {
    */
   username?: string;
 }
+
+/**
+ * @nullable
+ */
+export type UserPersonalAddress = Address | null;
 
 export type UserGender = (typeof UserGender)[keyof typeof UserGender];
 
@@ -731,26 +789,11 @@ export interface Role {
 export interface Address {
   city: string;
   country: string;
-  /** House number with entrace number */
+  /** House number with entrance number */
   houseNumber: string;
   id: number;
   street: string;
   zip: string;
-}
-
-export interface Organization {
-  address: Address;
-  createdAt: string;
-  id: string;
-  /** @nullable */
-  manager: OrganizationManager;
-  name: string;
-}
-
-export interface OrganizationMemberWithoutUser {
-  createdAt: string;
-  id: string;
-  organization: Organization;
 }
 
 export interface Photo {
@@ -766,7 +809,8 @@ export interface User {
   gender: UserGender;
   id: string;
   lastName: string;
-  personalAddress: Address;
+  /** @nullable */
+  personalAddress: UserPersonalAddress;
   photo: Photo;
   role: Role;
   updatedAt: string;

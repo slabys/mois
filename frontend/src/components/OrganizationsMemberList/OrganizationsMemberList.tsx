@@ -4,7 +4,9 @@ import {
   useAddOrganizationMembers,
   useDeleteOrganizationMembers,
   useGetAllUsers,
+  useGetOrganisationById,
   useOrganizationMembers,
+  useTransferManager,
 } from "@/utils/api";
 import ApiImage from "@components/ApiImage/ApiImage";
 import {
@@ -20,7 +22,7 @@ import {
   Title,
   Tooltip,
 } from "@mantine/core";
-import { IconEdit, IconUserX } from "@tabler/icons-react";
+import { IconCrown, IconUserX } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 
 interface OrganizationMemberListProps {
@@ -30,6 +32,8 @@ interface OrganizationMemberListProps {
 const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps) => {
   const [searchValue, setSearchValue] = useState<string | undefined>(undefined);
 
+  const { data: currentOrganisation, refetch: refetchCurrentOrganisation } = useGetOrganisationById(organizationId);
+
   const { data: allUsersList, refetch: refetchAllUsers } = useGetAllUsers(
     { take: 100 },
     {
@@ -38,7 +42,9 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
       },
     },
   );
+
   const { data: organizationMembers, refetch: refetchOrganisationMembers } = useOrganizationMembers(organizationId);
+
   const addOrganizationMemberMutation = useAddOrganizationMembers({
     mutation: {
       onSuccess: () => {
@@ -67,12 +73,10 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
     );
   }, [allUsersList, searchValue, organizationMembers]);
 
-  const handleDeleteOrganizationMembers = (memberId: number) => {
+  const handleDeleteOrganizationMembers = (memberId: string) => {
     deleteOrganizationMemberMutation.mutate({
       id: organizationId,
-      data: {
-        memberIds: [memberId],
-      },
+      memberId: memberId,
     });
   };
 
@@ -85,15 +89,34 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
     });
   };
 
+  const transferOrganisationManagerMutation = useTransferManager({
+    mutation: {
+      onSuccess: () => {
+        refetchOrganisationMembersInfo();
+      },
+    },
+  });
+
+  const handleTransferSectionManager = (organisationId: string, userId: string) => {
+    transferOrganisationManagerMutation.mutate({
+      organisationId: organisationId,
+      userId: userId,
+    });
+  };
+
   const refetchOrganisationMembersInfo = () => {
+    refetchCurrentOrganisation();
     refetchAllUsers();
     refetchOrganisationMembers();
   };
+
+  if (!currentOrganisation) return null;
 
   return (
     <Stack>
       <Flex justify="space-between" align="center" w="100%">
         <Title>Manage Organisation Members</Title>
+        <Title>{currentOrganisation?.name}</Title>
       </Flex>
       <Flex direction="column" gap={8}>
         <Box>
@@ -110,7 +133,7 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
           <>
             {filteredUserList?.map((user, index) => {
               return (
-                <Box bg={index % 2 === 0 ? "lightGray" : "gray.3"} key={`user-listed-${user.id}-${index}`}>
+                <Box bg={index % 2 === 0 ? "gray.3" : "gray.0"} key={`user-listed-${user.id}-${index}`}>
                   <Flex align="center" gap={16} direction={{ base: "column", sm: "row" }}>
                     <Flex justify="space-between" align="center" gap={16} wrap="wrap" w="100%" p={8}>
                       <Text miw={156}>{`${user.firstName} ${user.lastName}`}</Text>
@@ -166,6 +189,7 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
             {organizationMembers?.map((member, index) => {
               const { user } = member;
               const { personalAddress } = user;
+
               return (
                 <Table.Tr key={`member-${index}-${member.id}`}>
                   <Table.Td>
@@ -190,10 +214,21 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
                   <Table.Td>{user.role?.name ?? "N/A"}</Table.Td>
                   <Table.Td>
                     <Flex justify="space-evenly" gap={16}>
-                      <Tooltip label="Edit Organization">
-                        {/*TODO - edit organization*/}
-                        <ActionIcon variant="subtle" size={48} color="blue">
-                          <IconEdit width={32} height={32} />
+                      <Tooltip
+                        label={
+                          currentOrganisation?.manager?.id === member.user.id
+                            ? "This person is section manager"
+                            : "Transfer Manager"
+                        }
+                      >
+                        <ActionIcon
+                          variant="subtle"
+                          size={48}
+                          color="yellow"
+                          onClick={() => handleTransferSectionManager(currentOrganisation.id, member.user.id)}
+                          disabled={currentOrganisation?.manager?.id === member.user.id}
+                        >
+                          <IconCrown width={32} height={32} />
                         </ActionIcon>
                       </Tooltip>
                       <Tooltip label="Remove from Organization">
@@ -202,7 +237,7 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
                           size={48}
                           color="red"
                           loading={deleteOrganizationMemberMutation.isPending}
-                          onClick={() => handleDeleteOrganizationMembers(Number.parseInt(member.id))}
+                          onClick={() => handleDeleteOrganizationMembers(member.id)}
                         >
                           <IconUserX width={32} height={32} />
                         </ActionIcon>

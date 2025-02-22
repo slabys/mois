@@ -1,6 +1,6 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectEntityManager, InjectRepository } from "@nestjs/typeorm";
-import { EntityManager, FindOneOptions, In, Repository } from "typeorm";
+import { EntityManager, FindOneOptions, Repository } from "typeorm";
 
 import { FindManyOptions } from "libs/types";
 import { Organization, OrganizationMember } from "modules/organization/entities";
@@ -15,7 +15,8 @@ export class OrganizationService {
 		private readonly memberRepository: Repository<OrganizationMember>,
 		@InjectEntityManager()
 		private readonly entityManager: EntityManager,
-	) {}
+	) {
+	}
 
 	/**
 	 * Find organization by ID
@@ -23,7 +24,18 @@ export class OrganizationService {
 	 * @returns
 	 */
 	findById(id: string) {
-		return this.organizationRepository.findOneBy({ id });
+		// return this.organizationRepository.findOneBy({ id });
+		return this.organizationRepository.findOne({
+			where: {
+				id: id,
+			},
+			relations: {
+				manager: true,
+				members: {
+					user: true,
+				},
+			},
+		});
 	}
 
 	/**
@@ -60,7 +72,9 @@ export class OrganizationService {
 				},
 			},
 			relations: {
-				user: true,
+				user: {
+					personalAddress: true,
+				},
 			},
 			skip: options?.pagination?.skip,
 			take: options?.pagination?.take,
@@ -96,7 +110,10 @@ export class OrganizationService {
 		return this.memberRepository.find({
 			where: { user: { id: userId } },
 			relations: {
-				organization: true,
+				organization: {
+					manager: true,
+					address: true,
+				},
 			},
 			take: options?.pagination?.take,
 			skip: options?.pagination?.skip,
@@ -128,10 +145,37 @@ export class OrganizationService {
 
 	/**
 	 * Delete members by ID
-	 * @param organization Organization
-	 * @param memberIds Member Ids
+	 * @param memberId Member Ids
 	 */
-	async deleteMembers(organization: Organization, memberIds: number[]) {
-		await this.memberRepository.delete({ organization, id: In(memberIds) });
+	async deleteMembers(memberId: string) {
+		return this.entityManager.transaction(async (em) => {
+			return await em
+				.createQueryBuilder()
+				.delete()
+				.from(OrganizationMember)
+				.where("id = :memberId", { memberId: memberId })
+				.execute();
+
+		});
+	}
+
+	/**
+	 * Delete manager from organisation
+	 * @param organisationId organisation ID
+	 */
+	async deleteOrganisationManager(organisationId: string) {
+		return this.entityManager.transaction(async (em) => {
+			const organization = await em.findOne(Organization, {
+				where: { id: organisationId },
+				relations: {
+					manager: true,
+				},
+			});
+			if (!organization) {
+				throw new NotFoundException("Organization not found");
+			}
+			organization.manager = null;
+			return await em.save(organization);
+		});
 	}
 }

@@ -75,9 +75,15 @@ export class EventApplication extends BaseEntity {
 	@Column({ type: "enum", enum: InvoiceMethods, default: InvoiceMethods.personal, enumName: "InvoiceMethods" })
 	invoiceMethod: InvoiceMethods;
 
+	@Column({ nullable: true })
+	invoicedTo: string | null;
+
 	@OneToOne(() => Address, { cascade: true })
 	@JoinColumn()
 	invoiceAddress: Address;
+
+	@Column()
+	additionalInformation: string;
 
 	@Column({ select: false })
 	idNumber: string;

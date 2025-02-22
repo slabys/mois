@@ -5,6 +5,7 @@
  * The backend API description
  * OpenAPI spec version: 0.0.1
  */
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -18,7 +19,6 @@ import type {
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
-import { useMutation, useQuery } from "@tanstack/react-query";
 
 import type {
   AccessToken,
@@ -31,8 +31,6 @@ import type {
   CreateOrganization201,
   CreateRole,
   CreateUser,
-  DeleteEventSpot,
-  DeleteOrganizationMembers,
   EventApplicationDetailedWithApplications,
   EventApplicationSimpleWithApplications,
   EventDetail,
@@ -54,6 +52,7 @@ import type {
   OrganizationMemberWithoutUser,
   OrganizationMembersParams,
   Role,
+  TransferManager201,
   UpdateEvent,
   UpdateEventApplication,
   UpdateEventSpot,
@@ -64,8 +63,8 @@ import type {
   User,
   UserOrganizationMembershipsParams,
 } from "./api.schemas";
-import type { BodyType, ErrorType } from "./customInstance";
 import { customInstance } from "./customInstance";
+import type { BodyType, ErrorType } from "./customInstance";
 
 type SecondParameter<T extends (...args: any) => any> = Parameters<T>[1];
 
@@ -831,6 +830,97 @@ export const useCreateOrganization = <TError = ErrorType<unknown>, TContext = un
   return useMutation(mutationOptions);
 };
 
+export const getOrganisationById = (
+  id: string,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<Organization>({ url: `/organizations/${id}`, method: "GET", signal }, options);
+};
+
+export const getGetOrganisationByIdQueryKey = (id: string) => {
+  return [`/organizations/${id}`] as const;
+};
+
+export const getGetOrganisationByIdQueryOptions = <
+  TData = Awaited<ReturnType<typeof getOrganisationById>>,
+  TError = ErrorType<unknown>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganisationById>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetOrganisationByIdQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getOrganisationById>>> = ({ signal }) =>
+    getOrganisationById(id, requestOptions, signal);
+
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getOrganisationById>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type GetOrganisationByIdQueryResult = NonNullable<Awaited<ReturnType<typeof getOrganisationById>>>;
+export type GetOrganisationByIdQueryError = ErrorType<unknown>;
+
+export function useGetOrganisationById<
+  TData = Awaited<ReturnType<typeof getOrganisationById>>,
+  TError = ErrorType<unknown>,
+>(
+  id: string,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganisationById>>, TError, TData>> &
+      Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getOrganisationById>>, TError, TData>, "initialData">;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useGetOrganisationById<
+  TData = Awaited<ReturnType<typeof getOrganisationById>>,
+  TError = ErrorType<unknown>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganisationById>>, TError, TData>> &
+      Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof getOrganisationById>>, TError, TData>, "initialData">;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useGetOrganisationById<
+  TData = Awaited<ReturnType<typeof getOrganisationById>>,
+  TError = ErrorType<unknown>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganisationById>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+export function useGetOrganisationById<
+  TData = Awaited<ReturnType<typeof getOrganisationById>>,
+  TError = ErrorType<unknown>,
+>(
+  id: string,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOrganisationById>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getGetOrganisationByIdQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
 export const updateOrganization = (
   id: string,
   updateOrganization: BodyType<UpdateOrganization>,
@@ -896,6 +986,69 @@ export const useUpdateOrganization = <TError = ErrorType<unknown>, TContext = un
   TContext
 > => {
   const mutationOptions = getUpdateOrganizationMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const transferManager = (
+  organisationId: string,
+  userId: string,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<TransferManager201>(
+    { url: `/organizations/${organisationId}/${userId}`, method: "POST", signal },
+    options,
+  );
+};
+
+export const getTransferManagerMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof transferManager>>,
+    TError,
+    { organisationId: string; userId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof transferManager>>,
+  TError,
+  { organisationId: string; userId: string },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof transferManager>>,
+    { organisationId: string; userId: string }
+  > = (props) => {
+    const { organisationId, userId } = props ?? {};
+
+    return transferManager(organisationId, userId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type TransferManagerMutationResult = NonNullable<Awaited<ReturnType<typeof transferManager>>>;
+
+export type TransferManagerMutationError = ErrorType<unknown>;
+
+export const useTransferManager = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof transferManager>>,
+    TError,
+    { organisationId: string; userId: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof transferManager>>,
+  TError,
+  { organisationId: string; userId: string },
+  TContext
+> => {
+  const mutationOptions = getTransferManagerMutationOptions(options);
 
   return useMutation(mutationOptions);
 };
@@ -1077,43 +1230,35 @@ export const useAddOrganizationMembers = <TError = ErrorType<unknown>, TContext 
  */
 export const deleteOrganizationMembers = (
   id: string,
-  deleteOrganizationMembers: BodyType<DeleteOrganizationMembers>,
+  memberId: string,
   options?: SecondParameter<typeof customInstance>,
 ) => {
-  return customInstance<void>(
-    {
-      url: `/organization/${id}/members`,
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      data: deleteOrganizationMembers,
-    },
-    options,
-  );
+  return customInstance<void>({ url: `/organization/${id}/members/${memberId}`, method: "DELETE" }, options);
 };
 
 export const getDeleteOrganizationMembersMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteOrganizationMembers>>,
     TError,
-    { id: string; data: BodyType<DeleteOrganizationMembers> },
+    { id: string; memberId: string },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof deleteOrganizationMembers>>,
   TError,
-  { id: string; data: BodyType<DeleteOrganizationMembers> },
+  { id: string; memberId: string },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof deleteOrganizationMembers>>,
-    { id: string; data: BodyType<DeleteOrganizationMembers> }
+    { id: string; memberId: string }
   > = (props) => {
-    const { id, data } = props ?? {};
+    const { id, memberId } = props ?? {};
 
-    return deleteOrganizationMembers(id, data, requestOptions);
+    return deleteOrganizationMembers(id, memberId, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -1122,21 +1267,21 @@ export const getDeleteOrganizationMembersMutationOptions = <TError = ErrorType<u
 export type DeleteOrganizationMembersMutationResult = NonNullable<
   Awaited<ReturnType<typeof deleteOrganizationMembers>>
 >;
-export type DeleteOrganizationMembersMutationBody = BodyType<DeleteOrganizationMembers>;
+
 export type DeleteOrganizationMembersMutationError = ErrorType<unknown>;
 
 export const useDeleteOrganizationMembers = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof deleteOrganizationMembers>>,
     TError,
-    { id: string; data: BodyType<DeleteOrganizationMembers> },
+    { id: string; memberId: string },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof deleteOrganizationMembers>>,
   TError,
-  { id: string; data: BodyType<DeleteOrganizationMembers> },
+  { id: string; memberId: string },
   TContext
 > => {
   const mutationOptions = getDeleteOrganizationMembersMutationOptions(options);
@@ -2306,68 +2451,33 @@ export const useCreateEventSpot = <TError = ErrorType<void>, TContext = unknown>
   return useMutation(mutationOptions);
 };
 
-export const deleteEventSpot = (
-  id: number,
-  deleteEventSpot: BodyType<DeleteEventSpot>,
-  options?: SecondParameter<typeof customInstance>,
-) => {
-  return customInstance<void>(
-    {
-      url: `/events/spots/${id}`,
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      data: deleteEventSpot,
-    },
-    options,
-  );
+export const deleteEventSpot = (id: number, options?: SecondParameter<typeof customInstance>) => {
+  return customInstance<void>({ url: `/events/spots/${id}`, method: "DELETE" }, options);
 };
 
 export const getDeleteEventSpotMutationOptions = <TError = ErrorType<void>, TContext = unknown>(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteEventSpot>>,
-    TError,
-    { id: number; data: BodyType<DeleteEventSpot> },
-    TContext
-  >;
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteEventSpot>>, TError, { id: number }, TContext>;
   request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteEventSpot>>,
-  TError,
-  { id: number; data: BodyType<DeleteEventSpot> },
-  TContext
-> => {
+}): UseMutationOptions<Awaited<ReturnType<typeof deleteEventSpot>>, TError, { id: number }, TContext> => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteEventSpot>>,
-    { id: number; data: BodyType<DeleteEventSpot> }
-  > = (props) => {
-    const { id, data } = props ?? {};
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEventSpot>>, { id: number }> = (props) => {
+    const { id } = props ?? {};
 
-    return deleteEventSpot(id, data, requestOptions);
+    return deleteEventSpot(id, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
 export type DeleteEventSpotMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEventSpot>>>;
-export type DeleteEventSpotMutationBody = BodyType<DeleteEventSpot>;
+
 export type DeleteEventSpotMutationError = ErrorType<void>;
 
 export const useDeleteEventSpot = <TError = ErrorType<void>, TContext = unknown>(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteEventSpot>>,
-    TError,
-    { id: number; data: BodyType<DeleteEventSpot> },
-    TContext
-  >;
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteEventSpot>>, TError, { id: number }, TContext>;
   request?: SecondParameter<typeof customInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof deleteEventSpot>>,
-  TError,
-  { id: number; data: BodyType<DeleteEventSpot> },
-  TContext
-> => {
+}): UseMutationResult<Awaited<ReturnType<typeof deleteEventSpot>>, TError, { id: number }, TContext> => {
   const mutationOptions = getDeleteEventSpotMutationOptions(options);
 
   return useMutation(mutationOptions);

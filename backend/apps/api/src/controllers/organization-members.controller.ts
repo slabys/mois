@@ -51,11 +51,16 @@ export class OrganizationMembersController {
 	 */
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
-	@Delete("members/:memberIds")
-	async deleteOrganizationMembers(@Param("id") organizationId: string, @Param("memberIds") memberIds: number[]) {
+	@Delete("members/:memberId")
+	async deleteOrganizationMembers(@Param("id") organizationId: string, @Param("memberId") organisationMemberId: string) {
 		const organization = await this.organizationService.findById(organizationId);
 		if (!organization) throw new NotFoundException("Organization not found");
 
-		await this.organizationService.deleteMembers(organization, memberIds);
+		const organisationMember = organization.members.find((member) => member.id.toString() === organisationMemberId);
+		if (organisationMember) {
+			await this.organizationService.deleteOrganisationManager(organization.id);
+		}
+
+		return await this.organizationService.deleteMembers(organisationMemberId);
 	}
 }
