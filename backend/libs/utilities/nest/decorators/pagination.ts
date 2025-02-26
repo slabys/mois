@@ -1,15 +1,16 @@
 import {
 	BadRequestException,
+	createParamDecorator,
 	type ExecutionContext,
 	type ParamDecoratorEnhancer,
-	createParamDecorator,
 } from "@nestjs/common";
 import { ApiQuery, type ApiQueryOptions } from "@nestjs/swagger";
 import type { Request } from "express";
 
 export interface PaginationOptions {
-	skip: number;
-	take: number;
+	page?: number;
+	perPage?: number;
+	all?: boolean;
 }
 
 /**
@@ -26,28 +27,36 @@ type ApiQueryWithDefault = ApiQueryOptions & {
  */
 const PaginationTypeEnhancer =
 	(defaultOptions?: Partial<PaginationOptions>): ParamDecoratorEnhancer =>
-	(target: Record<string, unknown>, propertyKey: string): void => {
-		const descriptor = Reflect.getOwnPropertyDescriptor(target, propertyKey);
-		ApiQuery(<ApiQueryWithDefault>{
-			name: "take",
-			type: Number,
-			required: false,
-			description: "Pagination number of results",
-			default: defaultOptions?.take ?? 16,
-		})(target, propertyKey, descriptor);
-		ApiQuery(<ApiQueryWithDefault>{
-			name: "skip",
-			type: Number,
-			required: false,
-			description: "Pagination number of skipped results",
-			default: defaultOptions?.skip ?? 0,
-		})(target, propertyKey, descriptor);
-	};
+		(target: Record<string, unknown>, propertyKey: string): void => {
+			const descriptor = Reflect.getOwnPropertyDescriptor(target, propertyKey);
+			ApiQuery(<ApiQueryWithDefault>{
+				name: "page",
+				type: Number,
+				required: false,
+				description: "Current page number",
+				default: defaultOptions?.page ?? 1,
+			})(target, propertyKey, descriptor);
+			ApiQuery(<ApiQueryWithDefault>{
+				name: "perPage",
+				type: Number,
+				required: false,
+				description: "Number of results per page",
+				default: defaultOptions?.perPage ?? 10,
+			})(target, propertyKey, descriptor);
+			ApiQuery(<ApiQueryWithDefault>{
+				name: "all",
+				type: Boolean,
+				required: false,
+				description: "If true, fetches all data (ignores pagination)",
+				default: false,
+			})(target, propertyKey, descriptor);
+		};
 
 /**
  * Pagination
  * @param defaultOptions Default pagination options
- * @returns {PaginationOptions}
+ * @param dataOrPipes any[]
+ * @returns ParameterDecorator
  */
 export const Pagination = (
 	defaultOptions?: Partial<PaginationOptions>,
@@ -60,18 +69,29 @@ export const Pagination = (
 
 			const request = context.switchToHttp().getRequest<Request>();
 
-			let take = Number(request.query?.take);
-			let skip = Number(request.query?.skip);
+			let page = Number(request.query?.page);
+			let perPage = Number(request.query?.perPage);
+			const all = request.query?.all === "true"; // Convert query param to boolean
 
-			take = !Number.isNaN(take) ? take : defaultOptions?.take || 16;
-			skip = !Number.isNaN(skip) ? skip : defaultOptions?.skip || 0;
+			// If `all=true`, disable pagination
+			if (all) {
+				return <PaginationOptions>{
+					all: true,
+				};
+			}
 
-			take = Math.max(take, 0);
-			skip = Math.max(skip, 0);
+			// Default values
+			page = !Number.isNaN(page) ? page : defaultOptions?.page || 1;
+			perPage = !Number.isNaN(perPage) ? perPage : defaultOptions?.perPage || 10;
+
+			// Prevent negative or zero values
+			page = Math.max(page, 1);
+			perPage = Math.max(perPage, 1);
 
 			return <PaginationOptions>{
-				take,
-				skip,
+				page,
+				perPage,
+				all: false,
 			};
 		},
 		[PaginationTypeEnhancer(defaultOptions)],

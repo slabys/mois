@@ -12,7 +12,6 @@ import {
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
 import { Organization, OrganizationService } from "modules/organization";
-import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 import { CurrentUser } from "../decorators";
 import { User } from "modules/users";
 import { CookieGuard } from "modules/auth/providers/guards";
@@ -29,8 +28,8 @@ export class OrganizationsController {
 	}
 
 	@Get()
-	allOrganizations(@Pagination() pagination: PaginationOptions) {
-		return this.organizationService.findAll({ pagination });
+	allOrganizations() {
+		return this.organizationService.findAll();
 	}
 
 
@@ -52,6 +51,7 @@ export class OrganizationsController {
 		const { address } = body;
 
 		organization.name = body.name;
+		organization.cin = body.cin;
 		organization.address = new Address({
 			city: address.city,
 			houseNumber: address.houseNumber,
@@ -71,6 +71,7 @@ export class OrganizationsController {
 		if (!organization) throw new NotFoundException("Organization not found");
 
 		organization.name = body.name ?? organization.name;
+		organization.cin = body.cin ?? organization.cin;
 
 		if (body.address) {
 			organization.address.update(body.address);

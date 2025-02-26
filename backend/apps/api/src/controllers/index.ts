@@ -9,3 +9,4 @@ export { OrganizationsController } from "./organizations.controller";
 export { PhotoController } from "./photo.controller";
 export { UsersController } from "./users.controller";
 export { RolesController } from "./roles.controller";
+export { InitializeController } from "./initialize.controller";

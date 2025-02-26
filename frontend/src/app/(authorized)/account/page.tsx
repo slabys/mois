@@ -3,7 +3,6 @@
 import { useGetCurrentUser, useUpdateCurrentUser, useUpdateCurrentUserPhoto } from "@/utils/api";
 import { CreateAddress, CreateUserGender, UpdateUser } from "@/utils/api.schemas";
 import { apiImageURL } from "@/utils/apiImageURL";
-import { showErrorNotification, updateErrorNotification } from "@/utils/notifications";
 import { Dropzone } from "@components/Dropzone/Dropzone";
 import ImageEditor from "@components/ImageEditor/ImageEditor";
 import getCroppedImg from "@components/ImageEditor/imageEdit";
@@ -26,8 +25,8 @@ import {
 } from "@mantine/core";
 import { Form, isNotEmpty, useForm } from "@mantine/form";
 import { useHover } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
 import { IconMoodEdit } from "@tabler/icons-react";
+import { useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useMemo, useState } from "react";
 import { FileWithPath } from "react-dropzone-esm";
 import { Area } from "react-easy-crop";
@@ -37,6 +36,7 @@ interface UpdateUserProps extends Partial<UpdateUser> {
 }
 
 const AccountPage = () => {
+  const queryClient = useQueryClient();
   const { hovered, ref: hoverRef } = useHover();
 
   const [croppedArea, setCroppedArea] = useState<{ croppedArea: Area; croppedAreaPixels: Area } | null>(null);
@@ -74,7 +74,13 @@ const AccountPage = () => {
       lastName: currentUser.lastName,
       username: currentUser.username,
       gender: currentUser.gender,
-      personalAddress: currentUser.personalAddress,
+      personalAddress: currentUser.personalAddress ?? {
+        street: "",
+        houseNumber: "",
+        zip: "",
+        city: "",
+        country: "",
+      },
     };
 
     form.setInitialValues(userValues);
@@ -104,8 +110,8 @@ const AccountPage = () => {
       lastName: isNotEmpty("This field cannot be empty"),
       confirmPassword: (value, values) => (values.password === value ? null : "Password does not match"),
       personalAddress: {
-        houseNumber: (zipValue: string | undefined) =>
-          zipValue ? (/^(\d+)(\/\d+)?$/.test(zipValue) ? null : "Unable to send format") : null,
+        // houseNumber: (zipValue: string | undefined) =>
+        //   zipValue ? (/^(\d+)(\/\d+)?$/.test(zipValue) ? null : "Unable to send format") : null,
         zip: isNotEmpty("This field should not be empty"),
         city: isNotEmpty("This field should not be empty"),
         country: isNotEmpty("This field should not be empty"),
@@ -121,35 +127,13 @@ const AccountPage = () => {
 
   const updateUserMutation = useUpdateCurrentUser({
     mutation: {
-      onMutate: () => {
-        notifications.show({
-          id: "user-mutation",
-          loading: true,
-          title: "Loading! Please wait...",
-          message: "We are updating your information.",
-          autoClose: false,
-        });
-      },
       onSuccess: (data) => {
-        notifications.update({
-          id: "user-mutation",
-          title: "Account Edit",
-          message: "Account information updated successfully.",
-          color: "green",
-          loading: false,
-          autoClose: true,
-        });
         form.setInitialValues(data);
         form.setValues(data);
         form.resetDirty();
         form.resetTouched();
         setIsEditing(false);
         fetchCurrentUser();
-      },
-      onError: (mutationError) => {
-        if (!mutationError.response?.data) return;
-        updateErrorNotification("event-application");
-        showErrorNotification(mutationError);
       },
     },
   });
@@ -164,51 +148,10 @@ const AccountPage = () => {
 
   const updateUserPhotoMutation = useUpdateCurrentUserPhoto({
     mutation: {
-      onMutate: () => {
-        notifications.show({
-          id: "user-photo-update",
-          loading: true,
-          title: "Loading! Please wait...",
-          message: "We are updating your photo information.",
-          autoClose: false,
-        });
-      },
       onSuccess: () => {
-        notifications.update({
-          id: "user-photo-update",
-          title: "Update User Photo",
-          message: "Account photo updated successfully.",
-          color: "green",
-          loading: false,
-          autoClose: true,
-        });
         setCroppedArea(null);
         setNewUserPhoto(null);
         fetchCurrentUser();
-      },
-      onError: (mutationError) => {
-        if (!mutationError.response?.data) return;
-        const { statusCode, error, message } = mutationError.response?.data;
-        console.error(statusCode, error, message);
-        notifications.update({
-          id: "user-photo-update",
-          title: "Something went wrong.",
-          message: "Please check all information first. Then try again.",
-          color: "red",
-          loading: false,
-          autoClose: true,
-        });
-        let parsedMessage: string[] = [];
-        if (typeof message === "string") {
-          parsedMessage.push(message);
-        }
-        parsedMessage.forEach((err) => {
-          notifications.show({
-            title: `${statusCode} ${error}`,
-            message: err,
-            color: "red",
-          });
-        });
       },
     },
   });
@@ -234,8 +177,6 @@ const AccountPage = () => {
     setCroppedArea(null);
     setNewUserPhoto(null);
   };
-
-  console.log(currentUser);
 
   return (
     <Container size="sm" mt="lg">
@@ -360,6 +301,7 @@ const AccountPage = () => {
                   <Grid.Col span={8}>
                     <TextInput
                       label="Street"
+                      key={form.key("personalAddress.street")}
                       {...form.getInputProps("personalAddress.street")}
                       disabled={!isEditing}
                       required={isPersonalAddress(form.values.personalAddress)}
@@ -368,6 +310,7 @@ const AccountPage = () => {
                   <Grid.Col span={4}>
                     <TextInput
                       label="House Number"
+                      key={form.key("personalAddress.houseNumber")}
                       {...form.getInputProps("personalAddress.houseNumber")}
                       disabled={!isEditing}
                       required={isPersonalAddress(form.values.personalAddress)}
@@ -376,6 +319,7 @@ const AccountPage = () => {
                   <Grid.Col span={6}>
                     <TextInput
                       label="ZIP code"
+                      key={form.key("personalAddress.zip")}
                       {...form.getInputProps("personalAddress.zip")}
                       disabled={!isEditing}
                       required={isPersonalAddress(form.values.personalAddress)}
@@ -384,6 +328,7 @@ const AccountPage = () => {
                   <Grid.Col span={6}>
                     <TextInput
                       label="City"
+                      key={form.key("personalAddress.city")}
                       {...form.getInputProps("personalAddress.city")}
                       disabled={!isEditing}
                       required={isPersonalAddress(form.values.personalAddress)}
@@ -392,6 +337,7 @@ const AccountPage = () => {
                   <Grid.Col span={12}>
                     <TextInput
                       label="Country"
+                      key={form.key("personalAddress.country")}
                       {...form.getInputProps("personalAddress.country")}
                       disabled={!isEditing}
                       required={isPersonalAddress(form.values.personalAddress)}

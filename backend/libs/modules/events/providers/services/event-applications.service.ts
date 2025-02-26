@@ -1,12 +1,13 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FindManyOptions } from "libs/types";
 import { EventApplication } from "modules/events/entities";
 import { EventFilter } from "modules/events/models";
 import { filterSince } from "modules/events/utilities";
 import { FindOneOptions, Repository } from "typeorm";
+import { PaginationOptions } from "utilities/nest/decorators";
+import { formatPaginatedResponse } from "utilities/pagination.helper";
 
-interface FindEventOptions extends FindManyOptions {
+interface FindEventOptions {
 	filter?: EventFilter;
 	relations?: FindOneOptions<EventApplication>["relations"];
 }
@@ -16,11 +17,13 @@ export class EventApplicationsService {
 	constructor(
 		@InjectRepository(EventApplication)
 		private readonly eventApplicationRepository: Repository<EventApplication>,
-	) {}
+	) {
+	}
 
 	/**
 	 * Find event application by ID
 	 * @param id Event application ID
+	 * @param options options
 	 * @returns
 	 */
 	findById(id: number, options?: FindOneOptions<EventApplication>) {
@@ -34,6 +37,7 @@ export class EventApplicationsService {
 			},
 		});
 	}
+
 	/**
 	 * Find event applications by event ID
 	 * @param id
@@ -52,9 +56,11 @@ export class EventApplicationsService {
 	/**
 	 * Find applications by user ID
 	 * @param id User ID
+	 * @param options options
+	 * @param pagination Pagination
 	 * @returns Array of user applications
 	 */
-	findByUserId(id: string, options?: FindEventOptions) {
+	findByUserId(id: string, options?: FindEventOptions, pagination?: PaginationOptions) {
 		return this.eventApplicationRepository.find({
 			where: {
 				user: { id },
@@ -67,18 +73,19 @@ export class EventApplicationsService {
 				},
 				spotType: true,
 			},
-			take: options?.pagination?.take,
-			skip: options?.pagination?.skip,
+			take: pagination.all ? undefined : pagination.perPage,
+			skip: pagination.all ? undefined : (pagination.page - 1) * pagination.perPage,
 		});
 	}
 
 	/**
 	 * @param id User ID
-	 * @param options
+	 * @param options options
+	 * @param pagination Pagination
 	 * @returns
 	 */
-	findByUserIdDetailed(id: string, options?: FindEventOptions) {
-		return this.eventApplicationRepository.find({
+	async findByUserIdDetailed(id: string, options?: FindEventOptions, pagination?: PaginationOptions) {
+		const [eventApplications, totalCount] = await this.eventApplicationRepository.findAndCount({
 			where: {
 				user: { id },
 				// Apply event filters
@@ -99,15 +106,17 @@ export class EventApplicationsService {
 				invoiceAddress: true,
 				...options?.relations,
 			},
-			take: options?.pagination?.take,
-			skip: options?.pagination?.skip,
+			take: pagination?.all ? undefined : pagination?.perPage,
+			skip: pagination?.all ? undefined : ((pagination?.page - 1) * pagination?.perPage) || undefined,
 		});
+		return formatPaginatedResponse(eventApplications, totalCount, pagination);
 	}
 
 	/**
 	 * Find event application for user and event id
 	 * @param eventId
 	 * @param userId
+	 * @param options options
 	 * @returns
 	 */
 	findByEventAndUserId(eventId: number, userId: string, options?: FindEventOptions) {

@@ -34,14 +34,11 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
 
   const { data: currentOrganisation, refetch: refetchCurrentOrganisation } = useGetOrganisationById(organizationId);
 
-  const { data: allUsersList, refetch: refetchAllUsers } = useGetAllUsers(
-    { take: 100 },
-    {
-      query: {
-        enabled: !!searchValue,
-      },
+  const { data: allUsersList, refetch: refetchAllUsers } = useGetAllUsers(undefined, {
+    query: {
+      enabled: !!searchValue,
     },
-  );
+  });
 
   const { data: organizationMembers, refetch: refetchOrganisationMembers } = useOrganizationMembers(organizationId);
 
@@ -62,11 +59,11 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
 
   const filteredUserList = useMemo(() => {
     return (
-      allUsersList?.filter((user) => {
+      allUsersList?.data?.filter((user) => {
         // Check if is not in organisation already, if yes, then it will not be added
         // Check if firstName, lastName, username or e-mail is included in search field
         return (
-          !organizationMembers?.find((member) => member.user.id === user.id) &&
+          !organizationMembers?.data?.find((member) => member.user.id === user.id) &&
           [user.firstName, user.lastName, user.username, user.email].some((value) => value.includes(searchValue ?? ""))
         );
       }) ?? []
@@ -186,7 +183,7 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
-            {organizationMembers?.map((member, index) => {
+            {organizationMembers?.data?.map((member, index) => {
               const { user } = member;
               const { personalAddress } = user;
 

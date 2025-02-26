@@ -6,7 +6,6 @@ import RichTextEditor from "@components/Richtext/RichTextEditor";
 import DateInput from "@components/primitives/DateInput";
 import { Button, Flex, Group, Modal, NumberInput, SimpleGrid, Switch, TextInput } from "@mantine/core";
 import { Form, useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
 import dayjs from "dayjs";
 import React from "react";
 
@@ -41,47 +40,11 @@ const EventEditModal = ({ eventDetail, isOpened, close, handleSuccess = () => {}
   });
   const eventUpdateMutation = useUpdateEvent({
     mutation: {
-      onMutate: () => {
-        notifications.show({
-          id: "edit-event",
-          loading: true,
-          title: "Loading! Please wait...",
-          message: "We are updating event information.",
-          autoClose: false,
-        });
-      },
       onSuccess: (data) => {
-        notifications.update({
-          id: "edit-event",
-          title: "Event Edit",
-          message: "Event information updated successfully.",
-          color: "green",
-          loading: false,
-          autoClose: true,
-        });
         form.setInitialValues(data);
         form.reset();
         handleSuccess();
         close();
-      },
-      onError: (error) => {
-        notifications.update({
-          id: "edit-event",
-          title: "Something went wrong.",
-          message: "Please check all information first. Then try again.",
-          color: "red",
-          loading: false,
-          autoClose: true,
-        });
-        if (error.response?.data && error.response.data.message) {
-          (error.response.data.message as string[]).forEach((err) => {
-            notifications.show({
-              title: "Error",
-              message: err,
-              color: "red",
-            });
-          });
-        }
       },
     },
   });

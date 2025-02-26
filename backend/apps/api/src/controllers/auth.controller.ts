@@ -29,7 +29,7 @@ export class AuthController {
 		@Res({ passthrough: true }) response: Response,
 	) {
 		const token = await this.authService.createToken(user);
-
+		
 		response
 			.cookie("AuthCookie", token, {
 				domain: isProduction ? process.env.WEB_DOMAIN : "localhost",

@@ -21,6 +21,7 @@ import {
   Skeleton,
   Text,
   Title,
+  VisuallyHidden,
 } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import {
@@ -81,7 +82,6 @@ const EventDetail = ({ id }: EventDetailProps) => {
                 <IconUsersGroup />
                 <Text size="sm">
                   <Text c="dimmed" span>
-                    {/* TODO - FIXME fix type */}
                     {"applications" in eventDetail ? `${eventDetail.applications} / ${eventDetail.capacity}` : null}
                   </Text>
                 </Text>
@@ -135,7 +135,7 @@ const EventDetail = ({ id }: EventDetailProps) => {
                     Upload Image
                   </Button>
                 )}
-                {hasEveryPermissions(currentUser.role, []) && (
+                {hasEveryPermissions(currentUser.role, ["event.manageApplications"]) && (
                   <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconUsersGroup />}>
                     Manage Applications
                   </Button>
@@ -143,7 +143,8 @@ const EventDetail = ({ id }: EventDetailProps) => {
               </SimpleGrid>
 
               {isUserRegistered && (
-                <>
+                // TODO - not implemented on BE
+                <VisuallyHidden>
                   <Divider my={16} />
                   <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 1, xl: 1 }}>
                     {/* TODO */}
@@ -160,7 +161,7 @@ const EventDetail = ({ id }: EventDetailProps) => {
                       Upload Payment
                     </Button>
                   </SimpleGrid>
-                </>
+                </VisuallyHidden>
               )}
 
               <Divider my={16} />

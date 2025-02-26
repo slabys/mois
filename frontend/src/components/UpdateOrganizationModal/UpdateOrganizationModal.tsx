@@ -2,7 +2,6 @@ import { useUpdateOrganization } from "@/utils/api";
 import { Organization, UpdateOrganization } from "@/utils/api.schemas";
 import { Button, Grid, Group, Modal, TextInput } from "@mantine/core";
 import { Form, isNotEmpty, useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
 import React from "react";
 
 interface CrateOrganizationModalProps {
@@ -21,6 +20,7 @@ const UpdateOrganizationModal = ({
   const form = useForm<Partial<UpdateOrganization>>({
     initialValues: {
       name: activeOrganization.name,
+      cin: activeOrganization.cin,
       address: activeOrganization.address
         ? {
             street: activeOrganization.address.street,
@@ -33,6 +33,7 @@ const UpdateOrganizationModal = ({
     },
     validate: {
       name: isNotEmpty("This field should not be empty"),
+      cin: isNotEmpty("This field should not be empty"),
       address: {
         street: isNotEmpty("This field should not be empty"),
         houseNumber: (zipValue: string | undefined) =>
@@ -46,46 +47,10 @@ const UpdateOrganizationModal = ({
 
   const updateOrganizationMutation = useUpdateOrganization({
     mutation: {
-      onMutate: () => {
-        notifications.show({
-          id: "create-organization",
-          loading: true,
-          title: "Loading! Please wait...",
-          message: "We are creating organization.",
-          autoClose: false,
-        });
-      },
       onSuccess: () => {
-        notifications.update({
-          id: "create-organization",
-          title: "Organization created.",
-          message: "Organization created successfully.",
-          color: "green",
-          loading: false,
-          autoClose: true,
-        });
         handleSuccess();
         form.reset();
         closeModal();
-      },
-      onError: (error) => {
-        notifications.update({
-          id: "create-organiztaion",
-          title: "Something went wrong.",
-          message: "Please check all information first. Then try again.",
-          color: "red",
-          loading: false,
-          autoClose: true,
-        });
-        if (error.response?.data && error.response.data.message) {
-          (error.response.data.message as string[]).forEach((err) => {
-            notifications.show({
-              title: "Error",
-              message: err,
-              color: "red",
-            });
-          });
-        }
       },
     },
   });
@@ -111,6 +76,12 @@ const UpdateOrganizationModal = ({
     <Modal size="xl" opened={isOpened} onClose={handleClose} title="Update Organization">
       <Form form={form} onSubmit={handleCreateOrganization}>
         <Grid>
+          <Grid.Col span={6}>
+            <TextInput label="Organisation Name" {...form.getInputProps("name")} />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <TextInput label="Organisation CIN" {...form.getInputProps("cin")} />
+          </Grid.Col>
           <Grid.Col span={8}>
             <TextInput label="Street" {...form.getInputProps("address.street")} />
           </Grid.Col>

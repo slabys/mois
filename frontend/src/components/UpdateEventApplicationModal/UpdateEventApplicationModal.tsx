@@ -2,7 +2,6 @@ import { useUpdateEventApplication } from "@/utils/api";
 import { CreateAddress, EventApplicationDetailedWithApplications, UpdateEventApplication } from "@/utils/api.schemas";
 import { Button, Flex, Group, Modal, Text, TextInput } from "@mantine/core";
 import { Form, isNotEmpty, useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
 import React from "react";
 
 interface UpdateEventModalProps {
@@ -44,50 +43,9 @@ const UpdateEventApplicationModal = ({
 
   const updateEventApplication = useUpdateEventApplication({
     mutation: {
-      onMutate: () => {
-        notifications.show({
-          id: "event-application-update",
-          loading: true,
-          title: "Loading! Please wait...",
-          message: "We are updating your event application.",
-          autoClose: false,
-        });
-      },
       onSuccess: () => {
-        notifications.update({
-          id: "event-application-update",
-          title: "Update User Photo",
-          message: "Event application updated successfully.",
-          color: "green",
-          loading: false,
-          autoClose: true,
-        });
         handleSuccess();
         closeModal();
-      },
-      onError: (mutationError) => {
-        if (!mutationError.response?.data) return;
-        const { statusCode, error, message } = mutationError.response?.data;
-        console.error(statusCode, error, message);
-        notifications.update({
-          id: "event-application-update",
-          title: "Something went wrong.",
-          message: "Please check all information first. Then try again.",
-          color: "red",
-          loading: false,
-          autoClose: true,
-        });
-        let parsedMessage: string[] = [];
-        if (typeof message === "string") {
-          parsedMessage.push(message);
-        }
-        parsedMessage.forEach((err) => {
-          notifications.show({
-            title: `${statusCode} ${error}`,
-            message: err,
-            color: "red",
-          });
-        });
       },
     },
   });

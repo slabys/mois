@@ -16,11 +16,13 @@ import {
 	ApiBearerAuth,
 	ApiConsumes,
 	ApiCreatedResponse,
+	ApiExtraModels,
 	ApiForbiddenResponse,
 	ApiNotFoundResponse,
 	ApiOkResponse,
 	ApiQuery,
 	ApiTags,
+	getSchemaPath,
 } from "@nestjs/swagger";
 import { FormDataRequest } from "nestjs-form-data";
 
@@ -29,13 +31,14 @@ import { Event, EventsService } from "modules/events";
 import { EventLink, EventSpot } from "modules/events/entities";
 import { PhotoService } from "modules/photo";
 import type { User } from "modules/users";
-import { Pagination, type PaginationOptions } from "utilities/nest/decorators";
 import { ParseDatePipe } from "utilities/nest/pipes";
 
 import { CurrentUser } from "../decorators";
 import { EventSimpleWithApplicationsMapper } from "../mappers";
 import { CreateEvent, UpdateEvent, UpdatePhoto } from "../models/requests";
-import { EventDetail, EventSimple, EventSimpleWithApplications } from "../models/responses";
+import { EventDetail, EventSimple } from "../models/responses";
+import { Pagination, PaginationOptions } from "utilities/nest/decorators";
+import { PaginationDto, PaginationResponseDto } from "../models/responses/pagination-response.dto";
 
 @ApiTags("Events")
 @Controller("events")
@@ -44,7 +47,8 @@ export class EventsController {
 		private readonly eventsService: EventsService,
 		private readonly photoService: PhotoService,
 		private readonly eventSimpleWithApplicationsMapper: EventSimpleWithApplicationsMapper,
-	) {}
+	) {
+	}
 
 	/**
 	 * To filter by `since` use:
@@ -60,25 +64,42 @@ export class EventsController {
 	 * - To filter only events between two dates use `sinceSince`: `dateA`, `toSince`: `dateB`
 	 *
 	 */
-	@ApiOkResponse({ type: [EventSimpleWithApplications] })
+	@ApiExtraModels(Event, PaginationResponseDto<Event>)
+	@ApiOkResponse({
+		description: "All Events",
+		content: {
+			"application/json": {
+				schema: {
+					type: "object",
+					properties: {
+						data: {
+							type: "array",
+							items: { $ref: getSchemaPath(Event) },
+						},
+						pagination: { $ref: getSchemaPath(PaginationDto) },
+					},
+				},
+			},
+		},
+	})
 	@ApiQuery({ name: "sinceSince", required: false, type: Number })
 	@ApiQuery({ name: "toSince", required: false, type: Number })
 	@Get()
 	async getEvents(
-		@Pagination() pagination: PaginationOptions,
 		@Query("sinceSince", ParseDatePipe) since?: Date,
 		@Query("toSince", ParseDatePipe) to?: Date,
+		@Pagination() pagination?: PaginationOptions,
 	) {
 		const events = await this.eventsService.findByFilter(
 			{ since, to },
 			{
-				pagination,
 				visible: true,
 				relations: { applications: true },
 			},
+			pagination,
 		);
 
-		return this.eventSimpleWithApplicationsMapper.map(events);
+		return events;
 	}
 
 	/**

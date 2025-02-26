@@ -1,10 +1,9 @@
-import { getGetManagementEventsQueryKey, useCreateEvent } from "@/utils/api";
-import { CreateEvent, EventSimple } from "@/utils/api.schemas";
+import { getGetEventsQueryKey, useCreateEvent } from "@/utils/api";
+import { CreateEvent } from "@/utils/api.schemas";
 import RichTextEditor from "@components/Richtext/RichTextEditor";
 import DateInput from "@components/primitives/DateInput";
 import { Button, Flex, Group, Modal, NumberInput, SimpleGrid, Switch, TextInput } from "@mantine/core";
 import { Form, hasLength, isNotEmpty, useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import React from "react";
@@ -20,47 +19,11 @@ const CreateEventModal = ({ onCreateSuccess, isOpened, closeModal }: MyModalProp
 
   const createEventMutation = useCreateEvent({
     mutation: {
-      onMutate: () => {
-        notifications.show({
-          id: "create-event",
-          loading: true,
-          title: "Loading! Please wait...",
-          message: "We are create event.",
-          autoClose: false,
-        });
-      },
-      onSuccess: (data) => {
-        notifications.update({
-          id: "create-event",
-          title: "Event Edit",
-          message: "Event create updated successfully.",
-          color: "green",
-          loading: false,
-          autoClose: true,
-        });
-        queryClient.setQueryData(getGetManagementEventsQueryKey(), (oldData: EventSimple[]) => [...oldData, data]);
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: [getGetEventsQueryKey()] });
         onCreateSuccess();
         form.reset();
         closeModal();
-      },
-      onError: (error) => {
-        notifications.update({
-          id: "create-event",
-          title: "Something went wrong.",
-          message: "Please check all information first. Then try again.",
-          color: "red",
-          loading: false,
-          autoClose: true,
-        });
-        if (error.response?.data && error.response.data.message) {
-          (error.response.data.message as string[]).forEach((err) => {
-            notifications.show({
-              title: "Error",
-              message: err,
-              color: "red",
-            });
-          });
-        }
       },
     },
   });

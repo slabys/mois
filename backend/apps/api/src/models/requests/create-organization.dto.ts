@@ -7,6 +7,9 @@ export class CreateOrganization {
 	@IsString()
 	name: string;
 
+	@IsString()
+	cin: string | null;
+
 	@IsNotEmptyObject()
 	@IsObject()
 	@Type(() => CreateAddress)

@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectEntityManager, InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, FindOneOptions, Repository } from "typeorm";
-
-import { FindManyOptions } from "libs/types";
 import { Organization, OrganizationMember } from "modules/organization/entities";
 import { User } from "modules/users";
+import { PaginationOptions } from "utilities/nest/decorators";
+import { formatPaginatedResponse } from "utilities/pagination.helper";
 
 @Injectable()
 export class OrganizationService {
@@ -49,23 +49,24 @@ export class OrganizationService {
 
 	/**
 	 * Find all organizations
-	 * @returns {Organization[]} Organizations
+	 * @returns Organization[] Organizations
 	 */
-	findAll(options?: FindManyOptions) {
+	findAll() {
 		return this.organizationRepository.find({
-			take: options?.pagination?.take,
-			skip: options?.pagination?.skip,
+			relations: {
+				manager: true,
+			},
 		});
 	}
 
 	/**
 	 * Find all members of organization
 	 * @param id Organization ID
-	 * @param options Find options
+	 * @param pagination Pagination
 	 * @returns {OrganizationMember[]} Members
 	 */
-	findMembersOf(id: string, options?: FindManyOptions) {
-		return this.memberRepository.find({
+	async findMembersOf(id: string, pagination?: PaginationOptions) {
+		const [members, totalCount] = await this.memberRepository.findAndCount({
 			where: {
 				organization: {
 					id,
@@ -76,16 +77,18 @@ export class OrganizationService {
 					personalAddress: true,
 				},
 			},
-			skip: options?.pagination?.skip,
-			take: options?.pagination?.take,
+			take: pagination.all ? undefined : pagination.perPage,
+			skip: pagination.all ? undefined : (pagination.page - 1) * pagination.perPage,
 		});
+		return formatPaginatedResponse<OrganizationMember>(members, totalCount, pagination);
 	}
 
 	/**
 	 * Find organization user membership
 	 * @param organizationId Organization ID
 	 * @param userId User ID
-	 * @returns {OrganizationMember | null} Membership
+	 * @param options
+	 * @returns OrganizationMember | null Membership
 	 */
 	findMemberByUserId(organizationId: string, userId: string, options?: FindOneOptions<OrganizationMember>) {
 		return this.memberRepository.findOne({
@@ -97,16 +100,17 @@ export class OrganizationService {
 					id: userId,
 				},
 			},
-			relations: options?.relations,
+			...options,
 		});
 	}
 
 	/**
 	 * Find memberships where user is member of
 	 * @param userId User ID
-	 * @returns {OrganizationMember}
+	 // * @param options Find options
+	 * @returns OrganizationMember[]
 	 */
-	findUserMemberships(userId: string, options?: FindManyOptions) {
+	findUserMemberships(userId: string) { //, options?: FindManyOptions
 		return this.memberRepository.find({
 			where: { user: { id: userId } },
 			relations: {
@@ -115,8 +119,7 @@ export class OrganizationService {
 					address: true,
 				},
 			},
-			take: options?.pagination?.take,
-			skip: options?.pagination?.skip,
+			// ...options,
 		});
 	}
 

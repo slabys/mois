@@ -5,17 +5,26 @@
  * The backend API description
  * OpenAPI spec version: 0.0.1
  */
+export type GetManagementEvents200 = {
+  data?: Event[];
+  pagination?: PaginationDto;
+};
+
 export type GetManagementEventsParams = {
   sinceSince?: number;
   toSince?: number;
   /**
-   * Pagination number of results
+   * Current page number
    */
-  take?: number;
+  page?: number;
   /**
-   * Pagination number of skipped results
+   * Number of results per page
    */
-  skip?: number;
+  perPage?: number;
+  /**
+   * If true, fetches all data (ignores pagination)
+   */
+  all?: boolean;
 };
 
 export type GetRoleAllPermissions200Item =
@@ -26,6 +35,7 @@ export const GetRoleAllPermissions200Item = {
   eventcreate: "event.create",
   eventupdate: "event.update",
   eventduplicate: "event.duplicate",
+  eventmanageApplications: "event.manageApplications",
   organisationcreate: "organisation.create",
   organisationupdate: "organisation.update",
   organisationaddUser: "organisation.addUser",
@@ -36,28 +46,31 @@ export const GetRoleAllPermissions200Item = {
   roledelete: "role.delete",
 } as const;
 
-export type GetEventSpotsParams = {
-  /**
-   * Pagination number of results
-   */
-  take?: number;
-  /**
-   * Pagination number of skipped results
-   */
-  skip?: number;
+export type GetEvents200 = {
+  data?: Event[];
+  pagination?: PaginationDto;
 };
 
 export type GetEventsParams = {
   sinceSince?: number;
   toSince?: number;
   /**
-   * Pagination number of results
+   * Current page number
    */
-  take?: number;
+  page?: number;
   /**
-   * Pagination number of skipped results
+   * Number of results per page
    */
-  skip?: number;
+  perPage?: number;
+  /**
+   * If true, fetches all data (ignores pagination)
+   */
+  all?: boolean;
+};
+
+export type GetUserApplications200 = {
+  data?: EventApplication[];
+  pagination?: PaginationDto;
 };
 
 export type GetUserApplicationsParams = {
@@ -65,15 +78,24 @@ export type GetUserApplicationsParams = {
   toSince?: number;
 };
 
+export type OrganizationMembers200 = {
+  data?: OrganizationMember[];
+  pagination?: PaginationDto;
+};
+
 export type OrganizationMembersParams = {
   /**
-   * Pagination number of results
+   * Current page number
    */
-  take?: number;
+  page?: number;
   /**
-   * Pagination number of skipped results
+   * Number of results per page
    */
-  skip?: number;
+  perPage?: number;
+  /**
+   * If true, fetches all data (ignores pagination)
+   */
+  all?: boolean;
 };
 
 export type TransferManager201 = { [key: string]: unknown };
@@ -82,37 +104,24 @@ export type UpdateOrganization201 = { [key: string]: unknown };
 
 export type CreateOrganization201 = { [key: string]: unknown };
 
-export type AllOrganizationsParams = {
-  /**
-   * Pagination number of results
-   */
-  take?: number;
-  /**
-   * Pagination number of skipped results
-   */
-  skip?: number;
+export type GetAllUsers200 = {
+  data?: User[];
+  pagination?: PaginationDto;
 };
 
 export type GetAllUsersParams = {
   /**
-   * Pagination number of results
+   * Current page number
    */
-  take?: number;
+  page?: number;
   /**
-   * Pagination number of skipped results
+   * Number of results per page
    */
-  skip?: number;
-};
-
-export type UserOrganizationMembershipsParams = {
+  perPage?: number;
   /**
-   * Pagination number of results
+   * If true, fetches all data (ignores pagination)
    */
-  take?: number;
-  /**
-   * Pagination number of skipped results
-   */
-  skip?: number;
+  all?: boolean;
 };
 
 export type CreateRolePermissionsItem = (typeof CreateRolePermissionsItem)[keyof typeof CreateRolePermissionsItem];
@@ -122,6 +131,7 @@ export const CreateRolePermissionsItem = {
   eventcreate: "event.create",
   eventupdate: "event.update",
   eventduplicate: "event.duplicate",
+  eventmanageApplications: "event.manageApplications",
   organisationcreate: "organisation.create",
   organisationupdate: "organisation.update",
   organisationaddUser: "organisation.addUser",
@@ -231,11 +241,17 @@ export interface UpdateEvent {
   codeOfConductLink?: string;
   /** Generate invoices after {@link registrationDeadline} */
   generateInvoices?: boolean;
-  /** @minLength 30 */
+  /**
+   * Short description in JSON format for RichText
+   * @minLength 30
+   */
   longDescription?: string;
   photoPolicyLink?: string;
   registrationDeadline?: string;
-  /** @minLength 30 */
+  /**
+   * Short description in JSON format for RichText
+   * @minLength 30
+   */
   shortDescription?: string;
   since?: string;
   termsAndConditionsLink?: string;
@@ -260,6 +276,7 @@ export interface EventSimple {
   photo: EventSimplePhoto;
   photoPolicyLink: string;
   registrationDeadline: string;
+  /** Short description in JSON format for RichText */
   shortDescription: string;
   since: string;
   /** Links */
@@ -284,14 +301,20 @@ export interface CreateEvent {
   codeOfConductLink: string;
   /** Generate invoices after {@link registrationDeadline} */
   generateInvoices: boolean;
-  /** @minLength 30 */
+  /**
+   * Short description in JSON format for RichText
+   * @minLength 30
+   */
   longDescription: string;
   photoPolicyLink: string;
   registrationDeadline: string;
   /** Additional registration properties
 ! Must be valid JSON schema */
   registrationForm?: CreateEventRegistrationForm;
-  /** @minLength 30 */
+  /**
+   * Short description in JSON format for RichText
+   * @minLength 30
+   */
   shortDescription: string;
   since: string;
   termsAndConditionsLink: string;
@@ -328,6 +351,7 @@ export interface EventDetail {
   createdByUser: User;
   id: number;
   links: EventDetailLink[];
+  /** Long description in JSON format for RichText */
   longDescription: string;
   /** @nullable */
   photo: EventDetailPhoto;
@@ -339,6 +363,7 @@ Each event can have different "requirements"
    * @nullable
    */
   registrationForm: EventDetailRegistrationForm;
+  /** Short description in JSON format for RichText */
   shortDescription: string;
   since: string;
   /** Links */
@@ -447,20 +472,6 @@ export type EventApplicationDetailedWithApplicationsSpotType = SpotTypeSimple | 
 
 export type EventApplicationDetailedWithApplicationsAdditionalData = { [key: string]: unknown };
 
-export interface EventApplicationDetailedWithApplications {
-  additionalData: EventApplicationDetailedWithApplicationsAdditionalData;
-  createdAt: string;
-  customOrganization: EventCustomOrganization;
-  event: EventSimpleWithApplications;
-  id: number;
-  idNumber: string;
-  invoiceAddress: Address;
-  organization: Organization;
-  /** @nullable */
-  spotType: EventApplicationDetailedWithApplicationsSpotType;
-  user: User;
-}
-
 /**
  * @nullable
  */
@@ -477,6 +488,7 @@ export interface EventSimpleWithApplications {
   photo: EventSimpleWithApplicationsPhoto;
   photoPolicyLink: string;
   registrationDeadline: string;
+  /** Short description in JSON format for RichText */
   shortDescription: string;
   since: string;
   /** Links */
@@ -484,6 +496,20 @@ export interface EventSimpleWithApplications {
   title: string;
   until: string;
   visible: boolean;
+}
+
+export interface EventApplicationDetailedWithApplications {
+  additionalData: EventApplicationDetailedWithApplicationsAdditionalData;
+  createdAt: string;
+  customOrganization: EventCustomOrganization;
+  event: EventSimpleWithApplications;
+  id: number;
+  idNumber: string;
+  invoiceAddress: Address;
+  organization: Organization;
+  /** @nullable */
+  spotType: EventApplicationDetailedWithApplicationsSpotType;
+  user: User;
 }
 
 export type SpotTypeSimpleCurrency = (typeof SpotTypeSimpleCurrency)[keyof typeof SpotTypeSimpleCurrency];
@@ -499,6 +525,59 @@ export interface SpotTypeSimple {
   id: number;
   name: string;
   price: number;
+}
+
+/**
+ * Additional registration form
+Each event can have different "requirements"
+ * @nullable
+ */
+export type EventRegistrationForm = { [key: string]: unknown } | null;
+
+/**
+ * @nullable
+ */
+export type EventPhoto = Photo | null;
+
+export interface EventLink {
+  event: Event;
+  id: number;
+  link: string;
+  name: string;
+}
+
+export interface Event {
+  applications: EventApplication[];
+  /** Event capacity */
+  capacity: number;
+  codeOfConductLink: string;
+  createdAt: string;
+  createdByUser: User;
+  /** If true, generate invoices after {@link registrationDeadline} */
+  generateInvoices: boolean;
+  id: number;
+  links: EventLink[];
+  /** Long description in JSON format for RichText */
+  longDescription: string;
+  /** @nullable */
+  photo: EventPhoto;
+  photoPolicyLink: string;
+  registrationDeadline: string;
+  /**
+   * Additional registration form
+Each event can have different "requirements"
+   * @nullable
+   */
+  registrationForm: EventRegistrationForm;
+  /** Short description in JSON format for RichText */
+  shortDescription: string;
+  since: string;
+  spotTypes: EventSpot[];
+  /** Links */
+  termsAndConditionsLink: string;
+  title: string;
+  until: string;
+  visible: boolean;
 }
 
 /**
@@ -518,6 +597,29 @@ export const EventApplicationInvoiceMethod = {
 } as const;
 
 export type EventApplicationAdditionalData = { [key: string]: unknown };
+
+export interface EventApplication {
+  additionalData: EventApplicationAdditionalData;
+  additionalInformation: string;
+  createdAt: string;
+  customOrganization: EventCustomOrganization;
+  event: Event;
+  id: number;
+  idNumber: string;
+  invoice: Invoice;
+  invoiceAddress: Address;
+  /** @nullable */
+  invoicedTo: string | null;
+  invoiceMethod: EventApplicationInvoiceMethod;
+  organization: Organization;
+  personalAddress: Address;
+  /**
+   * Spot, must be one of {@link event} spots
+   * @nullable
+   */
+  spotType: EventApplicationSpotType;
+  user: User;
+}
 
 export type InvoiceCurrency = (typeof InvoiceCurrency)[keyof typeof InvoiceCurrency];
 
@@ -559,55 +661,12 @@ export interface Invoice {
   variableSymbol: number;
 }
 
-/**
- * Additional registration form
-Each event can have different "requirements"
- * @nullable
- */
-export type EventRegistrationForm = { [key: string]: unknown } | null;
-
-/**
- * @nullable
- */
-export type EventPhoto = Photo | null;
-
-export interface EventLink {
-  event: Event;
-  id: number;
-  link: string;
-  name: string;
-}
-
-export interface Event {
-  applications: EventApplication[];
-  /** Event capacity */
-  capacity: number;
-  codeOfConductLink: string;
+export interface EventCustomOrganization {
+  application: EventApplication;
+  country: string;
   createdAt: string;
-  createdByUser: User;
-  /** If true, generate invoices after {@link registrationDeadline} */
-  generateInvoices: boolean;
   id: number;
-  links: EventLink[];
-  longDescription: string;
-  /** @nullable */
-  photo: EventPhoto;
-  photoPolicyLink: string;
-  registrationDeadline: string;
-  /**
-   * Additional registration form
-Each event can have different "requirements"
-   * @nullable
-   */
-  registrationForm: EventRegistrationForm;
-  shortDescription: string;
-  since: string;
-  spotTypes: EventSpot[];
-  /** Links */
-  termsAndConditionsLink: string;
-  title: string;
-  until: string;
-  visible: boolean;
+  name: string;
 }
 
 export type EventSpotCurrency = (typeof EventSpotCurrency)[keyof typeof EventSpotCurrency];
@@ -630,67 +689,6 @@ export interface AddOrganizationMembers {
   userIds: string[];
 }
 
-export interface OrganizationMemberWithoutOrganization {
-  createdAt: string;
-  id: string;
-  user: User;
-}
-
-export interface UpdateOrganization {
-  address?: CreateAddress;
-  name?: string;
-}
-
-export interface CreateOrganization {
-  address: CreateAddress;
-  name: string;
-}
-
-/**
- * @nullable
- */
-export type OrganizationManager = User | null;
-
-export interface Organization {
-  address: Address;
-  createdAt: string;
-  id: string;
-  /** @nullable */
-  manager: OrganizationManager;
-  name: string;
-}
-
-export interface EventApplication {
-  additionalData: EventApplicationAdditionalData;
-  additionalInformation: string;
-  createdAt: string;
-  customOrganization: EventCustomOrganization;
-  event: Event;
-  id: number;
-  idNumber: string;
-  invoice: Invoice;
-  invoiceAddress: Address;
-  /** @nullable */
-  invoicedTo: string | null;
-  invoiceMethod: EventApplicationInvoiceMethod;
-  organization: Organization;
-  personalAddress: Address;
-  /**
-   * Spot, must be one of {@link event} spots
-   * @nullable
-   */
-  spotType: EventApplicationSpotType;
-  user: User;
-}
-
-export interface EventCustomOrganization {
-  application: EventApplication;
-  country: string;
-  createdAt: string;
-  id: number;
-  name: string;
-}
-
 export interface OrganizationMember {
   createdAt: string;
   id: string;
@@ -698,11 +696,35 @@ export interface OrganizationMember {
   user: User;
 }
 
-export interface OrganizationMemberWithoutUser {
-  createdAt: string;
-  id: string;
-  organization: Organization;
+export interface UpdateOrganization {
+  address?: CreateAddress;
+  /** @nullable */
+  cin?: string | null;
+  name?: string;
 }
+
+export type PaginationResponseDtoDataItem = { [key: string]: unknown };
+
+export interface PaginationDto {
+  /** Current page number */
+  currentPage: number;
+  /** Total number of pages */
+  maxPages: number;
+  /** Number of items per page */
+  perPage: number;
+}
+
+export interface PaginationResponseDto {
+  /** Array of requested data */
+  data: PaginationResponseDtoDataItem[];
+  /** Pagination metadata */
+  pagination: PaginationDto;
+}
+
+/**
+ * @nullable
+ */
+export type OrganizationManager = User | null;
 
 export interface UpdatePhoto {
   file: Blob;
@@ -748,11 +770,6 @@ export interface UpdateUser {
   username?: string;
 }
 
-/**
- * @nullable
- */
-export type UserPersonalAddress = Address | null;
-
 export type UserGender = (typeof UserGender)[keyof typeof UserGender];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -763,6 +780,21 @@ export const UserGender = {
   "prefer-not-to-say": "prefer-not-to-say",
 } as const;
 
+export interface User {
+  createdAt: string;
+  email: string;
+  firstName: string;
+  gender: UserGender;
+  id: string;
+  lastName: string;
+  /** @nullable */
+  personalAddress: UserPersonalAddress;
+  photo: Photo;
+  role: Role;
+  updatedAt: string;
+  username: string;
+}
+
 export type RolePermissionsItem = (typeof RolePermissionsItem)[keyof typeof RolePermissionsItem];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -770,6 +802,7 @@ export const RolePermissionsItem = {
   eventcreate: "event.create",
   eventupdate: "event.update",
   eventduplicate: "event.duplicate",
+  eventmanageApplications: "event.manageApplications",
   organisationcreate: "organisation.create",
   organisationupdate: "organisation.update",
   organisationaddUser: "organisation.addUser",
@@ -796,25 +829,47 @@ export interface Address {
   zip: string;
 }
 
+export interface Organization {
+  address: Address;
+  /** @nullable */
+  cin: string | null;
+  createdAt: string;
+  id: string;
+  /** @nullable */
+  manager: OrganizationManager;
+  name: string;
+}
+
+export interface OrganizationMemberWithoutUser {
+  createdAt: string;
+  id: string;
+  organization: Organization;
+}
+
+/**
+ * @nullable
+ */
+export type UserPersonalAddress = Address | null;
+
 export interface Photo {
   createdAt: string;
   filename: string;
   id: string;
 }
 
-export interface User {
-  createdAt: string;
+export interface AccessToken {
+  /** User access token */
+  accessToken: string;
+}
+
+export interface LoginUser {
+  /** User email or username */
   email: string;
-  firstName: string;
-  gender: UserGender;
-  id: string;
-  lastName: string;
-  /** @nullable */
-  personalAddress: UserPersonalAddress;
-  photo: Photo;
-  role: Role;
-  updatedAt: string;
-  username: string;
+  /**
+   * User password
+   * @minLength 6
+   */
+  password: string;
 }
 
 /**
@@ -842,6 +897,13 @@ export interface CreateAddress {
   zip: string;
 }
 
+export interface CreateOrganization {
+  address: CreateAddress;
+  /** @nullable */
+  cin: string | null;
+  name: string;
+}
+
 export interface CreateUser {
   /** User email */
   email: string;
@@ -865,17 +927,7 @@ export interface CreateUser {
   username: string;
 }
 
-export interface AccessToken {
-  /** User access token */
-  accessToken: string;
-}
-
-export interface LoginUser {
-  /** User email or username */
-  email: string;
-  /**
-   * User password
-   * @minLength 6
-   */
-  password: string;
+export interface InitializeType {
+  organization: CreateOrganization;
+  user: CreateUser;
 }

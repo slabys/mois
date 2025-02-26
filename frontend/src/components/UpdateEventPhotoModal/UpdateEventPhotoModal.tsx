@@ -1,7 +1,6 @@
 import { useUpdateEventPhoto } from "@/utils/api";
 import { Dropzone } from "@components/Dropzone/Dropzone";
 import { Button, Center, Group, Image, Modal } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
 import React, { useState } from "react";
 import { FileWithPath } from "react-dropzone-esm";
 
@@ -17,51 +16,10 @@ const UpdateEventPhotoModal: React.FC<MyModalProps> = ({ eventId, isOpened, clos
 
   const uploadEventPhoto = useUpdateEventPhoto({
     mutation: {
-      onMutate: () => {
-        notifications.show({
-          id: "event-photo-update",
-          loading: true,
-          title: "Loading! Please wait...",
-          message: "We are updating your photo information.",
-          autoClose: false,
-        });
-      },
       onSuccess: () => {
-        notifications.update({
-          id: "event-photo-update",
-          title: "Update User Photo",
-          message: "Account photo updated successfully.",
-          color: "green",
-          loading: false,
-          autoClose: true,
-        });
         handleSuccess();
         setFile(null);
         closeModal();
-      },
-      onError: (mutationError) => {
-        if (!mutationError.response?.data) return;
-        const { statusCode, error, message } = mutationError.response?.data;
-        console.error(statusCode, error, message);
-        notifications.update({
-          id: "event-photo-update",
-          title: "Something went wrong.",
-          message: "Please check all information first. Then try again.",
-          color: "red",
-          loading: false,
-          autoClose: true,
-        });
-        let parsedMessage: string[] = [];
-        if (typeof message === "string") {
-          parsedMessage.push(message);
-        }
-        parsedMessage.forEach((err) => {
-          notifications.show({
-            title: `${statusCode} ${error}`,
-            message: err,
-            color: "red",
-          });
-        });
       },
     },
   });

@@ -17,18 +17,19 @@ const ManageOrganizationsPage = () => {
   const [isUpdateOrganizationModalOpen, { open: openUpdateOrganizationModal, close: closeUpdateOrganizationModal }] =
     useDisclosure(false);
 
-  const [activeOrganization, setActiveOrganization] = useState<Organization | null>(null);
+  const [activeOrganisation, setActiveOrganisation] = useState<Organization | null>(null);
 
-  const { data: organizationsList, refetch: refetchOrganizationsList } = useAllOrganizations();
+  const { data: organisationsList, refetch: refetchOrganisationsList } = useAllOrganizations();
 
   const handleRefetch = () => {
-    setActiveOrganization(null);
-    refetchOrganizationsList();
+    setActiveOrganisation(null);
+    refetchOrganisationsList();
   };
 
-  const rows = organizationsList?.map((organization, index) => (
+  const rows = organisationsList?.map((organization, index) => (
     <Table.Tr key={`event-${index}-${organization.id}`}>
       <Table.Td>{organization.name}</Table.Td>
+      <Table.Td>{organization.cin}</Table.Td>
       <Table.Td>
         <Flex direction="column" justify="start" align="start">
           <Text>{`${organization.address.street} ${organization.address.houseNumber}`}</Text>
@@ -66,7 +67,7 @@ const ManageOrganizationsPage = () => {
               size={48}
               color="blue"
               onClick={() => {
-                setActiveOrganization(organization);
+                setActiveOrganisation(organization);
                 openUpdateOrganizationModal();
               }}
             >
@@ -105,16 +106,19 @@ const ManageOrganizationsPage = () => {
             >
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th h="100%" maw={64} w={64}>
+                  <Table.Th h="100%" miw={96} maw={128}>
                     Name
                   </Table.Th>
-                  <Table.Th w={148} miw={148}>
+                  <Table.Th miw={64} maw={64}>
+                    CIN
+                  </Table.Th>
+                  <Table.Th miw={148} maw={148}>
                     Address
                   </Table.Th>
-                  <Table.Th w={148} miw={148}>
+                  <Table.Th miw={148} maw={148}>
                     Manager&apos;s Name
                   </Table.Th>
-                  <Table.Th w={148} miw={148}>
+                  <Table.Th miw={148} maw={148}>
                     Manager&apos;s Username
                   </Table.Th>
                   <Table.Th w={200}>Operations</Table.Th>
@@ -132,9 +136,9 @@ const ManageOrganizationsPage = () => {
         isOpened={isCreateOrganizationModalOpen}
         closeModal={closeAddOrganizationModal}
       />
-      {activeOrganization && (
+      {activeOrganisation && (
         <UpdateOrganizationModal
-          activeOrganization={activeOrganization}
+          activeOrganization={activeOrganisation}
           handleSuccess={handleRefetch}
           isOpened={isUpdateOrganizationModalOpen}
           closeModal={closeUpdateOrganizationModal}

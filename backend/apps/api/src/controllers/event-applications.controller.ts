@@ -20,10 +20,12 @@ import {
 import {
 	ApiBearerAuth,
 	ApiConflictResponse,
+	ApiExtraModels,
 	ApiNotFoundResponse,
 	ApiOkResponse,
 	ApiQuery,
 	ApiTags,
+	getSchemaPath,
 } from "@nestjs/swagger";
 import { firstValueFrom } from "rxjs";
 
@@ -48,6 +50,7 @@ import { EventApplicationSimpleWithApplicationsMapper } from "../mappers";
 import {
 	EventApplicationDetailedWithApplications,
 } from "../models/responses/event-application-detailed-with-applications.dto";
+import { PaginationDto, PaginationResponseDto } from "../models/responses/pagination-response.dto";
 
 @ApiTags("Event applications")
 @Controller("events")
@@ -72,7 +75,24 @@ export class EventApplicationsController {
 	@ApiBearerAuth()
 	@ApiQuery({ name: "sinceSince", required: false, type: Number })
 	@ApiQuery({ name: "toSince", required: false, type: Number })
-	@ApiOkResponse({ type: [EventApplicationDetailedWithApplications] })
+	@ApiExtraModels(EventApplication, PaginationResponseDto<EventApplication>)
+	@ApiOkResponse({
+		description: "All Events",
+		content: {
+			"application/json": {
+				schema: {
+					type: "object",
+					properties: {
+						data: {
+							type: "array",
+							items: { $ref: getSchemaPath(EventApplication) },
+						},
+						pagination: { $ref: getSchemaPath(PaginationDto) },
+					},
+				},
+			},
+		},
+	})
 	@UseGuards(CookieGuard)
 	@Get("applications")
 	async getUserApplications(
@@ -80,12 +100,10 @@ export class EventApplicationsController {
 		@Query("sinceSince", ParseDatePipe) since?: Date,
 		@Query("toSince", ParseDatePipe) to?: Date,
 	) {
-		const applications = await this.eventApplicationsService.findByUserIdDetailed(user.id, {
+		return await this.eventApplicationsService.findByUserIdDetailed(user.id, {
 			filter: { to, since },
 			relations: { event: { applications: true } },
 		});
-
-		return this.eventApplicationSimpleWithApplicationsMapper.map(applications);
 	}
 
 	/**
@@ -225,7 +243,6 @@ export class EventApplicationsController {
 		@Param("id", ParseIntPipe) applicationId: number,
 		@Body() body: UpdateEventApplication,
 	): Promise<EventApplicationSimpleWithApplications> {
-		console.log(body);
 		let application = await this.eventApplicationsService.findById(applicationId, {
 			relations: {
 				personalAddress: true,
@@ -238,7 +255,6 @@ export class EventApplicationsController {
 
 		if (body.spotTypeId) {
 			const eventSpot = await this.eventSpotsService.findById(body.spotTypeId);
-			console.log(eventSpot);
 			if (!eventSpot) throw new BadRequestException("Invalid event spot");
 
 			application.spotType = eventSpot;

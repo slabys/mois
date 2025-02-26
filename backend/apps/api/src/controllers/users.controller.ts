@@ -16,8 +16,10 @@ import {
 	ApiBearerAuth,
 	ApiConsumes,
 	ApiCreatedResponse,
+	ApiExtraModels,
 	ApiOkResponse,
 	ApiTags,
+	getSchemaPath,
 } from "@nestjs/swagger";
 import { FormDataRequest, MemoryStoredFile } from "nestjs-form-data";
 
@@ -29,8 +31,9 @@ import { CookieGuard } from "modules/auth/providers/guards";
 import { CurrentUser } from "../decorators";
 import { CreateUser, UpdatePhoto, UpdateUser } from "../models/requests";
 import { OrganizationMemberWithoutUser } from "../models/responses";
-import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 import { Address } from "modules/addresses";
+import { Pagination, PaginationOptions } from "utilities/nest/decorators";
+import { PaginationDto, PaginationResponseDto } from "../models/responses/pagination-response.dto";
 
 @ApiTags("Users")
 @Controller("users")
@@ -137,8 +140,8 @@ export class UsersController {
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
 	@Get(":id/organizations")
-	userOrganizationMemberships(@Param("id", ParseUUIDPipe) userId: string, @Pagination() pagination: PaginationOptions) {
-		return this.organizationService.findUserMemberships(userId, { pagination });
+	userOrganizationMemberships(@Param("id", ParseUUIDPipe) userId: string) { //, @Pagination() pagination: PaginationOptions
+		return this.organizationService.findUserMemberships(userId);
 	}
 
 	/**
@@ -146,8 +149,26 @@ export class UsersController {
 	 */
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
+	@ApiExtraModels(User, PaginationResponseDto<User>)
+	@ApiOkResponse({
+		description: "Get all users",
+		content: {
+			"application/json": {
+				schema: {
+					type: "object",
+					properties: {
+						data: {
+							type: "array",
+							items: { $ref: getSchemaPath(User) },
+						},
+						pagination: { $ref: getSchemaPath(PaginationDto) },
+					},
+				},
+			},
+		},
+	})
 	@Get("all")
-	getAllUsers(@Pagination() pagination: PaginationOptions) {
-		return this.usersService.find({ pagination });
+	getAllUsers(@Pagination() pagination?: PaginationOptions) {
+		return this.usersService.find(pagination);
 	}
 }

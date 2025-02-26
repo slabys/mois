@@ -15,3 +15,4 @@ export * from "./update-organization.dto";
 export * from "./update-photo.dto";
 export * from "./update-user.dto";
 export * from "./create-role.dto";
+export * from "./init.dto";

@@ -5,9 +5,10 @@ import { getDataSourceOptions } from "config/typeorm.config";
 import {
 	AuthController,
 	EventApplicationsController,
-	EventSpotsController,
 	EventsController,
+	EventSpotsController,
 	HealthController,
+	InitializeController,
 	InvoiceController,
 	OrganizationMembersController,
 	OrganizationsController,
@@ -24,13 +25,16 @@ import { OrganizationModule } from "modules/organization";
 import { PhotoModule } from "modules/photo";
 import { RolesModule } from "modules/roles";
 import { UsersModule } from "modules/users";
+import { InitializeModule } from "modules/initialize";
 import { NestjsFormDataModule } from "nestjs-form-data";
 
 import { ManagementControllers } from "./controllers/management";
 import { EventApplicationSimpleWithApplicationsMapper, EventSimpleWithApplicationsMapper } from "./mappers";
 
+
 @Module({
 	imports: [
+		InitializeModule,
 		AuthModule,
 		UsersModule,
 		PhotoModule,
@@ -51,8 +55,10 @@ import { EventApplicationSimpleWithApplicationsMapper, EventSimpleWithApplicatio
 		}),
 		FileStorageModule,
 		RolesModule,
+
 	],
 	controllers: [
+		InitializeController,
 		AuthController,
 		UsersController,
 		PhotoController,
@@ -68,4 +74,5 @@ import { EventApplicationSimpleWithApplicationsMapper, EventSimpleWithApplicatio
 	],
 	providers: [EventSimpleWithApplicationsMapper, EventApplicationSimpleWithApplicationsMapper],
 })
-export class AppModule {}
+export class AppModule {
+}

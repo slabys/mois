@@ -2,7 +2,6 @@
 
 import { useCreateUser } from "@/utils/api";
 import { CreateUser, CreateUserGender } from "@/utils/api.schemas";
-import { showErrorNotification, updateErrorNotification } from "@/utils/notifications";
 import routes from "@/utils/routes";
 import Select from "@components/primitives/Select";
 import { Box, Button, Flex, PasswordInput, SimpleGrid, Text, TextInput } from "@mantine/core";
@@ -19,18 +18,8 @@ const RegistrationForm = () => {
   const router = useRouter();
   const registerUserMutation = useCreateUser({
     mutation: {
-      onMutate: () => {
-        notifications.show({
-          id: "register-event",
-          loading: true,
-          title: "Loading! Please wait...",
-          message: "We are processing your registration information.",
-          autoClose: false,
-        });
-      },
       onSuccess: () => {
         notifications.update({
-          id: "register-event",
           title: "Registration",
           message: "You have registered successfully!",
           color: "green",
@@ -38,11 +27,6 @@ const RegistrationForm = () => {
           autoClose: true,
         });
         router.push(routes.LOGIN);
-      },
-      onError: (mutationError) => {
-        if (!mutationError.response?.data) return;
-        updateErrorNotification("register-event");
-        showErrorNotification(mutationError);
       },
     },
   });

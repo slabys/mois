@@ -1,6 +1,5 @@
 import { useCreateUserApplication, useUserOrganizationMemberships } from "@/utils/api";
 import { CreateEventApplication, CreateEventApplicationInvoiceMethod, Organization, User } from "@/utils/api.schemas";
-import { showErrorNotification, updateErrorNotification } from "@/utils/notifications";
 import AddressCodeBlock from "@components/AddressCodeBlock/AddressCodeBlock";
 import Select from "@components/primitives/Select";
 import {
@@ -17,7 +16,6 @@ import {
   Textarea,
 } from "@mantine/core";
 import { Form, useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
 import React, { useState } from "react";
 
 interface JoinEventModalProps {
@@ -101,32 +99,10 @@ const JoinEventModal = ({
 
   const eventApplicationMutation = useCreateUserApplication({
     mutation: {
-      onMutate: () => {
-        notifications.show({
-          id: "event-application",
-          loading: true,
-          title: "Loading! Please wait...",
-          message: "We are processing your event application.",
-          autoClose: false,
-        });
-      },
       onSuccess: () => {
-        notifications.update({
-          id: "event-application",
-          title: "Event Application",
-          message: "Event Application created successfully.",
-          color: "green",
-          loading: false,
-          autoClose: true,
-        });
         handleSuccess();
         form.reset();
         closeModal();
-      },
-      onError: (mutationError) => {
-        if (!mutationError.response?.data) return;
-        updateErrorNotification("event-application");
-        showErrorNotification(mutationError);
       },
     },
   });
@@ -154,10 +130,6 @@ const JoinEventModal = ({
   if (!userOrganisationMemberships || !currentUser) {
     return null;
   }
-
-  console.log(selectedOrganisation);
-  console.log(form.values);
-  console.log(form.errors);
 
   return (
     <Modal size="xl" opened={isOpened} onClose={handleClose} title={<Text fz="h3">Event Application</Text>}>

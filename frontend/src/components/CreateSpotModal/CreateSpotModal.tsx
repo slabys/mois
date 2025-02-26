@@ -2,7 +2,6 @@ import { useCreateEventSpot } from "@/utils/api";
 import { CreateEventSpot } from "@/utils/api.schemas";
 import { Button, Flex, Group, Modal, NumberInput, SimpleGrid, TextInput } from "@mantine/core";
 import { Form, hasLength, useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
 import React from "react";
 
 interface CreateSpotModalProps {
@@ -15,45 +14,9 @@ interface CreateSpotModalProps {
 const CreateSpotModal = ({ isOpened, closeModal, eventId, handleSuccess = () => {} }: CreateSpotModalProps) => {
   const createSpotMutation = useCreateEventSpot({
     mutation: {
-      onMutate: () => {
-        notifications.show({
-          id: "create-spot",
-          loading: true,
-          title: "Loading! Please wait...",
-          message: "We are creating spot.",
-          autoClose: false,
-        });
-      },
       onSuccess: () => {
-        notifications.update({
-          id: "create-spot",
-          title: "Spot Edit",
-          message: "Spot created successfully.",
-          color: "green",
-          loading: false,
-          autoClose: true,
-        });
         handleSuccess();
         closeModal();
-      },
-      onError: (error) => {
-        notifications.update({
-          id: "create-spot",
-          title: "Something went wrong.",
-          message: "Please check all information first. Then try again.",
-          color: "red",
-          loading: false,
-          autoClose: true,
-        });
-        if (error.response?.data && error.response.data.message) {
-          (error.response.data.message as string[]).forEach((err) => {
-            notifications.show({
-              title: "Error",
-              message: err,
-              color: "red",
-            });
-          });
-        }
       },
     },
   });

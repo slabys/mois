@@ -2,7 +2,6 @@
 
 import { useLoginUserWithEmailOrUsername } from "@/utils/api";
 import { LoginUser } from "@/utils/api.schemas";
-import { showErrorNotification } from "@/utils/notifications";
 import routes from "@/utils/routes";
 import { Box, Button, Flex, PasswordInput, Text, TextInput } from "@mantine/core";
 import { Form, isNotEmpty, useForm } from "@mantine/form";
@@ -15,10 +14,6 @@ const LoginForm = () => {
     mutation: {
       onSuccess: () => {
         router.push(routes.DASHBOARD);
-      },
-      onError: (mutationError) => {
-        if (!mutationError.response?.data) return;
-        showErrorNotification(mutationError);
       },
     },
   });

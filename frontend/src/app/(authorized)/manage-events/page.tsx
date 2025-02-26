@@ -8,7 +8,6 @@ import CreateEventModal from "@components/CreateEventModal/CreateEventModal";
 import RichTextRenderer from "@components/Richtext/RichTextRenderer";
 import { ActionIcon, Button, Container, Flex, ScrollArea, Stack, Table, Text, Title, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
 import { IconCheck, IconCopy, IconPlus, IconTrash, IconX, IconZoom } from "@tabler/icons-react";
 import Link from "next/link";
 
@@ -17,44 +16,8 @@ const ManageEventsPage = () => {
 
   const duplicateEventMutation = useDuplicateEvent({
     mutation: {
-      onMutate: () => {
-        notifications.show({
-          id: "event-duplicate-mutation",
-          loading: true,
-          title: "Loading! Please wait...",
-          message: "We are duplicating event.",
-          autoClose: false,
-        });
-      },
       onSuccess: () => {
-        notifications.update({
-          id: "event-duplicate-mutation",
-          title: "Event Duplication",
-          message: "Event was duplicated successfully.",
-          color: "green",
-          loading: false,
-          autoClose: true,
-        });
         refetchManagementEvents();
-      },
-      onError: (error) => {
-        notifications.update({
-          id: "event-duplicate-mutation",
-          title: "Something went wrong.",
-          message: "Please check all information first. Then try again.",
-          color: "red",
-          loading: false,
-          autoClose: true,
-        });
-        if (error.response?.data && error.response.data.message) {
-          (error.response.data.message as string[]).forEach((err) => {
-            notifications.show({
-              title: "Error",
-              message: err,
-              color: "red",
-            });
-          });
-        }
       },
     },
   });
@@ -64,7 +27,7 @@ const ManageEventsPage = () => {
     duplicateEventMutation.mutate({ id: event.id });
   };
 
-  const rows = eventList?.map((event, index) => (
+  const rows = eventList?.data?.map((event, index) => (
     <Table.Tr key={`event-${index}-${event.id}`}>
       <Table.Td p={0}>
         <ApiImage src={event.photo?.id} w="100%" h="100%" fit="cover" />

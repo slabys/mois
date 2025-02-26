@@ -2,14 +2,15 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindOptionsRelations, FindOptionsSelect, type Repository } from "typeorm";
 
-import { FindManyOptions } from "libs/types";
 import { Event } from "modules/events/entities";
 
 import { EventFilter } from "../../models";
 import { filterSince } from "../../utilities";
 import { PhotoService } from "modules/photo";
+import { PaginationOptions } from "utilities/nest/decorators";
+import { formatPaginatedResponse } from "utilities/pagination.helper";
 
-interface EventFindOptions extends FindManyOptions {
+interface EventFindOptions {
 	visible?: boolean;
 	relations?: FindOptionsRelations<Event>;
 	select?: FindOptionsSelect<Event>;
@@ -21,7 +22,8 @@ export class EventsService {
 		@InjectRepository(Event)
 		private readonly eventsRepository: Repository<Event>,
 		private readonly photoService: PhotoService,
-	) {}
+	) {
+	}
 
 	/**
 	 * Find event by ID
@@ -73,8 +75,8 @@ export class EventsService {
 		return this.eventsRepository.save(new Event(event));
 	}
 
-	findByFilter(filter?: EventFilter, options?: EventFindOptions) {
-		return this.eventsRepository.find({
+	async findByFilter(filter?: EventFilter, options?: EventFindOptions, pagination?: PaginationOptions) {
+		const [events, totalCount] = await this.eventsRepository.findAndCount({
 			where: {
 				...filterSince(filter),
 				visible: options?.visible,
@@ -86,9 +88,10 @@ export class EventsService {
 			order: {
 				since: "DESC",
 			},
-			skip: options?.pagination?.skip,
-			take: options?.pagination?.take,
+			take: pagination.all ? undefined : pagination.perPage,
+			skip: pagination.all ? undefined : (pagination.page - 1) * pagination.perPage,
 		});
+		return formatPaginatedResponse<Event>(events, totalCount, pagination);
 	}
 
 	async delete(event: Event) {

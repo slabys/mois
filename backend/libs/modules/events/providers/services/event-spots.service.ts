@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FindManyOptions } from "libs/types";
 import { Event, EventApplication, EventSpot } from "modules/events/entities";
 import { Repository } from "typeorm";
 
@@ -9,7 +8,8 @@ export class EventSpotsService {
 	constructor(
 		@InjectRepository(EventSpot)
 		private readonly eventSpotRepository: Repository<EventSpot>,
-	) {}
+	) {
+	}
 
 	findById(id: EventSpot["id"]) {
 		return this.eventSpotRepository.findOne({
@@ -29,15 +29,13 @@ export class EventSpotsService {
 	 * @param id Event ID
 	 * @returns Array of event spots
 	 */
-	findByEventId(id: Event["id"], options?: FindManyOptions) {
+	findByEventId(id: Event["id"]) {
 		return this.eventSpotRepository.find({
 			where: {
 				event: {
 					id,
 				},
 			},
-			skip: options?.pagination?.skip,
-			take: options?.pagination?.take,
 		});
 	}
 

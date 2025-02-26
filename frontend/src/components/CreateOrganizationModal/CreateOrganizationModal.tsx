@@ -2,7 +2,6 @@ import { useCreateOrganization } from "@/utils/api";
 import { CreateOrganization } from "@/utils/api.schemas";
 import { Button, Grid, Group, Modal, TextInput } from "@mantine/core";
 import { Form, isNotEmpty, useForm } from "@mantine/form";
-import { notifications } from "@mantine/notifications";
 import React from "react";
 
 interface CrateOrganizationModalProps {
@@ -14,7 +13,8 @@ interface CrateOrganizationModalProps {
 const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateOrganizationModalProps) => {
   const form = useForm<Partial<CreateOrganization>>({
     initialValues: {
-      name: "",
+      name: undefined,
+      cin: undefined,
       address: {
         street: "",
         houseNumber: "",
@@ -25,6 +25,7 @@ const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateO
     },
     validate: {
       name: isNotEmpty("This field should not be empty"),
+      cin: isNotEmpty("This field should not be empty"),
       address: {
         street: isNotEmpty("This field should not be empty"),
         houseNumber: (zipValue: string | undefined) =>
@@ -38,46 +39,10 @@ const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateO
 
   const createOrganizationMutation = useCreateOrganization({
     mutation: {
-      onMutate: () => {
-        notifications.show({
-          id: "create-organization",
-          loading: true,
-          title: "Loading! Please wait...",
-          message: "We are creating organization.",
-          autoClose: false,
-        });
-      },
       onSuccess: () => {
-        notifications.update({
-          id: "create-organization",
-          title: "Organization created.",
-          message: "Organization created successfully.",
-          color: "green",
-          loading: false,
-          autoClose: true,
-        });
         handleSuccess();
         form.reset();
         closeModal();
-      },
-      onError: (error) => {
-        notifications.update({
-          id: "create-organiztaion",
-          title: "Something went wrong.",
-          message: "Please check all information first. Then try again.",
-          color: "red",
-          loading: false,
-          autoClose: true,
-        });
-        if (error.response?.data && error.response.data.message) {
-          (error.response.data.message as string[]).forEach((err) => {
-            notifications.show({
-              title: "Error",
-              message: err,
-              color: "red",
-            });
-          });
-        }
       },
     },
   });
@@ -102,8 +67,11 @@ const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateO
     <Modal size="xl" opened={isOpened} onClose={handleClose} title="Create Organization">
       <Form form={form} onSubmit={handleCreateOrganization}>
         <Grid>
-          <Grid.Col span={12}>
+          <Grid.Col span={6}>
             <TextInput label="Organisation Name" {...form.getInputProps("name")} />
+          </Grid.Col>
+          <Grid.Col span={6}>
+            <TextInput label="Organisation CIN" {...form.getInputProps("cin")} />
           </Grid.Col>
           <Grid.Col span={8}>
             <TextInput label="Street" {...form.getInputProps("address.street")} />

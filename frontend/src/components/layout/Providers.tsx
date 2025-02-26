@@ -1,7 +1,13 @@
 "use client";
 
+import {
+  onSuccessNotification,
+  showErrorNotification,
+  showLoadingNotification,
+  updateErrorNotification,
+} from "@/utils/notifications";
 import { Notifications } from "@mantine/notifications";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MutationCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
 
 interface ProvidersProps {
@@ -17,6 +23,18 @@ const Providers = ({ children }: ProvidersProps) => {
             staleTime: 1000 * 30,
           },
         },
+        mutationCache: new MutationCache({
+          onMutate: () => {
+            showLoadingNotification();
+          },
+          onError: (error) => {
+            updateErrorNotification();
+            showErrorNotification(error);
+          },
+          onSuccess: () => {
+            onSuccessNotification();
+          },
+        }),
       }),
   );
 

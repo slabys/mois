@@ -4,6 +4,7 @@ import { isEmail } from "class-validator";
 import { User } from "modules/users/entities";
 import { FindOptionsRelations, FindOptionsWhere, In, Repository } from "typeorm";
 import { PaginationOptions } from "utilities/nest/decorators";
+import { formatPaginatedResponse } from "utilities/pagination.helper";
 
 type UserId = User["id"];
 
@@ -93,17 +94,16 @@ export class UsersService {
 
 	/**
 	 * Find all users ordered by lastName
-	 * @param options Find options
-	 * @returns
+	 * @returns FormatPaginatedResponseType<User[]>
 	 */
-	find(options: { pagination: PaginationOptions }) {
-		return this.UsersRepository.find({
-			take: options.pagination.take,
-			skip: options.pagination.skip,
-			order: {
-				lastName: "ASC",
-			},
+	async find(pagination?: PaginationOptions) {
+		const [users, totalCount] = await this.UsersRepository.findAndCount({
+			order: { lastName: "ASC" },
+			take: pagination.all ? undefined : pagination.perPage,
+			skip: pagination.all ? undefined : (pagination.page - 1) * pagination.perPage,
 		});
+
+		return formatPaginatedResponse<User>(users, totalCount, pagination);
 	}
 
 	/**

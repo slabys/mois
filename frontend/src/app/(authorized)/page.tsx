@@ -11,14 +11,18 @@ const Home = () => {
   const newTime = useMemo(() => new Date().getTime(), []);
   const { data: upcomingEvents } = useGetEvents({ sinceSince: newTime });
 
+  if (!upcomingEvents?.data) {
+    return null;
+  }
+
   return (
     <Container size="xl">
       <Stack>
         <Title>Upcoming Events</Title>
         {upcomingEvents ? (
           <Stack>
-            {upcomingEvents.length > 0 ? (
-              upcomingEvents.map((event, index) => (
+            {upcomingEvents.data.length > 0 ? (
+              upcomingEvents.data.map((event, index) => (
                 <Anchor
                   component={Link}
                   key={`event-card-${index}-${event.id}`}

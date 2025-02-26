@@ -23,7 +23,6 @@ import { CookieGuard } from "modules/auth/providers/guards";
 import { EventSpotsService, EventsService } from "modules/events";
 import { EventSpot } from "modules/events/entities";
 import { User } from "modules/users";
-import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 import { CurrentUser } from "../decorators";
 import { CreateEventSpot, UpdateEventSpot } from "../models/requests";
 import { EventSpotSimple } from "../models/responses";
@@ -48,8 +47,8 @@ export class EventSpotsController {
 	})
 	@ApiEventIdParam()
 	@Get("events/:id/spots")
-	getEventSpots(@Param("id", ParseIntPipe) eventId: number, @Pagination() pagination: PaginationOptions) {
-		return this.eventSpotsService.findByEventId(eventId, { pagination });
+	getEventSpots(@Param("id", ParseIntPipe) eventId: number) {
+		return this.eventSpotsService.findByEventId(eventId);
 	}
 
 	/**

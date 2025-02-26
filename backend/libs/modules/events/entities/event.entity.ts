@@ -4,6 +4,7 @@ import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, OneToMany, Pri
 import { EventApplication } from "./event-application.entity";
 import { EventLink } from "./event-link.entity";
 import { EventSpot } from "./event-spot.entity";
+import { ApiProperty } from "@nestjs/swagger";
 
 @Entity()
 export class Event extends BaseEntity {
@@ -14,10 +15,32 @@ export class Event extends BaseEntity {
 	title: string;
 
 	@Column()
+	@ApiProperty({
+		description: "Short description in JSON format for RichText",
+		example: {
+			"type": "doc",
+			"content": [{
+				"type": "paragraph",
+				"attrs": { "textAlign": "left" },
+				"content": [{ "type": "text", "text": "Short description" }],
+			}],
+		},
+	})
 	shortDescription: string;
 
 	// Select only short description by default
 	@Column({ select: false })
+	@ApiProperty({
+		description: "Long description in JSON format for RichText",
+		example: {
+			"type": "doc",
+			"content": [{
+				"type": "paragraph",
+				"attrs": { "textAlign": "left" },
+				"content": [{ "type": "text", "text": "Very long description" }],
+			}],
+		},
+	})
 	longDescription: string;
 
 	@Column()

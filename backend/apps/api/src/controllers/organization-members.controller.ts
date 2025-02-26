@@ -1,13 +1,14 @@
 import { Body, Controller, Delete, Get, NotFoundException, Param, Post, UseGuards } from "@nestjs/common";
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from "@nestjs/swagger";
+import { ApiBearerAuth, ApiExtraModels, ApiOkResponse, ApiTags, getSchemaPath } from "@nestjs/swagger";
 
 import { OrganizationService } from "modules/organization";
 import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 
 import { CookieGuard } from "modules/auth/providers/guards";
 import { AddOrganizationMembers } from "../models/requests";
-import { OrganizationMemberWithoutOrganization } from "../models/responses";
 import { UsersService } from "modules/users";
+import { PaginationDto, PaginationResponseDto } from "../models/responses/pagination-response.dto";
+import { OrganizationMember } from "modules/organization/entities";
 
 @ApiTags("Organization members")
 @Controller("organization/:id")
@@ -18,15 +19,27 @@ export class OrganizationMembersController {
 	) {
 	}
 
+	@ApiExtraModels(OrganizationMember, PaginationResponseDto<OrganizationMember>)
 	@ApiOkResponse({
-		type: [OrganizationMemberWithoutOrganization],
 		description: "All members within organization",
+		content: {
+			"application/json": {
+				schema: {
+					type: "object",
+					properties: {
+						data: {
+							type: "array",
+							items: { $ref: getSchemaPath(OrganizationMember) },
+						},
+						pagination: { $ref: getSchemaPath(PaginationDto) },
+					},
+				},
+			},
+		},
 	})
 	@Get("members")
-	organizationMembers(@Param("id") organizationId: string, @Pagination() pagination: PaginationOptions) {
-		return this.organizationService.findMembersOf(organizationId, {
-			pagination,
-		});
+	organizationMembers(@Param("id") organizationId: string, @Pagination() pagination?: PaginationOptions) {
+		return this.organizationService.findMembersOf(organizationId, pagination);
 	}
 
 	/**
