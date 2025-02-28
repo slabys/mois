@@ -1,11 +1,13 @@
 import { useCreateUserApplication, useUserOrganizationMemberships } from "@/utils/api";
 import { CreateEventApplication, CreateEventApplicationInvoiceMethod, Organization, User } from "@/utils/api.schemas";
 import AddressCodeBlock from "@components/AddressCodeBlock/AddressCodeBlock";
+import DateInput from "@components/primitives/DateInput";
 import Select from "@components/primitives/Select";
 import {
   Blockquote,
   Box,
   Button,
+  Checkbox,
   Flex,
   Grid,
   Modal,
@@ -16,6 +18,8 @@ import {
   Textarea,
 } from "@mantine/core";
 import { Form, useForm } from "@mantine/form";
+import dayjs from "dayjs";
+import Link from "next/link";
 import React, { useState } from "react";
 
 interface JoinEventModalProps {
@@ -38,10 +42,12 @@ const JoinEventModal = ({
   const [activeStep, setActiveStep] = useState(0);
   const [selectedOrganisation, setSelectedOrganisation] = useState<Organization | null>(null);
   const [invoiceMethod, setInvoiceMethod] = useState<InvoiceMethodsType | undefined>(undefined);
+
   const { data: userOrganisationMemberships } = useUserOrganizationMemberships(currentUser.id);
 
   const form = useForm<Partial<CreateEventApplication>>({
     initialValues: {
+      validUntil: undefined,
       idNumber: undefined,
       organization: undefined,
       spotTypeId: null,
@@ -59,6 +65,10 @@ const JoinEventModal = ({
       }
 
       if (activeStep === 0) {
+        if (!values.validUntil) {
+          errors["validUntil"] = "ID/Passport valid until date is required";
+        }
+
         if (!values.idNumber?.trim()) {
           errors["idNumber"] = "ID number is required";
         }
@@ -137,7 +147,20 @@ const JoinEventModal = ({
         <Stepper active={activeStep} onStepClick={setActiveStep}>
           <Stepper.Step label="Step 1:" description="General Information">
             <Flex direction="column" gap="md">
-              <TextInput label="Person ID Number / Passport Number" {...form.getInputProps("idNumber")} required />
+              <SimpleGrid cols={2}>
+                <TextInput label="Person ID Number / Passport Number" {...form.getInputProps("idNumber")} required />
+                <DateInput
+                  label="Valid until (ID/Passport)"
+                  defaultValue={null}
+                  placeholder="ID/Passport valid until"
+                  value={form.values.validUntil ? dayjs(form.values.validUntil).toDate() : null}
+                  onChange={(value) => {
+                    value && form.setFieldValue("validUntil", value.toISOString());
+                  }}
+                  error={form.errors.validUntil}
+                  required
+                />
+              </SimpleGrid>
               <Select
                 label="Select Organisation"
                 value={
@@ -311,6 +334,48 @@ const JoinEventModal = ({
             </Flex>
           </Stepper.Step>
           <Stepper.Step label="Step 3" description="Additional Information">
+            <Checkbox
+              label={
+                <Text>
+                  I agree with{" "}
+                  <Link
+                    href="https://drive.google.com/file/d/1F3_rMeT2Gv6cFux4EE73iW7pN1k1cIYf/view?pli=1"
+                    target="_blank"
+                  >
+                    Terms and conditions
+                  </Link>
+                </Text>
+              }
+              required
+            />
+            <Checkbox
+              label={
+                <Text>
+                  I agree with{" "}
+                  <Link
+                    href="https://drive.google.com/file/d/1dWT-2mBct7T7SUhgRpAtctQUtB1Kj5ce/view?usp=sharing"
+                    target="_blank"
+                  >
+                    Photo Consent
+                  </Link>
+                </Text>
+              }
+              required
+            />
+            <Checkbox
+              label={
+                <Text>
+                  I agree with{" "}
+                  <Link
+                    href="https://drive.google.com/file/d/1Nj67l4Kn-GKbKn2yCwrSPkzGz7HtNP1B/view?usp=sharing"
+                    target="_blank"
+                  >
+                    Code of Conduct
+                  </Link>
+                </Text>
+              }
+              required
+            />
             <Textarea label="Additional Information" {...form.getInputProps("additionalInformation")} autosize />
           </Stepper.Step>
           <Stepper.Completed>Completed, click back button to get to previous step</Stepper.Completed>
@@ -320,7 +385,7 @@ const JoinEventModal = ({
           <Button variant="default" onClick={prevStep} disabled={activeStep === 0}>
             Back
           </Button>
-          {activeStep === 3 ? (
+          {activeStep === 2 ? (
             <Button type="submit" disabled={!isTouchedDirty} loading={eventApplicationMutation.isPending}>
               Submit application
             </Button>

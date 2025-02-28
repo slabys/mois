@@ -152,6 +152,7 @@ export class EventApplicationsController {
 			invoicedTo: body.invoicedTo,
 			additionalInformation: body.additionalInformation ?? "",
 			invoiceAddress: new Address(body.invoiceAddress),
+			validUntil: body.validUntil,
 			idNumber: body.idNumber,
 		});
 
@@ -263,6 +264,7 @@ export class EventApplicationsController {
 
 		if (body.invoiceAddress) application.personalAddress.update(body.invoiceAddress);
 
+		application.validUntil = body.validUntil ?? application.validUntil;
 		application.idNumber = body.idNumber ?? application.idNumber;
 
 		if (body.additionalFormData) {

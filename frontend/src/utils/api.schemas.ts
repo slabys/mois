@@ -431,6 +431,8 @@ export interface CreateEventApplication {
   organization: CreateEventApplicationOrganization;
   /** @nullable */
   spotTypeId?: number | null;
+  /** Date until the ID number is valid */
+  validUntil: string;
 }
 
 export type CreateEventApplicationCustomOrganizationType =
@@ -619,6 +621,7 @@ export interface EventApplication {
    */
   spotType: EventApplicationSpotType;
   user: User;
+  validUntil: string;
 }
 
 export type InvoiceCurrency = (typeof InvoiceCurrency)[keyof typeof InvoiceCurrency];

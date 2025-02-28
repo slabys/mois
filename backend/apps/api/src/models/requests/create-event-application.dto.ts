@@ -1,8 +1,9 @@
-import { Type } from "class-transformer";
+import { Transform, Type } from "class-transformer";
 import { IsEnum, IsNotEmptyObject, IsNumber, IsObject, IsOptional, IsString } from "class-validator";
 import { CreateAddress } from "./create-address.dto";
 import { ApiExtraModels, ApiProperty, refs } from "@nestjs/swagger";
 import { InvoiceMethods } from "modules/events/invoice-methods";
+import { DateTransform, IsValidDate } from "utilities/nest/class-validator";
 
 export class CreateEventApplicationExistingOrganization {
 	/**
@@ -57,7 +58,15 @@ export class CreateEventApplication {
 
 	@IsString()
 	additionalInformation: string;
-	
+
+	/**
+	 * Date until the ID number is valid
+	 * @example 2024-12-20T16:48:34.681Z
+	 */
+	@IsValidDate()
+	@Transform(DateTransform)
+	validUntil: Date;
+
 	@IsString()
 	idNumber: string;
 
