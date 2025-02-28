@@ -51,7 +51,8 @@ export class OrganizationsController {
 		const { address } = body;
 
 		organization.name = body.name;
-		organization.cin = body.cin;
+		organization.cin = body?.cin ?? null;
+		organization.vatin = body?.vatin ?? null;
 		organization.address = new Address({
 			city: address.city,
 			houseNumber: address.houseNumber,
@@ -71,7 +72,8 @@ export class OrganizationsController {
 		if (!organization) throw new NotFoundException("Organization not found");
 
 		organization.name = body.name ?? organization.name;
-		organization.cin = body.cin ?? organization.cin;
+		organization.cin = body?.cin ?? organization.cin;
+		organization.vatin = body?.vatin ?? organization.vatin;
 
 		if (body.address) {
 			organization.address.update(body.address);

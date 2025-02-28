@@ -15,6 +15,7 @@ const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateO
     initialValues: {
       name: undefined,
       cin: undefined,
+      vatin: undefined,
       address: {
         street: "",
         houseNumber: "",
@@ -25,7 +26,6 @@ const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateO
     },
     validate: {
       name: isNotEmpty("This field should not be empty"),
-      cin: isNotEmpty("This field should not be empty"),
       address: {
         street: isNotEmpty("This field should not be empty"),
         houseNumber: (zipValue: string | undefined) =>
@@ -67,26 +67,29 @@ const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateO
     <Modal size="xl" opened={isOpened} onClose={handleClose} title="Create Organization">
       <Form form={form} onSubmit={handleCreateOrganization}>
         <Grid>
-          <Grid.Col span={6}>
-            <TextInput label="Organisation Name" {...form.getInputProps("name")} />
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput label="Organisation Name" {...form.getInputProps("name")} required />
           </Grid.Col>
-          <Grid.Col span={6}>
+          <Grid.Col span={{ base: 6, md: 3 }}>
             <TextInput label="Organisation CIN" {...form.getInputProps("cin")} />
           </Grid.Col>
+          <Grid.Col span={{ base: 6, md: 3 }}>
+            <TextInput label="Organisation VATIN" {...form.getInputProps("vatin")} />
+          </Grid.Col>
           <Grid.Col span={8}>
-            <TextInput label="Street" {...form.getInputProps("address.street")} />
+            <TextInput label="Street" {...form.getInputProps("address.street")} required />
           </Grid.Col>
           <Grid.Col span={4}>
-            <TextInput label="House Number" {...form.getInputProps("address.houseNumber")} />
+            <TextInput label="House Number" {...form.getInputProps("address.houseNumber")} required />
           </Grid.Col>
           <Grid.Col span={6}>
-            <TextInput label="ZIP code" {...form.getInputProps("address.zip")} />
+            <TextInput label="ZIP code" {...form.getInputProps("address.zip")} required />
           </Grid.Col>
           <Grid.Col span={6}>
-            <TextInput label="City" {...form.getInputProps("address.city")} />
+            <TextInput label="City" {...form.getInputProps("address.city")} required />
           </Grid.Col>
           <Grid.Col span={12}>
-            <TextInput label="Country" {...form.getInputProps("address.country")} />
+            <TextInput label="Country" {...form.getInputProps("address.country")} required />
           </Grid.Col>
         </Grid>
         <Group justify="center" mt="lg">

@@ -8,7 +8,10 @@ export class CreateOrganization {
 	name: string;
 
 	@IsString()
-	cin: string | null;
+	cin?: string | null | undefined;
+
+	@IsString()
+	vatin?: string | null | undefined;
 
 	@IsNotEmptyObject()
 	@IsObject()

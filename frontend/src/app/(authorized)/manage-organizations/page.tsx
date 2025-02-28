@@ -26,10 +26,13 @@ const ManageOrganizationsPage = () => {
     refetchOrganisationsList();
   };
 
+  console.log(activeOrganisation);
+
   const rows = organisationsList?.map((organization, index) => (
     <Table.Tr key={`event-${index}-${organization.id}`}>
       <Table.Td>{organization.name}</Table.Td>
       <Table.Td>{organization.cin}</Table.Td>
+      <Table.Td>{organization.vatin}</Table.Td>
       <Table.Td>
         <Flex direction="column" justify="start" align="start">
           <Text>{`${organization.address.street} ${organization.address.houseNumber}`}</Text>
@@ -109,8 +112,11 @@ const ManageOrganizationsPage = () => {
                   <Table.Th h="100%" miw={96} maw={128}>
                     Name
                   </Table.Th>
-                  <Table.Th miw={64} maw={64}>
+                  <Table.Th miw={96} maw={96}>
                     CIN
+                  </Table.Th>
+                  <Table.Th miw={96} maw={96}>
+                    VATIN
                   </Table.Th>
                   <Table.Th miw={148} maw={148}>
                     Address

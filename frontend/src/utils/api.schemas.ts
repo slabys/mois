@@ -701,9 +701,9 @@ export interface OrganizationMember {
 
 export interface UpdateOrganization {
   address?: CreateAddress;
-  /** @nullable */
-  cin?: string | null;
+  cin?: string;
   name?: string;
+  vatin?: string;
 }
 
 export type PaginationResponseDtoDataItem = { [key: string]: unknown };
@@ -849,6 +849,8 @@ export interface Organization {
   /** @nullable */
   manager: OrganizationManager;
   name: string;
+  /** @nullable */
+  vatin: string | null;
 }
 
 export interface OrganizationMemberWithoutUser {
@@ -910,9 +912,9 @@ export interface CreateAddress {
 
 export interface CreateOrganization {
   address: CreateAddress;
-  /** @nullable */
-  cin: string | null;
+  cin?: string;
   name: string;
+  vatin?: string;
 }
 
 export interface CreateUser {

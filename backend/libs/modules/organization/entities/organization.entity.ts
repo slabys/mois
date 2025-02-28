@@ -26,6 +26,9 @@ export class Organization {
 	@Column({ nullable: true, default: null })
 	cin: string | null;
 
+	@Column({ nullable: true, default: null })
+	vatin: string | null;
+
 	@ManyToOne(() => Address, { nullable: false, cascade: true, eager: true })
 	address: Address;
 

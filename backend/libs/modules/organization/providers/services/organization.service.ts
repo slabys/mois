@@ -56,6 +56,7 @@ export class OrganizationService {
 			relations: {
 				manager: true,
 			},
+			order: { name: "ASC" },
 		});
 	}
 
