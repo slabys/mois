@@ -36,6 +36,7 @@ import type {
   EventSimple,
   EventSimpleWithApplications,
   EventSpotSimple,
+  GenerateSheetEventApplication200,
   GetAllUsers200,
   GetAllUsersParams,
   GetEvents200,
@@ -1989,6 +1990,108 @@ export function useGetUserApplicationForEvent<
   },
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
   const queryOptions = getGetUserApplicationForEventQueryOptions(eventId, userId, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const generateSheetEventApplication = (
+  eventId: number,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<GenerateSheetEventApplication200>(
+    { url: `/events/export/${eventId}/applications`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGenerateSheetEventApplicationQueryKey = (eventId: number) => {
+  return [`/events/export/${eventId}/applications`] as const;
+};
+
+export const getGenerateSheetEventApplicationQueryOptions = <
+  TData = Awaited<ReturnType<typeof generateSheetEventApplication>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof generateSheetEventApplication>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGenerateSheetEventApplicationQueryKey(eventId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof generateSheetEventApplication>>> = ({ signal }) =>
+    generateSheetEventApplication(eventId, requestOptions, signal);
+
+  return { queryKey, queryFn, enabled: !!eventId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof generateSheetEventApplication>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type GenerateSheetEventApplicationQueryResult = NonNullable<
+  Awaited<ReturnType<typeof generateSheetEventApplication>>
+>;
+export type GenerateSheetEventApplicationQueryError = ErrorType<unknown>;
+
+export function useGenerateSheetEventApplication<
+  TData = Awaited<ReturnType<typeof generateSheetEventApplication>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof generateSheetEventApplication>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<Awaited<ReturnType<typeof generateSheetEventApplication>>, TError, TData>,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useGenerateSheetEventApplication<
+  TData = Awaited<ReturnType<typeof generateSheetEventApplication>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof generateSheetEventApplication>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<Awaited<ReturnType<typeof generateSheetEventApplication>>, TError, TData>,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useGenerateSheetEventApplication<
+  TData = Awaited<ReturnType<typeof generateSheetEventApplication>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof generateSheetEventApplication>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+export function useGenerateSheetEventApplication<
+  TData = Awaited<ReturnType<typeof generateSheetEventApplication>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof generateSheetEventApplication>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getGenerateSheetEventApplicationQueryOptions(eventId, options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 

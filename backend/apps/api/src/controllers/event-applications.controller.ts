@@ -6,6 +6,7 @@ import {
 	Delete,
 	ForbiddenException,
 	Get,
+	Header,
 	InternalServerErrorException,
 	NotFoundException,
 	NotImplementedException,
@@ -15,6 +16,7 @@ import {
 	Patch,
 	Post,
 	Query,
+	Res,
 	UseGuards,
 } from "@nestjs/common";
 import {
@@ -51,6 +53,8 @@ import {
 	EventApplicationDetailedWithApplications,
 } from "../models/responses/event-application-detailed-with-applications.dto";
 import { PaginationDto, PaginationResponseDto } from "../models/responses/pagination-response.dto";
+import * as ExcelJS from "exceljs";
+
 
 @ApiTags("Event applications")
 @Controller("events")
@@ -352,5 +356,70 @@ export class EventApplicationsController {
 		if (!application) throw new NotFoundException("Event application not found");
 
 		return this.eventApplicationSimpleWithApplicationsMapper.map(application);
+	}
+
+	@Header("Content-disposition", "attachment; filename=EventApplicationExport.xlsx")
+	@Get("export/:eventId/applications")
+	async generateSheetEventApplication(@Res() res: Response, @Param("eventId", ParseIntPipe) eventId: number) {
+
+		const applicationList = await this.eventApplicationsService.findByEventId(eventId);
+
+		const workbook = new ExcelJS.Workbook();
+		const worksheet = workbook.addWorksheet("Export");
+
+		worksheet.columns = [
+			{ header: "Organisation Name", key: "organisation" },
+			{ header: "Spot", key: "spot" },
+			{ header: "Name", key: "firstname" },
+			{ header: "Lastname", key: "lastname" },
+			{ header: "E-mail", key: "email" },
+			{ header: "Phone Number", key: "phone" },
+			{ header: "Gender", key: "gender" },
+			{ header: "Birthdate", key: "birthdate" },
+
+			{ header: "Nationality", key: "nationality" },
+			{ header: "ID / Passport Number", key: "idNumber" },
+			{ header: "ID valid until", key: "idValidUntil" },
+			{ header: "Personal Address", key: "personalAddress" },
+			{ header: "Invoice Method", key: "invoiceMethod" },
+
+			{ header: "Invoice Address", key: "invoiceAddress" },
+			{ header: "Food Restrictions and Allergies", key: "foodRestrictions" },
+			{ header: "Disability or Health Limitations", key: "healthLimitations" },
+		];
+		
+		applicationList.map((application) => {
+			const { organization, user, spotType } = application;
+
+			worksheet.addRow({
+				organisation: organization?.name,
+				spot: spotType ? `${spotType?.name} - ${spotType?.price} ${spotType?.currency}` : "",
+				firstname: user?.firstName,
+				lastname: user?.lastName,
+				email: user?.email,
+				phone: `${user?.phonePrefix ?? ""}${user?.phoneNumber ?? ""}`,
+				gender: user?.gender,
+				birthdate: user?.birthDate,
+				nationality: user?.nationality,
+				idNumber: application?.idNumber,
+				idValidUntil: application?.validUntil,
+				personalAddress: user?.personalAddress ? `${user?.personalAddress?.street} ${user?.personalAddress?.houseNumber}
+${user?.personalAddress?.zip} ${user?.personalAddress?.city}
+${user?.personalAddress?.country}` : "",
+				invoiceMethod: application?.invoiceMethod,
+				invoiceAddress: application?.invoiceAddress ? `${application?.invoiceAddress?.street} ${application?.invoiceAddress?.houseNumber}
+${application?.invoiceAddress?.zip} ${application?.invoiceAddress?.city}
+${application?.invoiceAddress?.country}` : "",
+				foodRestrictions: application?.foodRestrictionAllergies,
+				healthLimitations: application?.healthLimitations,
+			});
+		});
+
+		const buffer = await workbook.xlsx.writeBuffer();
+		res
+			// @ts-ignore
+			.type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+			.send(buffer);
+		return buffer;
 	}
 }

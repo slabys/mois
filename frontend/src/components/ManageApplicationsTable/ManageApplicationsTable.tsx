@@ -3,11 +3,13 @@
 import {
   useDeleteEventApplication,
   useDeleteEventSpot,
+  useGenerateSheetEventApplication,
   useGetEventApplications,
   useGetEventSpots,
   useUpdateEventApplication,
 } from "@/utils/api";
 import { type EventApplicationDetailedWithApplications, type EventSpotSimple } from "@/utils/api.schemas";
+import { downloadFile } from "@/utils/downloadFile";
 import CreateSpotModal from "@components/CreateSpotModal/CreateSpotModal";
 import UpdateEventApplicationModal from "@components/UpdateEventApplicationModal/UpdateEventApplicationModal";
 import UpdateSpotModal from "@components/UpdateSpotModal/UpdateSpotModal";
@@ -27,8 +29,7 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { IconEdit, IconFileTypePdf, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconEdit, IconFileTypePdf, IconPlus, IconTableExport, IconTrash } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 
 interface ManageApplicationsTableProps {
@@ -86,49 +87,8 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
 
   const deleteApplicationMutation = useDeleteEventApplication({
     mutation: {
-      onMutate: () => {
-        notifications.show({
-          id: "event-application-delete",
-          loading: true,
-          title: "Loading! Please wait...",
-          message: "We are deleting Event Application.",
-          autoClose: false,
-        });
-      },
       onSuccess: () => {
-        notifications.update({
-          id: "event-application-delete",
-          title: "Delete Event Application.",
-          message: "Event application deleted succesfully.",
-          color: "green",
-          loading: false,
-          autoClose: true,
-        });
         refetchEventApplications();
-      },
-      onError: (mutationError) => {
-        if (!mutationError.response?.data) return;
-        const { statusCode, error, message } = mutationError.response?.data;
-        console.error(statusCode, error, message);
-        notifications.update({
-          id: "event-application-delete",
-          title: "Something went wrong.",
-          message: "Please try again.",
-          color: "red",
-          loading: false,
-          autoClose: true,
-        });
-        let parsedMessage: string[] = [];
-        if (typeof message === "string") {
-          parsedMessage.push(message);
-        }
-        parsedMessage.forEach((err) => {
-          notifications.show({
-            title: `${statusCode} ${error}`,
-            message: err,
-            color: "red",
-          });
-        });
       },
     },
   });
@@ -145,8 +105,16 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     });
   };
 
-  const generatePDF = () => {
-    // TODO - implement
+  const exportToSheet = useGenerateSheetEventApplication(eventId, {
+    request: {
+      responseType: "blob",
+    },
+  });
+
+  const exportDataXLSX = () => {
+    exportToSheet.refetch().then((response) => {
+      downloadFile(response?.data);
+    });
   };
 
   const eventApplicationsRows = applicationsList?.map((application, index) => (
@@ -175,7 +143,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
         <Flex justify="space-evenly" gap={16}>
           <Tooltip label="Generate Invoice">
             {/*TODO - Generate Invoice*/}
-            <ActionIcon variant="subtle" size={48} color="black" onClick={generatePDF} disabled>
+            <ActionIcon variant="subtle" size={48} color="black" disabled>
               <IconFileTypePdf width={32} height={32} />
             </ActionIcon>
           </Tooltip>
@@ -206,9 +174,14 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     <>
       <Flex justify="space-between" align="center" w="100%" wrap="wrap">
         <Title>Manage Event Applications</Title>
-        <Button onClick={openCreateSpotModal} leftSection={<IconPlus />}>
-          Add Spot
-        </Button>
+        <Flex gap={16}>
+          <Button onClick={exportDataXLSX} leftSection={<IconTableExport />} color="green" variant="outline">
+            Export Data
+          </Button>
+          <Button onClick={openCreateSpotModal} leftSection={<IconPlus />}>
+            Add Spot
+          </Button>
+        </Flex>
       </Flex>
       {eventApplicationsRows && eventApplicationsRows?.length > 0 ? (
         <List w="100%">

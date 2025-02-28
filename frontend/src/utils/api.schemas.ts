@@ -68,6 +68,8 @@ export type GetEventsParams = {
   all?: boolean;
 };
 
+export type GenerateSheetEventApplication200 = { [key: string]: unknown };
+
 export type GetUserApplications200 = {
   data?: EventApplication[];
   pagination?: PaginationDto;

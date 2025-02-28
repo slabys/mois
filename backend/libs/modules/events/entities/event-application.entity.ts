@@ -94,7 +94,7 @@ export class EventApplication extends BaseEntity {
 	@Column({ nullable: true })
 	validUntil: Date;
 
-	@Column({ select: false })
+	@Column({ select: true })
 	idNumber: string;
 
 	@CreateDateColumn()
