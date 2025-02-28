@@ -40,6 +40,18 @@ export class User extends BaseEntity {
 	@Column()
 	lastName: string;
 
+	@Column({ nullable: true })
+	birthDate: Date;
+
+	@Column({ nullable: true })
+	nationality: string;
+
+	@Column({ nullable: true })
+	phonePrefix: string;
+
+	@Column({ nullable: true })
+	phoneNumber: string;
+
 	@Column({
 		type: "enum",
 		enum: UserGender,
@@ -69,6 +81,7 @@ export class User extends BaseEntity {
 	@BeforeInsert()
 	async beforeSave() {
 		if (this.password) this.password = await hashPassword(this.password);
+		if (this.username) this.username = this.username.toLowerCase();
 	}
 
 	@ManyToOne(() => Role, { cascade: true, eager: true, onDelete: "SET NULL" })

@@ -26,7 +26,7 @@ import {
 import { Form, isNotEmpty, useForm } from "@mantine/form";
 import { useHover } from "@mantine/hooks";
 import { IconMoodEdit } from "@tabler/icons-react";
-import { useQueryClient } from "@tanstack/react-query";
+import CountryList from "country-list-with-dial-code-and-flag";
 import React, { useEffect, useMemo, useState } from "react";
 import { FileWithPath } from "react-dropzone-esm";
 import { Area } from "react-easy-crop";
@@ -36,7 +36,6 @@ interface UpdateUserProps extends Partial<UpdateUser> {
 }
 
 const AccountPage = () => {
-  const queryClient = useQueryClient();
   const { hovered, ref: hoverRef } = useHover();
 
   const [croppedArea, setCroppedArea] = useState<{ croppedArea: Area; croppedAreaPixels: Area } | null>(null);
@@ -74,6 +73,8 @@ const AccountPage = () => {
       lastName: currentUser.lastName,
       username: currentUser.username,
       gender: currentUser.gender,
+      phonePrefix: currentUser.phonePrefix,
+      phoneNumber: currentUser.phoneNumber,
       personalAddress: currentUser.personalAddress ?? {
         street: "",
         houseNumber: "",
@@ -97,31 +98,41 @@ const AccountPage = () => {
       gender: undefined,
       password: undefined,
       confirmPassword: undefined,
-      personalAddress: {
-        street: "",
-        houseNumber: "",
-        zip: "",
-        city: "",
-        country: "",
-      },
+      phonePrefix: undefined,
+      phoneNumber: undefined,
+      personalAddress: undefined,
     },
     validate: {
       firstName: isNotEmpty("This field cannot be empty"),
       lastName: isNotEmpty("This field cannot be empty"),
       confirmPassword: (value, values) => (values.password === value ? null : "Password does not match"),
+      phonePrefix: isNotEmpty("This field cannot be empty"),
+      phoneNumber: (value) =>
+        value ? (value?.match(/^\d+?$/) ? null : "Phone number must be numeric.") : "Phone Number can not be empty.",
       personalAddress: {
-        // houseNumber: (zipValue: string | undefined) =>
-        //   zipValue ? (/^(\d+)(\/\d+)?$/.test(zipValue) ? null : "Unable to send format") : null,
-        zip: isNotEmpty("This field should not be empty"),
-        city: isNotEmpty("This field should not be empty"),
-        country: isNotEmpty("This field should not be empty"),
+        street: (value, values) => (values.personalAddress ? (value ? null : "This field should not be empty") : null),
+        houseNumber: (zipValue, values) =>
+          values.personalAddress
+            ? zipValue
+              ? /^(\d+)(\/\d+)?$/.test(zipValue)
+                ? null
+                : "Use number format"
+              : "This field should not be empty"
+            : null,
+        zip: (value, values) => (values.personalAddress ? (value ? null : "This field should not be empty") : null),
+        city: (value, values) => (values.personalAddress ? (value ? null : "This field should not be empty") : null),
+        country: (value, values) => (values.personalAddress ? (value ? null : "This field should not be empty") : null),
       },
     },
     transformValues: (values) => {
       const isAddressActive = isPersonalAddress(values.personalAddress);
 
       const { personalAddress, ...restValues } = values;
-      return { ...restValues, personalAddress: isAddressActive ? values.personalAddress : undefined };
+
+      return {
+        ...restValues,
+        personalAddress: isAddressActive ? values.personalAddress : undefined,
+      };
     },
   });
 
@@ -270,6 +281,41 @@ const AccountPage = () => {
               disabled={!isEditing}
             />
           </SimpleGrid>
+          <Grid>
+            <Grid.Col span={4}>
+              <Select
+                label="Prefix"
+                defaultValue={
+                  form.values.phonePrefix
+                    ? () => {
+                        if (!form.values.phonePrefix) return null;
+                        const country = CountryList.findOneByDialCode(form.values.phonePrefix);
+                        return {
+                          label: `${country?.flag} (${country?.countryCode}) ${country?.code}`,
+                          value: country?.code,
+                        };
+                      }
+                    : null
+                }
+                data={CountryList.getAll()
+                  .filter(
+                    (value, index, array) => index === array.findIndex((t) => t.countryCode === value.countryCode),
+                  )
+                  .map((country) => {
+                    return {
+                      label: `${country.flag} (${country.countryCode}) ${country.code}`,
+                      value: country.countryCode,
+                    };
+                  })}
+                {...form.getInputProps("phonePrefix")}
+                searchable
+                disabled={!isEditing}
+              />
+            </Grid.Col>
+            <Grid.Col span={8}>
+              <TextInput label="Phone number" {...form.getInputProps("phoneNumber")} disabled={!isEditing} />
+            </Grid.Col>
+          </Grid>
           <SimpleGrid cols={2}>
             <TextInput
               label="Password"

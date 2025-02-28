@@ -762,6 +762,10 @@ export interface UpdateUser {
   password?: string;
   /** @nullable */
   personalAddress?: UpdateUserPersonalAddress;
+  /** User phone number */
+  phoneNumber?: string;
+  /** User phone number prefix */
+  phonePrefix?: string;
   /**
    * Must not contain special characters
    * @minLength 6
@@ -781,14 +785,18 @@ export const UserGender = {
 } as const;
 
 export interface User {
+  birthDate: string;
   createdAt: string;
   email: string;
   firstName: string;
   gender: UserGender;
   id: string;
   lastName: string;
+  nationality: string;
   /** @nullable */
   personalAddress: UserPersonalAddress;
+  phoneNumber: string;
+  phonePrefix: string;
   photo: Photo;
   role: Role;
   updatedAt: string;
@@ -905,6 +913,8 @@ export interface CreateOrganization {
 }
 
 export interface CreateUser {
+  /** User birthdate */
+  birthDate: string;
   /** User email */
   email: string;
   /** First name */
@@ -913,12 +923,18 @@ export interface CreateUser {
   gender: CreateUserGender;
   /** Last name */
   lastName: string;
+  /** User nationality */
+  nationality: string;
   /**
    * User password
    * @minLength 6
    */
   password: string;
   personalAddress?: CreateAddress;
+  /** User phone number */
+  phoneNumber: string;
+  /** User phone number prefix */
+  phonePrefix: string;
   /**
    * Must not contain special characters
    * @minLength 6

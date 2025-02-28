@@ -48,7 +48,8 @@ export class UsersController {
 	@ApiCreatedResponse({ type: User, description: "User has been created" })
 	@Post()
 	async createUser(@Body() body: CreateUser) {
-		const exist = await this.usersService.exist([{ email: body.email }, { username: body.username }]);
+		const lowerCaseUsername = body.username.toLowerCase();
+		const exist = await this.usersService.exist([{ email: body.email }, { username: lowerCaseUsername }]);
 		if (exist) throw new ConflictException("User with email or username already exist");
 
 		let newUser = new User({
@@ -56,8 +57,12 @@ export class UsersController {
 			password: body.password,
 			firstName: body.firstName,
 			lastName: body.lastName,
-			username: body.username,
+			username: lowerCaseUsername,
 			gender: body.gender,
+			birthDate: body.birthDate,
+			nationality: body.nationality,
+			phonePrefix: body.phonePrefix,
+			phoneNumber: body.phoneNumber,
 		});
 
 		if (body.personalAddress) {
@@ -84,8 +89,9 @@ export class UsersController {
 	@UseGuards(CookieGuard)
 	@Patch()
 	async updateCurrentUser(@Body() body: UpdateUser, @CurrentUser() requestUser: User) {
-		if (body.username && body.username !== requestUser.username) {
-			const exists = await this.usersService.exist({ username: body.username });
+		const lowerCaseUsername = body?.username.toLowerCase();
+		if (body.username && lowerCaseUsername !== requestUser.username) {
+			const exists = await this.usersService.exist({ username: lowerCaseUsername });
 			if (exists) throw new BadRequestException("Username is already taken");
 		}
 
@@ -97,8 +103,13 @@ export class UsersController {
 		user.password = body.password ?? user.password;
 		user.firstName = body.firstName ?? user.firstName;
 		user.lastName = body.lastName ?? user.lastName;
-		user.username = body.username ?? user.username;
+		user.username = lowerCaseUsername ?? user.username;
 		user.gender = body.gender ?? user.gender;
+		user.birthDate = body.birthDate ?? user.birthDate;
+		user.nationality = body.nationality ?? user.nationality;
+		user.phonePrefix = body.phonePrefix ?? user.phonePrefix;
+		user.phoneNumber = body.phoneNumber ?? user.phoneNumber;
+
 
 		if (body.personalAddress) {
 			if (user.personalAddress) user.personalAddress.update(body.personalAddress);

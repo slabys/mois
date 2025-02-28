@@ -3,10 +3,14 @@
 import { useCreateUser } from "@/utils/api";
 import { CreateUser, CreateUserGender } from "@/utils/api.schemas";
 import routes from "@/utils/routes";
+import DateInput from "@components/primitives/DateInput";
 import Select from "@components/primitives/Select";
-import { Box, Button, Flex, PasswordInput, SimpleGrid, Text, TextInput } from "@mantine/core";
+import { Box, Button, Checkbox, Flex, Grid, PasswordInput, SimpleGrid, Text, TextInput } from "@mantine/core";
 import { Form, hasLength, isEmail, isNotEmpty, useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
+import CountryList from "country-list-with-dial-code-and-flag";
+import dayjs from "dayjs";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 
@@ -16,6 +20,7 @@ interface FormInitialTypes extends Partial<CreateUser> {
 
 const RegistrationForm = () => {
   const router = useRouter();
+  const [phonePrefix, setPhonePrefix] = React.useState<string | undefined>(undefined);
   const registerUserMutation = useCreateUser({
     mutation: {
       onSuccess: () => {
@@ -40,14 +45,21 @@ const RegistrationForm = () => {
       username: "",
       password: "",
       confirmPassword: undefined,
-      gender: undefined,
+      gender: CreateUserGender["prefer-not-to-say"],
+      birthDate: undefined,
+      nationality: undefined,
+      phoneNumber: undefined,
     },
     validate: {
-      firstName: isNotEmpty("Password can not be empty."),
-      lastName: isNotEmpty("Password can not be empty."),
+      firstName: isNotEmpty("First name can not be empty."),
+      lastName: isNotEmpty("Last name can not be empty."),
       email: isEmail("E-mail is not valid."),
       username: hasLength({ min: 6 }, "Must be at least 6 characters"),
       gender: (value) => (value ? null : "Gender is required."),
+      birthDate: isNotEmpty("Birthdate can not be empty."),
+      nationality: isNotEmpty("Nationality can not be empty."),
+      phoneNumber: (value) =>
+        value ? (value?.match(/^\d+?$/) ? null : "Phone number must be numeric.") : "Phone Number can not be empty.",
       password: hasLength({ min: 6 }, "Must be at least 6 characters"),
       confirmPassword: (value, values) => (values.password === value ? null : "Password does not match"),
       personalAddress: (address) => {
@@ -71,6 +83,8 @@ const RegistrationForm = () => {
     }
   };
 
+  console.log(form.values);
+
   return (
     <Box maw="32rem" w="100%">
       <Form form={form} onSubmit={registerUser}>
@@ -79,11 +93,65 @@ const RegistrationForm = () => {
             <TextInput label="First Name" {...form.getInputProps("firstName")} required />
             <TextInput label="Last Name" {...form.getInputProps("lastName")} required />
           </SimpleGrid>
+          <SimpleGrid cols={2}>
+            <DateInput
+              label="Birthdate"
+              defaultValue={null}
+              placeholder="Birthdate"
+              value={form.values.birthDate ? dayjs(form.values.birthDate).toDate() : null}
+              onChange={(value) => {
+                value && form.setFieldValue("birthDate", value.toISOString());
+              }}
+              error={form.errors.birthDate}
+              required
+            />
+            <Select
+              label="Nationality"
+              data={CountryList.getAll()
+                .filter(
+                  (value, index, array) =>
+                    index === array.findIndex((t) => t.name === value.name || t.code === value.code),
+                )
+                .map((country) => {
+                  return {
+                    label: `(${country.code}) ${country.name}`,
+                    value: country.code,
+                  };
+                })}
+              searchable
+              {...form.getInputProps("nationality")}
+              required
+            />
+          </SimpleGrid>
           <TextInput label="Email" {...form.getInputProps("email")} required />
+          <Grid>
+            <Grid.Col span={4}>
+              <Select
+                label="Prefix"
+                data={CountryList.getAll()
+                  .filter(
+                    (value, index, array) => index === array.findIndex((t) => t.countryCode === value.countryCode),
+                  )
+                  .map((country) => {
+                    return {
+                      label: `${country.flag} (${country.countryCode}) ${country.code}`,
+                      value: country.countryCode,
+                    };
+                  })}
+                {...form.getInputProps("phonePrefix")}
+                searchable
+                required
+              />
+            </Grid.Col>
+            <Grid.Col span={8}>
+              <TextInput label="Phone number" {...form.getInputProps("phoneNumber")} required />
+            </Grid.Col>
+          </Grid>
           <SimpleGrid cols={2}>
             <TextInput label="Username" {...form.getInputProps("username")} required />
             <Select
               label="Gender"
+              defaultValue={CreateUserGender["prefer-not-to-say"]}
               data={Object.entries(CreateUserGender).map(([key, gender]) => {
                 return {
                   label: gender, // (String(gender).charAt(0).toUpperCase() + String(gender).slice(1)).replaceAll("-", " "),
@@ -105,6 +173,17 @@ const RegistrationForm = () => {
           </SimpleGrid>
         </Flex>
         <Flex direction="column" gap={16} mt={16}>
+          <Checkbox
+            label={
+              <Text>
+                I agree with{" "}
+                <Link href="https://esncz.org/privacy-policy " target="_blank">
+                  Privacy Policy
+                </Link>
+              </Text>
+            }
+            required
+          />
           <Button loading={registerUserMutation.isPending} type="submit">
             Register
           </Button>
