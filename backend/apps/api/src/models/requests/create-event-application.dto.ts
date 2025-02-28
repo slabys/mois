@@ -59,6 +59,12 @@ export class CreateEventApplication {
 	@IsString()
 	additionalInformation: string;
 
+	@IsString()
+	foodRestrictionAllergies: string;
+
+	@IsString()
+	healthLimitations: string;
+
 	/**
 	 * Date until the ID number is valid
 	 * @example 2024-12-20T16:48:34.681Z

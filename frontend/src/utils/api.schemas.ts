@@ -423,6 +423,8 @@ export type CreateEventApplicationAdditionalFormData = { [key: string]: unknown 
 export interface CreateEventApplication {
   additionalFormData: CreateEventApplicationAdditionalFormData;
   additionalInformation: string;
+  foodRestrictionAllergies: string;
+  healthLimitations: string;
   idNumber: string;
   invoiceAddress: CreateAddress;
   /** @nullable */
@@ -606,6 +608,8 @@ export interface EventApplication {
   createdAt: string;
   customOrganization: EventCustomOrganization;
   event: Event;
+  foodRestrictionAllergies: string;
+  healthLimitations: string;
   id: number;
   idNumber: string;
   invoice: Invoice;

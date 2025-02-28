@@ -55,6 +55,8 @@ const JoinEventModal = ({
       invoiceAddress: undefined,
       invoiceMethod: undefined,
       additionalInformation: "",
+      foodRestrictionAllergies: "",
+      healthLimitations: "",
       additionalFormData: {},
     },
     validate: (values) => {
@@ -377,6 +379,12 @@ const JoinEventModal = ({
               required
             />
             <Textarea label="Additional Information" {...form.getInputProps("additionalInformation")} autosize />
+            <Textarea
+              label="Food Restrictions and allergies"
+              {...form.getInputProps("foodRestrictionAllergies")}
+              autosize
+            />
+            <Textarea label="Disability or Health Limitations" {...form.getInputProps("healthLimitations")} autosize />
           </Stepper.Step>
           <Stepper.Completed>Completed, click back button to get to previous step</Stepper.Completed>
         </Stepper>

@@ -82,8 +82,14 @@ export class EventApplication extends BaseEntity {
 	@JoinColumn()
 	invoiceAddress: Address;
 
-	@Column()
+	@Column({ nullable: true })
 	additionalInformation: string;
+
+	@Column({ nullable: true })
+	foodRestrictionAllergies: string;
+
+	@Column({ nullable: true })
+	healthLimitations: string;
 
 	@Column({ nullable: true })
 	validUntil: Date;

@@ -151,6 +151,8 @@ export class EventApplicationsController {
 			invoiceMethod: body.invoiceMethod,
 			invoicedTo: body.invoicedTo,
 			additionalInformation: body.additionalInformation ?? "",
+			foodRestrictionAllergies: body.foodRestrictionAllergies ?? "",
+			healthLimitations: body.healthLimitations ?? "",
 			invoiceAddress: new Address(body.invoiceAddress),
 			validUntil: body.validUntil,
 			idNumber: body.idNumber,
