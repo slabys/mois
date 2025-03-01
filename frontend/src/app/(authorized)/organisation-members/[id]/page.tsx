@@ -24,15 +24,18 @@ const UseFetchOrganizationMembers = async () => {
     .then((res) => res.json())
     .catch((e) => console.error(e));
 
-  if (!organizationList) {
+  if (!organizationList) return [];
+  {
     return [];
   }
 
-  return organizationList.map((organization) => {
-    return {
-      id: organization.id,
-    };
-  });
+  return (
+    organizationList?.map((organization) => {
+      return {
+        id: organization.id,
+      };
+    }) ?? []
+  );
 };
 
 export async function generateStaticParams() {
