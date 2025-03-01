@@ -5,6 +5,8 @@
  * The backend API description
  * OpenAPI spec version: 0.0.1
  */
+export type SendMail200 = { [key: string]: unknown };
+
 export type GetManagementEvents200 = {
   data?: Event[];
   pagination?: PaginationDto;

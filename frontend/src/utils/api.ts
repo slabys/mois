@@ -57,6 +57,7 @@ import type {
   OrganizationMembers200,
   OrganizationMembersParams,
   Role,
+  SendMail200,
   TransferManager201,
   UpdateEvent,
   UpdateEventApplication,
@@ -3425,6 +3426,65 @@ export function useGetManagementEvents<
   },
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
   const queryOptions = getGetManagementEventsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const sendMail = (options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
+  return customInstance<SendMail200>({ url: `/mailer`, method: "GET", signal }, options);
+};
+
+export const getSendMailQueryKey = () => {
+  return [`/mailer`] as const;
+};
+
+export const getSendMailQueryOptions = <
+  TData = Awaited<ReturnType<typeof sendMail>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof sendMail>>, TError, TData>>;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getSendMailQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof sendMail>>> = ({ signal }) => sendMail(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof sendMail>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type SendMailQueryResult = NonNullable<Awaited<ReturnType<typeof sendMail>>>;
+export type SendMailQueryError = ErrorType<unknown>;
+
+export function useSendMail<TData = Awaited<ReturnType<typeof sendMail>>, TError = ErrorType<unknown>>(options: {
+  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof sendMail>>, TError, TData>> &
+    Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof sendMail>>, TError, TData>, "initialData">;
+  request?: SecondParameter<typeof customInstance>;
+}): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useSendMail<TData = Awaited<ReturnType<typeof sendMail>>, TError = ErrorType<unknown>>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof sendMail>>, TError, TData>> &
+    Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof sendMail>>, TError, TData>, "initialData">;
+  request?: SecondParameter<typeof customInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useSendMail<TData = Awaited<ReturnType<typeof sendMail>>, TError = ErrorType<unknown>>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof sendMail>>, TError, TData>>;
+  request?: SecondParameter<typeof customInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+export function useSendMail<TData = Awaited<ReturnType<typeof sendMail>>, TError = ErrorType<unknown>>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof sendMail>>, TError, TData>>;
+  request?: SecondParameter<typeof customInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getSendMailQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 

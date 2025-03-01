@@ -80,6 +80,9 @@ services:
       - STORAGE_ROOT=${STORAGE_ROOT:-/app/storage}
       - REDIS_HOST=${REDIS_HOST:-redis}
       - REDIS_PORT=${REDIS_PORT:-6379}
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_USER=${MAIL_USER}
+      - MAIL_PASS=${MAIL_PASS}
     env_file:
       - .env
     ports:
