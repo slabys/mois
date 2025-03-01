@@ -37,6 +37,7 @@ import type {
   EventSimpleWithApplications,
   EventSpotSimple,
   GenerateSheetEventApplication200,
+  GenerateSheetUsers200,
   GetAllUsers200,
   GetAllUsersParams,
   GetEvents200,
@@ -740,6 +741,78 @@ export function useGetAllUsers<TData = Awaited<ReturnType<typeof getAllUsers>>, 
   },
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
   const queryOptions = getGetAllUsersQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const generateSheetUsers = (options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
+  return customInstance<GenerateSheetUsers200>({ url: `/users/export/users`, method: "GET", signal }, options);
+};
+
+export const getGenerateSheetUsersQueryKey = () => {
+  return [`/users/export/users`] as const;
+};
+
+export const getGenerateSheetUsersQueryOptions = <
+  TData = Awaited<ReturnType<typeof generateSheetUsers>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof generateSheetUsers>>, TError, TData>>;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGenerateSheetUsersQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof generateSheetUsers>>> = ({ signal }) =>
+    generateSheetUsers(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof generateSheetUsers>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData> };
+};
+
+export type GenerateSheetUsersQueryResult = NonNullable<Awaited<ReturnType<typeof generateSheetUsers>>>;
+export type GenerateSheetUsersQueryError = ErrorType<unknown>;
+
+export function useGenerateSheetUsers<
+  TData = Awaited<ReturnType<typeof generateSheetUsers>>,
+  TError = ErrorType<unknown>,
+>(options: {
+  query: Partial<UseQueryOptions<Awaited<ReturnType<typeof generateSheetUsers>>, TError, TData>> &
+    Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof generateSheetUsers>>, TError, TData>, "initialData">;
+  request?: SecondParameter<typeof customInstance>;
+}): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useGenerateSheetUsers<
+  TData = Awaited<ReturnType<typeof generateSheetUsers>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof generateSheetUsers>>, TError, TData>> &
+    Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof generateSheetUsers>>, TError, TData>, "initialData">;
+  request?: SecondParameter<typeof customInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+export function useGenerateSheetUsers<
+  TData = Awaited<ReturnType<typeof generateSheetUsers>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof generateSheetUsers>>, TError, TData>>;
+  request?: SecondParameter<typeof customInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
+
+export function useGenerateSheetUsers<
+  TData = Awaited<ReturnType<typeof generateSheetUsers>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof generateSheetUsers>>, TError, TData>>;
+  request?: SecondParameter<typeof customInstance>;
+}): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
+  const queryOptions = getGenerateSheetUsersQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
 
@@ -3070,6 +3143,60 @@ export const useCreateRole = <TError = ErrorType<unknown>, TContext = unknown>(o
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<Awaited<ReturnType<typeof createRole>>, TError, { data: BodyType<CreateRole> }, TContext> => {
   const mutationOptions = getCreateRoleMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const updateUserRole = (userId: string, roleId: number, options?: SecondParameter<typeof customInstance>) => {
+  return customInstance<User>({ url: `/roles/update/${userId}/${roleId}`, method: "PATCH" }, options);
+};
+
+export const getUpdateUserRoleMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateUserRole>>,
+    TError,
+    { userId: string; roleId: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateUserRole>>,
+  TError,
+  { userId: string; roleId: number },
+  TContext
+> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateUserRole>>, { userId: string; roleId: number }> = (
+    props,
+  ) => {
+    const { userId, roleId } = props ?? {};
+
+    return updateUserRole(userId, roleId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateUserRoleMutationResult = NonNullable<Awaited<ReturnType<typeof updateUserRole>>>;
+
+export type UpdateUserRoleMutationError = ErrorType<unknown>;
+
+export const useUpdateUserRole = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateUserRole>>,
+    TError,
+    { userId: string; roleId: number },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateUserRole>>,
+  TError,
+  { userId: string; roleId: number },
+  TContext
+> => {
+  const mutationOptions = getUpdateUserRoleMutationOptions(options);
 
   return useMutation(mutationOptions);
 };

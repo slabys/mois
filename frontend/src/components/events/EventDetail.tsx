@@ -5,10 +5,10 @@ import { hasEveryPermissions } from "@/utils/checkPermissions";
 import routes from "@/utils/routes";
 import { dateWithTime, dayMonthYear } from "@/utils/time";
 import ApiImage from "@components/ApiImage/ApiImage";
-import JoinEventModal from "@components/JoinEventModal/JoinEventModal";
 import RichTextRenderer from "@components/Richtext/RichTextRenderer";
-import UpdateEventPhotoModal from "@components/UpdateEventPhotoModal/UpdateEventPhotoModal";
 import EventEditModal from "@components/events/modals/EventEditModal";
+import JoinEventModal from "@components/modals/JoinEventModal/JoinEventModal";
+import UpdateEventPhotoModal from "@components/modals/UpdateEventPhotoModal/UpdateEventPhotoModal";
 import {
   Blockquote,
   Button,

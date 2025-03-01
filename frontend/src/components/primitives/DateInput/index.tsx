@@ -2,7 +2,7 @@ import { DateValue, DateInput as MantineDateInput, DateInputProps as MantineDate
 import { IconCalendar } from "@tabler/icons-react";
 import "dayjs/locale/en";
 
-interface DateInputProps extends MantineDateInputProps {
+export interface DateInputProps extends MantineDateInputProps {
   value: DateValue;
   onChange: (value: DateValue) => void;
 }

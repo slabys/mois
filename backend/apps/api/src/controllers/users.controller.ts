@@ -4,11 +4,13 @@ import {
 	ConflictException,
 	Controller,
 	Get,
+	Header,
 	InternalServerErrorException,
 	Param,
 	ParseUUIDPipe,
 	Patch,
 	Post,
+	Res,
 	UseGuards,
 } from "@nestjs/common";
 import {
@@ -34,6 +36,7 @@ import { OrganizationMemberWithoutUser } from "../models/responses";
 import { Address } from "modules/addresses";
 import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 import { PaginationDto, PaginationResponseDto } from "../models/responses/pagination-response.dto";
+import * as ExcelJS from "exceljs";
 
 @ApiTags("Users")
 @Controller("users")
@@ -180,6 +183,64 @@ export class UsersController {
 	})
 	@Get("all")
 	getAllUsers(@Pagination() pagination?: PaginationOptions) {
-		return this.usersService.find(pagination);
+		return this.usersService.find(pagination, { relations: { personalAddress: true, role: true } });
+	}
+
+	@Header("Content-disposition", "attachment; filename=EventApplicationExport.xlsx")
+	@Get("export/users")
+	async generateSheetUsers(@Res() res: Response) {
+
+		const userList = await this.usersService.find({ all: true }, {
+			relations: {
+				personalAddress: true,
+				role: true,
+			},
+		});
+
+		const workbook = new ExcelJS.Workbook();
+		const worksheet = workbook.addWorksheet("Export");
+
+		worksheet.columns = [
+			{ header: "First Name", key: "firstName" },
+			{ header: "Last Name", key: "lastName" },
+			{ header: "Email", key: "email" },
+			{ header: "Username", key: "username" },
+			{ header: "Personal Address", key: "personalAddress" },
+
+			{ header: "Birthdate", key: "birthDate" },
+			{ header: "Nationality", key: "nationality" },
+			{ header: "Phone Prefix", key: "phonePrefix" },
+			{ header: "Phone Number", key: "phoneNumber" },
+			{ header: "Gender", key: "gender" },
+
+			{ header: "Role", key: "role" },
+			{ header: "Role Permissions", key: "rolePermissions" },
+		];
+
+		userList.data.map((user) => {
+			worksheet.addRow({
+				firstName: user?.firstName,
+				lastName: user?.lastName,
+				email: user?.email,
+				username: user?.username,
+				personalAddress: user?.personalAddress ? `${user?.personalAddress?.street} ${user?.personalAddress?.houseNumber}
+${user?.personalAddress?.zip} ${user?.personalAddress?.city}
+${user?.personalAddress?.country}` : "",
+				birthDate: user?.birthDate,
+				nationality: user?.nationality,
+				phonePrefix: user?.phonePrefix,
+				phoneNumber: user?.phoneNumber,
+				gender: user?.gender,
+				role: user?.role?.name,
+				rolePermissions: user?.role?.permissions.toString(),
+			});
+		});
+
+		const buffer = await workbook.xlsx.writeBuffer();
+		res
+			// @ts-ignore
+			.type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+			.send(buffer);
+		return buffer;
 	}
 }

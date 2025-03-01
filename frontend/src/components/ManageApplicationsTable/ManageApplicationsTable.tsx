@@ -10,9 +10,9 @@ import {
 } from "@/utils/api";
 import { type EventApplicationDetailedWithApplications, type EventSpotSimple } from "@/utils/api.schemas";
 import { downloadFile } from "@/utils/downloadFile";
-import CreateSpotModal from "@components/CreateSpotModal/CreateSpotModal";
-import UpdateEventApplicationModal from "@components/UpdateEventApplicationModal/UpdateEventApplicationModal";
-import UpdateSpotModal from "@components/UpdateSpotModal/UpdateSpotModal";
+import CreateSpotModal from "@components/modals/CreateSpotModal/CreateSpotModal";
+import UpdateEventApplicationModal from "@components/modals/UpdateEventApplicationModal/UpdateEventApplicationModal";
+import UpdateSpotModal from "@components/modals/UpdateSpotModal/UpdateSpotModal";
 import {
   ActionIcon,
   Box,

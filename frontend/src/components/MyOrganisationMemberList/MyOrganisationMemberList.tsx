@@ -115,7 +115,7 @@ const MyOrganisationMemberList = ({ organizationId }: MyOrganisationMemberListPr
   return (
     <Stack>
       <Flex justify="space-between" align="center" w="100%">
-        <Title>Manage Organisation Members</Title>
+        <Title>My Organisation</Title>
         <Title>{currentOrganisation?.name}</Title>
       </Flex>
       <Flex direction="column" gap={8}>

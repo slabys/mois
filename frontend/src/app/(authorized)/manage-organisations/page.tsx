@@ -3,8 +3,8 @@
 import { useAllOrganizations } from "@/utils/api";
 import type { Organization } from "@/utils/api.schemas";
 import routes from "@/utils/routes";
-import CreateOrganizationModal from "@components/CreateOrganizationModal/CreateOrganizationModal";
-import UpdateOrganizationModal from "@components/UpdateOrganizationModal/UpdateOrganizationModal";
+import CreateOrganizationModal from "@components/modals/CreateOrganizationModal/CreateOrganizationModal";
+import UpdateOrganizationModal from "@components/modals/UpdateOrganizationModal/UpdateOrganizationModal";
 import { ActionIcon, Button, Container, Flex, ScrollArea, Stack, Table, Text, Title, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconEdit, IconPlus, IconTrash, IconUsersGroup } from "@tabler/icons-react";
@@ -25,8 +25,6 @@ const ManageOrganisationsPage = () => {
     setActiveOrganisation(null);
     refetchOrganisationsList();
   };
-
-  console.log(activeOrganisation);
 
   const rows = organisationsList?.map((organization, index) => (
     <Table.Tr key={`event-${index}-${organization.id}`}>

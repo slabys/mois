@@ -77,15 +77,15 @@ export class User extends BaseEntity {
 	@ManyToOne(() => Address, { nullable: true, onDelete: "SET NULL", cascade: true })
 	personalAddress: Address | null;
 
+	@ManyToOne(() => Role, { cascade: true, eager: true, onDelete: "SET NULL" })
+	role: Role;
+
 	@BeforeUpdate()
 	@BeforeInsert()
 	async beforeSave() {
 		if (this.password) this.password = await hashPassword(this.password);
 		if (this.username) this.username = this.username.toLowerCase();
 	}
-
-	@ManyToOne(() => Role, { cascade: true, eager: true, onDelete: "SET NULL" })
-	role: Role;
 
 	constructor(partial?: DeepPartial<User>) {
 		super();

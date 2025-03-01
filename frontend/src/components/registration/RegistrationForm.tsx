@@ -83,8 +83,6 @@ const RegistrationForm = () => {
     }
   };
 
-  console.log(form.values);
-
   return (
     <Box maw="32rem" w="100%">
       <Form form={form} onSubmit={registerUser}>

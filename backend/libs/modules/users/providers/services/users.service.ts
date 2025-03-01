@@ -96,9 +96,12 @@ export class UsersService {
 	 * Find all users ordered by lastName
 	 * @returns FormatPaginatedResponseType<User[]>
 	 */
-	async find(pagination?: PaginationOptions) {
+	async find(pagination?: PaginationOptions, options?: FindUserOptions) {
 		const [users, totalCount] = await this.UsersRepository.findAndCount({
-			order: { lastName: "ASC" },
+			order: { createdAt: "ASC" },
+			relations: {
+				...options?.relations,
+			},
 			take: pagination.all ? undefined : pagination.perPage,
 			skip: pagination.all ? undefined : (pagination.page - 1) * pagination.perPage,
 		});

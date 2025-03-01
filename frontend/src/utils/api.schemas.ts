@@ -44,6 +44,7 @@ export const GetRoleAllPermissions200Item = {
   rolecreate: "role.create",
   roleupdate: "role.update",
   roledelete: "role.delete",
+  userupdateRole: "user.updateRole",
 } as const;
 
 export type GetEvents200 = {
@@ -106,6 +107,8 @@ export type UpdateOrganization201 = { [key: string]: unknown };
 
 export type CreateOrganization201 = { [key: string]: unknown };
 
+export type GenerateSheetUsers200 = { [key: string]: unknown };
+
 export type GetAllUsers200 = {
   data?: User[];
   pagination?: PaginationDto;
@@ -142,6 +145,7 @@ export const CreateRolePermissionsItem = {
   rolecreate: "role.create",
   roleupdate: "role.update",
   roledelete: "role.delete",
+  userupdateRole: "user.updateRole",
 } as const;
 
 export interface CreateRole {
@@ -410,6 +414,10 @@ export interface EventApplicationSimpleWithApplications {
   user: User;
 }
 
+export type CreateEventApplicationOrganization =
+  | CreateEventApplicationExistingOrganization
+  | CreateEventApplicationCustomOrganization;
+
 export type CreateEventApplicationInvoiceMethod =
   (typeof CreateEventApplicationInvoiceMethod)[keyof typeof CreateEventApplicationInvoiceMethod];
 
@@ -466,10 +474,6 @@ export interface CreateEventApplicationExistingOrganization {
   id: string;
   type: CreateEventApplicationExistingOrganizationType;
 }
-
-export type CreateEventApplicationOrganization =
-  | CreateEventApplicationExistingOrganization
-  | CreateEventApplicationCustomOrganization;
 
 /**
  * @nullable
@@ -828,6 +832,7 @@ export const RolePermissionsItem = {
   rolecreate: "role.create",
   roleupdate: "role.update",
   roledelete: "role.delete",
+  userupdateRole: "user.updateRole",
 } as const;
 
 export interface Role {

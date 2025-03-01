@@ -1,11 +1,12 @@
 "use client";
 
-import { Container, Text } from "@mantine/core";
+import ManagePeopleList from "@components/ManagePeopleList/ManagePeopleList";
+import { Container } from "@mantine/core";
 
 const ManagePeoplePage = () => {
   return (
     <Container size="xl">
-      <Text>This page was not implemented yet</Text>
+      <ManagePeopleList />
     </Container>
   );
 };
