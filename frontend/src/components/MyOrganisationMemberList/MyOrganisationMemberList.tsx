@@ -9,7 +9,6 @@ import {
   useOrganizationMembers,
   useTransferManager,
 } from "@/utils/api";
-import { dayMonthYear } from "@/utils/time";
 import ApiImage from "@components/ApiImage/ApiImage";
 import {
   ActionIcon,
@@ -184,7 +183,7 @@ const MyOrganisationMemberList = ({ organizationId }: MyOrganisationMemberListPr
               <Table.Th w={148} miw={148}>
                 E-mail
               </Table.Th>
-              <Table.Th w={148}>Birthdate</Table.Th>
+              <Table.Th w={148}>Username</Table.Th>
               {isUserManager && <Table.Th w={200}>Operations</Table.Th>}
             </Table.Tr>
           </Table.Thead>
@@ -214,7 +213,7 @@ const MyOrganisationMemberList = ({ organizationId }: MyOrganisationMemberListPr
                   </Table.Td>
                   <Table.Td>{user.gender}</Table.Td>
                   <Table.Td>{user.email}</Table.Td>
-                  <Table.Td>{dayMonthYear(user.birthDate)}</Table.Td>
+                  <Table.Td>{user.username}</Table.Td>
                   {isUserManager && (
                     <Table.Td>
                       <Flex justify="space-evenly" gap={16}>
