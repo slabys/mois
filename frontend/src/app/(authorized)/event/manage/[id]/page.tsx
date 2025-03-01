@@ -1,5 +1,5 @@
 import { getGetEventsQueryKey } from "@/utils/api";
-import { EventSimple } from "@/utils/api.schemas";
+import { type GetEvents200 } from "@/utils/api.schemas";
 import ManageApplicationsTable from "@components/ManageApplicationsTable/ManageApplicationsTable";
 import { Container, Stack } from "@mantine/core";
 
@@ -23,15 +23,15 @@ export const revalidate = 60;
 
 const UseFetchEventApplications = async () => {
   const queryKey = getGetEventsQueryKey();
-  const events: EventSimple[] = await fetch(`${process.env.NEXT_PUBLIC_APP1_URL}${queryKey[0]}`)
+  const events: GetEvents200 = await fetch(`${process.env.NEXT_PUBLIC_APP1_URL}${queryKey[0]}`)
     .then((res) => res.json())
     .catch((e) => console.error(e));
 
-  if (!events) {
+  if (!events?.data) {
     return [];
   }
 
-  return events.map((event) => {
+  return events.data.map((event) => {
     return {
       id: event.id.toString(),
     };
