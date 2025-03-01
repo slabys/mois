@@ -24,8 +24,7 @@ const UseFetchOrganizationMembers = async () => {
     .then((res) => res.json())
     .catch((e) => console.error(e));
 
-  if (!organizationList) return [];
-  {
+  if (!organizationList) {
     return [];
   }
 
