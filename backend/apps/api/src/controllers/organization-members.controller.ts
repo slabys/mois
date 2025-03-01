@@ -70,7 +70,7 @@ export class OrganizationMembersController {
 		if (!organization) throw new NotFoundException("Organization not found");
 
 		const organisationMember = organization.members.find((member) => member.id.toString() === organisationMemberId);
-		if (organisationMember) {
+		if (organization.manager.id === organisationMember.user.id) {
 			await this.organizationService.deleteOrganisationManager(organization.id);
 		}
 

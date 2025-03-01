@@ -11,7 +11,7 @@ import { IconEdit, IconPlus, IconTrash, IconUsersGroup } from "@tabler/icons-rea
 import Link from "next/link";
 import { useState } from "react";
 
-const ManageOrganizationsPage = () => {
+const ManageOrganisationsPage = () => {
   const [isCreateOrganizationModalOpen, { open: openAddOrganizationModal, close: closeAddOrganizationModal }] =
     useDisclosure(false);
   const [isUpdateOrganizationModalOpen, { open: openUpdateOrganizationModal, close: closeUpdateOrganizationModal }] =
@@ -56,7 +56,7 @@ const ManageOrganizationsPage = () => {
           <Tooltip label="Organization Members">
             <ActionIcon
               component={Link}
-              href={routes.ORGANIZATION_MEMBERS({ id: organization.id })}
+              href={routes.ORGANISATION_MEMBERS({ id: organization.id })}
               variant="subtle"
               size={48}
               color="black"
@@ -153,4 +153,4 @@ const ManageOrganizationsPage = () => {
     </Container>
   );
 };
-export default ManageOrganizationsPage;
+export default ManageOrganisationsPage;

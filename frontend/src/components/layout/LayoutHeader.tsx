@@ -41,6 +41,7 @@ export type MainLinksProps = (MainLink | GroupedLinks)[];
 const mainLinks: MainLinksProps = [
   { link: routes.DASHBOARD, label: "Home", permissions: null },
   { link: routes.SENT_APPLICATIONS, label: "Sent Applications", permissions: null },
+  { link: routes.MY_ORGANISATION, label: "My Organisation", permissions: null },
   {
     label: "Management",
     children: [
@@ -50,7 +51,7 @@ const mainLinks: MainLinksProps = [
         permissions: ["event.create", "event.update", "event.duplicate"],
       },
       {
-        link: routes.MANAGE_ORGANIZATIONS,
+        link: routes.MANAGE_ORGANISATIONS,
         label: "Manage Organizations",
         permissions: [
           "organisation.create",
