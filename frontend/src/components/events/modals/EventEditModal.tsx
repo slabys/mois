@@ -5,6 +5,7 @@ import { EventDetail } from "@/utils/api.schemas";
 import RichTextEditor from "@components/Richtext/RichTextEditor";
 import DateInput from "@components/primitives/DateInput";
 import { Button, Flex, Group, Modal, NumberInput, SimpleGrid, Switch, TextInput } from "@mantine/core";
+import { DateTimePicker } from "@mantine/dates";
 import { Form, useForm } from "@mantine/form";
 import dayjs from "dayjs";
 import React from "react";
@@ -81,7 +82,7 @@ const EventEditModal = ({ eventDetail, isOpened, close, handleSuccess = () => {}
               {...form.getInputProps("capacity")}
               error={form.errors.capacity}
             />
-            <DateInput
+            <DateTimePicker
               label="Registration Deadline"
               value={dayjs(form.values.registrationDeadline).toDate()}
               onChange={(value) => {

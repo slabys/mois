@@ -1,6 +1,14 @@
 "use client";
 
-import { useGetCurrentUser, useGetEvent, useGetEventApplications } from "@/utils/api";
+import {
+  getGetCurrentUserQueryKey,
+  getGetEventApplicationsQueryKey,
+  getGetEventQueryKey,
+  useDeleteEventApplication,
+  useGetCurrentUser,
+  useGetEvent,
+  useGetEventApplications,
+} from "@/utils/api";
 import { hasEveryPermissions } from "@/utils/checkPermissions";
 import routes from "@/utils/routes";
 import { dateWithTime, dayMonthYear } from "@/utils/time";
@@ -25,6 +33,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import {
+  IconCancel,
   IconCash,
   IconChevronDown,
   IconEdit,
@@ -34,6 +43,8 @@ import {
   IconUsersGroup,
   IconWritingSign,
 } from "@tabler/icons-react";
+import { useQueryClient } from "@tanstack/react-query";
+import dayjs from "dayjs";
 import Link from "next/link";
 import React, { useMemo } from "react";
 
@@ -42,6 +53,7 @@ interface EventDetailProps {
 }
 
 const EventDetail = ({ id }: EventDetailProps) => {
+  const queryClient = useQueryClient();
   const isPhone = useMediaQuery("(min-width: 62em)");
   const [opened, { toggle }] = useDisclosure(isPhone);
 
@@ -53,11 +65,29 @@ const EventDetail = ({ id }: EventDetailProps) => {
   const { data: eventDetail, refetch: refetchEvent } = useGetEvent(id);
   const { data: currentUser, refetch: refetchCurrentUser } = useGetCurrentUser();
 
+  const deleteEventApplication = useDeleteEventApplication({
+    mutation: {
+      onSuccess: () => {
+        handleRefetchDetail();
+      },
+    },
+  });
+
   const isUserRegistered = useMemo(() => {
     return eventApplications?.some((f) => f.user.id === currentUser?.id);
   }, [eventApplications, id]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleDeleteApplication = () => {
+    const eventApplicationId = eventApplications?.find((f) => f.user.id === currentUser?.id)?.id;
+    if (eventApplicationId) {
+      deleteEventApplication.mutate({ id: eventApplicationId });
+    }
+  };
+
   const handleRefetchDetail = () => {
+    queryClient.invalidateQueries({ queryKey: [getGetEventApplicationsQueryKey(id)] });
+    queryClient.invalidateQueries({ queryKey: [getGetEventQueryKey(id)] });
+    queryClient.invalidateQueries({ queryKey: [getGetCurrentUserQueryKey()] });
     refetchEventApplications();
     refetchEvent();
     refetchCurrentUser();
@@ -173,14 +203,28 @@ const EventDetail = ({ id }: EventDetailProps) => {
                       Fill your personal address on your profile before registration.
                     </Blockquote>
                   )}
-                  <Button
-                    onClick={openModalJoinEvent}
-                    disabled={isUserRegistered || currentUser.personalAddress === null}
-                    color="green"
-                    leftSection={<IconWritingSign />}
-                  >
-                    {isUserRegistered ? "Already registered" : "Register to Event"}
-                  </Button>
+                  {isUserRegistered ? (
+                    <Button
+                      onClick={handleDeleteApplication}
+                      color="red"
+                      leftSection={<IconCancel />}
+                      disabled={dayjs(eventDetail.registrationDeadline).diff(new Date()) <= 0}
+                    >
+                      Unregister from Event
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={openModalJoinEvent}
+                      color="green"
+                      leftSection={<IconWritingSign />}
+                      disabled={
+                        currentUser.personalAddress === null ||
+                        dayjs(eventDetail.registrationDeadline).diff(new Date()) <= 0
+                      }
+                    >
+                      Register to Event
+                    </Button>
+                  )}
                 </Flex>
               </SimpleGrid>
             </Collapse>

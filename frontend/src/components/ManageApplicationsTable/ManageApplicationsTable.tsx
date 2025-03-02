@@ -117,58 +117,71 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     });
   };
 
-  const eventApplicationsRows = applicationsList?.map((application, index) => (
-    <Table.Tr key={`application-${index}-${application.id}`}>
-      <Table.Td>{application.user.firstName + " " + application.user.lastName}</Table.Td>
-      <Table.Td>
-        {application.organization ? application.organization.name : application.customOrganization.name}
-      </Table.Td>
-      <Table.Td>
-        {application.organization ? application.organization.address.country : application.customOrganization.country}
-      </Table.Td>
-      <Table.Td>
-        <Select
-          defaultValue={application.spotType?.id.toString()}
-          data={spots}
-          searchable
-          nothingFoundMessage="Nothing found..."
-          allowDeselect
-          onChange={(value) => {
-            handleSpotChange(application.id, Number(value));
-          }}
-        />
-      </Table.Td>
-      <Table.Td>{application.spotType?.price} CZK</Table.Td>
-      <Table.Td>
-        <Flex justify="space-evenly" gap={16}>
-          <Tooltip label="Generate Invoice">
-            {/*TODO - Generate Invoice*/}
-            <ActionIcon variant="subtle" size={48} color="black" disabled>
-              <IconFileTypePdf width={32} height={32} />
-            </ActionIcon>
-          </Tooltip>
-          <Tooltip label="Edit Application">
-            <ActionIcon
-              variant="subtle"
-              color="blue"
-              size={48}
-              onClick={() => {
-                setCurrentApplication(application);
-                openEditApplicationModal();
+  const eventApplicationsRows = !applicationsList
+    ? []
+    : applicationsList?.map((application, index) => (
+        <Table.Tr key={`application-${index}-${application.id}`}>
+          <Table.Td>{application.user.firstName + " " + application.user.lastName}</Table.Td>
+          <Table.Td>
+            {application.organization ? application.organization.name : application.customOrganization.name}
+          </Table.Td>
+          <Table.Td>
+            {application.organization
+              ? application.organization.address.country
+              : application.customOrganization.country}
+          </Table.Td>
+          <Table.Td>
+            {application.spotType
+              ? `${application.spotType.name} - ${application.spotType.price} ${application.spotType.currency}`
+              : "N/A"}
+          </Table.Td>
+          <Table.Td>
+            <Select
+              defaultValue={application.spotType?.id ? application.spotType.id.toString() : null}
+              data={spots}
+              searchable
+              nothingFoundMessage="Nothing found..."
+              allowDeselect
+              onChange={(value) => {
+                handleSpotChange(application.id, Number(value));
               }}
-            >
-              <IconEdit width={32} height={32} />
-            </ActionIcon>
-          </Tooltip>
-          <Tooltip label="Delete Application">
-            <ActionIcon variant="subtle" size={48} color="red" onClick={() => handleDeleteApplication(application.id)}>
-              <IconTrash width={32} height={32} />
-            </ActionIcon>
-          </Tooltip>
-        </Flex>
-      </Table.Td>
-    </Table.Tr>
-  ));
+            />
+          </Table.Td>
+          <Table.Td>
+            <Flex justify="space-evenly" gap={16}>
+              <Tooltip label="Generate Invoice">
+                {/*TODO - Generate Invoice*/}
+                <ActionIcon variant="subtle" size={48} color="black" disabled>
+                  <IconFileTypePdf width={32} height={32} />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip label="Edit Application">
+                <ActionIcon
+                  variant="subtle"
+                  color="blue"
+                  size={48}
+                  onClick={() => {
+                    setCurrentApplication(application);
+                    openEditApplicationModal();
+                  }}
+                >
+                  <IconEdit width={32} height={32} />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip label="Delete Application">
+                <ActionIcon
+                  variant="subtle"
+                  size={48}
+                  color="red"
+                  onClick={() => handleDeleteApplication(application.id)}
+                >
+                  <IconTrash width={32} height={32} />
+                </ActionIcon>
+              </Tooltip>
+            </Flex>
+          </Table.Td>
+        </Table.Tr>
+      ));
 
   return (
     <>
@@ -230,21 +243,14 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
 
       <ScrollArea w="100%">
         {eventApplicationsRows && eventApplicationsRows?.length > 0 ? (
-          <Table
-            withTableBorder
-            withColumnBorders
-            withRowBorders
-            striped
-            highlightOnHover={true}
-            style={{ textAlign: "center" }}
-          >
+          <Table withTableBorder withColumnBorders withRowBorders striped highlightOnHover={true}>
             <Table.Thead>
               <Table.Tr>
                 <Table.Th miw={148}>First and Last Name</Table.Th>
                 <Table.Th miw={148}>Section</Table.Th>
                 <Table.Th miw={148}>Country</Table.Th>
-                <Table.Th miw={224}>Spot type</Table.Th>
-                <Table.Th miw={148}>Price</Table.Th>
+                <Table.Th miw={224}>Current Spot</Table.Th>
+                <Table.Th miw={224}>Change Spot</Table.Th>
                 <Table.Th miw={148} w={200}>
                   Operations
                 </Table.Th>

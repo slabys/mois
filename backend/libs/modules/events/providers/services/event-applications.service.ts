@@ -47,6 +47,8 @@ export class EventApplicationsService {
 		return this.eventApplicationRepository.find({
 			where: { event: { id } },
 			relations: {
+				organization: true,
+				event: true,
 				user: {
 					personalAddress: true,
 				},

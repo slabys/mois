@@ -19,7 +19,7 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { Form, isEmail, useForm } from "@mantine/form";
+import { Form, useForm } from "@mantine/form";
 import CountryList from "country-list-with-dial-code-and-flag";
 import dayjs from "dayjs";
 import Link from "next/link";
@@ -132,11 +132,7 @@ const InitializePage = () => {
     },
   });
 
-  console.log(isEmail(form.values.user.email));
-  console.log(form.values);
-  console.log(form.errors);
-
-  const { activeStep, setActiveStep, nextStep, prevStep } = useStepper(form);
+  const { activeStep, onClickStep, nextStep, prevStep } = useStepper(form);
 
   const initializeSystem = (values: FormInitialTypes) => {
     form.validate();
@@ -155,7 +151,7 @@ const InitializePage = () => {
       <Flex direction="column" justify="center" align="center" h="100%" gap={8}>
         <Box maw="32rem" w="100%">
           <Form form={form} onSubmit={initializeSystem}>
-            <Stepper active={activeStep} onStepClick={setActiveStep}>
+            <Stepper active={activeStep} onStepClick={onClickStep}>
               <Stepper.Step label="Step 1:" description="User Information">
                 <Flex direction="column" gap={12}>
                   <SimpleGrid cols={2}>
@@ -169,7 +165,6 @@ const InitializePage = () => {
                       placeholder="Birthdate"
                       value={form.values.user.birthDate ? dayjs(form.values.user.birthDate).toDate() : null}
                       onChange={(value) => {
-                        console.log(value);
                         value && form.setFieldValue("user.birthDate", value.toISOString());
                       }}
                       error={form.errors["user.birthDate"]}

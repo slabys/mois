@@ -197,9 +197,9 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
                   <Table.Td>{`${user.firstName} ${user.lastName}`}</Table.Td>
                   <Table.Td>
                     {personalAddress ? (
-                      <Flex direction="column" justify="start" align="start">
+                      <Flex direction="column" justify="start" align="start" ta="start">
                         <Text>{`${personalAddress.street} ${personalAddress.houseNumber}`}</Text>
-                        <Text>{`${personalAddress.zip}, ${personalAddress.city}`}</Text>
+                        <Text>{`${personalAddress.zip} ${personalAddress.city}`}</Text>
                         <Text>{personalAddress.country}</Text>
                       </Flex>
                     ) : (

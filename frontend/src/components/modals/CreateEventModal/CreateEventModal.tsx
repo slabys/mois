@@ -3,6 +3,7 @@ import { CreateEvent } from "@/utils/api.schemas";
 import RichTextEditor from "@components/Richtext/RichTextEditor";
 import DateInput from "@components/primitives/DateInput";
 import { Button, Flex, Group, Modal, NumberInput, SimpleGrid, Switch, TextInput } from "@mantine/core";
+import { DateTimePicker } from "@mantine/dates";
 import { Form, hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
@@ -89,7 +90,7 @@ const CreateEventModal = ({ onCreateSuccess, isOpened, closeModal }: MyModalProp
               {...form.getInputProps("capacity")}
               error={form.errors.capacity}
             />
-            <DateInput
+            <DateTimePicker
               label="Registration Deadline"
               value={dayjs(form.values.registrationDeadline).toDate()}
               onChange={(value) => {
@@ -118,7 +119,7 @@ const CreateEventModal = ({ onCreateSuccess, isOpened, closeModal }: MyModalProp
           <RichTextEditor label="Long Description" {...form.getInputProps("longDescription")} />
           <TextInput label="Terms and Conditions Link" {...form.getInputProps("termsAndConditionsLink")} />
           <TextInput label="Code of Conduct Link" {...form.getInputProps("codeOfConductLink")} />
-          <TextInput label="Photo Policy Link" {...form.getInputProps("photoPolicyLink")} />
+          <TextInput label="Photo Consent Link" {...form.getInputProps("photoPolicyLink")} />
         </Flex>
         <Group justify="center" mt="lg">
           <Button type="submit" disabled={!isTouchedDirty} loading={createEventMutation.isPending}>

@@ -1,5 +1,6 @@
 import { useCreateUserApplication, useUserOrganizationMemberships } from "@/utils/api";
 import { CreateEventApplication, CreateEventApplicationInvoiceMethod, Organization, User } from "@/utils/api.schemas";
+import useStepper from "@/utils/useStepper";
 import AddressCodeBlock from "@components/AddressCodeBlock/AddressCodeBlock";
 import DateInput from "@components/primitives/DateInput";
 import Select from "@components/primitives/Select";
@@ -11,6 +12,7 @@ import {
   Flex,
   Grid,
   Modal,
+  MultiSelect,
   SimpleGrid,
   Stepper,
   Text,
@@ -39,7 +41,8 @@ const JoinEventModal = ({
   closeModal,
   handleSuccess = () => {},
 }: JoinEventModalProps) => {
-  const [activeStep, setActiveStep] = useState(0);
+  const [foodRestrictionList, setFoodRestrictionList] = useState<string[]>([]);
+  const [healthLimitationsList, setHealthLimitationsList] = useState<string[]>([]);
   const [selectedOrganisation, setSelectedOrganisation] = useState<Organization | null>(null);
   const [invoiceMethod, setInvoiceMethod] = useState<InvoiceMethodsType | undefined>(undefined);
 
@@ -99,13 +102,24 @@ const JoinEventModal = ({
 
       return errors;
     },
+    transformValues: (values) => {
+      const { foodRestrictionAllergies, healthLimitations, ...restValues } = values;
+
+      return {
+        ...restValues,
+        foodRestrictionAllergies: `${foodRestrictionList.sort().join(", ")}, ${foodRestrictionAllergies}`,
+        healthLimitations: `${healthLimitationsList.sort().join(", ")}, ${healthLimitations}`,
+      };
+    },
   });
+
+  const { activeStep, setActiveStep, onClickStep, nextStep, prevStep } = useStepper(form);
 
   const isTouchedDirty = form.isTouched() && form.isDirty();
 
   const handleClose = () => {
     form.reset();
-    setActiveStep(0);
+    onClickStep(0);
     closeModal();
   };
 
@@ -127,16 +141,6 @@ const JoinEventModal = ({
         data: submitValues as CreateEventApplication,
       });
     }
-  };
-
-  const nextStep = () => {
-    form.validate();
-    if (form.isValid()) {
-      setActiveStep((current) => (current < 3 ? current + 1 : current));
-    }
-  };
-  const prevStep = () => {
-    setActiveStep((current) => (current > 0 ? current - 1 : current));
   };
 
   if (!userOrganisationMemberships || !currentUser) {
@@ -336,70 +340,99 @@ const JoinEventModal = ({
             </Flex>
           </Stepper.Step>
           <Stepper.Step label="Step 3" description="Additional Information">
-            <Checkbox
-              label={
-                <Text>
-                  I agree with{" "}
-                  <Link
-                    href="https://drive.google.com/file/d/1F3_rMeT2Gv6cFux4EE73iW7pN1k1cIYf/view?pli=1"
-                    target="_blank"
-                  >
-                    Terms and conditions
-                  </Link>
-                </Text>
-              }
-              required
-            />
-            <Checkbox
-              label={
-                <Text>
-                  I agree with{" "}
-                  <Link
-                    href="https://drive.google.com/file/d/1dWT-2mBct7T7SUhgRpAtctQUtB1Kj5ce/view?usp=sharing"
-                    target="_blank"
-                  >
-                    Photo Consent
-                  </Link>
-                </Text>
-              }
-              required
-            />
-            <Checkbox
-              label={
-                <Text>
-                  I agree with{" "}
-                  <Link
-                    href="https://drive.google.com/file/d/1Nj67l4Kn-GKbKn2yCwrSPkzGz7HtNP1B/view?usp=sharing"
-                    target="_blank"
-                  >
-                    Code of Conduct
-                  </Link>
-                </Text>
-              }
-              required
-            />
-            <Textarea label="Additional Information" {...form.getInputProps("additionalInformation")} autosize />
-            <Textarea
-              label="Food Restrictions and allergies"
-              {...form.getInputProps("foodRestrictionAllergies")}
-              autosize
-            />
-            <Textarea label="Disability or Health Limitations" {...form.getInputProps("healthLimitations")} autosize />
+            <Flex direction="column" gap="md">
+              <MultiSelect
+                label="Food Restrictions and allergies"
+                data={["None", "Vegetarian", "Vegan", "Gluten Free", "Lactose Free", "No pork", "No Fish", "Other"]}
+                onChange={(value) => {
+                  setFoodRestrictionList(value);
+                }}
+                clearable
+              />
+              {foodRestrictionList.includes("Other") && (
+                <Textarea
+                  label="Food Restrictions and allergies (Other)"
+                  {...form.getInputProps("foodRestrictionAllergies")}
+                  autosize
+                />
+              )}
+              <MultiSelect
+                label="Disability or Health Limitations"
+                data={["None", "Prefer Not To Say", "Other"]}
+                onChange={(value) => {
+                  setHealthLimitationsList(value);
+                }}
+              />
+              {healthLimitationsList.includes("Other") && (
+                <Textarea
+                  label="Disability or Health Limitations (Other)"
+                  {...form.getInputProps("healthLimitations")}
+                  autosize
+                />
+              )}
+              <Textarea label="Additional Information" {...form.getInputProps("additionalInformation")} autosize />
+            </Flex>
           </Stepper.Step>
-          <Stepper.Completed>Completed, click back button to get to previous step</Stepper.Completed>
+          <Stepper.Completed>
+            <Flex direction="column" gap="md">
+              <Checkbox
+                label={
+                  <Text>
+                    I agree with{" "}
+                    <Link
+                      href="https://drive.google.com/file/d/1F3_rMeT2Gv6cFux4EE73iW7pN1k1cIYf/view?pli=1"
+                      target="_blank"
+                    >
+                      Terms and conditions
+                    </Link>
+                  </Text>
+                }
+                required
+              />
+              <Checkbox
+                label={
+                  <Text>
+                    I agree with{" "}
+                    <Link
+                      href="https://drive.google.com/file/d/1dWT-2mBct7T7SUhgRpAtctQUtB1Kj5ce/view?usp=sharing"
+                      target="_blank"
+                    >
+                      Photo Consent
+                    </Link>
+                  </Text>
+                }
+                required
+              />
+              <Checkbox
+                label={
+                  <Text>
+                    I agree with{" "}
+                    <Link
+                      href="https://drive.google.com/file/d/1Nj67l4Kn-GKbKn2yCwrSPkzGz7HtNP1B/view?usp=sharing"
+                      target="_blank"
+                    >
+                      Code of Conduct
+                    </Link>
+                  </Text>
+                }
+                required
+              />
+            </Flex>
+            <Flex mt={16} gap={8} justify="center" align="center">
+              <Button type="submit" disabled={!isTouchedDirty} loading={eventApplicationMutation.isPending}>
+                Submit application
+              </Button>
+            </Flex>
+          </Stepper.Completed>
         </Stepper>
 
         <Flex mt={16} gap={8} justify="space-between">
           <Button variant="default" onClick={prevStep} disabled={activeStep === 0}>
             Back
           </Button>
-          {activeStep === 2 ? (
-            <Button type="submit" disabled={!isTouchedDirty} loading={eventApplicationMutation.isPending}>
-              Submit application
-            </Button>
-          ) : (
-            <Button onClick={nextStep}>Next step</Button>
-          )}
+          <Button onClick={nextStep} disabled={activeStep > 2}>
+            Next step
+          </Button>
         </Flex>
       </Form>
     </Modal>

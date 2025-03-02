@@ -28,7 +28,7 @@ const SentApplicationsPage = () => {
                 <Anchor
                   component={Link}
                   key={`event-card-${index}-${eventApplication.id}`}
-                  href={routes.EVENT_DETAIL({ id: eventApplication.id })}
+                  href={routes.EVENT_DETAIL({ id: eventApplication.event.id })}
                   underline="never"
                 >
                   <EventCard event={eventApplication.event} />
@@ -49,7 +49,7 @@ const SentApplicationsPage = () => {
                 <Anchor
                   component={Link}
                   key={`event-card-${index}-${eventApplication.id}`}
-                  href={routes.EVENT_DETAIL({ id: eventApplication.id })}
+                  href={routes.EVENT_DETAIL({ id: eventApplication.event.id })}
                   underline="never"
                 >
                   <EventCard event={eventApplication.event} />

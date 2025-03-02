@@ -66,6 +66,8 @@ export class InitializeService {
 			firstName: user.firstName,
 			lastName: user.lastName,
 			password: user.password,
+			birthDate: user.birthDate,
+			nationality: user.nationality,
 			role: adminRole, // add created admin role
 			personalAddress: personalAddress, // add personal address
 		});
@@ -83,7 +85,8 @@ export class InitializeService {
 
 		let newOrganization = this.OrganisationRepository.create({
 			name: organization.name,
-			cin: organization.cin,
+			cin: organization?.cin ?? null,
+			vatin: organization?.vatin ?? null,
 			address: organizationAddress, // add create organisation address
 		});
 		newOrganization = await this.OrganisationRepository.save(newOrganization);

@@ -387,7 +387,7 @@ export class EventApplicationsController {
 			{ header: "Food Restrictions and Allergies", key: "foodRestrictions" },
 			{ header: "Disability or Health Limitations", key: "healthLimitations" },
 		];
-		
+
 		applicationList.map((application) => {
 			const { organization, user, spotType } = application;
 
