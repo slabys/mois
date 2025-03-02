@@ -1,13 +1,14 @@
 "use client";
 
-import { useGenerateSheetUsers, useGetAllUsers } from "@/utils/api";
-import { User } from "@/utils/api.schemas";
+import { useGenerateSheetUsers, useGetAllUsers, useGetCurrentUser } from "@/utils/api";
+import { RolePermissionsItem, User } from "@/utils/api.schemas";
 import { downloadFile } from "@/utils/downloadFile";
 import ChangeRoleModal from "@components/modals/ChangeRoleModal/ChangeRoleModal";
+import CreateRoleModal from "@components/modals/CreateRoleModal/CreateRoleModal";
 import DynamicSearch from "@components/shared/DynamicSearch";
 import { Button, Flex, ScrollArea, Stack, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconTableExport } from "@tabler/icons-react";
+import { IconPlus, IconTableExport } from "@tabler/icons-react";
 import React, { useState } from "react";
 
 interface ManagePeopleListProps {}
@@ -15,6 +16,9 @@ interface ManagePeopleListProps {}
 const ManagePeopleList = ({}: ManagePeopleListProps) => {
   const [selectedUserId, setSelectedUserId] = useState<string | undefined>(undefined);
   const [isChangeRoleModalOpen, { open: openChangeRoleModal, close: closeChangeRoleModal }] = useDisclosure(false);
+  const [isCreateRoleModal, { open: openCreateRoleModal, close: closeCreateRoleModal }] = useDisclosure(false);
+
+  const { data: currentUser } = useGetCurrentUser();
   const { data: allUsers, refetch: refetchUsers } = useGetAllUsers({ all: true });
 
   const exportToSheet = useGenerateSheetUsers({
@@ -29,7 +33,7 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
     });
   };
 
-  if (!allUsers?.data) return null;
+  if (!currentUser || !allUsers?.data) return null;
 
   return (
     <Stack>
@@ -39,6 +43,9 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
           <Button onClick={exportDataXLSX} leftSection={<IconTableExport />} color="green" variant="outline">
             Export Data
           </Button>
+          <Button onClick={openCreateRoleModal} leftSection={<IconPlus />}>
+            Add Role
+          </Button>
         </Flex>
       </Flex>
       <ScrollArea w="100%">
@@ -46,17 +53,21 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
           <DynamicSearch<User>
             filterData={allUsers.data}
             dataColumns={["firstName", "lastName", "username", "email", "birthDate", "nationality", "role.name"]}
-            customColumns={[
-              {
-                type: "button",
-                children: "Change Role",
-                headerLabel: "Change Role",
-                handleOnChange: (rowId) => {
-                  setSelectedUserId(rowId);
-                  openChangeRoleModal();
-                },
-              },
-            ]}
+            customColumns={
+              currentUser.role.permissions.includes(RolePermissionsItem.userupdateRole)
+                ? [
+                    {
+                      type: "button",
+                      children: "Change Role",
+                      headerLabel: "Change Role",
+                      handleOnChange: (rowId) => {
+                        setSelectedUserId(rowId);
+                        openChangeRoleModal();
+                      },
+                    },
+                  ]
+                : []
+            }
           />
         </Flex>
       </ScrollArea>
@@ -70,6 +81,7 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
           }}
         />
       )}
+      <CreateRoleModal isOpened={isCreateRoleModal} closeModal={closeCreateRoleModal} />
     </Stack>
   );
 };

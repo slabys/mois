@@ -45,7 +45,7 @@ const ChangeRoleModal = ({ user, isOpened, closeModal, handleOnSuccess }: MyModa
     if (!allRoles) return [];
     const tmp = allRoles.find((f) => f.id === Number(newRole));
     if (!tmp) return [];
-    return groupPermissions(tmp);
+    return groupPermissions(tmp.permissions);
   }, [allRoles, newRole]);
 
   if (!user || !allRoles) return;
@@ -64,7 +64,7 @@ const ChangeRoleModal = ({ user, isOpened, closeModal, handleOnSuccess }: MyModa
       <Stack justify="center" mt="lg">
         <Text>Current Role: {user?.role?.name ? user?.role?.name : "N/A"}</Text>
         {user?.role &&
-          groupPermissions(user.role)?.map((group, index) => {
+          groupPermissions(user.role.permissions)?.map((group, index) => {
             return (
               <Box key={`current-user-group-${group.name}-${index}`}>
                 <Text fz="sm" fw={700} key={`${index}-permission`}>
@@ -74,7 +74,7 @@ const ChangeRoleModal = ({ user, isOpened, closeModal, handleOnSuccess }: MyModa
                 {group.permissionList.map((permission, permissionIndex) => {
                   return (
                     <Text fz="sm" span key={`current-user-permission-${group.name}-${permissionIndex}`}>
-                      {group.permissionList.length - 1 === permissionIndex ? permission : `${permission}, `}
+                      {group.permissionList.length - 1 === permissionIndex ? permission.label : `${permission.label}, `}
                     </Text>
                   );
                 })}
@@ -85,11 +85,11 @@ const ChangeRoleModal = ({ user, isOpened, closeModal, handleOnSuccess }: MyModa
         <Select
           label="Select New Role"
           value={newRole}
-          data={allRoles.map((role) => {
+          data={allRoles.sort().map((role) => {
             return {
               label: role.name,
               value: role.id.toString(),
-              disabled: role.id === user?.role?.id,
+              disabled: role.id === user?.role?.id || (role.id === 1 && user.role.id !== 1),
             };
           })}
           onChange={(value) => setNewRole(value)}
@@ -107,7 +107,7 @@ const ChangeRoleModal = ({ user, isOpened, closeModal, handleOnSuccess }: MyModa
                 {group.permissionList.map((permission, itemIndex) => {
                   return (
                     <Text fz="sm" span key={`category-${group.name}-${itemIndex}`}>
-                      {group.permissionList.length - 1 === itemIndex ? permission : `${permission}, `}
+                      {group.permissionList.length - 1 === itemIndex ? permission.label : `${permission.label}, `}
                     </Text>
                   );
                 })}

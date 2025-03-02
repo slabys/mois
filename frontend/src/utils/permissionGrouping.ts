@@ -1,23 +1,24 @@
-import { Role } from "@/utils/api.schemas";
+import { GetRoleAllPermissions200Item, RolePermissionsItem } from "@/utils/api.schemas";
 
-const formatPermission = (permission: string): string => {
+export const formatPermission = (permission: string): string => {
   return permission
-    .split(".")[1] // Take the second part (action)
+    .split(".")
+    .join(" ") // Take the second part (action)
     .replace(/([A-Z])/g, " $1") // Add space before uppercase letters (CamelCase support)
     .replace(/^\w/, (c) => c.toUpperCase()); // Capitalize first letter
 };
 
-export const groupPermissions = (role: Role) => {
-  const groupedPermissions: Record<string, string[]> = {};
+export const groupPermissions = (permissions: RolePermissionsItem[] | GetRoleAllPermissions200Item[]) => {
+  const groupedPermissions: Record<string, { label: string; value: string }[]> = {};
 
-  role.permissions.forEach((permission) => {
+  permissions.forEach((permission) => {
     const [category, _] = permission.split(".");
 
     if (!groupedPermissions[category]) {
       groupedPermissions[category] = [];
     }
 
-    groupedPermissions[category].push(formatPermission(permission));
+    groupedPermissions[category].push({ label: formatPermission(permission), value: permission });
   });
 
   return Object.entries(groupedPermissions).map(([name, permissionList]) => ({
