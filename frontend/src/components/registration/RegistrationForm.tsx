@@ -20,7 +20,6 @@ interface FormInitialTypes extends Partial<CreateUser> {
 
 const RegistrationForm = () => {
   const router = useRouter();
-  const [phonePrefix, setPhonePrefix] = React.useState<string | undefined>(undefined);
   const registerUserMutation = useCreateUser({
     mutation: {
       onSuccess: () => {

@@ -23,4 +23,4 @@ export type ErrorDataType = {
 
 export type ErrorType<Error = ErrorDataType> = AxiosError<Error & ErrorDataType>;
 
-export type BodyType<BodyData> = BodyData;
+// export type BodyType<BodyData> = BodyData;

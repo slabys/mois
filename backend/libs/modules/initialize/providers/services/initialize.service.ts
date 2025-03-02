@@ -47,14 +47,17 @@ export class InitializeService {
 		adminRole = await this.RoleRepository.save(adminRole);
 
 		// Create Personal Address for the User
-		let personalAddress = this.AddressRepository.create({
+		let personalAddress = user?.personalAddress ? this.AddressRepository.create({
 			street: user.personalAddress.street,
 			city: user.personalAddress.city,
 			houseNumber: user.personalAddress.houseNumber,
 			zip: user.personalAddress.zip,
 			country: user.personalAddress.country,
-		});
-		personalAddress = await this.AddressRepository.save(personalAddress);
+		}) : null;
+
+		if (personalAddress) {
+			personalAddress = await this.AddressRepository.save(personalAddress);
+		}
 
 		// Create Admin User with Hashed Password
 		let adminUser = this.UsersRepository.create({

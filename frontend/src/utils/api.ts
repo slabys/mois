@@ -69,7 +69,7 @@ import type {
   User,
 } from "./api.schemas";
 import { customInstance } from "./customInstance";
-import type { BodyType, ErrorType } from "./customInstance";
+import type { ErrorType } from "./customInstance";
 
 type SecondParameter<T extends (...args: any) => any> = Parameters<T>[1];
 
@@ -146,7 +146,7 @@ export function useGetInitialized<
 }
 
 export const createInitialState = (
-  initializeType: BodyType<InitializeType>,
+  initializeType: InitializeType,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -166,22 +166,16 @@ export const getCreateInitialStateMutationOptions = <TError = ErrorType<unknown>
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createInitialState>>,
     TError,
-    { data: BodyType<InitializeType> },
+    { data: InitializeType },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createInitialState>>,
-  TError,
-  { data: BodyType<InitializeType> },
-  TContext
-> => {
+}): UseMutationOptions<Awaited<ReturnType<typeof createInitialState>>, TError, { data: InitializeType }, TContext> => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createInitialState>>,
-    { data: BodyType<InitializeType> }
-  > = (props) => {
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof createInitialState>>, { data: InitializeType }> = (
+    props,
+  ) => {
     const { data } = props ?? {};
 
     return createInitialState(data, requestOptions);
@@ -191,23 +185,18 @@ export const getCreateInitialStateMutationOptions = <TError = ErrorType<unknown>
 };
 
 export type CreateInitialStateMutationResult = NonNullable<Awaited<ReturnType<typeof createInitialState>>>;
-export type CreateInitialStateMutationBody = BodyType<InitializeType>;
+export type CreateInitialStateMutationBody = InitializeType;
 export type CreateInitialStateMutationError = ErrorType<unknown>;
 
 export const useCreateInitialState = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createInitialState>>,
     TError,
-    { data: BodyType<InitializeType> },
+    { data: InitializeType },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof createInitialState>>,
-  TError,
-  { data: BodyType<InitializeType> },
-  TContext
-> => {
+}): UseMutationResult<Awaited<ReturnType<typeof createInitialState>>, TError, { data: InitializeType }, TContext> => {
   const mutationOptions = getCreateInitialStateMutationOptions(options);
 
   return useMutation(mutationOptions);
@@ -217,7 +206,7 @@ export const useCreateInitialState = <TError = ErrorType<unknown>, TContext = un
  * Try to login user with given email and password
  */
 export const loginUserWithEmailOrUsername = (
-  loginUser: BodyType<LoginUser>,
+  loginUser: LoginUser,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -234,22 +223,21 @@ export const getLoginUserWithEmailOrUsernameMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof loginUserWithEmailOrUsername>>,
     TError,
-    { data: BodyType<LoginUser> },
+    { data: LoginUser },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof loginUserWithEmailOrUsername>>,
   TError,
-  { data: BodyType<LoginUser> },
+  { data: LoginUser },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof loginUserWithEmailOrUsername>>,
-    { data: BodyType<LoginUser> }
-  > = (props) => {
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginUserWithEmailOrUsername>>, { data: LoginUser }> = (
+    props,
+  ) => {
     const { data } = props ?? {};
 
     return loginUserWithEmailOrUsername(data, requestOptions);
@@ -261,21 +249,21 @@ export const getLoginUserWithEmailOrUsernameMutationOptions = <
 export type LoginUserWithEmailOrUsernameMutationResult = NonNullable<
   Awaited<ReturnType<typeof loginUserWithEmailOrUsername>>
 >;
-export type LoginUserWithEmailOrUsernameMutationBody = BodyType<LoginUser>;
+export type LoginUserWithEmailOrUsernameMutationBody = LoginUser;
 export type LoginUserWithEmailOrUsernameMutationError = ErrorType<unknown>;
 
 export const useLoginUserWithEmailOrUsername = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof loginUserWithEmailOrUsername>>,
     TError,
-    { data: BodyType<LoginUser> },
+    { data: LoginUser },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof loginUserWithEmailOrUsername>>,
   TError,
-  { data: BodyType<LoginUser> },
+  { data: LoginUser },
   TContext
 > => {
   const mutationOptions = getLoginUserWithEmailOrUsernameMutationOptions(options);
@@ -317,7 +305,7 @@ export const useLogoutUser = <TError = ErrorType<unknown>, TContext = unknown>(o
 };
 
 export const createUser = (
-  createUser: BodyType<CreateUser>,
+  createUser: CreateUser,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -328,19 +316,12 @@ export const createUser = (
 };
 
 export const getCreateUserMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createUser>>,
-    TError,
-    { data: BodyType<CreateUser> },
-    TContext
-  >;
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError, { data: CreateUser }, TContext>;
   request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError, { data: BodyType<CreateUser> }, TContext> => {
+}): UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError, { data: CreateUser }, TContext> => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof createUser>>, { data: BodyType<CreateUser> }> = (
-    props,
-  ) => {
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof createUser>>, { data: CreateUser }> = (props) => {
     const { data } = props ?? {};
 
     return createUser(data, requestOptions);
@@ -350,18 +331,13 @@ export const getCreateUserMutationOptions = <TError = ErrorType<unknown>, TConte
 };
 
 export type CreateUserMutationResult = NonNullable<Awaited<ReturnType<typeof createUser>>>;
-export type CreateUserMutationBody = BodyType<CreateUser>;
+export type CreateUserMutationBody = CreateUser;
 export type CreateUserMutationError = ErrorType<unknown>;
 
 export const useCreateUser = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createUser>>,
-    TError,
-    { data: BodyType<CreateUser> },
-    TContext
-  >;
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError, { data: CreateUser }, TContext>;
   request?: SecondParameter<typeof customInstance>;
-}): UseMutationResult<Awaited<ReturnType<typeof createUser>>, TError, { data: BodyType<CreateUser> }, TContext> => {
+}): UseMutationResult<Awaited<ReturnType<typeof createUser>>, TError, { data: CreateUser }, TContext> => {
   const mutationOptions = getCreateUserMutationOptions(options);
 
   return useMutation(mutationOptions);
@@ -370,10 +346,7 @@ export const useCreateUser = <TError = ErrorType<unknown>, TContext = unknown>(o
 /**
  * Update user data
  */
-export const updateCurrentUser = (
-  updateUser: BodyType<UpdateUser>,
-  options?: SecondParameter<typeof customInstance>,
-) => {
+export const updateCurrentUser = (updateUser: UpdateUser, options?: SecondParameter<typeof customInstance>) => {
   return customInstance<User>(
     { url: `/users`, method: "PATCH", headers: { "Content-Type": "application/json" }, data: updateUser },
     options,
@@ -381,24 +354,12 @@ export const updateCurrentUser = (
 };
 
 export const getUpdateCurrentUserMutationOptions = <TError = ErrorType<void>, TContext = unknown>(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateCurrentUser>>,
-    TError,
-    { data: BodyType<UpdateUser> },
-    TContext
-  >;
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError, { data: UpdateUser }, TContext>;
   request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof updateCurrentUser>>,
-  TError,
-  { data: BodyType<UpdateUser> },
-  TContext
-> => {
+}): UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError, { data: UpdateUser }, TContext> => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCurrentUser>>, { data: BodyType<UpdateUser> }> = (
-    props,
-  ) => {
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCurrentUser>>, { data: UpdateUser }> = (props) => {
     const { data } = props ?? {};
 
     return updateCurrentUser(data, requestOptions);
@@ -408,23 +369,13 @@ export const getUpdateCurrentUserMutationOptions = <TError = ErrorType<void>, TC
 };
 
 export type UpdateCurrentUserMutationResult = NonNullable<Awaited<ReturnType<typeof updateCurrentUser>>>;
-export type UpdateCurrentUserMutationBody = BodyType<UpdateUser>;
+export type UpdateCurrentUserMutationBody = UpdateUser;
 export type UpdateCurrentUserMutationError = ErrorType<void>;
 
 export const useUpdateCurrentUser = <TError = ErrorType<void>, TContext = unknown>(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateCurrentUser>>,
-    TError,
-    { data: BodyType<UpdateUser> },
-    TContext
-  >;
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUser>>, TError, { data: UpdateUser }, TContext>;
   request?: SecondParameter<typeof customInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof updateCurrentUser>>,
-  TError,
-  { data: BodyType<UpdateUser> },
-  TContext
-> => {
+}): UseMutationResult<Awaited<ReturnType<typeof updateCurrentUser>>, TError, { data: UpdateUser }, TContext> => {
   const mutationOptions = getUpdateCurrentUserMutationOptions(options);
 
   return useMutation(mutationOptions);
@@ -502,10 +453,7 @@ export function useGetCurrentUser<
   return query;
 }
 
-export const updateCurrentUserPhoto = (
-  updatePhoto: BodyType<UpdatePhoto>,
-  options?: SecondParameter<typeof customInstance>,
-) => {
+export const updateCurrentUserPhoto = (updatePhoto: UpdatePhoto, options?: SecondParameter<typeof customInstance>) => {
   const formData = new FormData();
   formData.append("file", updatePhoto.file);
 
@@ -519,22 +467,16 @@ export const getUpdateCurrentUserPhotoMutationOptions = <TError = ErrorType<unkn
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateCurrentUserPhoto>>,
     TError,
-    { data: BodyType<UpdatePhoto> },
+    { data: UpdatePhoto },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof updateCurrentUserPhoto>>,
-  TError,
-  { data: BodyType<UpdatePhoto> },
-  TContext
-> => {
+}): UseMutationOptions<Awaited<ReturnType<typeof updateCurrentUserPhoto>>, TError, { data: UpdatePhoto }, TContext> => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updateCurrentUserPhoto>>,
-    { data: BodyType<UpdatePhoto> }
-  > = (props) => {
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateCurrentUserPhoto>>, { data: UpdatePhoto }> = (
+    props,
+  ) => {
     const { data } = props ?? {};
 
     return updateCurrentUserPhoto(data, requestOptions);
@@ -544,23 +486,18 @@ export const getUpdateCurrentUserPhotoMutationOptions = <TError = ErrorType<unkn
 };
 
 export type UpdateCurrentUserPhotoMutationResult = NonNullable<Awaited<ReturnType<typeof updateCurrentUserPhoto>>>;
-export type UpdateCurrentUserPhotoMutationBody = BodyType<UpdatePhoto>;
+export type UpdateCurrentUserPhotoMutationBody = UpdatePhoto;
 export type UpdateCurrentUserPhotoMutationError = ErrorType<unknown>;
 
 export const useUpdateCurrentUserPhoto = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateCurrentUserPhoto>>,
     TError,
-    { data: BodyType<UpdatePhoto> },
+    { data: UpdatePhoto },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof updateCurrentUserPhoto>>,
-  TError,
-  { data: BodyType<UpdatePhoto> },
-  TContext
-> => {
+}): UseMutationResult<Awaited<ReturnType<typeof updateCurrentUserPhoto>>, TError, { data: UpdatePhoto }, TContext> => {
   const mutationOptions = getUpdateCurrentUserPhotoMutationOptions(options);
 
   return useMutation(mutationOptions);
@@ -967,7 +904,7 @@ export function useAllOrganizations<
 }
 
 export const createOrganization = (
-  createOrganization: BodyType<CreateOrganization>,
+  createOrganization: CreateOrganization,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -987,22 +924,21 @@ export const getCreateOrganizationMutationOptions = <TError = ErrorType<unknown>
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createOrganization>>,
     TError,
-    { data: BodyType<CreateOrganization> },
+    { data: CreateOrganization },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof createOrganization>>,
   TError,
-  { data: BodyType<CreateOrganization> },
+  { data: CreateOrganization },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createOrganization>>,
-    { data: BodyType<CreateOrganization> }
-  > = (props) => {
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof createOrganization>>, { data: CreateOrganization }> = (
+    props,
+  ) => {
     const { data } = props ?? {};
 
     return createOrganization(data, requestOptions);
@@ -1012,21 +948,21 @@ export const getCreateOrganizationMutationOptions = <TError = ErrorType<unknown>
 };
 
 export type CreateOrganizationMutationResult = NonNullable<Awaited<ReturnType<typeof createOrganization>>>;
-export type CreateOrganizationMutationBody = BodyType<CreateOrganization>;
+export type CreateOrganizationMutationBody = CreateOrganization;
 export type CreateOrganizationMutationError = ErrorType<unknown>;
 
 export const useCreateOrganization = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createOrganization>>,
     TError,
-    { data: BodyType<CreateOrganization> },
+    { data: CreateOrganization },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof createOrganization>>,
   TError,
-  { data: BodyType<CreateOrganization> },
+  { data: CreateOrganization },
   TContext
 > => {
   const mutationOptions = getCreateOrganizationMutationOptions(options);
@@ -1127,7 +1063,7 @@ export function useGetOrganisationById<
 
 export const updateOrganization = (
   id: string,
-  updateOrganization: BodyType<UpdateOrganization>,
+  updateOrganization: UpdateOrganization,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -1147,21 +1083,21 @@ export const getUpdateOrganizationMutationOptions = <TError = ErrorType<unknown>
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateOrganization>>,
     TError,
-    { id: string; data: BodyType<UpdateOrganization> },
+    { id: string; data: UpdateOrganization },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof updateOrganization>>,
   TError,
-  { id: string; data: BodyType<UpdateOrganization> },
+  { id: string; data: UpdateOrganization },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof updateOrganization>>,
-    { id: string; data: BodyType<UpdateOrganization> }
+    { id: string; data: UpdateOrganization }
   > = (props) => {
     const { id, data } = props ?? {};
 
@@ -1172,21 +1108,21 @@ export const getUpdateOrganizationMutationOptions = <TError = ErrorType<unknown>
 };
 
 export type UpdateOrganizationMutationResult = NonNullable<Awaited<ReturnType<typeof updateOrganization>>>;
-export type UpdateOrganizationMutationBody = BodyType<UpdateOrganization>;
+export type UpdateOrganizationMutationBody = UpdateOrganization;
 export type UpdateOrganizationMutationError = ErrorType<unknown>;
 
 export const useUpdateOrganization = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateOrganization>>,
     TError,
-    { id: string; data: BodyType<UpdateOrganization> },
+    { id: string; data: UpdateOrganization },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof updateOrganization>>,
   TError,
-  { id: string; data: BodyType<UpdateOrganization> },
+  { id: string; data: UpdateOrganization },
   TContext
 > => {
   const mutationOptions = getUpdateOrganizationMutationOptions(options);
@@ -1362,7 +1298,7 @@ export function useOrganizationMembers<
  */
 export const addOrganizationMembers = (
   id: string,
-  addOrganizationMembers: BodyType<AddOrganizationMembers>,
+  addOrganizationMembers: AddOrganizationMembers,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -1382,21 +1318,21 @@ export const getAddOrganizationMembersMutationOptions = <TError = ErrorType<unkn
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof addOrganizationMembers>>,
     TError,
-    { id: string; data: BodyType<AddOrganizationMembers> },
+    { id: string; data: AddOrganizationMembers },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof addOrganizationMembers>>,
   TError,
-  { id: string; data: BodyType<AddOrganizationMembers> },
+  { id: string; data: AddOrganizationMembers },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof addOrganizationMembers>>,
-    { id: string; data: BodyType<AddOrganizationMembers> }
+    { id: string; data: AddOrganizationMembers }
   > = (props) => {
     const { id, data } = props ?? {};
 
@@ -1407,21 +1343,21 @@ export const getAddOrganizationMembersMutationOptions = <TError = ErrorType<unkn
 };
 
 export type AddOrganizationMembersMutationResult = NonNullable<Awaited<ReturnType<typeof addOrganizationMembers>>>;
-export type AddOrganizationMembersMutationBody = BodyType<AddOrganizationMembers>;
+export type AddOrganizationMembersMutationBody = AddOrganizationMembers;
 export type AddOrganizationMembersMutationError = ErrorType<unknown>;
 
 export const useAddOrganizationMembers = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof addOrganizationMembers>>,
     TError,
-    { id: string; data: BodyType<AddOrganizationMembers> },
+    { id: string; data: AddOrganizationMembers },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof addOrganizationMembers>>,
   TError,
-  { id: string; data: BodyType<AddOrganizationMembers> },
+  { id: string; data: AddOrganizationMembers },
   TContext
 > => {
   const mutationOptions = getAddOrganizationMembersMutationOptions(options);
@@ -1694,7 +1630,7 @@ export function useGetEventApplications<
  */
 export const createUserApplication = (
   eventId: number,
-  createEventApplication: BodyType<CreateEventApplication>,
+  createEventApplication: CreateEventApplication,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -1714,21 +1650,21 @@ export const getCreateUserApplicationMutationOptions = <TError = ErrorType<void>
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createUserApplication>>,
     TError,
-    { eventId: number; data: BodyType<CreateEventApplication> },
+    { eventId: number; data: CreateEventApplication },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof createUserApplication>>,
   TError,
-  { eventId: number; data: BodyType<CreateEventApplication> },
+  { eventId: number; data: CreateEventApplication },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof createUserApplication>>,
-    { eventId: number; data: BodyType<CreateEventApplication> }
+    { eventId: number; data: CreateEventApplication }
   > = (props) => {
     const { eventId, data } = props ?? {};
 
@@ -1739,21 +1675,21 @@ export const getCreateUserApplicationMutationOptions = <TError = ErrorType<void>
 };
 
 export type CreateUserApplicationMutationResult = NonNullable<Awaited<ReturnType<typeof createUserApplication>>>;
-export type CreateUserApplicationMutationBody = BodyType<CreateEventApplication>;
+export type CreateUserApplicationMutationBody = CreateEventApplication;
 export type CreateUserApplicationMutationError = ErrorType<void>;
 
 export const useCreateUserApplication = <TError = ErrorType<void>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createUserApplication>>,
     TError,
-    { eventId: number; data: BodyType<CreateEventApplication> },
+    { eventId: number; data: CreateEventApplication },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof createUserApplication>>,
   TError,
-  { eventId: number; data: BodyType<CreateEventApplication> },
+  { eventId: number; data: CreateEventApplication },
   TContext
 > => {
   const mutationOptions = getCreateUserApplicationMutationOptions(options);
@@ -1766,7 +1702,7 @@ export const useCreateUserApplication = <TError = ErrorType<void>, TContext = un
  */
 export const updateEventApplication = (
   id: number,
-  updateEventApplication: BodyType<UpdateEventApplication>,
+  updateEventApplication: UpdateEventApplication,
   options?: SecondParameter<typeof customInstance>,
 ) => {
   return customInstance<EventApplicationSimpleWithApplications>(
@@ -1784,21 +1720,21 @@ export const getUpdateEventApplicationMutationOptions = <TError = ErrorType<unkn
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateEventApplication>>,
     TError,
-    { id: number; data: BodyType<UpdateEventApplication> },
+    { id: number; data: UpdateEventApplication },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof updateEventApplication>>,
   TError,
-  { id: number; data: BodyType<UpdateEventApplication> },
+  { id: number; data: UpdateEventApplication },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof updateEventApplication>>,
-    { id: number; data: BodyType<UpdateEventApplication> }
+    { id: number; data: UpdateEventApplication }
   > = (props) => {
     const { id, data } = props ?? {};
 
@@ -1809,21 +1745,21 @@ export const getUpdateEventApplicationMutationOptions = <TError = ErrorType<unkn
 };
 
 export type UpdateEventApplicationMutationResult = NonNullable<Awaited<ReturnType<typeof updateEventApplication>>>;
-export type UpdateEventApplicationMutationBody = BodyType<UpdateEventApplication>;
+export type UpdateEventApplicationMutationBody = UpdateEventApplication;
 export type UpdateEventApplicationMutationError = ErrorType<unknown>;
 
 export const useUpdateEventApplication = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateEventApplication>>,
     TError,
-    { id: number; data: BodyType<UpdateEventApplication> },
+    { id: number; data: UpdateEventApplication },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof updateEventApplication>>,
   TError,
-  { id: number; data: BodyType<UpdateEventApplication> },
+  { id: number; data: UpdateEventApplication },
   TContext
 > => {
   const mutationOptions = getUpdateEventApplicationMutationOptions(options);
@@ -2269,7 +2205,7 @@ export function useGetEvents<TData = Awaited<ReturnType<typeof getEvents>>, TErr
 Organization permissions required: `create.event`
  */
 export const createEvent = (
-  createEvent: BodyType<CreateEvent>,
+  createEvent: CreateEvent,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -2280,19 +2216,12 @@ export const createEvent = (
 };
 
 export const getCreateEventMutationOptions = <TError = ErrorType<void>, TContext = unknown>(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createEvent>>,
-    TError,
-    { data: BodyType<CreateEvent> },
-    TContext
-  >;
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof createEvent>>, TError, { data: CreateEvent }, TContext>;
   request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<Awaited<ReturnType<typeof createEvent>>, TError, { data: BodyType<CreateEvent> }, TContext> => {
+}): UseMutationOptions<Awaited<ReturnType<typeof createEvent>>, TError, { data: CreateEvent }, TContext> => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof createEvent>>, { data: BodyType<CreateEvent> }> = (
-    props,
-  ) => {
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof createEvent>>, { data: CreateEvent }> = (props) => {
     const { data } = props ?? {};
 
     return createEvent(data, requestOptions);
@@ -2302,18 +2231,13 @@ export const getCreateEventMutationOptions = <TError = ErrorType<void>, TContext
 };
 
 export type CreateEventMutationResult = NonNullable<Awaited<ReturnType<typeof createEvent>>>;
-export type CreateEventMutationBody = BodyType<CreateEvent>;
+export type CreateEventMutationBody = CreateEvent;
 export type CreateEventMutationError = ErrorType<void>;
 
 export const useCreateEvent = <TError = ErrorType<void>, TContext = unknown>(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createEvent>>,
-    TError,
-    { data: BodyType<CreateEvent> },
-    TContext
-  >;
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof createEvent>>, TError, { data: CreateEvent }, TContext>;
   request?: SecondParameter<typeof customInstance>;
-}): UseMutationResult<Awaited<ReturnType<typeof createEvent>>, TError, { data: BodyType<CreateEvent> }, TContext> => {
+}): UseMutationResult<Awaited<ReturnType<typeof createEvent>>, TError, { data: CreateEvent }, TContext> => {
   const mutationOptions = getCreateEventMutationOptions(options);
 
   return useMutation(mutationOptions);
@@ -2431,7 +2355,7 @@ export const useDuplicateEvent = <TError = ErrorType<unknown>, TContext = unknow
 
 export const updateEvent = (
   eventId: number,
-  updateEvent: BodyType<UpdateEvent>,
+  updateEvent: UpdateEvent,
   options?: SecondParameter<typeof customInstance>,
 ) => {
   return customInstance<EventDetail>(
@@ -2444,21 +2368,21 @@ export const getUpdateEventMutationOptions = <TError = ErrorType<void>, TContext
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateEvent>>,
     TError,
-    { eventId: number; data: BodyType<UpdateEvent> },
+    { eventId: number; data: UpdateEvent },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof updateEvent>>,
   TError,
-  { eventId: number; data: BodyType<UpdateEvent> },
+  { eventId: number; data: UpdateEvent },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof updateEvent>>,
-    { eventId: number; data: BodyType<UpdateEvent> }
+    { eventId: number; data: UpdateEvent }
   > = (props) => {
     const { eventId, data } = props ?? {};
 
@@ -2469,21 +2393,21 @@ export const getUpdateEventMutationOptions = <TError = ErrorType<void>, TContext
 };
 
 export type UpdateEventMutationResult = NonNullable<Awaited<ReturnType<typeof updateEvent>>>;
-export type UpdateEventMutationBody = BodyType<UpdateEvent>;
+export type UpdateEventMutationBody = UpdateEvent;
 export type UpdateEventMutationError = ErrorType<void>;
 
 export const useUpdateEvent = <TError = ErrorType<void>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateEvent>>,
     TError,
-    { eventId: number; data: BodyType<UpdateEvent> },
+    { eventId: number; data: UpdateEvent },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof updateEvent>>,
   TError,
-  { eventId: number; data: BodyType<UpdateEvent> },
+  { eventId: number; data: UpdateEvent },
   TContext
 > => {
   const mutationOptions = getUpdateEventMutationOptions(options);
@@ -2529,7 +2453,7 @@ Organization permissions required: `create.event`
  */
 export const updateEventPhoto = (
   eventId: number,
-  updatePhoto: BodyType<UpdatePhoto>,
+  updatePhoto: UpdatePhoto,
   options?: SecondParameter<typeof customInstance>,
 ) => {
   const formData = new FormData();
@@ -2550,21 +2474,21 @@ export const getUpdateEventPhotoMutationOptions = <TError = ErrorType<void>, TCo
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateEventPhoto>>,
     TError,
-    { eventId: number; data: BodyType<UpdatePhoto> },
+    { eventId: number; data: UpdatePhoto },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof updateEventPhoto>>,
   TError,
-  { eventId: number; data: BodyType<UpdatePhoto> },
+  { eventId: number; data: UpdatePhoto },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof updateEventPhoto>>,
-    { eventId: number; data: BodyType<UpdatePhoto> }
+    { eventId: number; data: UpdatePhoto }
   > = (props) => {
     const { eventId, data } = props ?? {};
 
@@ -2575,21 +2499,21 @@ export const getUpdateEventPhotoMutationOptions = <TError = ErrorType<void>, TCo
 };
 
 export type UpdateEventPhotoMutationResult = NonNullable<Awaited<ReturnType<typeof updateEventPhoto>>>;
-export type UpdateEventPhotoMutationBody = BodyType<UpdatePhoto>;
+export type UpdateEventPhotoMutationBody = UpdatePhoto;
 export type UpdateEventPhotoMutationError = ErrorType<void>;
 
 export const useUpdateEventPhoto = <TError = ErrorType<void>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateEventPhoto>>,
     TError,
-    { eventId: number; data: BodyType<UpdatePhoto> },
+    { eventId: number; data: UpdatePhoto },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof updateEventPhoto>>,
   TError,
-  { eventId: number; data: BodyType<UpdatePhoto> },
+  { eventId: number; data: UpdatePhoto },
   TContext
 > => {
   const mutationOptions = getUpdateEventPhotoMutationOptions(options);
@@ -2680,7 +2604,7 @@ export function useGetEventSpots<TData = Awaited<ReturnType<typeof getEventSpots
  */
 export const createEventSpot = (
   id: number,
-  createEventSpot: BodyType<CreateEventSpot>,
+  createEventSpot: CreateEventSpot,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -2700,21 +2624,21 @@ export const getCreateEventSpotMutationOptions = <TError = ErrorType<void>, TCon
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createEventSpot>>,
     TError,
-    { id: number; data: BodyType<CreateEventSpot> },
+    { id: number; data: CreateEventSpot },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof createEventSpot>>,
   TError,
-  { id: number; data: BodyType<CreateEventSpot> },
+  { id: number; data: CreateEventSpot },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof createEventSpot>>,
-    { id: number; data: BodyType<CreateEventSpot> }
+    { id: number; data: CreateEventSpot }
   > = (props) => {
     const { id, data } = props ?? {};
 
@@ -2725,21 +2649,21 @@ export const getCreateEventSpotMutationOptions = <TError = ErrorType<void>, TCon
 };
 
 export type CreateEventSpotMutationResult = NonNullable<Awaited<ReturnType<typeof createEventSpot>>>;
-export type CreateEventSpotMutationBody = BodyType<CreateEventSpot>;
+export type CreateEventSpotMutationBody = CreateEventSpot;
 export type CreateEventSpotMutationError = ErrorType<void>;
 
 export const useCreateEventSpot = <TError = ErrorType<void>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createEventSpot>>,
     TError,
-    { id: number; data: BodyType<CreateEventSpot> },
+    { id: number; data: CreateEventSpot },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof createEventSpot>>,
   TError,
-  { id: number; data: BodyType<CreateEventSpot> },
+  { id: number; data: CreateEventSpot },
   TContext
 > => {
   const mutationOptions = getCreateEventSpotMutationOptions(options);
@@ -2781,7 +2705,7 @@ export const useDeleteEventSpot = <TError = ErrorType<void>, TContext = unknown>
 
 export const updateEventSpot = (
   id: number,
-  updateEventSpot: BodyType<UpdateEventSpot>,
+  updateEventSpot: UpdateEventSpot,
   options?: SecondParameter<typeof customInstance>,
 ) => {
   return customInstance<EventSpotSimple>(
@@ -2799,21 +2723,21 @@ export const getUpdateEventSpotMutationOptions = <TError = ErrorType<void>, TCon
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateEventSpot>>,
     TError,
-    { id: number; data: BodyType<UpdateEventSpot> },
+    { id: number; data: UpdateEventSpot },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof updateEventSpot>>,
   TError,
-  { id: number; data: BodyType<UpdateEventSpot> },
+  { id: number; data: UpdateEventSpot },
   TContext
 > => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof updateEventSpot>>,
-    { id: number; data: BodyType<UpdateEventSpot> }
+    { id: number; data: UpdateEventSpot }
   > = (props) => {
     const { id, data } = props ?? {};
 
@@ -2824,21 +2748,21 @@ export const getUpdateEventSpotMutationOptions = <TError = ErrorType<void>, TCon
 };
 
 export type UpdateEventSpotMutationResult = NonNullable<Awaited<ReturnType<typeof updateEventSpot>>>;
-export type UpdateEventSpotMutationBody = BodyType<UpdateEventSpot>;
+export type UpdateEventSpotMutationBody = UpdateEventSpot;
 export type UpdateEventSpotMutationError = ErrorType<void>;
 
 export const useUpdateEventSpot = <TError = ErrorType<void>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateEventSpot>>,
     TError,
-    { id: number; data: BodyType<UpdateEventSpot> },
+    { id: number; data: UpdateEventSpot },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<
   Awaited<ReturnType<typeof updateEventSpot>>,
   TError,
-  { id: number; data: BodyType<UpdateEventSpot> },
+  { id: number; data: UpdateEventSpot },
   TContext
 > => {
   const mutationOptions = getUpdateEventSpotMutationOptions(options);
@@ -3098,7 +3022,7 @@ export function useGetInvoicePdfStream<
 }
 
 export const createRole = (
-  createRole: BodyType<CreateRole>,
+  createRole: CreateRole,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -3109,19 +3033,12 @@ export const createRole = (
 };
 
 export const getCreateRoleMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createRole>>,
-    TError,
-    { data: BodyType<CreateRole> },
-    TContext
-  >;
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof createRole>>, TError, { data: CreateRole }, TContext>;
   request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<Awaited<ReturnType<typeof createRole>>, TError, { data: BodyType<CreateRole> }, TContext> => {
+}): UseMutationOptions<Awaited<ReturnType<typeof createRole>>, TError, { data: CreateRole }, TContext> => {
   const { mutation: mutationOptions, request: requestOptions } = options ?? {};
 
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof createRole>>, { data: BodyType<CreateRole> }> = (
-    props,
-  ) => {
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof createRole>>, { data: CreateRole }> = (props) => {
     const { data } = props ?? {};
 
     return createRole(data, requestOptions);
@@ -3131,18 +3048,13 @@ export const getCreateRoleMutationOptions = <TError = ErrorType<unknown>, TConte
 };
 
 export type CreateRoleMutationResult = NonNullable<Awaited<ReturnType<typeof createRole>>>;
-export type CreateRoleMutationBody = BodyType<CreateRole>;
+export type CreateRoleMutationBody = CreateRole;
 export type CreateRoleMutationError = ErrorType<unknown>;
 
 export const useCreateRole = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createRole>>,
-    TError,
-    { data: BodyType<CreateRole> },
-    TContext
-  >;
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof createRole>>, TError, { data: CreateRole }, TContext>;
   request?: SecondParameter<typeof customInstance>;
-}): UseMutationResult<Awaited<ReturnType<typeof createRole>>, TError, { data: BodyType<CreateRole> }, TContext> => {
+}): UseMutationResult<Awaited<ReturnType<typeof createRole>>, TError, { data: CreateRole }, TContext> => {
   const mutationOptions = getCreateRoleMutationOptions(options);
 
   return useMutation(mutationOptions);

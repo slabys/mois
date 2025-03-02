@@ -32,6 +32,9 @@ export const middleware = async (request: NextRequest) => {
       }
     }
     if (!isInitialized) {
+      if (request.nextUrl.pathname === routes.INIT) {
+        return NextResponse.next();
+      }
       // If not initialized, redirect to the /init page
       if (request.nextUrl.pathname !== routes.INIT) {
         return NextResponse.redirect(new URL(routes.INIT, request.url));
@@ -79,6 +82,7 @@ export const middleware = async (request: NextRequest) => {
   if (publicPaths.find((allowed) => path.startsWith(allowed))) {
     return NextResponse.next();
   }
+  console.log("login");
 
   return NextResponse.redirect(new URL(routes.LOGIN, request.url));
 };
