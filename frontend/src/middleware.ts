@@ -31,7 +31,7 @@ export const middleware = async (request: NextRequest) => {
   }
 
   if (authCookieToken) {
-    return await fetch(`${apiUrl}/users`, {
+    const fetchCurrentUser = await fetch(`${apiUrl}/users`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -41,9 +41,15 @@ export const middleware = async (request: NextRequest) => {
       if (!res.ok) {
         console.warn("Invalid token detected, clearing cookies.");
 
-        await fetch(`${apiUrl}/auth/clear-auth`, { method: "DELETE" });
+        const clearAuthCookie = await fetch(`${apiUrl}/auth/clear-auth`, { method: "DELETE" });
+        console.log("OK");
+        console.log(clearAuthCookie.ok);
+        console.log("Headers");
+        console.log(clearAuthCookie.headers);
         const newResponse = NextResponse.redirect(new URL(routes.LOGIN, request.url));
         newResponse.cookies.delete("AuthCookie");
+        console.log("New Response");
+        console.log(newResponse);
         return newResponse; //NextResponse.redirect(new URL(routes.LOGIN, request.url));
       } else {
         if (path.startsWith(routes.LOGIN)) {
@@ -52,6 +58,9 @@ export const middleware = async (request: NextRequest) => {
         return NextResponse.next();
       }
     });
+    console.log("fetchCurrentUser");
+    console.log(fetchCurrentUser);
+    return fetchCurrentUser;
   }
 
   // public
