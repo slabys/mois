@@ -10,14 +10,14 @@ const publicPaths = ["/-/", "/_next", ...notAuthorizedPaths];
 export const middleware = async (request: NextRequest) => {
   const path = request.nextUrl.pathname;
   const apiUrl = process.env.NEXT_PUBLIC_APP1_URL;
-  const authCookieToken = request.cookies.get("AuthCookie")?.value;
+  const authCookieToken = request.cookies.get("AuthCookie");
 
-  console.log("Request");
-  console.log(request);
-  console.log("Path");
-  console.log(path);
-  console.log("authCookieToken");
-  console.log(authCookieToken);
+  // console.log("Request");
+  // console.log(request);
+  // console.log("Path");
+  // console.log(path);
+  // console.log("authCookieToken");
+  // console.log(authCookieToken);
 
   try {
     const res = await fetch(`${apiUrl}/initialize`, {
@@ -25,13 +25,15 @@ export const middleware = async (request: NextRequest) => {
       headers: { "Content-Type": "application/json" },
     });
 
+    const dataInit = await res.json();
+    const { isInitialized } = dataInit;
+    // console.log("Data Init");
+    // console.log(dataInit);
+
     if (!res.ok) {
       console.error("Failed to fetch initialization status:", res.statusText);
       return NextResponse.next(); // Let request pass if API call fails
     }
-
-    const data = await res.json();
-    const { isInitialized } = data;
 
     if (isInitialized) {
       if (request.nextUrl.pathname === routes.INIT) {
@@ -48,38 +50,43 @@ export const middleware = async (request: NextRequest) => {
       }
     }
   } catch (error) {
-    console.error("Error checking initialization status:", error);
+    console.error("Error checking initialization status:", JSON.stringify(error, null, 2));
   }
 
   // If token exists, validate it --> remove invalid token
   try {
-    if (authCookieToken) {
+    if (authCookieToken?.value) {
       const authRes = await fetch(`${apiUrl}/users`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authCookieToken}`,
+          Authorization: `Bearer ${authCookieToken?.value}`,
         },
       });
 
       const authData = await authRes.json();
-      console.log("Auth user data");
-      console.log(authData);
+      // console.log("Auth user data");
+      // console.log(authData);
 
       if (!authRes.ok) {
         console.warn("Invalid token detected, clearing cookies.");
 
         // Create a response and delete the token cookie
-        const response = NextResponse.redirect(new URL(routes.LOGIN, request.url));
+        // const response = NextResponse.next();
+        // const response = NextResponse.redirect(new URL(routes.LOGIN, request.url));
+        const response = NextResponse.next();
+        // redirect(new URL(routes.LOGIN, request.url));
         response.cookies.delete("AuthCookie");
 
         return response;
       }
     }
   } catch (error) {
-    console.error("Error in middleware:", error);
+    console.error("Error in middleware:", JSON.stringify(error, null, 2));
   }
 
+  // console.log("Request AuthCookie");
+  // console.log(request.cookies.has("AuthCookie"));
   // AUTH
   if (request.cookies.has("AuthCookie")) {
     if (notAuthorizedPaths.find((allowed) => path.startsWith(allowed))) {
@@ -91,7 +98,9 @@ export const middleware = async (request: NextRequest) => {
 
   // public
   if (publicPaths.find((allowed) => path.startsWith(allowed))) {
+    // console.log("Next");
     return NextResponse.next();
   }
+  // console.log("Login");
   return NextResponse.redirect(new URL(routes.LOGIN, request.url));
 };
