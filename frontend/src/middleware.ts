@@ -12,109 +12,54 @@ export const middleware = async (request: NextRequest) => {
   const apiUrl = process.env.NEXT_PUBLIC_APP1_URL;
   const authCookieToken = request.cookies.get("AuthCookie");
 
-  // console.log("Request");
-  // console.log(request);
-  // console.log("Path");
-  // console.log(path);
-  // console.log("authCookieToken");
-  // console.log(authCookieToken);
-
-  try {
-    const res = await fetch(`${apiUrl}/initialize`, {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-
-    const dataInit = await res.json();
-    const { isInitialized } = dataInit;
-    // console.log("Data Init");
-    // console.log(dataInit);
-
+  const isInitialized = await fetch(`${apiUrl}/initialize`, {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+  }).then(async (res) => {
     if (!res.ok) {
-      console.error("Failed to fetch initialization status:", res.statusText);
-      return NextResponse.next(); // Let request pass if API call fails
+      console.warn("Unable to fetch initialized.");
+    } else {
+      const dataInit = await res.json();
+      return dataInit.isInitialized;
     }
+  });
 
-    if (isInitialized) {
-      if (request.nextUrl.pathname === routes.INIT) {
-        return NextResponse.redirect(new URL(routes.DASHBOARD, request.url));
-      }
+  if (!isInitialized) {
+    if (!path.startsWith(routes.INIT)) {
+      return NextResponse.redirect(new URL(routes.INIT, request.url));
     }
-    if (!isInitialized) {
-      if (request.nextUrl.pathname === routes.INIT) {
-        return NextResponse.next();
-      }
-      // If not initialized, redirect to the /init page
-      if (request.nextUrl.pathname !== routes.INIT) {
-        return NextResponse.redirect(new URL(routes.INIT, request.url));
-      }
-    }
-  } catch (error) {
-    console.error("Error checking initialization status:", JSON.stringify(error, null, 2));
   }
 
-  // If token exists, validate it --> remove invalid token
-  // try {
-  if (authCookieToken?.value) {
-    const authRes = await fetch(`${apiUrl}/users`, {
+  if (authCookieToken) {
+    return await fetch(`${apiUrl}/users`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${authCookieToken?.value}`,
       },
-    });
+    }).then(async (res) => {
+      if (!res.ok) {
+        console.warn("Invalid token detected, clearing cookies.");
 
-    const authData = await authRes.json();
-    // console.log("Auth user data");
-    console.log(authRes.ok);
-    console.log(authData);
-
-    if (!authRes.ok) {
-      console.warn("Invalid token detected, clearing cookies.");
-
-      // Create a response and delete the token cookie
-      // const response = NextResponse.next();
-      // const response = NextResponse.redirect(new URL(routes.LOGIN, request.url));
-
-      const responseClearAuth = await fetch(`${apiUrl}/auth/clear-auth`, { method: "DELETE" });
-      // const data = await response.json();
-      console.log(responseClearAuth.ok);
-      if (responseClearAuth.ok) {
-        const response = NextResponse.next();
-        response.cookies.delete("AuthCookie");
-        return response;
+        await fetch(`${apiUrl}/auth/clear-auth`, { method: "DELETE" });
+        const newResponse = NextResponse.redirect(new URL(routes.LOGIN, request.url));
+        newResponse.cookies.delete("AuthCookie");
+        return newResponse; //NextResponse.redirect(new URL(routes.LOGIN, request.url));
+      } else {
+        if (path.startsWith(routes.LOGIN)) {
+          console.error("Redirect");
+          return NextResponse.redirect(new URL(routes.DASHBOARD, request.url));
+        }
+        console.error("No Redirect");
+        return NextResponse.next();
       }
-
-      // const dataAuth = await clearAuth.json();
-      // console.log(dataAuth);
-      // const response = NextResponse.next();
-      // redirect(new URL(routes.LOGIN, request.url));
-      // response.cookies.delete("AuthCookie");
-
-      // return response;
-      return NextResponse.next();
-    }
-  }
-  // } catch (error) {
-  //   console.error("Error in middleware:", JSON.stringify(error, null, 2));
-  // }
-
-  // console.log("Request AuthCookie");
-  // console.log(request.cookies.has("AuthCookie"));
-  // AUTH
-  if (request.cookies.has("AuthCookie")) {
-    if (notAuthorizedPaths.find((allowed) => path.startsWith(allowed))) {
-      return NextResponse.redirect(new URL(routes.DASHBOARD, request.url));
-    } else {
-      return NextResponse.next();
-    }
+    });
   }
 
   // public
   if (publicPaths.find((allowed) => path.startsWith(allowed))) {
-    // console.log("Next");
     return NextResponse.next();
   }
-  // console.log("Login");
+
   return NextResponse.redirect(new URL(routes.LOGIN, request.url));
 };
