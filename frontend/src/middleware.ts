@@ -47,10 +47,8 @@ export const middleware = async (request: NextRequest) => {
         return newResponse; //NextResponse.redirect(new URL(routes.LOGIN, request.url));
       } else {
         if (path.startsWith(routes.LOGIN)) {
-          console.error("Redirect");
           return NextResponse.redirect(new URL(routes.DASHBOARD, request.url));
         }
-        console.error("No Redirect");
         return NextResponse.next();
       }
     });
