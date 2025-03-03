@@ -29,7 +29,7 @@ export class AuthController {
 		@Res({ passthrough: true }) response: Response,
 	) {
 		const token = await this.authService.createToken(user);
-		
+
 		response
 			.cookie("AuthCookie", token, {
 				domain: isProduction ? process.env.WEB_DOMAIN : "localhost",
@@ -53,6 +53,22 @@ export class AuthController {
 	@UseGuards(CookieGuard)
 	@Delete("logout")
 	async logoutUser(@Res({ passthrough: true }) response: Response) {
+		response
+			.clearCookie("AuthCookie", {
+				domain: isProduction ? process.env.WEB_DOMAIN : "localhost",
+				httpOnly: true,
+				secure: true,
+				sameSite: "none",
+				partitioned: isProduction,
+				maxAge: 0,
+				path: "/",
+			})
+			.status(HttpStatus.OK);
+	}
+
+
+	@Delete("clear-auth")
+	async removeCookie(@Res({ passthrough: true }) response: Response) {
 		response
 			.clearCookie("AuthCookie", {
 				domain: isProduction ? process.env.WEB_DOMAIN : "localhost",

@@ -54,36 +54,50 @@ export const middleware = async (request: NextRequest) => {
   }
 
   // If token exists, validate it --> remove invalid token
-  try {
-    if (authCookieToken?.value) {
-      const authRes = await fetch(`${apiUrl}/users`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authCookieToken?.value}`,
-        },
-      });
+  // try {
+  if (authCookieToken?.value) {
+    const authRes = await fetch(`${apiUrl}/users`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authCookieToken?.value}`,
+      },
+    });
 
-      const authData = await authRes.json();
-      // console.log("Auth user data");
-      // console.log(authData);
+    const authData = await authRes.json();
+    // console.log("Auth user data");
+    console.log(authRes.ok);
+    console.log(authData);
 
-      if (!authRes.ok) {
-        console.warn("Invalid token detected, clearing cookies.");
+    if (!authRes.ok) {
+      console.warn("Invalid token detected, clearing cookies.");
 
-        // Create a response and delete the token cookie
-        // const response = NextResponse.next();
-        // const response = NextResponse.redirect(new URL(routes.LOGIN, request.url));
+      // Create a response and delete the token cookie
+      // const response = NextResponse.next();
+      // const response = NextResponse.redirect(new URL(routes.LOGIN, request.url));
+
+      const responseClearAuth = await fetch("http://localhost:4000/auth/clear-auth", { method: "DELETE" });
+      // const data = await response.json();
+      console.log(responseClearAuth.ok);
+      if (responseClearAuth.ok) {
         const response = NextResponse.next();
-        // redirect(new URL(routes.LOGIN, request.url));
         response.cookies.delete("AuthCookie");
-
         return response;
       }
+
+      // const dataAuth = await clearAuth.json();
+      // console.log(dataAuth);
+      // const response = NextResponse.next();
+      // redirect(new URL(routes.LOGIN, request.url));
+      // response.cookies.delete("AuthCookie");
+
+      // return response;
+      return NextResponse.next();
     }
-  } catch (error) {
-    console.error("Error in middleware:", JSON.stringify(error, null, 2));
   }
+  // } catch (error) {
+  //   console.error("Error in middleware:", JSON.stringify(error, null, 2));
+  // }
 
   // console.log("Request AuthCookie");
   // console.log(request.cookies.has("AuthCookie"));
