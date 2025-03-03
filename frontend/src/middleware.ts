@@ -76,7 +76,7 @@ export const middleware = async (request: NextRequest) => {
       // const response = NextResponse.next();
       // const response = NextResponse.redirect(new URL(routes.LOGIN, request.url));
 
-      const responseClearAuth = await fetch("http://localhost:4000/auth/clear-auth", { method: "DELETE" });
+      const responseClearAuth = await fetch(`${apiUrl}/auth/clear-auth`, { method: "DELETE" });
       // const data = await response.json();
       console.log(responseClearAuth.ok);
       if (responseClearAuth.ok) {
