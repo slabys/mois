@@ -30,7 +30,7 @@ export const middleware = async (request: NextRequest) => {
     }
   }
 
-  if (authCookieToken) {
+  if (authCookieToken?.value) {
     const fetchCurrentUser = await fetch(`${apiUrl}/users`, {
       method: "GET",
       headers: {
@@ -48,6 +48,8 @@ export const middleware = async (request: NextRequest) => {
         console.log(clearAuthCookie.headers);
         const newResponse = NextResponse.redirect(new URL(routes.LOGIN, request.url));
         newResponse.cookies.delete("AuthCookie");
+        console.log("All Cookies");
+        console.log(newResponse.cookies.getAll());
         console.log("New Response");
         console.log(newResponse);
         return newResponse; //NextResponse.redirect(new URL(routes.LOGIN, request.url));
@@ -60,7 +62,7 @@ export const middleware = async (request: NextRequest) => {
     });
     console.log("fetchCurrentUser");
     console.log(fetchCurrentUser);
-    return fetchCurrentUser;
+    return fetchCurrentUser.cookies.delete("AuthCookie");
   }
 
   // public
