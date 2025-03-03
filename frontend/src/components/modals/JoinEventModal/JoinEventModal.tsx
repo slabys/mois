@@ -107,8 +107,14 @@ const JoinEventModal = ({
 
       return {
         ...restValues,
-        foodRestrictionAllergies: `${foodRestrictionList.sort().join(", ")}, ${foodRestrictionAllergies}`,
-        healthLimitations: `${healthLimitationsList.sort().join(", ")}, ${healthLimitations}`,
+        foodRestrictionAllergies:
+          foodRestrictionList.length > 0
+            ? `${foodRestrictionList.sort().join(", ")}, ${foodRestrictionAllergies}`
+            : foodRestrictionAllergies,
+        healthLimitations:
+          healthLimitationsList.length > 0
+            ? `${healthLimitationsList.sort().join(", ")}, ${healthLimitations}`
+            : healthLimitations,
       };
     },
   });
@@ -343,7 +349,7 @@ const JoinEventModal = ({
             <Flex direction="column" gap="md">
               <MultiSelect
                 label="Food Restrictions and allergies"
-                data={["None", "Vegetarian", "Vegan", "Gluten Free", "Lactose Free", "No pork", "No Fish", "Other"]}
+                data={["Vegetarian", "Vegan", "Gluten Free", "Lactose Free", "No pork", "No Fish", "Other"]}
                 onChange={(value) => {
                   setFoodRestrictionList(value);
                 }}
@@ -358,7 +364,7 @@ const JoinEventModal = ({
               )}
               <MultiSelect
                 label="Disability or Health Limitations"
-                data={["None", "Prefer Not To Say", "Other"]}
+                data={["Prefer Not To Say", "Other"]}
                 onChange={(value) => {
                   setHealthLimitationsList(value);
                 }}

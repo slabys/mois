@@ -13,9 +13,9 @@ interface CrateOrganizationModalProps {
 const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateOrganizationModalProps) => {
   const form = useForm<Partial<CreateOrganization>>({
     initialValues: {
-      name: undefined,
-      cin: undefined,
-      vatin: undefined,
+      name: "",
+      cin: "",
+      vatin: "",
       address: {
         street: "",
         houseNumber: "",
