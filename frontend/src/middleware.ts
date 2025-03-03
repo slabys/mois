@@ -12,6 +12,13 @@ export const middleware = async (request: NextRequest) => {
   const apiUrl = process.env.NEXT_PUBLIC_APP1_URL;
   const authCookieToken = request.cookies.get("AuthCookie")?.value;
 
+  console.log("Request");
+  console.log(request);
+  console.log("Path");
+  console.log(path);
+  console.log("authCookieToken");
+  console.log(authCookieToken);
+
   try {
     const res = await fetch(`${apiUrl}/initialize`, {
       method: "GET",
@@ -55,11 +62,15 @@ export const middleware = async (request: NextRequest) => {
         },
       });
 
+      const authData = await authRes.json();
+      console.log("Auth user data");
+      console.log(authData);
+
       if (!authRes.ok) {
         console.warn("Invalid token detected, clearing cookies.");
 
         // Create a response and delete the token cookie
-        const response = NextResponse.redirect(new URL("/login", request.url));
+        const response = NextResponse.redirect(new URL(routes.LOGIN, request.url));
         response.cookies.delete("AuthCookie");
 
         return response;
