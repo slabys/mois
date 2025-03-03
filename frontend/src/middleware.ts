@@ -62,7 +62,8 @@ export const middleware = async (request: NextRequest) => {
     });
     console.log("fetchCurrentUser");
     console.log(fetchCurrentUser);
-    return fetchCurrentUser.cookies.delete("AuthCookie");
+    fetchCurrentUser.cookies.delete("AuthCookie");
+    return fetchCurrentUser;
   }
 
   // public
