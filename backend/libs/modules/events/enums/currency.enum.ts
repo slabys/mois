@@ -1,7 +1,7 @@
 /**
  * Currencies defined in ISO 4217
  */
-export enum InvoiceCurrency {
+export enum CurrencyEnum {
 	CZK = "CZK",
 	EUR = "EUR",
 }

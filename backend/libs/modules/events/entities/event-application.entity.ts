@@ -16,7 +16,6 @@ import {
 import { EventCustomOrganization } from "./event-custom-organization.entity";
 import { EventSpot } from "./event-spot.entity";
 import { Event } from "./event.entity";
-import { Invoice } from "modules/invoice/entities";
 import { InvoiceMethods } from "modules/events/invoice-methods";
 
 /**
@@ -99,9 +98,6 @@ export class EventApplication extends BaseEntity {
 
 	@CreateDateColumn()
 	createdAt: Date;
-
-	@ManyToOne(() => Invoice, { nullable: true })
-	invoice: Invoice;
 
 	constructor(initial?: DeepPartial<EventApplication>) {
 		super();

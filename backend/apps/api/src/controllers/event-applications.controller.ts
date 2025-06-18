@@ -7,7 +7,6 @@ import {
 	ForbiddenException,
 	Get,
 	Header,
-	InternalServerErrorException,
 	NotFoundException,
 	NotImplementedException,
 	Param,
@@ -29,25 +28,20 @@ import {
 	ApiTags,
 	getSchemaPath,
 } from "@nestjs/swagger";
-import { firstValueFrom } from "rxjs";
 
 import { Address } from "modules/addresses";
 import { CookieGuard } from "modules/auth/providers/guards";
 import { EventApplicationsService, EventSpotsService, EventsService } from "modules/events";
 import { EventApplication, EventCustomOrganization } from "modules/events/entities";
 import { FileStorageService } from "modules/file-storage";
-import { InvoiceService } from "modules/invoice";
-import { InvoiceItem } from "modules/invoice/entities";
-import { InvoiceCurrency } from "modules/invoice/enums";
 import { OrganizationService } from "modules/organization";
-import { PaymentSubject } from "modules/payments";
 import { User, UsersService } from "modules/users";
 import { ajv } from "utilities/ajv";
 import { ParseDatePipe } from "utilities/nest/pipes";
 
 import { CurrentUser } from "../decorators";
 import { CreateEventApplication, UpdateEventApplication } from "../models/requests";
-import { EventApplicationInvoice, EventApplicationSimpleWithApplications } from "../models/responses";
+import { EventApplicationSimpleWithApplications } from "../models/responses";
 import { EventApplicationSimpleWithApplicationsMapper } from "../mappers";
 import {
 	EventApplicationDetailedWithApplications,
@@ -65,7 +59,6 @@ export class EventApplicationsController {
 		private readonly usersService: UsersService,
 		private readonly organizationService: OrganizationService,
 		private readonly eventSpotsService: EventSpotsService,
-		private readonly invoiceService: InvoiceService,
 		private readonly fileStorageService: FileStorageService,
 		private readonly eventApplicationSimpleWithApplicationsMapper: EventApplicationSimpleWithApplicationsMapper,
 	) {
@@ -200,38 +193,6 @@ export class EventApplicationsController {
 		}
 
 		// Hard-coded invoice
-		const invoice = await this.invoiceService.create({
-			constantSymbol: 123,
-			currency: application?.invoice?.currency ?? InvoiceCurrency.CZK,
-			iban: "CZ6508000000192000145399",
-			items: application.spotType
-				? [
-					new InvoiceItem({
-						amount: 1,
-						name: `Spot: ${application.spotType.name}`,
-						price: application.spotType.price,
-					}),
-				]
-				: [],
-			swift: "SWIFT",
-			subscriber: new PaymentSubject({
-				address: application.invoiceAddress,
-				name: "Subscriber",
-			}),
-			supplier: new PaymentSubject({
-				// TODO: Hlavní sekce
-				address: new Address({
-					city: "CITY",
-					country: "Czech Republic",
-					houseNumber: "50/7",
-					street: "STREET",
-					zip: "111 10",
-				}),
-				name: "SUPPLIER",
-			}),
-			variableSymbol: 123,
-		});
-		application.invoice = invoice;
 		application = await this.eventApplicationsService.save(application);
 		return this.eventApplicationSimpleWithApplicationsMapper.map(application);
 	}
@@ -308,35 +269,6 @@ export class EventApplicationsController {
 		await this.eventApplicationsService.delete(application);
 	}
 
-	@ApiOkResponse({ description: "Event application deleted" })
-	@ApiNotFoundResponse({ description: "Event application not found" })
-	@ApiBearerAuth()
-	@UseGuards(CookieGuard)
-	@Get("application/:id/invoice")
-	async getEventApplicationInvoice(@Param("id", ParseIntPipe) applicationId: number): Promise<EventApplicationInvoice> {
-		const application = await this.eventApplicationsService.findById(applicationId, {
-			relations: {
-				invoice: {
-					subscriber: { address: true },
-					supplier: { address: true },
-				},
-			},
-		});
-
-		if (!application?.invoice) throw new NotFoundException("Invoice not found");
-
-		const result = await this.invoiceService.generatePdfFromInvoice(application.invoice);
-		const value = await firstValueFrom(result);
-
-		if (value.success) {
-			return {
-				invoice: application.invoice,
-				url: await this.fileStorageService.getPublicUrl(value.outputPath),
-			};
-		}
-		throw new InternalServerErrorException("Could not generate invoice");
-	}
-
 	/**
 	 * Get event application for user for event
 	 */
@@ -358,6 +290,7 @@ export class EventApplicationsController {
 		return this.eventApplicationSimpleWithApplicationsMapper.map(application);
 	}
 
+	@ApiBearerAuth()
 	@Header("Content-disposition", "attachment; filename=EventApplicationExport.xlsx")
 	@Get("export/:eventId/applications")
 	async generateSheetEventApplication(@Res() res: Response, @Param("eventId", ParseIntPipe) eventId: number) {

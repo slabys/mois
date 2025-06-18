@@ -1,5 +1,5 @@
 import { IsEnum, IsInt, IsString, Min, MinLength } from "class-validator";
-import { InvoiceCurrency } from "modules/invoice/enums";
+import { CurrencyEnum } from "modules/events/enums/currency.enum";
 
 export class CreateEventSpot {
 	@MinLength(6)
@@ -15,6 +15,6 @@ export class CreateEventSpot {
 	@Min(0)
 	price: number;
 
-	@IsEnum(InvoiceCurrency)
-	currency: InvoiceCurrency = InvoiceCurrency.CZK;
+	@IsEnum(CurrencyEnum)
+	currency: CurrencyEnum = CurrencyEnum.CZK;
 }
