@@ -9,7 +9,6 @@ import {
 	EventSpotsController,
 	HealthController,
 	InitializeController,
-	InvoiceController,
 	OrganizationMembersController,
 	OrganizationsController,
 	PhotoController,
@@ -20,7 +19,6 @@ import {
 import { AuthModule } from "modules/auth";
 import { EventsModule } from "modules/events";
 import { FileStorageModule } from "modules/file-storage";
-import { InvoiceModule } from "modules/invoice";
 import { OrganizationModule } from "modules/organization";
 import { PhotoModule } from "modules/photo";
 import { RolesModule } from "modules/roles";
@@ -43,7 +41,6 @@ import { ConfigModule } from "@nestjs/config";
 		OrganizationModule,
 		EventsModule,
 		NestjsFormDataModule.config({}),
-		InvoiceModule,
 		TypeOrmModule.forRootAsync({
 			useFactory: () => {
 				const options = getDataSourceOptions();
@@ -71,7 +68,6 @@ import { ConfigModule } from "@nestjs/config";
 		EventApplicationsController,
 		EventsController,
 		EventSpotsController,
-		InvoiceController,
 		RolesController,
 		...ManagementControllers,
 		HealthController,

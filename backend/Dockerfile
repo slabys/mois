@@ -50,5 +50,7 @@ RUN pnpm install --frozen-lockfile --prod=true
 
 EXPOSE $PORT_APP1
 
+CMD npx typeorm migration:run -d ./libs/config/typeorm.config.ts -t each
+
 # Start the server
 ENTRYPOINT node main.js

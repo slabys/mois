@@ -22,40 +22,40 @@ services:
       timeout: 10s
       retries: 5
 
-  redis:
-    container_name: redis
-    image: redis
-    environment:
-      - REDIS_HOST=${REDIS_HOST:-redis}
-      - REDIS_PORT=${REDIS_PORT:-6379}
-    env_file:
-      - .env
-    expose:
-      - ${REDIS_PORT:-6379}
-    networks:
-      - app-network
+  #  redis:
+  #    container_name: redis
+  #    image: redis
+  #    environment:
+  #      - REDIS_HOST=${REDIS_HOST:-redis}
+  #      - REDIS_PORT=${REDIS_PORT:-6379}
+  #    env_file:
+  #      - .env
+  #    expose:
+  #      - ${REDIS_PORT:-6379}
+  #    networks:
+  #      - app-network
 
-  documents:
-    container_name: backend_documents
-    build:
-      context: ./backend
-      args:
-        - PROJECT_NAME=documents
-        - NODE_ENV=${NODE_ENV:-production}
-      target: production
-    environment:
-      - NODE_ENV=${NODE_ENV:-production}
-      - STORAGE_ROOT=${STORAGE_ROOT:-/app/storage}
-      - REDIS_HOST=${REDIS_HOST:-redis}
-      - REDIS_PORT=${REDIS_PORT:-6379}
-    env_file:
-      - .env
-    networks:
-      - app-network
-    volumes:
-      - backend_data:/app/storage
-    depends_on:
-      - redis
+  #  documents:
+  #    container_name: backend_documents
+  #    build:
+  #      context: ./backend
+  #      args:
+  #        - PROJECT_NAME=documents
+  #        - NODE_ENV=${NODE_ENV:-production}
+  #      target: production
+  #    environment:
+  #      - NODE_ENV=${NODE_ENV:-production}
+  #      - STORAGE_ROOT=${STORAGE_ROOT:-/app/storage}
+  #      - REDIS_HOST=${REDIS_HOST:-redis}
+  #      - REDIS_PORT=${REDIS_PORT:-6379}
+  #    env_file:
+  #      - .env
+  #    networks:
+  #      - app-network
+  #    volumes:
+  #      - backend_data:/app/storage
+  #    depends_on:
+  #      - redis
 
   backend:
     container_name: backend_app1
@@ -78,8 +78,8 @@ services:
       - PORT_APP1=${PORT_APP1:-4000}
       - JWT_SECRET=${JWT_SECRET:-secret}
       - STORAGE_ROOT=${STORAGE_ROOT:-/app/storage}
-      - REDIS_HOST=${REDIS_HOST:-redis}
-      - REDIS_PORT=${REDIS_PORT:-6379}
+      #      - REDIS_HOST=${REDIS_HOST:-redis}
+      #      - REDIS_PORT=${REDIS_PORT:-6379}
       - MAIL_HOST=${MAIL_HOST}
       - MAIL_USER=${MAIL_USER}
       - MAIL_PASS=${MAIL_PASS}
@@ -98,23 +98,23 @@ services:
       - backend_data:/app/storage
     depends_on:
       - database
-      - database_run_migrations
-      - redis
+  #      - database_run_migrations
+  #      - redis
 
-  database_run_migrations:
-    container_name: database_migrations
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.Migration
-    environment:
-      - DB_HOST=${DB_HOST:-database}
-    env_file:
-      - .env
-    restart: no
-    networks:
-      - app-network
-    depends_on:
-      - database
+  #  database_run_migrations:
+  #    container_name: database_migrations
+  #    build:
+  #      context: ./backend
+  #      dockerfile: Dockerfile.Migration
+  #    environment:
+  #      - DB_HOST=${DB_HOST:-database}
+  #    env_file:
+  #      - .env
+  #    restart: no
+  #    networks:
+  #      - app-network
+  #    depends_on:
+  #      - database
 
   frontend:
     container_name: frontend
