@@ -48,8 +48,6 @@ import type {
   GetUserApplications200,
   GetUserApplicationsParams,
   InitializeType,
-  InvoiceSimple,
-  InvoiceUrl,
   LoginUser,
   Organization,
   OrganizationMember,
@@ -300,6 +298,36 @@ export const useLogoutUser = <TError = ErrorType<unknown>, TContext = unknown>(o
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationResult<Awaited<ReturnType<typeof logoutUser>>, TError, void, TContext> => {
   const mutationOptions = getLogoutUserMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const removeCookie = (options?: SecondParameter<typeof customInstance>) => {
+  return customInstance<void>({ url: `/auth/clear-auth`, method: "DELETE" }, options);
+};
+
+export const getRemoveCookieMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof removeCookie>>, TError, void, TContext>;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<Awaited<ReturnType<typeof removeCookie>>, TError, void, TContext> => {
+  const { mutation: mutationOptions, request: requestOptions } = options ?? {};
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeCookie>>, void> = () => {
+    return removeCookie(requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RemoveCookieMutationResult = NonNullable<Awaited<ReturnType<typeof removeCookie>>>;
+
+export type RemoveCookieMutationError = ErrorType<unknown>;
+
+export const useRemoveCookie = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof removeCookie>>, TError, void, TContext>;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationResult<Awaited<ReturnType<typeof removeCookie>>, TError, void, TContext> => {
+  const mutationOptions = getRemoveCookieMutationOptions(options);
 
   return useMutation(mutationOptions);
 };
@@ -1802,103 +1830,6 @@ export const useDeleteEventApplication = <TError = ErrorType<void>, TContext = u
   return useMutation(mutationOptions);
 };
 
-export const getEventApplicationInvoice = (
-  id: number,
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  return customInstance<void>({ url: `/events/application/${id}/invoice`, method: "GET", signal }, options);
-};
-
-export const getGetEventApplicationInvoiceQueryKey = (id: number) => {
-  return [`/events/application/${id}/invoice`] as const;
-};
-
-export const getGetEventApplicationInvoiceQueryOptions = <
-  TData = Awaited<ReturnType<typeof getEventApplicationInvoice>>,
-  TError = ErrorType<void>,
->(
-  id: number,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventApplicationInvoice>>, TError, TData>>;
-    request?: SecondParameter<typeof customInstance>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetEventApplicationInvoiceQueryKey(id);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getEventApplicationInvoice>>> = ({ signal }) =>
-    getEventApplicationInvoice(id, requestOptions, signal);
-
-  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getEventApplicationInvoice>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
-
-export type GetEventApplicationInvoiceQueryResult = NonNullable<Awaited<ReturnType<typeof getEventApplicationInvoice>>>;
-export type GetEventApplicationInvoiceQueryError = ErrorType<void>;
-
-export function useGetEventApplicationInvoice<
-  TData = Awaited<ReturnType<typeof getEventApplicationInvoice>>,
-  TError = ErrorType<void>,
->(
-  id: number,
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventApplicationInvoice>>, TError, TData>> &
-      Pick<
-        DefinedInitialDataOptions<Awaited<ReturnType<typeof getEventApplicationInvoice>>, TError, TData>,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetEventApplicationInvoice<
-  TData = Awaited<ReturnType<typeof getEventApplicationInvoice>>,
-  TError = ErrorType<void>,
->(
-  id: number,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventApplicationInvoice>>, TError, TData>> &
-      Pick<
-        UndefinedInitialDataOptions<Awaited<ReturnType<typeof getEventApplicationInvoice>>, TError, TData>,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof customInstance>;
-  },
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetEventApplicationInvoice<
-  TData = Awaited<ReturnType<typeof getEventApplicationInvoice>>,
-  TError = ErrorType<void>,
->(
-  id: number,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventApplicationInvoice>>, TError, TData>>;
-    request?: SecondParameter<typeof customInstance>;
-  },
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-
-export function useGetEventApplicationInvoice<
-  TData = Awaited<ReturnType<typeof getEventApplicationInvoice>>,
-  TError = ErrorType<void>,
->(
-  id: number,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getEventApplicationInvoice>>, TError, TData>>;
-    request?: SecondParameter<typeof customInstance>;
-  },
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getGetEventApplicationInvoiceQueryOptions(id, options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
 /**
  * Get event application for user for event
  */
@@ -2769,257 +2700,6 @@ export const useUpdateEventSpot = <TError = ErrorType<void>, TContext = unknown>
 
   return useMutation(mutationOptions);
 };
-
-/**
- * Get invoice data
- */
-export const getInvoice = (id: string, options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
-  return customInstance<InvoiceSimple>({ url: `/invoice/${id}`, method: "GET", signal }, options);
-};
-
-export const getGetInvoiceQueryKey = (id: string) => {
-  return [`/invoice/${id}`] as const;
-};
-
-export const getGetInvoiceQueryOptions = <TData = Awaited<ReturnType<typeof getInvoice>>, TError = ErrorType<void>>(
-  id: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoice>>, TError, TData>>;
-    request?: SecondParameter<typeof customInstance>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetInvoiceQueryKey(id);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getInvoice>>> = ({ signal }) =>
-    getInvoice(id, requestOptions, signal);
-
-  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getInvoice>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
-
-export type GetInvoiceQueryResult = NonNullable<Awaited<ReturnType<typeof getInvoice>>>;
-export type GetInvoiceQueryError = ErrorType<void>;
-
-export function useGetInvoice<TData = Awaited<ReturnType<typeof getInvoice>>, TError = ErrorType<void>>(
-  id: string,
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoice>>, TError, TData>> &
-      Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getInvoice>>, TError, TData>, "initialData">;
-    request?: SecondParameter<typeof customInstance>;
-  },
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetInvoice<TData = Awaited<ReturnType<typeof getInvoice>>, TError = ErrorType<void>>(
-  id: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoice>>, TError, TData>> &
-      Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof getInvoice>>, TError, TData>, "initialData">;
-    request?: SecondParameter<typeof customInstance>;
-  },
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetInvoice<TData = Awaited<ReturnType<typeof getInvoice>>, TError = ErrorType<void>>(
-  id: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoice>>, TError, TData>>;
-    request?: SecondParameter<typeof customInstance>;
-  },
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-
-export function useGetInvoice<TData = Awaited<ReturnType<typeof getInvoice>>, TError = ErrorType<void>>(
-  id: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoice>>, TError, TData>>;
-    request?: SecondParameter<typeof customInstance>;
-  },
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getGetInvoiceQueryOptions(id, options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-/**
- * Get invoice PDF public address
-
-Will be generated if does not exist.
- */
-export const getInvoiceUrl = (id: string, options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
-  return customInstance<InvoiceUrl>({ url: `/invoice/${id}/url`, method: "GET", signal }, options);
-};
-
-export const getGetInvoiceUrlQueryKey = (id: string) => {
-  return [`/invoice/${id}/url`] as const;
-};
-
-export const getGetInvoiceUrlQueryOptions = <
-  TData = Awaited<ReturnType<typeof getInvoiceUrl>>,
-  TError = ErrorType<void>,
->(
-  id: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoiceUrl>>, TError, TData>>;
-    request?: SecondParameter<typeof customInstance>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetInvoiceUrlQueryKey(id);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getInvoiceUrl>>> = ({ signal }) =>
-    getInvoiceUrl(id, requestOptions, signal);
-
-  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getInvoiceUrl>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
-
-export type GetInvoiceUrlQueryResult = NonNullable<Awaited<ReturnType<typeof getInvoiceUrl>>>;
-export type GetInvoiceUrlQueryError = ErrorType<void>;
-
-export function useGetInvoiceUrl<TData = Awaited<ReturnType<typeof getInvoiceUrl>>, TError = ErrorType<void>>(
-  id: string,
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoiceUrl>>, TError, TData>> &
-      Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getInvoiceUrl>>, TError, TData>, "initialData">;
-    request?: SecondParameter<typeof customInstance>;
-  },
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetInvoiceUrl<TData = Awaited<ReturnType<typeof getInvoiceUrl>>, TError = ErrorType<void>>(
-  id: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoiceUrl>>, TError, TData>> &
-      Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof getInvoiceUrl>>, TError, TData>, "initialData">;
-    request?: SecondParameter<typeof customInstance>;
-  },
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetInvoiceUrl<TData = Awaited<ReturnType<typeof getInvoiceUrl>>, TError = ErrorType<void>>(
-  id: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoiceUrl>>, TError, TData>>;
-    request?: SecondParameter<typeof customInstance>;
-  },
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-
-export function useGetInvoiceUrl<TData = Awaited<ReturnType<typeof getInvoiceUrl>>, TError = ErrorType<void>>(
-  id: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoiceUrl>>, TError, TData>>;
-    request?: SecondParameter<typeof customInstance>;
-  },
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getGetInvoiceUrlQueryOptions(id, options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-/**
- * Get invoice PDF public address
-
-Will be generated if does not exist.
- */
-export const getInvoicePdfStream = (
-  id: string,
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  return customInstance<unknown>({ url: `/invoice/${id}/stream`, method: "GET", signal }, options);
-};
-
-export const getGetInvoicePdfStreamQueryKey = (id: string) => {
-  return [`/invoice/${id}/stream`] as const;
-};
-
-export const getGetInvoicePdfStreamQueryOptions = <
-  TData = Awaited<ReturnType<typeof getInvoicePdfStream>>,
-  TError = ErrorType<unknown>,
->(
-  id: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoicePdfStream>>, TError, TData>>;
-    request?: SecondParameter<typeof customInstance>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetInvoicePdfStreamQueryKey(id);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getInvoicePdfStream>>> = ({ signal }) =>
-    getInvoicePdfStream(id, requestOptions, signal);
-
-  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getInvoicePdfStream>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData> };
-};
-
-export type GetInvoicePdfStreamQueryResult = NonNullable<Awaited<ReturnType<typeof getInvoicePdfStream>>>;
-export type GetInvoicePdfStreamQueryError = ErrorType<unknown>;
-
-export function useGetInvoicePdfStream<
-  TData = Awaited<ReturnType<typeof getInvoicePdfStream>>,
-  TError = ErrorType<unknown>,
->(
-  id: string,
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoicePdfStream>>, TError, TData>> &
-      Pick<DefinedInitialDataOptions<Awaited<ReturnType<typeof getInvoicePdfStream>>, TError, TData>, "initialData">;
-    request?: SecondParameter<typeof customInstance>;
-  },
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetInvoicePdfStream<
-  TData = Awaited<ReturnType<typeof getInvoicePdfStream>>,
-  TError = ErrorType<unknown>,
->(
-  id: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoicePdfStream>>, TError, TData>> &
-      Pick<UndefinedInitialDataOptions<Awaited<ReturnType<typeof getInvoicePdfStream>>, TError, TData>, "initialData">;
-    request?: SecondParameter<typeof customInstance>;
-  },
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-export function useGetInvoicePdfStream<
-  TData = Awaited<ReturnType<typeof getInvoicePdfStream>>,
-  TError = ErrorType<unknown>,
->(
-  id: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoicePdfStream>>, TError, TData>>;
-    request?: SecondParameter<typeof customInstance>;
-  },
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-
-export function useGetInvoicePdfStream<
-  TData = Awaited<ReturnType<typeof getInvoicePdfStream>>,
-  TError = ErrorType<unknown>,
->(
-  id: string,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getInvoicePdfStream>>, TError, TData>>;
-    request?: SecondParameter<typeof customInstance>;
-  },
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> } {
-  const queryOptions = getGetInvoicePdfStreamQueryOptions(id, options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData> };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
 
 export const createRole = (
   createRole: CreateRole,

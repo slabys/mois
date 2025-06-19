@@ -103,9 +103,7 @@ const EventDetail = ({ id }: EventDetailProps) => {
           <Flex direction="column" w="100%" gap={16}>
             <Flex direction="column" w="100%" gap={8}>
               <Paper radius="md" style={{ overflow: "hidden" }}>
-                {eventDetail.photo?.id ? (
-                  <ApiImage src={eventDetail.photo.id} mah="180px" h="100%" fit="contain" />
-                ) : null}
+                {eventDetail.photo?.id ? <ApiImage src={eventDetail.photo.id} w="100%" h="100%" /> : null}
               </Paper>
               <Title order={1}>{eventDetail.title}</Title>
               <Flex justify="start" align="center" gap={8} wrap="wrap">

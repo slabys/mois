@@ -34,7 +34,7 @@ export class CreateUser {
 	 * Must not contain special characters
 	 */
 	@IsString()
-	@Matches(/^[a-zA-Z0-9]+$/)
+	@Matches(/^[a-zA-Z0-9_-]+$/)
 	@MinLength(6)
 	username: string;
 

@@ -155,38 +155,6 @@ export interface CreateRole {
   permissions?: CreateRolePermissionsItem[];
 }
 
-export interface InvoiceUrl {
-  url: string;
-}
-
-export type InvoiceSimpleCurrency = (typeof InvoiceSimpleCurrency)[keyof typeof InvoiceSimpleCurrency];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const InvoiceSimpleCurrency = {
-  CZK: "CZK",
-  EUR: "EUR",
-} as const;
-
-export interface InvoiceSimpleItem {
-  amount: number;
-  id: number;
-  name: string;
-  price: number;
-}
-
-export interface InvoiceSimple {
-  constantSymbol: number;
-  createdAt: string;
-  currency: InvoiceSimpleCurrency;
-  iban: string;
-  id: string;
-  items: InvoiceSimpleItem[];
-  subscriber: PaymentSubject;
-  supplier: PaymentSubject;
-  swift: string;
-  variableSymbol: number;
-}
-
 export type UpdateEventSpotCurrency = (typeof UpdateEventSpotCurrency)[keyof typeof UpdateEventSpotCurrency];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -484,6 +452,20 @@ export type EventApplicationDetailedWithApplicationsSpotType = SpotTypeSimple | 
 
 export type EventApplicationDetailedWithApplicationsAdditionalData = { [key: string]: unknown };
 
+export interface EventApplicationDetailedWithApplications {
+  additionalData: EventApplicationDetailedWithApplicationsAdditionalData;
+  createdAt: string;
+  customOrganization: EventCustomOrganization;
+  event: EventSimpleWithApplications;
+  id: number;
+  idNumber: string;
+  invoiceAddress: Address;
+  organization: Organization;
+  /** @nullable */
+  spotType: EventApplicationDetailedWithApplicationsSpotType;
+  user: User;
+}
+
 /**
  * @nullable
  */
@@ -508,20 +490,6 @@ export interface EventSimpleWithApplications {
   title: string;
   until: string;
   visible: boolean;
-}
-
-export interface EventApplicationDetailedWithApplications {
-  additionalData: EventApplicationDetailedWithApplicationsAdditionalData;
-  createdAt: string;
-  customOrganization: EventCustomOrganization;
-  event: EventSimpleWithApplications;
-  id: number;
-  idNumber: string;
-  invoiceAddress: Address;
-  organization: Organization;
-  /** @nullable */
-  spotType: EventApplicationDetailedWithApplicationsSpotType;
-  user: User;
 }
 
 export type SpotTypeSimpleCurrency = (typeof SpotTypeSimpleCurrency)[keyof typeof SpotTypeSimpleCurrency];
@@ -592,12 +560,6 @@ Each event can have different "requirements"
   visible: boolean;
 }
 
-/**
- * Spot, must be one of {@link event} spots
- * @nullable
- */
-export type EventApplicationSpotType = EventSpot | null;
-
 export type EventApplicationInvoiceMethod =
   (typeof EventApplicationInvoiceMethod)[keyof typeof EventApplicationInvoiceMethod];
 
@@ -610,6 +572,14 @@ export const EventApplicationInvoiceMethod = {
 
 export type EventApplicationAdditionalData = { [key: string]: unknown };
 
+export interface EventCustomOrganization {
+  application: EventApplication;
+  country: string;
+  createdAt: string;
+  id: number;
+  name: string;
+}
+
 export interface EventApplication {
   additionalData: EventApplicationAdditionalData;
   additionalInformation: string;
@@ -620,7 +590,6 @@ export interface EventApplication {
   healthLimitations: string;
   id: number;
   idNumber: string;
-  invoice: Invoice;
   invoiceAddress: Address;
   /** @nullable */
   invoicedTo: string | null;
@@ -634,54 +603,6 @@ export interface EventApplication {
   spotType: EventApplicationSpotType;
   user: User;
   validUntil: string;
-}
-
-export type InvoiceCurrency = (typeof InvoiceCurrency)[keyof typeof InvoiceCurrency];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const InvoiceCurrency = {
-  CZK: "CZK",
-  EUR: "EUR",
-} as const;
-
-export interface PaymentSubject {
-  address: Address;
-  /** @nullable */
-  cin: string | null;
-  createdAt: string;
-  id: string;
-  name: string;
-  /** @nullable */
-  vatId: string | null;
-}
-
-export interface InvoiceItem {
-  amount: number;
-  id: number;
-  invoice: Invoice;
-  name: string;
-  price: number;
-}
-
-export interface Invoice {
-  constantSymbol: number;
-  createdAt: string;
-  currency: InvoiceCurrency;
-  iban: string;
-  id: string;
-  items: InvoiceItem[];
-  subscriber: PaymentSubject;
-  supplier: PaymentSubject;
-  swift: string;
-  variableSymbol: number;
-}
-
-export interface EventCustomOrganization {
-  application: EventApplication;
-  country: string;
-  createdAt: string;
-  id: number;
-  name: string;
 }
 
 export type EventSpotCurrency = (typeof EventSpotCurrency)[keyof typeof EventSpotCurrency];
@@ -699,6 +620,12 @@ export interface EventSpot {
   name: string;
   price: number;
 }
+
+/**
+ * Spot, must be one of {@link event} spots
+ * @nullable
+ */
+export type EventApplicationSpotType = EventSpot | null;
 
 export interface AddOrganizationMembers {
   userIds: string[];
@@ -784,7 +711,7 @@ export interface UpdateUser {
   /**
    * Must not contain special characters
    * @minLength 6
-   * @pattern /^[a-zA-Z0-9]+$/
+   * @pattern /^[a-zA-Z0-9_-]+$/
    */
   username?: string;
 }
@@ -956,7 +883,7 @@ export interface CreateUser {
   /**
    * Must not contain special characters
    * @minLength 6
-   * @pattern /^[a-zA-Z0-9]+$/
+   * @pattern /^[a-zA-Z0-9_-]+$/
    */
   username: string;
 }

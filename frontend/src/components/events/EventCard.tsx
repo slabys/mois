@@ -19,7 +19,7 @@ const EventCard = ({ event }: EventCardProps) => {
     <Card withBorder radius="md" p={0} className={styles.card}>
       <Flex direction={{ base: "column", sm: "row" }} gap={0} w="100%" h="100%">
         <Box w={{ base: "100%", sm: 448 }} h={{ base: 224, sm: "auto" }}>
-          <ApiImage src={photo?.id} h="100%" fit="contain" />
+          <ApiImage src={photo?.id} h="100%" fit="cover" />
         </Box>
         <Stack w="100%" justify="center" p={{ base: "2rem 1rem", xs: "1rem 2rem" }}>
           <Stack gap={16}>
