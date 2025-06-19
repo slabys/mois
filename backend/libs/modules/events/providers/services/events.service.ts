@@ -95,7 +95,9 @@ export class EventsService {
 	}
 
 	async delete(event: Event) {
-		await this.photoService.delete(event.photo);
+		if (event.photo) {
+			await this.photoService.delete(event.photo);
+		}
 		await this.eventsRepository.remove(event);
 	}
 }

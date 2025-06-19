@@ -1,6 +1,6 @@
 "use client";
 
-import { useDuplicateEvent, useGetManagementEvents } from "@/utils/api";
+import { useDeleteEvent, useDuplicateEvent, useGetManagementEvents } from "@/utils/api";
 import { EventSimple } from "@/utils/api.schemas";
 import routes from "@/utils/routes";
 import ApiImage from "@components/ApiImage/ApiImage";
@@ -21,10 +21,23 @@ const ManageEventsPage = () => {
       },
     },
   });
+
+  const deleteEventMutation = useDeleteEvent({
+    mutation: {
+      onSuccess: () => {
+        refetchManagementEvents();
+      },
+    },
+  });
+
   const { data: eventList, refetch: refetchManagementEvents } = useGetManagementEvents();
 
   const handleDuplicateEvent = (event: EventSimple) => {
     duplicateEventMutation.mutate({ id: event.id });
+  };
+
+  const handleDeleteEvent = (event: EventSimple) => {
+    deleteEventMutation.mutate({ eventId: event.id });
   };
 
   const rows = eventList?.data?.map((event, index) => (
@@ -61,7 +74,7 @@ const ManageEventsPage = () => {
           </Tooltip>
           <Tooltip label="Delete Event">
             {/*TODO - Delete EP*/}
-            <ActionIcon variant="subtle" size={48} color="red" disabled>
+            <ActionIcon variant="subtle" size={48} color="red" onClick={() => handleDeleteEvent(event)}>
               <IconTrash width={32} height={32} />
             </ActionIcon>
           </Tooltip>
