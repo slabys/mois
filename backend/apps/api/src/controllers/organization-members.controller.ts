@@ -54,9 +54,14 @@ export class OrganizationMembersController {
 			this.usersService.findManyById(body.userIds),
 		]);
 
+
 		if (!organization) throw new NotFoundException("Organization not found");
 
-		return this.organizationService.addMembers(organization, users);
+		const organisationMembers = await this.organizationService.findMembersOf(organization.id).then((r) => r.data);
+		const unassignedMemberIds = body.userIds.filter((id) => organisationMembers.some((member) => member.user.id !== id));
+		const newMembers = await this.usersService.findManyById(unassignedMemberIds);
+
+		return this.organizationService.addMembers(organization, newMembers);
 	}
 
 	/**
