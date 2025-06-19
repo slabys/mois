@@ -45,6 +45,8 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
   const [currentSpot, setCurrentSpot] = useState<EventSpotSimple | null>(null);
   const [currentApplication, setCurrentApplication] = useState<EventApplicationDetailedWithApplications | null>(null);
 
+  console.log(currentSpot);
+
   const [isCreateSpotModalOpen, { open: openCreateSpotModal, close: closeCreateSpotModal }] = useDisclosure(false);
   const [isUpdateSpotModalOpen, { open: openUpdateSpotModal, close: closeUpdateSpotModal }] = useDisclosure(false);
 
@@ -196,7 +198,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
           </Button>
         </Flex>
       </Flex>
-      {eventApplicationsRows && eventApplicationsRows?.length > 0 ? (
+      {eventSpotsList && eventSpotsList?.length > 0 ? (
         <List w="100%">
           {eventSpotsList?.map((spot, index) => (
             <ListItem key={`event-spot-${index}-${spot.id}`}>
@@ -213,6 +215,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
                       color="blue"
                       size={32}
                       onClick={() => {
+                        console.log(spot);
                         setCurrentSpot(spot);
                         openUpdateSpotModal();
                       }}

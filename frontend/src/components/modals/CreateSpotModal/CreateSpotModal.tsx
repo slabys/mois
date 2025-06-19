@@ -16,7 +16,7 @@ const CreateSpotModal = ({ isOpened, closeModal, eventId, handleSuccess = () => 
     mutation: {
       onSuccess: () => {
         handleSuccess();
-        closeModal();
+        handleCloseModal();
       },
     },
   });
@@ -32,6 +32,11 @@ const CreateSpotModal = ({ isOpened, closeModal, eventId, handleSuccess = () => 
     },
   });
 
+  const handleCloseModal = () => {
+    form.reset();
+    closeModal();
+  };
+
   const handleCreateSpot = (submitValues: Partial<CreateEventSpot>) => {
     form.validate();
     if (form.isValid()) {
@@ -45,7 +50,7 @@ const CreateSpotModal = ({ isOpened, closeModal, eventId, handleSuccess = () => 
   const isTouchedDirty = form.isTouched() && form.isDirty();
 
   return (
-    <Modal size="lg" opened={isOpened} onClose={closeModal} title="Add Spot type">
+    <Modal size="lg" opened={isOpened} onClose={handleCloseModal} title="Add Spot type">
       <Form form={form} onSubmit={handleCreateSpot}>
         <Flex direction="column" gap={16}>
           <SimpleGrid cols={2}>

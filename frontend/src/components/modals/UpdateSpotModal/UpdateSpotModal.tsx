@@ -2,7 +2,7 @@ import { useUpdateEventSpot } from "@/utils/api";
 import { EventSpotSimple, UpdateEventSpot } from "@/utils/api.schemas";
 import { Button, Flex, Group, Modal, NumberInput, SimpleGrid, TextInput } from "@mantine/core";
 import { Form, hasLength, useForm } from "@mantine/form";
-import React from "react";
+import React, { useEffect } from "react";
 
 interface UpdateSpotModalProps {
   currentSpot: EventSpotSimple;
@@ -16,21 +16,26 @@ const UpdateSpotModal = ({ currentSpot, isOpened, closeModal, handleSuccess = ()
     mutation: {
       onSuccess: () => {
         handleSuccess();
-        closeModal();
+        handleClose();
       },
     },
   });
 
   const form = useForm<Partial<EventSpotSimple>>({
     initialValues: {
-      name: currentSpot.name,
-      price: currentSpot.price,
+      name: undefined,
+      price: undefined,
     },
     validate: {
       name: hasLength({ min: 6 }, "Must be at least 6 characters."),
       price: (value) => (!!value && value < 0 ? "Must be larger than or equal to 0" : null),
     },
   });
+
+  useEffect(() => {
+    form.setInitialValues(currentSpot);
+    form.setValues(currentSpot);
+  }, [currentSpot]);
 
   const handleUpdateSpot = (submitValues: Partial<UpdateEventSpot>) => {
     form.validate();
@@ -42,10 +47,15 @@ const UpdateSpotModal = ({ currentSpot, isOpened, closeModal, handleSuccess = ()
     }
   };
 
+  const handleClose = () => {
+    form.reset();
+    closeModal();
+  };
+
   const isTouchedDirty = form.isTouched() && form.isDirty();
 
   return (
-    <Modal size="lg" opened={isOpened} onClose={closeModal} title="Add Spot type">
+    <Modal size="lg" opened={isOpened} onClose={handleClose} title="Add Spot type">
       <Form form={form} onSubmit={handleUpdateSpot}>
         <Flex direction="column" gap={16}>
           <SimpleGrid cols={2}>
