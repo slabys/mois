@@ -39,8 +39,6 @@ const CreateRoleModal = ({ isOpened, closeModal, handleOnSuccess }: MyModalProps
     }));
   }, [allPermissions]);
 
-  console.log(categorizedPermissions);
-
   const changeRoleMutation = useCreateRole({
     mutation: {
       onSuccess: () => {
@@ -67,8 +65,6 @@ const CreateRoleModal = ({ isOpened, closeModal, handleOnSuccess }: MyModalProps
     closeModal();
   };
 
-  console.log(categorizedPermissions);
-
   return (
     <Modal size="xl" opened={isOpened} onClose={handleClose} title="Create Role">
       <Stack justify="center" mt="lg">
@@ -89,7 +85,6 @@ const CreateRoleModal = ({ isOpened, closeModal, handleOnSuccess }: MyModalProps
             };
           })}
           onChange={(value) => {
-            console.log(value);
             setPermissions(value as RolePermissionsItem[]);
           }}
         />
