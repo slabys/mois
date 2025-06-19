@@ -110,8 +110,8 @@ export class EventApplicationsService {
 				invoiceAddress: true,
 				...options?.relations,
 			},
-			take: pagination?.all ? undefined : pagination?.perPage,
-			skip: pagination?.all ? undefined : ((pagination?.page - 1) * pagination?.perPage) || undefined,
+			take: pagination?.all ? pagination.perPage : undefined,
+			skip: pagination?.all ? (pagination.page - 1) * pagination.perPage : undefined,
 		});
 		return formatPaginatedResponse(eventApplications, totalCount, pagination);
 	}

@@ -78,10 +78,10 @@ export class OrganizationService {
 					personalAddress: true,
 				},
 			},
-			take: pagination.all ? undefined : pagination.perPage,
-			skip: pagination.all ? undefined : (pagination.page - 1) * pagination.perPage,
+			take: pagination?.all ? pagination.perPage : undefined,
+			skip: pagination?.all ? (pagination.page - 1) * pagination.perPage : undefined,
 		});
-		return formatPaginatedResponse<OrganizationMember>(members, totalCount, pagination);
+		return await formatPaginatedResponse<OrganizationMember>(members, totalCount, pagination);
 	}
 
 	/**
@@ -132,18 +132,7 @@ export class OrganizationService {
 	 */
 	async addMembers(organization: Organization, addMembers: User[]) {
 		return this.entityManager.transaction(async (em) => {
-			const alreadyMembers = await em
-				.createQueryBuilder(OrganizationMember, "member")
-				.leftJoinAndSelect("member.user", "user")
-				.where("member.user.id IN (:...userIds)", {
-					userIds: addMembers.map((e) => e.id),
-				})
-				.getMany();
-			const alreadyMembersIds = alreadyMembers.map((e) => e.user.id);
-
-			const newMembers = addMembers.filter((e) => !alreadyMembersIds.includes(e.id));
-
-			return em.save(newMembers.map((user) => em.create(OrganizationMember, { user, organization })));
+			return em.save(addMembers.map((user) => em.create(OrganizationMember, { user, organization })));
 		});
 	}
 
