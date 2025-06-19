@@ -12,11 +12,6 @@ export const middleware = async (request: NextRequest) => {
   const apiUrl = process.env.NEXT_PUBLIC_APP1_URL;
   const authCookieToken = request.cookies.get("AuthCookie");
 
-  // ✅ Bypass middleware for public paths immediately
-  if (publicPaths.some((allowed) => path.startsWith(allowed))) {
-    return NextResponse.next();
-  }
-
   // ✅ Check if the application is initialized
   try {
     const res = await fetch(`${apiUrl}/initialize`, { method: "GET" });
@@ -31,6 +26,9 @@ export const middleware = async (request: NextRequest) => {
 
   // ✅ If no auth token, redirect to login (excluding login itself)
   if (!authCookieToken?.value) {
+    if (publicPaths.some((allowed) => path.startsWith(allowed))) {
+      return NextResponse.next();
+    }
     return NextResponse.redirect(new URL(routes.LOGIN, request.url));
   }
 
@@ -54,7 +52,7 @@ export const middleware = async (request: NextRequest) => {
     }
 
     // ✅ If user is already on login, send them to the dashboard
-    if (path.startsWith(routes.LOGIN)) {
+    if (publicPaths.some((allowed) => path.startsWith(allowed))) {
       return NextResponse.redirect(new URL(routes.DASHBOARD, request.url));
     }
   } catch (error) {

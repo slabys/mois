@@ -52,7 +52,7 @@ const mainLinks: MainLinksProps = [
       },
       {
         link: routes.MANAGE_ORGANISATIONS,
-        label: "Manage Organizations",
+        label: "Manage Organisations",
         permissions: [
           "organisation.create",
           "organisation.update",

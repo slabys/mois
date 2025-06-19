@@ -65,7 +65,7 @@ const EventEditModal = ({ eventDetail, isOpened, close, handleSuccess = () => {}
   };
 
   return (
-    <Modal size="lg" opened={isOpened} onClose={handleClose} title="Edit Event">
+    <Modal size="xl" opened={isOpened} onClose={handleClose} title="Edit Event">
       <Form form={form} onSubmit={handleEventUpdate}>
         <Flex direction="column" gap={8}>
           <Switch
