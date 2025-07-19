@@ -1,5 +1,5 @@
 import { PickType } from "@nestjs/swagger";
-import { Event } from "modules/events";
+import { Event } from "../../modules/events";
 
 export class EventSimple extends PickType(Event, [
 	"id",
@@ -15,4 +15,5 @@ export class EventSimple extends PickType(Event, [
 	"photoPolicyLink",
 	"codeOfConductLink",
 	"capacity",
-]) {}
+]) {
+}

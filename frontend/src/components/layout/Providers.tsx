@@ -21,6 +21,7 @@ const Providers = ({ children }: ProvidersProps) => {
         defaultOptions: {
           queries: {
             staleTime: 1000 * 30,
+            refetchOnMount: "always",
           },
         },
         mutationCache: new MutationCache({

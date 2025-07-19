@@ -1,4 +1,4 @@
-import type { Event } from "modules/events";
+import type { Event } from "../modules/events";
 import { Injectable } from "@nestjs/common";
 
 import type { EventSimpleWithApplications } from "../models/responses";

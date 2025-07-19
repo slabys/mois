@@ -11,6 +11,10 @@ export default defineConfig({
           path: "./src/utils/customInstance.ts",
           name: "customInstance",
         },
+        query: {
+          useQuery: true,
+          //   usePrefetch: true,
+        },
       },
     },
     input: {

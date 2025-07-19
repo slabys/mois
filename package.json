@@ -14,8 +14,13 @@
     "dev:web": "cd frontend && yarn dev"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^2.0.2",
     "concurrently": "^8.2.2",
-    "yarn": "^1.22.22",
-    "pnpm": "^9.14.3"
+    "nodemailer": "^7.0.5",
+    "pnpm": "^9.14.3",
+    "yarn": "^1.22.22"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^6.4.17"
   }
 }
