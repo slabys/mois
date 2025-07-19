@@ -21,11 +21,16 @@ import { AccessToken } from "../../models/responses";
 import { AuthService } from "./index";
 import { User, UsersService } from "../users";
 import { isProduction } from "utilities/env";
+import { ConfigService } from "@nestjs/config";
+import { MailerService } from "@nestjs-modules/mailer";
+import { ResetPasswordDto } from "@api/models/requests/reset-password.dto";
 
 @ApiTags("Auth")
 @Controller("auth")
 export class AuthController {
 	constructor(
+		private readonly mailerService: MailerService,
+		private readonly configService: ConfigService,
 		private readonly authService: AuthService,
 		private readonly usersService: UsersService,
 	) {
@@ -96,6 +101,50 @@ export class AuthController {
 			.status(HttpStatus.OK);
 	}
 
+	@Post("forgot-password")
+	async forgotPassword(@Query("email") email: string) {
+		const user = await this.usersService.findByEmailWithPassword(email);
+		if (!user) {
+			// Do not reveal user existence
+			return { message: "If this email is registered, a reset link has been sent." };
+		}
+
+		const resetToken = await this.authService.createResetPasswordToken(user);
+		const resetUrl = `https://${this.configService.getOrThrow("WEB_DOMAIN")}/forgot-password/reset?token=${resetToken}`;
+
+		await this.mailerService.sendMail({
+			to: [{ name: `${user.firstName} ${user.lastName}`, address: user.email }],
+			from: { name: "No Reply", address: this.configService.get<string>("MAIL_USER") },
+			subject: "Password Reset Request",
+			template: "reset-password", // create this template!
+			context: {
+				name: `${user.firstName} ${user.lastName}`,
+				link: resetUrl,
+			},
+		});
+
+		return { message: "If this email is registered, a reset link has been sent." };
+	}
+
+	@Post("reset-password")
+	async resetPassword(
+		@Body() body: ResetPasswordDto,
+	) {
+		let payload: any;
+		try {
+			payload = await this.authService.verifyResetPasswordToken(body.token);
+		} catch (e) {
+			throw new BadRequestException("Invalid or expired token");
+		}
+		const user = await this.usersService.findById(payload.id);
+		if (!user) throw new BadRequestException("User not found");
+
+		user.password = body.password;
+		await this.usersService.save(user);
+
+		return { message: "Password has been reset. You can now log in." };
+	}
+
 	@Get("verify")
 	async verifyEmail(@Query("token") token: string) {
 		try {
@@ -111,6 +160,31 @@ export class AuthController {
 		} catch (e) {
 			throw new BadRequestException("Invalid or expired token");
 		}
+	}
+
+
+	@Post("resend-verification")
+	async resendVerification(@Query("email") email: string) {
+		const user = await this.usersService.findByEmailWithPassword(email);
+		if (!user) throw new BadRequestException("User not found");
+		if (user.isVerified) return { message: "Already verified" };
+
+		const verificationToken = await this.authService.createEmailVerificationToken(user);
+		const verifyUrl = `https://${this.configService.getOrThrow("WEB_DOMAIN")}/verify?token=${verificationToken}`;
+
+		// TODO - Move to MailController (resend verification)
+		await this.mailerService.sendMail({
+			from: { name: "No Reply", address: this.configService.get<string>("MAIL_USER") },
+			to: [{ name: `${user.firstName} ${user.lastName}`, address: user.email }],
+			subject: "Verify your email - resend",
+			template: "verify-email",
+			context: {
+				name: `${user.firstName} ${user.lastName}`,
+				link: verifyUrl,
+			},
+		});
+
+		return { message: "Verification email resent" };
 	}
 
 }

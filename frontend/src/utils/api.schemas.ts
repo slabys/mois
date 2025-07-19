@@ -88,6 +88,13 @@ export interface AccessToken {
   accessToken: string;
 }
 
+export interface ResetPasswordDto {
+  /** User token */
+  token: string;
+  /** User password */
+  password: string;
+}
+
 export interface Photo {
   id: string;
   filename: string;
@@ -793,10 +800,16 @@ export interface Error {
   [key: string]: unknown;
 }
 
-export type GetInitialized200 = { [key: string]: unknown };
+export type ForgotPasswordParams = {
+  email: string;
+};
 
 export type VerifyEmailParams = {
   token: string;
+};
+
+export type ResendVerificationParams = {
+  email: string;
 };
 
 export type GetAllUsersParams = {

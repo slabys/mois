@@ -5,6 +5,8 @@ export const routes = {
   // Any unauthorized routes need to be added to CustomHooksLoader and middleware.ts
   LOGIN: "/login",
   REGISTER: "/registration",
+  FORGOT_PASSWORD: "/forgot-password",
+  RESET_PASSWORD: "/forgot-password/reset",
   VERIFY: "/verify",
   LOGOUT: "/api/auth/logout",
 
