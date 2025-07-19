@@ -38,7 +38,13 @@ interface ManageApplicationsTableProps {
 
 const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
   const { data: eventSpotsList, refetch: refetchEventSpots } = useGetEventSpots(eventId);
-  const deleteEventSpotMutation = useDeleteEventSpot();
+  const deleteEventSpotMutation = useDeleteEventSpot({
+    mutation: {
+      onSuccess: () => {
+        refetchEventSpots();
+      },
+    },
+  });
 
   const { data: applicationsList, refetch: refetchEventApplications } = useGetEventApplications(eventId);
 

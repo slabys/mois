@@ -1,5 +1,5 @@
 import { IsEnum, IsInt, IsString, Min, MinLength } from "class-validator";
-import { CurrencyEnum } from "modules/events/enums/currency.enum";
+import { CurrencyEnum } from "../../modules/events/enums/currency.enum";
 
 export class CreateEventSpot {
 	@MinLength(6)

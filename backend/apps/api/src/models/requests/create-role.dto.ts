@@ -1,5 +1,5 @@
 import { IsOptional, IsString } from "class-validator";
-import { Permission } from "modules/roles";
+import { Permission } from "../../modules/roles";
 
 export class CreateRole {
 	@IsString()

@@ -1,6 +1,6 @@
 import { PickType } from "@nestjs/swagger";
 
-import { EventApplication } from "modules/events/entities";
+import { EventApplication } from "../../modules/events/entities";
 
 import type { EventSimple } from "./event-simple.dto";
 import type { SpotTypeSimple } from "./spot-type-simple.dto";

@@ -1,4 +1,4 @@
-import packageJson from "package.json";
+import packageJson from "base/package.json";
 
 import { ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";

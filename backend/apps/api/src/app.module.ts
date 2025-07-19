@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
-import { getDataSourceOptions } from "config/typeorm.config";
+import { getDataSourceOptions } from "../config/typeorm.config";
 import {
 	AuthController,
 	EventApplicationsController,
@@ -16,19 +16,19 @@ import {
 	UsersController,
 } from "./controllers";
 
-import { AuthModule } from "modules/auth";
-import { EventsModule } from "modules/events";
-import { FileStorageModule } from "modules/file-storage";
-import { OrganizationModule } from "modules/organization";
-import { PhotoModule } from "modules/photo";
-import { RolesModule } from "modules/roles";
-import { UsersModule } from "modules/users";
-import { InitializeModule } from "modules/initialize";
+import { AuthModule } from "./modules/auth";
+import { EventsModule } from "./modules/events";
+import { FileStorageModule } from "./modules/file-storage";
+import { OrganizationModule } from "./modules/organization";
+import { PhotoModule } from "./modules/photo";
+import { RolesModule } from "./modules/roles";
+import { UsersModule } from "./modules/users";
+import { InitializeModule } from "./modules/initialize";
 import { NestjsFormDataModule } from "nestjs-form-data";
 
 import { ManagementControllers } from "./controllers/management";
 import { EventApplicationSimpleWithApplicationsMapper, EventSimpleWithApplicationsMapper } from "./mappers";
-import { MailerModule } from "modules/mailer/mailer.module";
+import { MailerModule } from "./modules/mailer/mailer.module";
 import { ConfigModule } from "@nestjs/config";
 
 

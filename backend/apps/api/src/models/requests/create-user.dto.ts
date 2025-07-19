@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum, IsObject, IsOptional, IsString, Matches, MinLength } from "class-validator";
-import { UserGender } from "modules/users/enums";
+import { UserGender } from "../../modules/users/enums";
 import { CreateAddress } from "./create-address.dto";
 import { Transform, Type } from "class-transformer";
 import { DateTransform, IsValidDate } from "utilities/nest/class-validator";

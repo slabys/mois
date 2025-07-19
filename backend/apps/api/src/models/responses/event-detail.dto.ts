@@ -1,10 +1,11 @@
 import { OmitType, PickType } from "@nestjs/swagger";
 import { Type } from "class-transformer";
 import { IsObject } from "class-validator";
-import { Event } from "modules/events";
-import { EventLink } from "modules/events/entities";
+import { Event } from "../../modules/events";
+import { EventLink } from "../../modules/events/entities";
 
-class EventDetailLink extends OmitType(EventLink, ["event"]) {}
+class EventDetailLink extends OmitType(EventLink, ["event"]) {
+}
 
 export class EventDetail extends PickType(Event, [
 	"id",
