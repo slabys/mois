@@ -4,9 +4,10 @@ FROM node:20-alpine AS build
 # Set working directory
 WORKDIR /frontend/app
 
+RUN npm install -g pnpm
 # Install dependencies
-COPY package.json yarn.lock ./
-RUN yarn install
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install
 
 # Copy all project files
 COPY . .
@@ -17,7 +18,7 @@ RUN echo "NEXT_PUBLIC_APP1_URL=${NEXT_PUBLIC_APP1_URL}" >> .env.production
 ENV NODE_ENV=production
 
 # Build the Next.js application
-RUN yarn build
+RUN pnpm build
 
 # Production image
 FROM node:20-alpine AS runner
