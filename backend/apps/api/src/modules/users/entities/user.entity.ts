@@ -91,4 +91,8 @@ export class User extends BaseEntity {
 		super();
 		Object.assign(this, partial);
 	}
+
+	@Column({ default: false })
+	isVerified: boolean;
+
 }

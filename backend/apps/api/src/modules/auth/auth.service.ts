@@ -4,12 +4,14 @@ import { JwtService } from "@nestjs/jwt";
 import { User, UsersService } from "@api/modules/users";
 import { verifyPassword } from "@api/modules/auth/utilities/crypto";
 import { JwtContent } from "./types";
+import { ConfigService } from "@nestjs/config";
 
 @Injectable()
 export class AuthService {
 	constructor(
 		private readonly usersService: UsersService,
 		private readonly jwtService: JwtService,
+		private readonly configService: ConfigService,
 	) {
 	}
 
@@ -22,6 +24,9 @@ export class AuthService {
 	async validateUser(emailOrUsername: string, password: string): Promise<User | null> {
 		const user = await this.usersService.findByUsernameOrEmailWithPassword(emailOrUsername);
 		if (!user) return null;
+		if (!user.isVerified) {
+			return null;
+		}
 
 		const result = await verifyPassword(password, user.password);
 		return result ? user : null;
@@ -37,4 +42,29 @@ export class AuthService {
 			sub: user.id,
 		});
 	}
+
+	/**
+	 * Create Token for e-mail verification of user
+	 * @param user User data
+	 * @returns Promise<string>
+	 */
+	async createEmailVerificationToken(user: User): Promise<string> {
+		return this.jwtService.signAsync(
+			{ id: user.id, email: user.email },
+			{ expiresIn: "1d", issuer: this.configService.getOrThrow("WEB_DOMAIN"), subject: "verify" },
+		);
+	}
+
+	/**
+	 * Verify user token from e-mail
+	 * @param token User e-mail token
+	 * @returns Promise<any>
+	 */
+	async verifyVerificationToken(token: string): Promise<any> {
+		return this.jwtService.verifyAsync(token, {
+			issuer: this.configService.getOrThrow("WEB_DOMAIN"),
+			subject: "verify",
+		});
+	}
+
 }

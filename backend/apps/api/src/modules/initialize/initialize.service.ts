@@ -1,12 +1,15 @@
 import { ConflictException, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { User } from "../users/entities";
+import { User } from "@api/modules/users/entities";
 import { Repository } from "typeorm";
 import { Organization } from "../organization";
-import { InitializeType } from "../../models/requests/init.dto";
-import { Address } from "../addresses";
-import { Permission, Role } from "../roles";
-import { OrganizationMember } from "../organization/entities";
+import { InitializeType } from "@api/models/requests/init.dto";
+import { Address } from "@api/modules/addresses";
+import { Permission, Role } from "@api/modules/roles";
+import { OrganizationMember } from "@api/modules/organization/entities";
+import { AuthService } from "@api/modules/auth";
+import { ConfigService } from "@nestjs/config";
+import { MailerService } from "@nestjs-modules/mailer";
 
 @Injectable()
 export class InitializeService {
@@ -21,6 +24,9 @@ export class InitializeService {
 		private readonly AddressRepository: Repository<Address>,
 		@InjectRepository(Role)
 		private readonly RoleRepository: Repository<Role>,
+		private readonly mailerService: MailerService,
+		private readonly authService: AuthService,
+		private readonly configService: ConfigService,
 	) {
 	}
 
@@ -101,6 +107,21 @@ export class InitializeService {
 		// Assign Admin User as Manager of the Organization
 		newOrganization.manager = adminUser;
 		await this.OrganisationRepository.save(newOrganization);
+
+		const verificationToken = await this.authService.createEmailVerificationToken(adminUser);
+		const verifyUrl = `https://${this.configService.getOrThrow("WEB_DOMAIN")}/verify?token=${verificationToken}`;
+
+		// Send verification email (use your MailerService)
+		await this.mailerService.sendMail({
+			to: [{ name: "No Reply", address: this.configService.get<string>("MAIL_USER") }],
+			bcc: [{ name: `${adminUser.firstName} ${adminUser.lastName}`, address: adminUser.email }],
+			subject: "Verify your email",
+			template: "verify-email",
+			context: {
+				name: `${adminUser.firstName} ${adminUser.lastName}`,
+				link: verifyUrl,
+			},
+		});
 
 		return {
 			message: "System initialized successfully",
