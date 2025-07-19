@@ -38,13 +38,13 @@ import type {
   EventSimple,
   EventSimpleWithApplications,
   EventSpotSimple,
+  ForgotPasswordParams,
   GenerateSheetEventApplication200,
   GenerateSheetUsers200,
   GetAllUsers200,
   GetAllUsersParams,
   GetEvents200,
   GetEventsParams,
-  GetInitialized200,
   GetManagementEvents200,
   GetManagementEventsParams,
   GetRoleAllPermissions200Item,
@@ -57,6 +57,8 @@ import type {
   OrganizationMemberWithoutUser,
   OrganizationMembers200,
   OrganizationMembersParams,
+  ResendVerificationParams,
+  ResetPasswordDto,
   Role,
   SendEmailDTO,
   TransferManager201,
@@ -76,7 +78,7 @@ import type { ErrorType } from "./customInstance";
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 export const getInitialized = (options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
-  return customInstance<GetInitialized200>({ url: `/initialize`, method: "GET", signal }, options);
+  return customInstance<void>({ url: `/initialize`, method: "GET", signal }, options);
 };
 
 export const getGetInitializedQueryKey = () => {
@@ -384,6 +386,137 @@ export const useRemoveCookie = <TError = ErrorType<unknown>, TContext = unknown>
   return useMutation(mutationOptions, queryClient);
 };
 
+export const forgotPassword = (
+  params: ForgotPasswordParams,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<void>({ url: `/auth/forgot-password`, method: "POST", params, signal }, options);
+};
+
+export const getForgotPasswordMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof forgotPassword>>,
+    TError,
+    { params: ForgotPasswordParams },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof forgotPassword>>,
+  TError,
+  { params: ForgotPasswordParams },
+  TContext
+> => {
+  const mutationKey = ["forgotPassword"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof forgotPassword>>, { params: ForgotPasswordParams }> = (
+    props,
+  ) => {
+    const { params } = props ?? {};
+
+    return forgotPassword(params, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ForgotPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof forgotPassword>>>;
+
+export type ForgotPasswordMutationError = ErrorType<unknown>;
+
+export const useForgotPassword = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof forgotPassword>>,
+      TError,
+      { params: ForgotPasswordParams },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof forgotPassword>>,
+  TError,
+  { params: ForgotPasswordParams },
+  TContext
+> => {
+  const mutationOptions = getForgotPasswordMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+export const resetPassword = (
+  resetPasswordDto: ResetPasswordDto,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<void>(
+    {
+      url: `/auth/reset-password`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: resetPasswordDto,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getResetPasswordMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof resetPassword>>,
+    TError,
+    { data: ResetPasswordDto },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<Awaited<ReturnType<typeof resetPassword>>, TError, { data: ResetPasswordDto }, TContext> => {
+  const mutationKey = ["resetPassword"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof resetPassword>>, { data: ResetPasswordDto }> = (
+    props,
+  ) => {
+    const { data } = props ?? {};
+
+    return resetPassword(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ResetPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof resetPassword>>>;
+export type ResetPasswordMutationBody = ResetPasswordDto;
+export type ResetPasswordMutationError = ErrorType<unknown>;
+
+export const useResetPassword = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof resetPassword>>,
+      TError,
+      { data: ResetPasswordDto },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<Awaited<ReturnType<typeof resetPassword>>, TError, { data: ResetPasswordDto }, TContext> => {
+  const mutationOptions = getResetPasswordMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
 export const verifyEmail = (
   params: VerifyEmailParams,
   options?: SecondParameter<typeof customInstance>,
@@ -482,6 +615,73 @@ export function useVerifyEmail<TData = Awaited<ReturnType<typeof verifyEmail>>, 
 
   return query;
 }
+
+export const resendVerification = (
+  params: ResendVerificationParams,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<void>({ url: `/auth/resend-verification`, method: "POST", params, signal }, options);
+};
+
+export const getResendVerificationMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof resendVerification>>,
+    TError,
+    { params: ResendVerificationParams },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof resendVerification>>,
+  TError,
+  { params: ResendVerificationParams },
+  TContext
+> => {
+  const mutationKey = ["resendVerification"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof resendVerification>>,
+    { params: ResendVerificationParams }
+  > = (props) => {
+    const { params } = props ?? {};
+
+    return resendVerification(params, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ResendVerificationMutationResult = NonNullable<Awaited<ReturnType<typeof resendVerification>>>;
+
+export type ResendVerificationMutationError = ErrorType<unknown>;
+
+export const useResendVerification = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof resendVerification>>,
+      TError,
+      { params: ResendVerificationParams },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof resendVerification>>,
+  TError,
+  { params: ResendVerificationParams },
+  TContext
+> => {
+  const mutationOptions = getResendVerificationMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
 
 export const createUser = (
   createUser: CreateUser,
@@ -1044,59 +1244,6 @@ export function useGenerateSheetUsers<
 
   return query;
 }
-
-export const resendVerification = (
-  resendVerificationBody: string,
-  options?: SecondParameter<typeof customInstance>,
-  signal?: AbortSignal,
-) => {
-  return customInstance<void>(
-    {
-      url: `/users/resend-verification`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: resendVerificationBody,
-      signal,
-    },
-    options,
-  );
-};
-
-export const getResendVerificationMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
-  mutation?: UseMutationOptions<Awaited<ReturnType<typeof resendVerification>>, TError, { data: string }, TContext>;
-  request?: SecondParameter<typeof customInstance>;
-}): UseMutationOptions<Awaited<ReturnType<typeof resendVerification>>, TError, { data: string }, TContext> => {
-  const mutationKey = ["resendVerification"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof resendVerification>>, { data: string }> = (props) => {
-    const { data } = props ?? {};
-
-    return resendVerification(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type ResendVerificationMutationResult = NonNullable<Awaited<ReturnType<typeof resendVerification>>>;
-export type ResendVerificationMutationBody = string;
-export type ResendVerificationMutationError = ErrorType<unknown>;
-
-export const useResendVerification = <TError = ErrorType<unknown>, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<Awaited<ReturnType<typeof resendVerification>>, TError, { data: string }, TContext>;
-    request?: SecondParameter<typeof customInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<Awaited<ReturnType<typeof resendVerification>>, TError, { data: string }, TContext> => {
-  const mutationOptions = getResendVerificationMutationOptions(options);
-
-  return useMutation(mutationOptions, queryClient);
-};
 
 export const getPhoto = (id: string, options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
   return customInstance<void>({ url: `/photo/${id}`, method: "GET", signal }, options);

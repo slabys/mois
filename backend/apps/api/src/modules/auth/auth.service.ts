@@ -43,6 +43,26 @@ export class AuthService {
 		});
 	}
 
+	// Create JWT reset password token
+	async createResetPasswordToken(user: User): Promise<string> {
+		return this.jwtService.signAsync(
+			{ id: user.id, email: user.email },
+			{
+				expiresIn: "1h",
+				issuer: this.configService.getOrThrow("WEB_DOMAIN"),
+				subject: "reset-password",
+			},
+		);
+	}
+
+	// Verify reset password token
+	async verifyResetPasswordToken(token: string): Promise<any> {
+		return this.jwtService.verifyAsync(token, {
+			issuer: this.configService.getOrThrow("WEB_DOMAIN"),
+			subject: "reset-password",
+		});
+	}
+
 	/**
 	 * Create Token for e-mail verification of user
 	 * @param user User data

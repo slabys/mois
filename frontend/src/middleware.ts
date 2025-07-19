@@ -4,7 +4,14 @@ import { NextRequest, NextResponse } from "next/server";
 // Stop Middleware running on static files https://stackoverflow.com/questions/76348460/nextjs-13-4-app-router-middleware-page-redirect-has-no-styles
 export const config = { matcher: "/((?!.*\\.).*)" };
 
-const notAuthorizedPaths = [routes.LOGIN, routes.REGISTER, routes.INIT, routes.VERIFY];
+const notAuthorizedPaths = [
+  routes.LOGIN,
+  routes.REGISTER,
+  routes.INIT,
+  routes.VERIFY,
+  routes.FORGOT_PASSWORD,
+  routes.RESET_PASSWORD,
+];
 const publicPaths = ["/-/", "/_next", ...notAuthorizedPaths];
 
 export const middleware = async (request: NextRequest) => {

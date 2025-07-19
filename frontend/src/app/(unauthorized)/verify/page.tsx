@@ -58,7 +58,7 @@ const VerifyPage = () => {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              resendMutation.mutate({ data: email });
+              resendMutation.mutate({ params: { email: email } });
             }}
           >
             <label>
