@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, HttpStatus, Post, Res, UseGuards } from "@nestjs/common";
+import {
+	BadRequestException,
+	Body,
+	Controller,
+	Delete,
+	Get,
+	HttpStatus,
+	Post,
+	Query,
+	Res,
+	UseGuards,
+} from "@nestjs/common";
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import type { Response } from "express";
 
@@ -8,13 +19,16 @@ import { LoginUser } from "../../models/requests";
 import { AccessToken } from "../../models/responses";
 
 import { AuthService } from "./index";
-import type { User } from "../users";
+import { User, UsersService } from "../users";
 import { isProduction } from "utilities/env";
 
 @ApiTags("Auth")
 @Controller("auth")
 export class AuthController {
-	constructor(private readonly authService: AuthService) {
+	constructor(
+		private readonly authService: AuthService,
+		private readonly usersService: UsersService,
+	) {
 	}
 
 	/**
@@ -81,4 +95,23 @@ export class AuthController {
 			})
 			.status(HttpStatus.OK);
 	}
+
+	@Get("verify")
+	async verifyEmail(@Query("token") token: string) {
+		try {
+			const payload = await this.authService.verifyVerificationToken(token);
+			const user = await this.usersService.findById(payload.id);
+			if (!user) throw new BadRequestException("User not found");
+			if (user.isVerified) return { message: "Already verified" };
+
+			user.isVerified = true;
+			await this.usersService.save(user);
+
+			return { message: "Email verified successfully" };
+		} catch (e) {
+			throw new BadRequestException("Invalid or expired token");
+		}
+	}
+
 }
+

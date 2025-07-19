@@ -10,6 +10,7 @@ import {
 	ParseUUIDPipe,
 	Patch,
 	Post,
+	Query,
 	Res,
 	UseGuards,
 } from "@nestjs/common";
@@ -37,14 +38,20 @@ import { Address } from "../addresses";
 import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 import { PaginationDto, PaginationResponseDto } from "../../models/responses/pagination-response.dto";
 import * as ExcelJS from "exceljs";
+import { AuthService } from "@api/modules/auth";
+import { ConfigService } from "@nestjs/config";
+import { MailerService } from "@nestjs-modules/mailer";
 
 @ApiTags("Users")
 @Controller("users")
 export class UsersController {
 	constructor(
+		private readonly configService: ConfigService,
+		private readonly authService: AuthService,
 		private readonly usersService: UsersService,
 		private readonly photoService: PhotoService,
 		private readonly organizationService: OrganizationService,
+		private readonly mailerService: MailerService,
 	) {
 	}
 
@@ -81,6 +88,22 @@ export class UsersController {
 
 		newUser = await this.usersService.save(newUser);
 		newUser.password = undefined;
+
+		const verificationToken = await this.authService.createEmailVerificationToken(newUser);
+		const verifyUrl = `https://${this.configService.getOrThrow("WEB_DOMAIN")}/verify?token=${verificationToken}`;
+
+		// Send verification email (use your MailerService)
+		await this.mailerService.sendMail({
+			to: [{ name: "No Reply", address: this.configService.get<string>("MAIL_USER") }],
+			bcc: [{ name: `${newUser.firstName} ${newUser.lastName}`, address: newUser.email }],
+			subject: "Verify your email",
+			template: "verify-email",
+			context: {
+				name: `${newUser.firstName} ${newUser.lastName}`,
+				link: verifyUrl,
+			},
+		});
+
 		return newUser;
 	}
 
@@ -242,5 +265,28 @@ ${user?.personalAddress?.country}` : "",
 			.type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 			.send(buffer);
 		return buffer;
+	}
+
+	@Post("resend-verification")
+	async resendVerification(@Query("email") email: string) {
+		const user = await this.usersService.findByEmailWithPassword(email);
+		if (!user) throw new BadRequestException("User not found");
+		if (user.isVerified) return { message: "Already verified" };
+
+		const verificationToken = await this.authService.createEmailVerificationToken(user);
+		const verifyUrl = `https://${this.configService.getOrThrow("WEB_DOMAIN")}/verify?token=${verificationToken}`;
+
+		await this.mailerService.sendMail({
+			from: { name: "No Reply", address: this.configService.get<string>("MAIL_USER") },
+			to: [{ name: `${user.firstName} ${user.lastName}`, address: user.email }],
+			subject: "Verify your email - resend",
+			template: "verify-email",
+			context: {
+				name: `${user.firstName} ${user.lastName}`,
+				link: verifyUrl,
+			},
+		});
+
+		return { message: "Verification email resent" };
 	}
 }

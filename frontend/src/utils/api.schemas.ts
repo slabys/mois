@@ -161,6 +161,7 @@ export interface User {
   /** @nullable */
   personalAddress: UserPersonalAddress;
   role: Role;
+  isVerified: boolean;
 }
 
 /**
@@ -788,10 +789,15 @@ export interface SendEmailDTO {
   placeholderReplacement?: SendEmailDTOPlaceholderReplacement;
 }
 
-export interface TestMailDto {
-  test: string;
-  name: string;
+export interface Error {
+  [key: string]: unknown;
 }
+
+export type GetInitialized200 = { [key: string]: unknown };
+
+export type VerifyEmailParams = {
+  token: string;
+};
 
 export type GetAllUsersParams = {
   /**
@@ -916,5 +922,3 @@ export type GetManagementEvents200 = {
   data?: Event[];
   pagination?: PaginationDto;
 };
-
-export type SendMail200 = { [key: string]: unknown };

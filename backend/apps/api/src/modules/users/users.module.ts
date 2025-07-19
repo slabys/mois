@@ -1,11 +1,11 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 
-import { AddressesModule } from "../addresses";
+import { AddressesModule } from "@api/modules/addresses";
 import { PhotoModule } from "@api/modules/photo";
 
-import { User } from "./entities";
-import { UsersService } from "./users.service";
+import { User } from "@api/modules/users/entities";
+import { UsersService } from "@api/modules/users/users.service";
 
 @Module({
 	imports: [TypeOrmModule.forFeature([User]), PhotoModule, AddressesModule],

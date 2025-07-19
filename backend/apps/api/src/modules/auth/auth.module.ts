@@ -20,7 +20,7 @@ import { UsersModule } from "../users";
 			useFactory: (configService: ConfigService) => ({
 				secret: configService.getOrThrow("JWT_SECRET"),
 				signOptions: {
-					issuer: "MOIS",
+					issuer: configService.getOrThrow("WEB_DOMAIN"),
 				},
 			}),
 		}),

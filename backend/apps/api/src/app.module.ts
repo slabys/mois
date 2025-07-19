@@ -28,7 +28,7 @@ import { NestjsFormDataModule } from "nestjs-form-data";
 
 import { ManagementControllers } from "./controllers/management";
 import { EventApplicationSimpleWithApplicationsMapper, EventSimpleWithApplicationsMapper } from "./mappers";
-import { MailerModule } from "./modules/mailer/mailer.module";
+import { MailModule } from "@api/modules/mail/mail.module";
 import { ConfigModule } from "@nestjs/config";
 
 
@@ -55,7 +55,7 @@ import { ConfigModule } from "@nestjs/config";
 		FileStorageModule,
 		RolesModule,
 		ConfigModule.forRoot(),
-		MailerModule,
+		MailModule,
 
 	],
 	controllers: [

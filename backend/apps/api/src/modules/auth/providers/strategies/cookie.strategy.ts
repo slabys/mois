@@ -20,7 +20,7 @@ export class CookieStrategy extends PassportStrategy(Strategy) {
 				(request: Request) => request.cookies?.AuthCookie,
 				ExtractJwt.fromAuthHeaderAsBearerToken(),
 			]),
-			issuer: "MOIS",
+			issuer: configService.getOrThrow("WEB_DOMAIN"),
 		});
 	}
 
