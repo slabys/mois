@@ -18,6 +18,7 @@ import {
   Group,
   Image,
   Overlay,
+  PasswordInput,
   SimpleGrid,
   Stack,
   Text,
@@ -73,6 +74,7 @@ const AccountPage = () => {
       lastName: currentUser.lastName,
       username: currentUser.username,
       gender: currentUser.gender,
+      pronouns: currentUser.pronouns,
       phonePrefix: currentUser.phonePrefix,
       phoneNumber: currentUser.phoneNumber,
       personalAddress: currentUser.personalAddress ?? {
@@ -96,6 +98,7 @@ const AccountPage = () => {
       lastName: undefined,
       username: undefined,
       gender: undefined,
+      pronouns: undefined,
       password: undefined,
       confirmPassword: undefined,
       phonePrefix: undefined,
@@ -148,6 +151,8 @@ const AccountPage = () => {
       },
     },
   });
+
+  console.log(form.values);
 
   const handleUpdateUser = (values: UpdateUser) => {
     updateUserMutation.mutate({
@@ -267,7 +272,7 @@ const AccountPage = () => {
             <TextInput label="First name" {...form.getInputProps("firstName")} disabled={!isEditing} />
             <TextInput label="Second name" {...form.getInputProps("lastName")} disabled={!isEditing} />
           </SimpleGrid>
-          <SimpleGrid cols={2}>
+          <SimpleGrid cols={3}>
             <TextInput label="Username" {...form.getInputProps("username")} disabled={!isEditing} />
             <Select
               label="Gender"
@@ -280,6 +285,7 @@ const AccountPage = () => {
               {...form.getInputProps("gender")}
               disabled={!isEditing}
             />
+            <TextInput label="Pronouns" {...form.getInputProps("pronouns")} disabled={!isEditing} />
           </SimpleGrid>
           <Grid>
             <Grid.Col span={4}>
@@ -317,7 +323,7 @@ const AccountPage = () => {
             </Grid.Col>
           </Grid>
           <SimpleGrid cols={2}>
-            <TextInput
+            <PasswordInput
               label="Password"
               type="password"
               {...form.getInputProps("password")}
@@ -326,7 +332,7 @@ const AccountPage = () => {
               }}
               disabled={!isEditing}
             />
-            <TextInput
+            <PasswordInput
               label="Confirm Password"
               type="password"
               {...form.getInputProps("confirmPassword")}

@@ -59,6 +59,9 @@ export class User extends BaseEntity {
 	})
 	gender: UserGender;
 
+	@Column({ nullable: true })
+	pronouns: string;
+
 	// Exclude property from generated docs
 	@ApiHideProperty()
 	@Exclude()

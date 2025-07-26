@@ -149,7 +149,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
               nothingFoundMessage="Nothing found..."
               allowDeselect
               onChange={(value) => {
-                handleSpotChange(application.id, Number(value));
+                handleSpotChange(application.id, value === null ? null : Number(value));
               }}
             />
           </Table.Td>

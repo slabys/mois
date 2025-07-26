@@ -302,12 +302,15 @@ export class EventApplicationsController {
 
 		worksheet.columns = [
 			{ header: "Organisation Name", key: "organisation" },
-			{ header: "Spot", key: "spot" },
+			{ header: "Spot Name", key: "spotName" },
+			{ header: "Spot Price", key: "spotPrice" },
+			{ header: "Spot Price Currency", key: "spotPriceCurrency" },
 			{ header: "Name", key: "firstname" },
 			{ header: "Lastname", key: "lastname" },
 			{ header: "E-mail", key: "email" },
 			{ header: "Phone Number", key: "phone" },
 			{ header: "Gender", key: "gender" },
+			{ header: "Pronouns", key: "pronouns" },
 			{ header: "Birthdate", key: "birthdate" },
 
 			{ header: "Nationality", key: "nationality" },
@@ -323,15 +326,19 @@ export class EventApplicationsController {
 
 		applicationList.map((application) => {
 			const { organization, user, spotType } = application;
+			console.log(application);
 
 			worksheet.addRow({
-				organisation: organization?.name,
-				spot: spotType ? `${spotType?.name} - ${spotType?.price} ${spotType?.currency}` : "",
+				organisation: organization !== null ? application.organization.name : application.customOrganization?.name,
+				spotName: spotType?.name,
+				spotPrice: spotType?.price,
+				spotPriceCurrency: spotType?.currency,
 				firstname: user?.firstName,
 				lastname: user?.lastName,
 				email: user?.email,
 				phone: `${user?.phonePrefix ?? ""}${user?.phoneNumber ?? ""}`,
 				gender: user?.gender,
+				pronouns: user?.pronouns,
 				birthdate: user?.birthDate,
 				nationality: user?.nationality,
 				idNumber: application?.idNumber,

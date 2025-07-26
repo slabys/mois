@@ -52,6 +52,7 @@ export class EventApplicationsService {
 				user: {
 					personalAddress: true,
 				},
+				customOrganization: true,
 				invoiceAddress: true,
 			},
 		});

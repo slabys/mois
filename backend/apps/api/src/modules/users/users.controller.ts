@@ -130,6 +130,7 @@ export class UsersController {
 		user.lastName = body.lastName ?? user.lastName;
 		user.username = lowerCaseUsername ?? user.username;
 		user.gender = body.gender ?? user.gender;
+		user.pronouns = body.pronouns ?? user.pronouns;
 		user.birthDate = body.birthDate ?? user.birthDate;
 		user.nationality = body.nationality ?? user.nationality;
 		user.phonePrefix = body.phonePrefix ?? user.phonePrefix;

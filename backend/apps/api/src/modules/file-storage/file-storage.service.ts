@@ -3,6 +3,7 @@ import path from "node:path";
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { createReadStream, existsSync, ReadStream } from "node:fs";
+import { storagePath } from "utilities/env";
 
 @Injectable()
 export class FileStorageService {
@@ -12,14 +13,13 @@ export class FileStorageService {
 	private readonly BaseUrl: string;
 
 	constructor(private readonly configService: ConfigService) {
-		const storageRouterPrefix = configService.getOrThrow("STORAGE_ROUTER_PREFIX");
-		this.BasePath = this.configService.getOrThrow("STORAGE_ROOT");
-		this.BaseUrl = `${this.configService.getOrThrow("BASE_URL")}${storageRouterPrefix}`;
+		this.BasePath = storagePath;
+		this.BaseUrl = `${this.configService.getOrThrow("BASE_URL")}/${storagePath}`;
 
 		this.BasePath = path.isAbsolute(this.BasePath) ? this.BasePath : path.join(process.cwd(), this.BasePath);
 		fs.mkdir(this.BasePath, { recursive: true });
 
-		this.logger.log(`Storage is located at: ${this.BasePath} and mapped to ${storageRouterPrefix}`);
+		this.logger.log(`Storage is located at: ${this.BasePath} and mapped to ${storagePath}`);
 	}
 
 	/**

@@ -12,4 +12,9 @@ export class UpdateUser extends PartialType(
 	@ValidateNested()
 	@Type(() => CreateAddress)
 	personalAddress?: CreateAddress | null;
+
+
+	@Allow()
+	@IsOptional()
+	pronouns?: string | null;
 }

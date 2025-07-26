@@ -162,6 +162,7 @@ export interface User {
   phonePrefix: string;
   phoneNumber: string;
   gender: UserGender;
+  pronouns: string;
   photo: Photo;
   createdAt: string;
   updatedAt: string;
@@ -192,6 +193,8 @@ export const UpdateUserGender = {
 export interface UpdateUser {
   /** @nullable */
   personalAddress?: UpdateUserPersonalAddress;
+  /** @nullable */
+  pronouns?: string | null;
   /**
    * User password
    * @minLength 6

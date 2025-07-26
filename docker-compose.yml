@@ -67,7 +67,6 @@ services:
         - WEB_DOMAIN=${WEB_DOMAIN:-localhost}
       target: production
     environment:
-      - STORAGE_ROOT=/app/storage
       - NODE_ENV=${NODE_ENV:-production}
       - WEB_DOMAIN=${WEB_DOMAIN:-localhost}
       - DB_HOST=${DB_HOST:-database}
@@ -77,9 +76,6 @@ services:
       - BASE_URL=${BASE_URL:-http://localhost:4000}
       - PORT_APP1=${PORT_APP1:-4000}
       - JWT_SECRET=${JWT_SECRET:-secret}
-      - STORAGE_ROOT=${STORAGE_ROOT:-/app/storage}
-      #      - REDIS_HOST=${REDIS_HOST:-redis}
-      #      - REDIS_PORT=${REDIS_PORT:-6379}
       - MAIL_HOST=${MAIL_HOST}
       - MAIL_USER=${MAIL_USER}
       - MAIL_PASS=${MAIL_PASS}

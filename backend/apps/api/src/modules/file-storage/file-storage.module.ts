@@ -13,16 +13,13 @@ import { FileStorageService } from "./providers/services";
 			imports: [ConfigModule],
 			inject: [ConfigService],
 			useFactory: (configService: ConfigService) => {
-				const routerPrefix = configService.getOrThrow("STORAGE_ROUTER_PREFIX");
-
-				if (!path.isAbsolute(routerPrefix)) throw new Error("STORAGE_ROUTER_PREFIX must be absolute");
-
-				const storageRoot = configService.getOrThrow("STORAGE_ROOT");
-
+				// const routerPrefix = configService.getOrThrow("STORAGE_ROUTER_PREFIX");
+				// if (!path.isAbsolute(routerPrefix)) throw new Error("STORAGE_ROUTER_PREFIX must be absolute");
+				// const storageRoot = configService.getOrThrow("STORAGE_ROOT");
 				return [
 					{
-						rootPath: path.isAbsolute(storageRoot) ? storageRoot : path.join(process.cwd(), storageRoot),
-						serveRoot: routerPrefix,
+						rootPath: path.join(process.cwd(), "storage"),
+						serveRoot: "/storage/",
 					},
 				];
 			},
@@ -31,4 +28,5 @@ import { FileStorageService } from "./providers/services";
 	providers: [FileStorageService],
 	exports: [FileStorageService],
 })
-export class FileStorageModule {}
+export class FileStorageModule {
+}
