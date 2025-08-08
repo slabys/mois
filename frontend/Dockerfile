@@ -1,42 +1,50 @@
-# Use Node.js 20 as the base image for the build stage
-FROM node:20-alpine AS build
+# ============================
+# Base Stage
+# ============================
+FROM node:22-alpine AS base
 
-# Set working directory
-WORKDIR /frontend/app
+FROM base AS deps
+# ============================
+# Dependencies Stage
+# ============================
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+COPY package.json pnpm-lock.yaml* ./
+RUN corepack enable pnpm && pnpm i --frozen-lockfile;
 
-RUN npm install -g pnpm
-# Install dependencies
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install
+FROM base AS builder
+# ============================
+# Builder Stage
+# ============================
+WORKDIR /app
 
-# Copy all project files
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-ARG NEXT_PUBLIC_APP1_URL
-RUN echo "NEXT_PUBLIC_APP1_URL=${NEXT_PUBLIC_APP1_URL}" >> .env.production
-
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ARG NEXT_PUBLIC_API_URL
+RUN echo "NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}" >> .env.production
 
-# Build the Next.js application
-RUN pnpm build
+RUN corepack enable pnpm && pnpm run build;
 
-# Production image
-FROM node:20-alpine AS runner
+FROM base AS runner
+# ============================
+# Runner Stage
+# ============================
+WORKDIR /app
 
 ARG PORT_FE
-ARG NEXT_PUBLIC_APP1_URL
-RUN echo "NEXT_PUBLIC_APP1_URL=${NEXT_PUBLIC_APP1_URL}" >> .env.production
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ARG NEXT_PUBLIC_API_URL
+RUN echo "NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}" >> .env.production
 
-# Set working directory
-WORKDIR /frontend/app
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 
-# Copy Next.js build output and other required files
-COPY --from=build /frontend/app/.next/standalone /frontend/app
-COPY --from=build /frontend/app/.next/static /frontend/app/.next/static
-COPY --from=build /frontend/app/public /frontend/app/public
-
-# Expose the required port
 EXPOSE $PORT_FE
 
-# Start the Next.js application
+ENV HOSTNAME="0.0.0.0"
 CMD ["node", "server.js"]

@@ -115,11 +115,13 @@ export class EventSpotsController {
 	@UseGuards(CookieGuard)
 	@Patch("events/spots/:id")
 	async updateEventSpot(
+		@CurrentUser() currentUser: User,
 		@Param("id", ParseIntPipe) eventSpotId: number,
 		@Body() body: UpdateEventSpot,
-		@CurrentUser() user: User,
 	) {
-		// TODO: Check user role for modifications
+		if (!(currentUser.role.isAdmin())) {
+			return;
+		}
 
 		const eventSpot = await this.eventSpotsService.findById(eventSpotId);
 		if (!eventSpot) throw new NotFoundException("Event spot not found");

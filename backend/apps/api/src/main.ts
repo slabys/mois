@@ -46,7 +46,7 @@ async function bootstrap() {
 
 	// const configService = app.get(ConfigService);
 	app.use(cookieParser());
-	await app.listen(process.env.PORT_APP1 ?? 4000);
+	await app.listen(process.env.PORT_API ?? 4000);
 }
 
 bootstrap();

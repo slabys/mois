@@ -220,7 +220,7 @@ DB_NAME=database
 DB_USER=user
 DB_PASS=password
 
-PORT_APP1=4000
+PORT_API=4000
 JWT_SECRET=secret
 
 BASE_URL=http://localhost:4000
@@ -254,7 +254,7 @@ For this step its required to have running Postgres database and Redis.
 
 ```dotenv
 # .env - inside /frontend folder
-NEXT_PUBLIC_APP1_URL=http://localhost:4000
+NEXT_PUBLIC_API_URL=http://localhost:4000
 PORT_FE=3000
 ```
 
@@ -282,11 +282,11 @@ API_DOMAIN="http://localhost:${PORT_BACKEND}"
 
 ### APP 1
 BASE_URL="${API_DOMAIN}"
-PORT_APP1="${PORT_BACKEND}"
+PORT_API="${PORT_BACKEND}"
 JWT_SECRET=secret
 
 ### FRONTEND
-NEXT_PUBLIC_APP1_URL="${API_DOMAIN}"
+NEXT_PUBLIC_API_URL="${API_DOMAIN}"
 PORT_FE="${PORT_FRONTEND}"
 
 ### DATABASE
@@ -314,11 +314,11 @@ API_DOMAIN=api.example.com
 
 ### APP 1
 BASE_URL="${API_DOMAIN}"
-PORT_APP1=4000
+PORT_API=4000
 JWT_SECRET=secret
 
 ### FRONTEND
-NEXT_PUBLIC_APP1_URL="${API_DOMAIN}"
+NEXT_PUBLIC_API_URL="${API_DOMAIN}"
 PORT_FE=3000
 
 ### DATABASE

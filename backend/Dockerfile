@@ -26,7 +26,7 @@ RUN pnpm run build ${PROJECT_NAME}
 FROM node:22-alpine AS production
 
 ARG PROJECT_NAME
-ARG PORT_APP1
+ARG PORT_API
 ARG NODE_ENV
 ARG WEB_DOMAIN
 ENV NODE_ENV=$NODE_ENV
@@ -48,7 +48,7 @@ COPY --from=builder /app/pnpm-lock.yaml ./
 # Install prod dependencies
 RUN pnpm install --frozen-lockfile --prod=true
 
-EXPOSE $PORT_APP1
+EXPOSE $PORT_API
 
 CMD npx typeorm migration:run -d ./libs/config/typeorm.config.ts -t each
 

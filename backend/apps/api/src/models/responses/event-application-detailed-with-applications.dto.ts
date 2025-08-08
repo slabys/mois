@@ -12,6 +12,12 @@ export class EventApplicationDetailed extends PickType(EventApplication, [
 	"user",
 	"spotType",
 	"invoiceAddress",
+	"invoiceMethod",
+	"validUntil",
+	"foodRestrictionAllergies",
+	"healthLimitations",
+	"additionalInformation",
+	"invoicedTo",
 ]) {
 }
 

@@ -47,6 +47,7 @@ export class AuthController {
 		@CurrentUser() user: User,
 		@Res({ passthrough: true }) response: Response,
 	) {
+		const tokenAge = 7 * 24 * 60 * 60 * 1_000; // 7 days in milliseconds
 		const token = await this.authService.createToken(user);
 
 		response
@@ -56,7 +57,7 @@ export class AuthController {
 				secure: true,
 				sameSite: "none",
 				partitioned: isProduction,
-				maxAge: 7 * 24 * 60 * 60 * 1_000,
+				maxAge: tokenAge,
 				path: "/",
 			})
 			.status(HttpStatus.OK)

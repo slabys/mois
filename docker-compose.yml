@@ -22,43 +22,8 @@ services:
       timeout: 10s
       retries: 5
 
-  #  redis:
-  #    container_name: redis
-  #    image: redis
-  #    environment:
-  #      - REDIS_HOST=${REDIS_HOST:-redis}
-  #      - REDIS_PORT=${REDIS_PORT:-6379}
-  #    env_file:
-  #      - .env
-  #    expose:
-  #      - ${REDIS_PORT:-6379}
-  #    networks:
-  #      - app-network
-
-  #  documents:
-  #    container_name: backend_documents
-  #    build:
-  #      context: ./backend
-  #      args:
-  #        - PROJECT_NAME=documents
-  #        - NODE_ENV=${NODE_ENV:-production}
-  #      target: production
-  #    environment:
-  #      - NODE_ENV=${NODE_ENV:-production}
-  #      - STORAGE_ROOT=${STORAGE_ROOT:-/app/storage}
-  #      - REDIS_HOST=${REDIS_HOST:-redis}
-  #      - REDIS_PORT=${REDIS_PORT:-6379}
-  #    env_file:
-  #      - .env
-  #    networks:
-  #      - app-network
-  #    volumes:
-  #      - backend_data:/app/storage
-  #    depends_on:
-  #      - redis
-
   backend:
-    container_name: backend_app1
+    container_name: backend_api
     build:
       context: ./backend
       args:
@@ -74,7 +39,7 @@ services:
       - DB_NAME=${DB_NAME:-database}
       - DB_USER=${DB_USER:-user}
       - BASE_URL=${BASE_URL:-http://localhost:4000}
-      - PORT_APP1=${PORT_APP1:-4000}
+      - PORT_API=${PORT_API:-4000}
       - JWT_SECRET=${JWT_SECRET:-secret}
       - MAIL_HOST=${MAIL_HOST}
       - MAIL_USER=${MAIL_USER}
@@ -82,7 +47,7 @@ services:
     env_file:
       - .env
     ports:
-      - ${PORT_APP1:-4000}:${PORT_APP1:-4000}
+      - ${PORT_API:-4000}:${PORT_API:-4000}
     networks:
       - app-network
     healthcheck:
@@ -94,33 +59,17 @@ services:
       - backend_data:/app/storage
     depends_on:
       - database
-  #      - database_run_migrations
-  #      - redis
-
-  #  database_run_migrations:
-  #    container_name: database_migrations
-  #    build:
-  #      context: ./backend
-  #      dockerfile: Dockerfile.Migration
-  #    environment:
-  #      - DB_HOST=${DB_HOST:-database}
-  #    env_file:
-  #      - .env
-  #    restart: no
-  #    networks:
-  #      - app-network
-  #    depends_on:
-  #      - database
 
   frontend:
     container_name: frontend
     build:
       context: ./frontend
       args:
-        - NEXT_PUBLIC_APP1_URL=${NEXT_PUBLIC_APP1_URL:-http://localhost:4000}
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:4000}
     environment:
-      - NEXT_PUBLIC_APP1_URL=${NEXT_PUBLIC_APP1_URL:-http://localhost:4000}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:4000}
       - PORT_FE=${PORT_FE:-3000}
+      - JWT_SECRET=${JWT_SECRET:-secret}
     env_file:
       - .env
     ports:

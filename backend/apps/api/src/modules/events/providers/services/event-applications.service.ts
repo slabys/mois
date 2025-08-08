@@ -157,9 +157,15 @@ export class EventApplicationsService {
 			where: { event: { id } },
 			select: {
 				id: true,
-				additionalData: true as never,
+				additionalData: true,
 				createdAt: true,
 				idNumber: true,
+				invoiceMethod: true,
+				validUntil: true,
+				foodRestrictionAllergies: true,
+				healthLimitations: true,
+				additionalInformation: true,
+				invoicedTo: true,
 			},
 			relations: {
 				...options?.relations,

@@ -3,7 +3,6 @@ import { JwtService } from "@nestjs/jwt";
 
 import { User, UsersService } from "@api/modules/users";
 import { verifyPassword } from "@api/modules/auth/utilities/crypto";
-import { JwtContent } from "./types";
 import { ConfigService } from "@nestjs/config";
 
 @Injectable()
@@ -38,7 +37,7 @@ export class AuthService {
 	 * @returns Token
 	 */
 	createToken(user: User) {
-		return this.jwtService.signAsync(<JwtContent>{
+		return this.jwtService.signAsync({
 			sub: user.id,
 		});
 	}

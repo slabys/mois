@@ -50,9 +50,9 @@ export class EventApplication extends BaseEntity {
 	@OneToOne(
 		() => EventCustomOrganization,
 		(organization) => organization.application,
-		{ cascade: true },
+		{ cascade: true, nullable: true },
 	)
-	customOrganization: EventCustomOrganization;
+	customOrganization: EventCustomOrganization | null;
 
 	/**
 	 * Spot, must be one of {@link event} spots

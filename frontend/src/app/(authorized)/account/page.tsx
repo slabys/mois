@@ -152,8 +152,6 @@ const AccountPage = () => {
     },
   });
 
-  console.log(form.values);
-
   const handleUpdateUser = (values: UpdateUser) => {
     updateUserMutation.mutate({
       data: values,

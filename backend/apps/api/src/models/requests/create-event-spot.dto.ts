@@ -7,9 +7,9 @@ export class CreateEventSpot {
 	name: string;
 
 	/**
-	 * Price in format `1000` => `10.00`
+	 * Price in format `1000`
 	 *
-	 * @example 5090 means 50.90,-
+	 * @example 5090
 	 */
 	@IsInt()
 	@Min(0)

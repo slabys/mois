@@ -6,7 +6,7 @@ import {
   useGenerateSheetEventApplication,
   useGetEventApplications,
   useGetEventSpots,
-  useUpdateEventApplication,
+  useUpdateUserApplicationSpot,
 } from "@/utils/api";
 import { type EventApplicationDetailedWithApplications, type EventSpotSimple } from "@/utils/api.schemas";
 import { downloadFile } from "@/utils/downloadFile";
@@ -73,7 +73,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     refetchEventApplications();
   };
 
-  const updateApplicationMutation = useUpdateEventApplication({
+  const updateApplicationSpotMutation = useUpdateUserApplicationSpot({
     mutation: {
       onSuccess: () => {
         refetchEventApplications();
@@ -82,11 +82,11 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     },
   });
 
-  const handleSpotChange = (applicationId: number, spotId: number | null) => {
-    updateApplicationMutation.mutate({
-      id: applicationId,
+  const handleChangeApplicationSpot = (applicationId: number, spotId: number | null) => {
+    updateApplicationSpotMutation.mutate({
+      applicationId: applicationId,
       data: {
-        spotTypeId: spotId,
+        spotId: spotId,
       },
     });
   };
@@ -129,12 +129,12 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
         <Table.Tr key={`application-${index}-${application.id}`}>
           <Table.Td>{application.user.firstName + " " + application.user.lastName}</Table.Td>
           <Table.Td>
-            {application.organization ? application.organization.name : application.customOrganization.name}
+            {application.organization ? application.organization.name : application.customOrganization?.name}
           </Table.Td>
           <Table.Td>
             {application.organization
               ? application.organization.address.country
-              : application.customOrganization.country}
+              : application.customOrganization?.country}
           </Table.Td>
           <Table.Td>
             {application.spotType
@@ -149,7 +149,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
               nothingFoundMessage="Nothing found..."
               allowDeselect
               onChange={(value) => {
-                handleSpotChange(application.id, value === null ? null : Number(value));
+                handleChangeApplicationSpot(application.id, value === null ? null : Number(value));
               }}
             />
           </Table.Td>

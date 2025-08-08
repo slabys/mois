@@ -15,7 +15,7 @@ import { dateWithTime, dayMonthYear } from "@/utils/time";
 import ApiImage from "@components/ApiImage/ApiImage";
 import RichTextRenderer from "@components/Richtext/RichTextRenderer";
 import EventEditModal from "@components/events/modals/EventEditModal";
-import JoinEventModal from "@components/modals/JoinEventModal/JoinEventModal";
+import EventApplicationModal from "@components/modals/EventApplicationModal/EventApplicationModal";
 import UpdateEventPhotoModal from "@components/modals/UpdateEventPhotoModal/UpdateEventPhotoModal";
 import {
   Blockquote,
@@ -242,7 +242,7 @@ const EventDetail = ({ id }: EventDetailProps) => {
         close={closeModalEdit}
       />
       {!!currentUser ? (
-        <JoinEventModal
+        <EventApplicationModal
           currentUser={currentUser}
           eventId={eventDetail.id}
           handleSuccess={handleRefetchDetail}

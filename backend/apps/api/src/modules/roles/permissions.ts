@@ -3,11 +3,13 @@ export enum Permission {
 	EventUpdate = "event.update",
 	EventDuplicate = "event.duplicate",
 	EventManageApplications = "event.manageApplications",
+	
 	OrganisationCreate = "organisation.create",
 	OrganisationUpdate = "organisation.update",
 	OrganisationAddUser = "organisation.addUser",
 	OrganisationUpdateUser = "organisation.updateUser",
 	OrganisationDeleteUser = "organisation.deleteUser",
+
 	RoleCreate = "role.create",
 	RoleUpdate = "role.update",
 	RoleDelete = "role.delete",

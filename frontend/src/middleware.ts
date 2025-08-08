@@ -1,8 +1,7 @@
+import { getGetInitializedQueryKey } from "@/utils/api";
+import { absoluteUrl, verifyJwtToken } from "@/utils/middleware-helper";
 import { routes } from "@/utils/routes";
 import { NextRequest, NextResponse } from "next/server";
-
-// Stop Middleware running on static files https://stackoverflow.com/questions/76348460/nextjs-13-4-app-router-middleware-page-redirect-has-no-styles
-export const config = { matcher: "/((?!.*\\.).*)" };
 
 const notAuthorizedPaths = [
   routes.LOGIN,
@@ -12,59 +11,98 @@ const notAuthorizedPaths = [
   routes.FORGOT_PASSWORD,
   routes.RESET_PASSWORD,
 ];
-const publicPaths = ["/-/", "/_next", ...notAuthorizedPaths];
+
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+const cookieTokenName = "AuthCookie";
+let isInit = false;
 
 export const middleware = async (request: NextRequest) => {
-  const path = request.nextUrl.pathname;
-  const apiUrl = process.env.NEXT_PUBLIC_APP1_URL;
-  const authCookieToken = request.cookies.get("AuthCookie");
+  const { pathname } = request.nextUrl;
+  const isNonProtectedPath = notAuthorizedPaths.includes(pathname);
 
-  // ✅ Check if the application is initialized
+  const token = request.cookies.get(cookieTokenName)?.value;
+  const verifiedToken = await verifyJwtToken(token);
+
+  // If token exists and is not valid, delete the cookie and redirect to login.
+  if (!!token && verifiedToken === null) {
+    const response = NextResponse.redirect(absoluteUrl(request, routes.LOGIN));
+    response.cookies.delete(cookieTokenName);
+    return response;
+  }
+
+  // --- Step 1: Check if the application is initialised ---
   try {
-    const res = await fetch(`${apiUrl}/initialize`, { method: "GET" });
-    const { isInitialized } = res.ok ? await res.json() : { isInitialized: false };
+    if (!isInit) {
+      const initResponse = await fetch(`${apiUrl}${getGetInitializedQueryKey()[0]}`, {
+        method: "GET",
+      })
+        .then(async (response) => {
+          console.log(JSON.stringify(response, null, 2));
+          return await response.json();
+        })
+        .catch(async (error) => {
+          console.log(JSON.stringify(error, null, 2));
+          return await error.json();
+        });
+      const { isInitialized } = initResponse;
+      isInit = isInitialized;
+      console.log(`[AUTH] App initialised: ${isInit}`);
+    }
 
-    if (!isInitialized && !path.startsWith(routes.INIT)) {
-      return NextResponse.redirect(new URL(routes.INIT, request.url));
+    if (!isInit && pathname !== routes.INIT) {
+      // Allow access only to the init page itself.
+      console.log(`[AUTH] App not initialised. Redirecting from ${pathname} to ${routes.INIT}`);
+      return NextResponse.redirect(absoluteUrl(request, routes.INIT));
+    }
+
+    // If the app IS initialised but the user tries to access the init page, redirect them to the login page.
+    if (isInit && pathname === routes.INIT) {
+      console.log(`[AUTH] App already initialised. Redirecting from ${pathname} to ${routes.LOGIN}`);
+      return NextResponse.redirect(absoluteUrl(request, routes.LOGIN));
     }
   } catch (error) {
-    console.error("Error checking initialization:", error);
+    console.error("[AUTH] Failed to check initialisation status:", JSON.stringify(error, null, 2));
+    // Handle this error state appropriately, perhaps by showing a generic error page.
+    // For now, we'll let it fall through to token validation.
   }
 
-  // ✅ If no auth token, redirect to login (excluding login itself)
-  if (!authCookieToken?.value) {
-    if (publicPaths.some((allowed) => path.startsWith(allowed))) {
+  // --- Step 2: Validate User Authentication Token (Optimized) ---
+  // If there's a token, verify it directly in the middleware.
+  if (!!verifiedToken) {
+    try {
+      // TOKEN IS VALID
+      // If the user is on a public-only page (like login/register), redirect to dashboard.
+      if (isNonProtectedPath) {
+        console.log(`[AUTH] Valid token. User on public page ${pathname}. Redirecting to ${routes.DASHBOARD}`);
+        return NextResponse.redirect(absoluteUrl(request, routes.DASHBOARD));
+      }
+
+      // Allow access to the requested protected page.
       return NextResponse.next();
-    }
-    return NextResponse.redirect(new URL(routes.LOGIN, request.url));
-  }
-
-  // ✅ Validate auth token
-  try {
-    const userResponse = await fetch(`${apiUrl}/users`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authCookieToken.value}`,
-      },
-    });
-
-    // ❌ Invalid Token: Clear cookie and redirect to login
-    if (!userResponse.ok) {
-      console.warn("Invalid token detected, clearing cookies.");
-
-      const response = NextResponse.redirect(new URL(routes.LOGIN, request.url));
-      response.cookies.delete("AuthCookie");
+    } catch (error) {
+      // TOKEN IS INVALID (or expired)
+      console.log(`[AUTH] Invalid token. Deleting cookie and redirecting to ${routes.LOGIN}`);
+      // If verification fails, the token is invalid. Redirect to login and delete the cookie.
+      const response = NextResponse.redirect(absoluteUrl(request, routes.LOGIN));
+      response.cookies.delete(cookieTokenName);
       return response;
     }
-
-    // ✅ If user is already on login, send them to the dashboard
-    if (publicPaths.some((allowed) => path.startsWith(allowed))) {
-      return NextResponse.redirect(new URL(routes.DASHBOARD, request.url));
-    }
-  } catch (error) {
-    console.error("Error validating user:", error);
   }
 
+  // --- Step 3: Handle Users Without a Token ---
+  // If there's no token and the user is trying to access a protected path, redirect them.
+  if (!verifiedToken) {
+    if (isNonProtectedPath) {
+      return NextResponse.next();
+    }
+    // console.log(`[AUTH] No token. Access to protected route ${pathname} denied. Redirecting to ${routes.LOGIN}`);
+    return NextResponse.redirect(absoluteUrl(request, routes.LOGIN));
+  }
+
+  // Otherwise, allow the request to proceed (e.g., to the login page).
   return NextResponse.next();
+};
+
+export const config = {
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };

@@ -5,18 +5,20 @@ import AddressCodeBlock from "@components/AddressCodeBlock/AddressCodeBlock";
 import DateInput from "@components/primitives/DateInput";
 import Select from "@components/primitives/Select";
 import {
+  allergenData,
+  healthLimitationsData,
+  renderMultiSelectOption,
+} from "@components/shared/renderMultiSelectOptions";
+import {
   Anchor,
-  Avatar,
   Blockquote,
   Box,
   Button,
   Checkbox,
   Flex,
   Grid,
-  Group,
   Modal,
   MultiSelect,
-  MultiSelectProps,
   SimpleGrid,
   Stepper,
   Text,
@@ -29,7 +31,6 @@ import Link from "next/link";
 import React, { useState } from "react";
 
 interface JoinEventModalProps {
-  isEdit?: boolean;
   eventId: number;
   currentUser: User;
   isOpened: boolean;
@@ -37,65 +38,9 @@ interface JoinEventModalProps {
   handleSuccess?: () => void;
 }
 
-const allergenData: Record<string, { image?: string }> = {
-  "Cereals containing gluten": {
-    image: "",
-  },
-  "Crustaceans and products thereof": {
-    image: "",
-  },
-  "Eggs and products thereof": {
-    image: "",
-  },
-  "Fish and products thereof": {
-    image: "",
-  },
-  "Peanuts and products thereof": {
-    image: "",
-  },
-  "Soybeans and products thereof": {
-    image: "",
-  },
-  "Milk and products thereof": {
-    image: "",
-  },
-  Nuts: {
-    image: "",
-  },
-  "Celery and products thereof": {
-    image: "",
-  },
-  "Mustard and products thereof": {
-    image: "",
-  },
-  "Sesame seeds and products thereof": {
-    image: "",
-  },
-  "Sulphur dioxide and sulphites": {
-    image: "",
-  },
-  "Lupin and products thereof": {
-    image: "",
-  },
-  "Molluscs and products thereof": {
-    image: "",
-  },
-  Other: {},
-};
-
-const renderMultiSelectOption: MultiSelectProps["renderOption"] = ({ option }) => (
-  <Group gap="sm">
-    {allergenData[option.value]?.image ? <Avatar src={allergenData[option.value].image} size={36} radius="xl" /> : null}
-    <div>
-      <Text size="sm">{option.value}</Text>
-    </div>
-  </Group>
-);
-
 type InvoiceMethodsType = "personal" | "organisation" | "different";
 
-const JoinEventModal = ({
-  isEdit = false,
+const EventApplicationModal = ({
   currentUser,
   eventId,
   isOpened,
@@ -170,11 +115,11 @@ const JoinEventModal = ({
         ...restValues,
         foodRestrictionAllergies:
           foodRestrictionList.length > 0
-            ? `${foodRestrictionList.sort().join(", ")}, ${foodRestrictionAllergies}`
+            ? `${foodRestrictionList.sort().join(", ")}${foodRestrictionList.includes("Other") ? `, ${foodRestrictionAllergies}` : ""}`
             : foodRestrictionAllergies,
         healthLimitations:
           healthLimitationsList.length > 0
-            ? `${healthLimitationsList.sort().join(", ")}, ${healthLimitations}`
+            ? `${healthLimitationsList.sort().join(", ")}${healthLimitationsList.includes("Other") ? `, ${healthLimitations}` : ""}`
             : healthLimitations,
       };
     },
@@ -439,7 +384,7 @@ const JoinEventModal = ({
               )}
               <MultiSelect
                 label="Disability or Health Limitations"
-                data={["Prefer Not To Say", "Other"]}
+                data={healthLimitationsData}
                 onChange={(value) => {
                   setHealthLimitationsList(value);
                 }}
@@ -519,4 +464,4 @@ const JoinEventModal = ({
     </Modal>
   );
 };
-export default JoinEventModal;
+export default EventApplicationModal;

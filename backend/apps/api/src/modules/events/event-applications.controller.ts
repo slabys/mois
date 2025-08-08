@@ -48,6 +48,8 @@ import {
 } from "../../models/responses/event-application-detailed-with-applications.dto";
 import { PaginationDto, PaginationResponseDto } from "../../models/responses/pagination-response.dto";
 import * as ExcelJS from "exceljs";
+import { Permission } from "@api/modules/roles";
+import { UpdateApplicationSlotDto } from "@api/modules/events/dto/update-application-slot.dto";
 
 
 @ApiTags("Event applications")
@@ -104,7 +106,7 @@ export class EventApplicationsController {
 	}
 
 	/**
-	 * Gett all event user applications
+	 * Get all event user applications
 	 * @param eventId
 	 * @returns
 	 */
@@ -117,6 +119,19 @@ export class EventApplicationsController {
 			relations: { event: { applications: true } },
 		});
 		return this.eventApplicationSimpleWithApplicationsMapper.map(application);
+	}
+
+	/**
+	 * Get all event user applications
+	 * @returns
+	 * @param applicationId
+	 */
+	@ApiBearerAuth()
+	@ApiOkResponse({ type: [EventApplicationDetailedWithApplications] })
+	@UseGuards(CookieGuard)
+	@Get("application/:applicationId")
+	async getApplication(@Param("applicationId", ParseIntPipe) applicationId: number) {
+		return await this.eventApplicationsService.findById(applicationId);
 	}
 
 	/**
@@ -290,6 +305,33 @@ export class EventApplicationsController {
 		return this.eventApplicationSimpleWithApplicationsMapper.map(application);
 	}
 
+	/**
+	 * Update User Application Spot
+	 */
+	@ApiOkResponse({ type: EventApplicationSimpleWithApplications })
+	@ApiNotFoundResponse({ description: "Event application not found" })
+	@ApiBearerAuth()
+	@UseGuards(CookieGuard)
+	@Patch(":applicationId/applications-spot")
+	async updateUserApplicationSpot(
+		@CurrentUser() currentUser: User,
+		@Param("applicationId", ParseIntPipe) applicationId: number,
+		@Body() body: UpdateApplicationSlotDto,
+	) {
+		const application = await this.eventApplicationsService.findById(applicationId);
+
+		if (!(currentUser.id === application.user.id || currentUser.role.isAdmin() || currentUser.role.hasOneOfPermissions([Permission.EventManageApplications]))) {
+			return;
+		}
+
+		if (!application) throw new NotFoundException("Event application not found");
+
+		application.spotType = body.spotId === null ? null : await this.eventSpotsService.findById(body.spotId);
+		await application.save();
+
+		return application;
+	}
+
 	@ApiBearerAuth()
 	@Header("Content-disposition", "attachment; filename=EventApplicationExport.xlsx")
 	@Get("export/:eventId/applications")
@@ -326,7 +368,6 @@ export class EventApplicationsController {
 
 		applicationList.map((application) => {
 			const { organization, user, spotType } = application;
-			console.log(application);
 
 			worksheet.addRow({
 				organisation: organization !== null ? application.organization.name : application.customOrganization?.name,

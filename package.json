@@ -3,24 +3,24 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "database/*",
-    "backend/*",
-    "frontend/*",
-    "nginx/*"
+	"database/*",
+	"backend/*",
+	"frontend/*",
+	"nginx/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm:dev:app1\" \"npm:dev:web\"",
-    "dev:app1": "cd backend && pnpm start:dev",
-    "dev:web": "cd frontend && yarn dev"
+	"dev": "concurrently \"npm:dev:app1\" \"npm:dev:web\"",
+	"dev:api": "cd backend && pnpm start:dev",
+	"dev:web": "cd frontend && pnpm dev"
   },
   "dependencies": {
-    "@nestjs-modules/mailer": "^2.0.2",
-    "concurrently": "^8.2.2",
-    "nodemailer": "^7.0.5",
-    "pnpm": "^9.14.3",
-    "yarn": "^1.22.22"
+	"@nestjs-modules/mailer": "^2.0.2",
+	"concurrently": "^8.2.2",
+	"nodemailer": "^7.0.5",
+	"pnpm": "^9.14.3",
+	"yarn": "^1.22.22"
   },
   "devDependencies": {
-    "@types/nodemailer": "^6.4.17"
+	"@types/nodemailer": "^6.4.17"
   }
 }

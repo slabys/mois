@@ -14,7 +14,7 @@ const nextConfig = {
   reactStrictMode: false,
   swcMinify: true,
   env: {
-    NEXT_PUBLIC_APP1_URL: process.env.NEXT_PUBLIC_APP1_URL,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
     PORT_FE: process.env.PORT_FE,
   },
   experimental: {

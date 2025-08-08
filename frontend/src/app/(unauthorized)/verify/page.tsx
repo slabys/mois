@@ -19,8 +19,6 @@ const VerifyPage = () => {
     token: token as string,
   });
 
-  console.log(verifyMutation.data);
-
   // Orval hook for resending verification
   const resendMutation = useResendVerification({
     mutation: {
