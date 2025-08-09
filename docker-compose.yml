@@ -22,18 +22,18 @@ services:
       timeout: 10s
       retries: 5
 
-  database_run_migrations:
-    container_name: database_migrations
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.Migration
-    env_file:
-      - .env
-    restart: no
-    networks:
-      - app-network
-    depends_on:
-      - database
+  #  database_run_migrations:
+  #    container_name: database_migrations
+  #    build:
+  #      context: ./backend
+  #      dockerfile: Dockerfile.Migration
+  #    env_file:
+  #      - .env
+  #    restart: no
+  #    networks:
+  #      - app-network
+  #    depends_on:
+  #      - database
 
   backend:
     container_name: backend_api

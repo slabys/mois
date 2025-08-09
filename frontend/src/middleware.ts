@@ -55,6 +55,12 @@ export const middleware = async (request: NextRequest) => {
       return NextResponse.redirect(absoluteUrl(request, routes.INIT));
     }
 
+    if (!isInit && pathname === routes.INIT) {
+      // Allow access only to the init page itself.
+      console.log(`[AUTH] App not initialised. Redirecting from ${pathname} to ${routes.INIT}`);
+      return NextResponse.next();
+    }
+
     // If the app IS initialised but the user tries to access the init page, redirect them to the login page.
     if (isInit && pathname === routes.INIT) {
       console.log(`[AUTH] App already initialised. Redirecting from ${pathname} to ${routes.LOGIN}`);
