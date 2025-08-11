@@ -86,7 +86,7 @@ const EventEditModal = ({ eventDetail, isOpened, close, handleSuccess = () => {}
               label="Registration Deadline"
               value={dayjs(form.values.registrationDeadline).toDate()}
               onChange={(value) => {
-                value && form.setFieldValue("registrationDeadline", value.toISOString());
+                value && form.setFieldValue("registrationDeadline", dayjs(value).toISOString());
               }}
               error={form.errors.since}
             />
@@ -96,7 +96,7 @@ const EventEditModal = ({ eventDetail, isOpened, close, handleSuccess = () => {}
               label="Date Since"
               value={dayjs(form.values.since).toDate()}
               onChange={(value) => {
-                value && form.setFieldValue("since", value.toISOString());
+                value && form.setFieldValue("since", dayjs(value).toISOString());
               }}
               error={form.errors.since}
             />
@@ -104,7 +104,7 @@ const EventEditModal = ({ eventDetail, isOpened, close, handleSuccess = () => {}
               label="Date Until"
               value={dayjs(form.values.until).toDate()}
               onChange={(value) => {
-                value && form.setFieldValue("until", value.toDateString());
+                value && form.setFieldValue("until", dayjs(value).toISOString());
               }}
               error={form.errors.until}
             />

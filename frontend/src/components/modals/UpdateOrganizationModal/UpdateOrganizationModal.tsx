@@ -60,7 +60,7 @@ const UpdateOrganizationModal = ({
           }
         : undefined,
     });
-  }, [activeOrganization, isOpened]);
+  }, [activeOrganization, isOpened]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateOrganizationMutation = useUpdateOrganization({
     mutation: {

@@ -94,15 +94,18 @@ const CreateEventModal = ({ onCreateSuccess, isOpened, closeModal }: MyModalProp
               label="Registration Deadline"
               value={dayjs(form.values.registrationDeadline).toDate()}
               onChange={(value) => {
-                value && form.setFieldValue("registrationDeadline", value.toISOString());
+                value && form.setFieldValue("registrationDeadline", dayjs(value).toISOString());
               }}
               error={form.errors.registrationDeadline}
+              timePickerProps={{
+                withDropdown: true,
+              }}
             />
             <DateInput
               label="Event Date Since"
               value={dayjs(form.values.since).toDate()}
               onChange={(value) => {
-                value && form.setFieldValue("since", value.toISOString());
+                value && form.setFieldValue("since", dayjs(value).toISOString());
               }}
               error={form.errors.since}
             />
@@ -110,7 +113,7 @@ const CreateEventModal = ({ onCreateSuccess, isOpened, closeModal }: MyModalProp
               label="Event Date Until"
               value={dayjs(form.values.until).toDate()}
               onChange={(value) => {
-                value && form.setFieldValue("until", value.toISOString());
+                value && form.setFieldValue("until", dayjs(value).toISOString());
               }}
               error={form.errors.until}
             />

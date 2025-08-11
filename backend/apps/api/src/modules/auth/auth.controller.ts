@@ -14,9 +14,9 @@ import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from "@nest
 import type { Response } from "express";
 
 import { CookieGuard, LocalGuard } from "./providers/guards";
-import { CurrentUser } from "../../decorators";
-import { LoginUser } from "../../models/requests";
-import { AccessToken } from "../../models/responses";
+import { CurrentUser } from "@api/decorators";
+import { LoginUser } from "@api/models/requests";
+import { AccessToken } from "@api/models/responses";
 
 import { AuthService } from "./index";
 import { User, UsersService } from "../users";
@@ -111,7 +111,7 @@ export class AuthController {
 		}
 
 		const resetToken = await this.authService.createResetPasswordToken(user);
-		const resetUrl = `https://${this.configService.getOrThrow("WEB_DOMAIN")}/forgot-password/reset?token=${resetToken}`;
+		const resetUrl = `${this.configService.getOrThrow("WEB_DOMAIN")}/forgot-password/reset?token=${resetToken}`;
 
 		await this.mailerService.sendMail({
 			to: [{ name: `${user.firstName} ${user.lastName}`, address: user.email }],
@@ -171,7 +171,7 @@ export class AuthController {
 		if (user.isVerified) return { message: "Already verified" };
 
 		const verificationToken = await this.authService.createEmailVerificationToken(user);
-		const verifyUrl = `https://${this.configService.getOrThrow("WEB_DOMAIN")}/verify?token=${verificationToken}`;
+		const verifyUrl = `${this.configService.getOrThrow("WEB_DOMAIN")}/verify?token=${verificationToken}`;
 
 		// TODO - Move to MailController (resend verification)
 		await this.mailerService.sendMail({

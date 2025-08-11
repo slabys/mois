@@ -35,7 +35,7 @@ const UpdateSpotModal = ({ currentSpot, isOpened, closeModal, handleSuccess = ()
   useEffect(() => {
     form.setInitialValues(currentSpot);
     form.setValues(currentSpot);
-  }, [currentSpot]);
+  }, [currentSpot]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleUpdateSpot = (submitValues: Partial<UpdateEventSpot>) => {
     form.validate();

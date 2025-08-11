@@ -1,4 +1,3 @@
-import { Address } from "../../addresses";
 import { Organization } from "../../organization";
 import { User } from "../../users";
 import {
@@ -17,6 +16,7 @@ import { EventCustomOrganization } from "./event-custom-organization.entity";
 import { EventSpot } from "./event-spot.entity";
 import { Event } from "./event.entity";
 import { InvoiceMethods } from "../invoice-methods";
+import { Address } from "@api/modules/addresses/entities";
 
 /**
  * Event application represents registration to event

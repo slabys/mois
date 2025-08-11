@@ -29,7 +29,6 @@ import {
 	getSchemaPath,
 } from "@nestjs/swagger";
 
-import { Address } from "../addresses";
 import { CookieGuard } from "../auth/providers/guards";
 import { EventApplicationsService, EventSpotsService, EventsService } from "./index";
 import { EventApplication, EventCustomOrganization } from "./entities";
@@ -39,17 +38,18 @@ import { User, UsersService } from "../users";
 import { ajv } from "utilities/ajv";
 import { ParseDatePipe } from "utilities/nest/pipes";
 
-import { CurrentUser } from "../../decorators";
-import { CreateEventApplication, UpdateEventApplication } from "../../models/requests";
-import { EventApplicationSimpleWithApplications } from "../../models/responses";
-import { EventApplicationSimpleWithApplicationsMapper } from "../../mappers";
+import { CurrentUser } from "@api/decorators";
+import { CreateEventApplication, UpdateEventApplication } from "@api/models/requests";
+import { EventApplicationSimpleWithApplications } from "@api/models/responses";
+import { EventApplicationSimpleWithApplicationsMapper } from "@api/mappers";
 import {
 	EventApplicationDetailedWithApplications,
-} from "../../models/responses/event-application-detailed-with-applications.dto";
-import { PaginationDto, PaginationResponseDto } from "../../models/responses/pagination-response.dto";
+} from "@api/models/responses/event-application-detailed-with-applications.dto";
+import { PaginationDto, PaginationResponseDto } from "@api/models/responses/pagination-response.dto";
 import * as ExcelJS from "exceljs";
 import { Permission } from "@api/modules/roles";
 import { UpdateApplicationSlotDto } from "@api/modules/events/dto/update-application-slot.dto";
+import { Address } from "@api/modules/addresses/entities";
 
 
 @ApiTags("Event applications")

@@ -254,7 +254,7 @@ For this step its required to have running Postgres database and Redis.
 
 ```dotenv
 # .env - inside /frontend folder
-NEXT_PUBLIC_API_URL=http://localhost:4000
+NEXT_PUBLIC_API_DOMAIN=http://localhost:4000
 PORT_FE=3000
 ```
 
@@ -286,7 +286,7 @@ PORT_API="${PORT_BACKEND}"
 JWT_SECRET=secret
 
 ### FRONTEND
-NEXT_PUBLIC_API_URL="${API_DOMAIN}"
+NEXT_PUBLIC_API_DOMAIN="${API_DOMAIN}"
 PORT_FE="${PORT_FRONTEND}"
 
 ### DATABASE
@@ -318,7 +318,7 @@ PORT_API=4000
 JWT_SECRET=secret
 
 ### FRONTEND
-NEXT_PUBLIC_API_URL="${API_DOMAIN}"
+NEXT_PUBLIC_API_DOMAIN="${API_DOMAIN}"
 PORT_FE=3000
 
 ### DATABASE

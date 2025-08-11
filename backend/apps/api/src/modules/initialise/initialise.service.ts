@@ -3,16 +3,16 @@ import { InjectEntityManager, InjectRepository } from "@nestjs/typeorm";
 import { User } from "@api/modules/users/entities";
 import { EntityManager, Repository } from "typeorm";
 import { Organization } from "../organization";
-import { InitializeType } from "@api/models/requests/init.dto";
-import { Address } from "@api/modules/addresses";
+import { InitialiseType } from "@api/models/requests/init.dto";
 import { Permission, Role } from "@api/modules/roles";
 import { OrganizationMember } from "@api/modules/organization/entities";
 import { AuthService } from "@api/modules/auth";
 import { ConfigService } from "@nestjs/config";
 import { MailerService } from "@nestjs-modules/mailer";
+import { Address } from "@api/modules/addresses/entities";
 
 @Injectable()
-export class InitializeService {
+export class InitialiseService {
 	constructor(
 		@InjectRepository(User)
 		private readonly UsersRepository: Repository<User>,
@@ -37,13 +37,13 @@ export class InitializeService {
 	 * @param init
 	 * @returns
 	 */
-	async initializeSystem(init: InitializeType) {
+	async initialiseSystem(init: InitialiseType) {
 		const { user, role, organization } = await this.entityManager.transaction(async (em) => {
 			const userCount = await this.UsersRepository.count();
 			const organizationCount = await this.OrganisationRepository.count();
 
 			if (userCount > 0 && organizationCount > 0) {
-				throw new ConflictException("System is already initialized");
+				throw new ConflictException("System is already initialised");
 			}
 
 			const { user, organization } = init;
@@ -119,7 +119,7 @@ export class InitializeService {
 		});
 
 		const verificationToken = await this.authService.createEmailVerificationToken(user);
-		const verifyUrl = `https://${this.configService.getOrThrow("WEB_DOMAIN")}/verify?token=${verificationToken}`;
+		const verifyUrl = `${this.configService.getOrThrow("WEB_DOMAIN")}/verify?token=${verificationToken}`;
 
 		// TODO - Move to MailController
 		// Send verification email (use your MailerService)
@@ -134,7 +134,7 @@ export class InitializeService {
 		});
 
 		return {
-			message: "System initialized successfully",
+			message: "System initialised successfully",
 			user: user,
 			organization: organization,
 			role: role,
@@ -146,13 +146,13 @@ export class InitializeService {
 	 * Check if user and organisation exists
 	 * @returns boolean
 	 */
-	async checkInitialization() {
+	async checkInitialisation() {
 		const countUser = await this.UsersRepository.count();
 		const countOrganisation = await this.UsersRepository.count();
-		const isInitialized = countUser > 0 && countOrganisation > 0;
+		const isInitialised = countUser > 0 && countOrganisation > 0;
 		return {
-			isInitialized: isInitialized,
-			message: isInitialized ? "Initial setup already fulfilled" : "Initial setup not fulfilled",
+			isInitialised: isInitialised,
+			message: isInitialised ? "Initial setup already fulfilled" : "Initial setup not fulfilled",
 		};
 	}
 

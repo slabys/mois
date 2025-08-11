@@ -31,9 +31,7 @@ const MyOrganisationsPage = ({ params }: UseFetchAllEventsProps) => {
                   </Group>
                 </Stack>
 
-                <Text size="sm" c="dimmed">
-                  <AddressCodeBlock address={membership.organization.address} />
-                </Text>
+                <AddressCodeBlock address={membership.organization.address} />
 
                 <Button
                   component={Link}

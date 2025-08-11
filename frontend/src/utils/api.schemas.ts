@@ -68,7 +68,7 @@ export interface CreateOrganization {
   address: CreateAddress;
 }
 
-export interface InitializeType {
+export interface InitialiseType {
   user: CreateUser;
   organization: CreateOrganization;
 }

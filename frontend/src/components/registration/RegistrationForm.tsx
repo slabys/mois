@@ -97,7 +97,7 @@ const RegistrationForm = () => {
               placeholder="Birthdate"
               value={form.values.birthDate ? dayjs(form.values.birthDate).toDate() : null}
               onChange={(value) => {
-                value && form.setFieldValue("birthDate", value.toISOString());
+                value && form.setFieldValue("birthDate", dayjs(value).toISOString());
               }}
               error={form.errors.birthDate}
               required

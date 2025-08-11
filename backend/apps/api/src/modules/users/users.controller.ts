@@ -33,13 +33,13 @@ import { CookieGuard } from "../auth/providers/guards";
 import { CurrentUser } from "../../decorators";
 import { CreateUser, UpdatePhoto, UpdateUser } from "../../models/requests";
 import { OrganizationMemberWithoutUser } from "../../models/responses";
-import { Address } from "../addresses";
 import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 import { PaginationDto, PaginationResponseDto } from "../../models/responses/pagination-response.dto";
 import * as ExcelJS from "exceljs";
 import { AuthService } from "@api/modules/auth";
 import { ConfigService } from "@nestjs/config";
 import { MailerService } from "@nestjs-modules/mailer";
+import { Address } from "@api/modules/addresses/entities";
 
 @ApiTags("Users")
 @Controller("users")
@@ -89,7 +89,7 @@ export class UsersController {
 		newUser.password = undefined;
 
 		const verificationToken = await this.authService.createEmailVerificationToken(newUser);
-		const verifyUrl = `https://${this.configService.getOrThrow("WEB_DOMAIN")}/verify?token=${verificationToken}`;
+		const verifyUrl = `${this.configService.getOrThrow("WEB_DOMAIN")}/verify?token=${verificationToken}`;
 
 		// TODO - Move to MailController
 		// Send verification email (use your MailerService)

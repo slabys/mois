@@ -1,5 +1,4 @@
 import { ApiHideProperty } from "@nestjs/swagger";
-import { Address } from "../../addresses";
 import { User } from "../../users";
 import {
 	Column,
@@ -12,6 +11,7 @@ import {
 	PrimaryGeneratedColumn,
 } from "typeorm";
 import { OrganizationMember } from "./organization-member.entity";
+import { Address } from "@api/modules/addresses/entities";
 
 // Should be parent.id but it's not converted to parent_id, so this needs to be "hardcoded"
 @Entity()

@@ -6,7 +6,7 @@ import "@mantine/dates/styles.css";
 import "@mantine/dropzone/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/tiptap/styles.css";
-import type { Metadata } from "next";
+import { Metadata } from "next";
 import React, { ReactElement, Suspense } from "react";
 
 export const metadata: Metadata = {
@@ -45,7 +45,7 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/icons/favicon.ico" />
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
         <meta name="apple-mobile-web-app-title" content="ESN ERS" />
-        <link rel="manifest" href="/manifest.json" />
+        <link rel="manifest" href="./manifest.ts" />
         <ColorSchemeScript />
       </head>
       <body style={{ width: "100%", height: "100vh" }}>

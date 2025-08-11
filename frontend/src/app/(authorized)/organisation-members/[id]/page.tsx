@@ -20,7 +20,7 @@ export const revalidate = 60;
 
 const UseFetchOrganizationMembers = async () => {
   const queryKey = getAllOrganizationsQueryKey();
-  const organizationList: Organization[] = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${queryKey[0]}`)
+  const organizationList: Organization[] = await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}${queryKey[0]}`)
     .then((res) => res.json())
     .catch((e) => console.error(e));
 

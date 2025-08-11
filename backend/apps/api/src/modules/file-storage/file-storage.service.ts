@@ -14,7 +14,7 @@ export class FileStorageService {
 
 	constructor(private readonly configService: ConfigService) {
 		this.BasePath = storagePath;
-		this.BaseUrl = `${this.configService.getOrThrow("BASE_URL")}/${storagePath}`;
+		this.BaseUrl = `${this.configService.getOrThrow("API_DOMAIN")}/${storagePath}`;
 
 		this.BasePath = path.isAbsolute(this.BasePath) ? this.BasePath : path.join(process.cwd(), this.BasePath);
 		fs.mkdir(this.BasePath, { recursive: true });

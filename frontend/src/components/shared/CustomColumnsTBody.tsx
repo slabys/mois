@@ -4,6 +4,7 @@ import DateInput from "@components/primitives/DateInput";
 import Select from "@components/primitives/Select";
 import { CustomColumn } from "@components/shared/DynamicSearch";
 import { Button, Table, TextInput } from "@mantine/core";
+import dayjs from "dayjs";
 
 /** Props for the Dynamic Table */
 export interface CustomDynamicColumnsProps {
@@ -43,7 +44,7 @@ const CustomColumnsTBody = ({ rowId, customColumns }: CustomDynamicColumnsProps)
             label={col.label}
             value={col.value}
             onChange={(value) => {
-              col.handleOnChange && value && col.handleOnChange(rowId, value.toISOString());
+              col.handleOnChange && value && col.handleOnChange(rowId, dayjs(value).toISOString());
             }}
           />
         )}

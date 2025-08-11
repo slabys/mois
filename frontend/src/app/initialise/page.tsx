@@ -1,7 +1,7 @@
 "use client";
 
 import { useCreateInitialState } from "@/utils/api";
-import { CreateUserGender, InitializeType } from "@/utils/api.schemas";
+import { CreateUserGender, InitialiseType } from "@/utils/api.schemas";
 import routes from "@/utils/routes";
 import useStepper from "@/utils/useStepper";
 import DateInput from "@components/primitives/DateInput";
@@ -26,14 +26,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-interface FormInitialTypes extends InitializeType {
+interface FormInitialTypes extends InitialiseType {
   confirmPassword: string | undefined;
   confirmPrivacyPolicy: boolean;
 }
 
-const InitializePage = () => {
+const InitialisePage = () => {
   const router = useRouter();
-  const initializeMutation = useCreateInitialState({
+  const initialiseMutation = useCreateInitialState({
     mutation: {
       onSuccess: () => {
         router.push(routes.LOGIN);
@@ -134,10 +134,10 @@ const InitializePage = () => {
 
   const { activeStep, onClickStep, nextStep, prevStep } = useStepper(form);
 
-  const initializeSystem = (values: FormInitialTypes) => {
+  const initialiseSystem = (values: FormInitialTypes) => {
     form.validate();
     if (form.isValid()) {
-      initializeMutation.mutate({
+      initialiseMutation.mutate({
         data: {
           user: values.user,
           organization: values.organization,
@@ -150,7 +150,7 @@ const InitializePage = () => {
     <Container h="100vh">
       <Flex direction="column" justify="center" align="center" h="100%" gap={8}>
         <Box maw="32rem" w="100%">
-          <Form form={form} onSubmit={initializeSystem}>
+          <Form form={form} onSubmit={initialiseSystem}>
             <Stepper active={activeStep} onStepClick={onClickStep}>
               <Stepper.Step label="Step 1:" description="User Information">
                 <Flex direction="column" gap={12}>
@@ -165,7 +165,7 @@ const InitializePage = () => {
                       placeholder="Birthdate"
                       value={form.values.user.birthDate ? dayjs(form.values.user.birthDate).toDate() : null}
                       onChange={(value) => {
-                        value && form.setFieldValue("user.birthDate", value.toISOString());
+                        value && form.setFieldValue("user.birthDate", dayjs(value).toISOString());
                       }}
                       error={form.errors["user.birthDate"]}
                       required
@@ -289,7 +289,7 @@ const InitializePage = () => {
                   required
                 />
                 <Flex mt={16} gap={8} justify="center" align="center">
-                  <Button type="submit" disabled={initializeMutation.isPending}>
+                  <Button type="submit" disabled={initialiseMutation.isPending}>
                     Submit
                   </Button>
                 </Flex>
@@ -299,7 +299,7 @@ const InitializePage = () => {
             <Flex direction="column" gap={16} mt={16}>
               {/* Register ERROR */}
               <Flex direction="row">
-                {initializeMutation.isError && <Text c="red">Something went wrong! Please try again later.</Text>}
+                {initialiseMutation.isError && <Text c="red">Something went wrong! Please try again later.</Text>}
               </Flex>
             </Flex>
             <Flex mt={16} gap={8} justify="space-between">
@@ -317,4 +317,4 @@ const InitializePage = () => {
   );
 };
 
-export default InitializePage;
+export default InitialisePage;

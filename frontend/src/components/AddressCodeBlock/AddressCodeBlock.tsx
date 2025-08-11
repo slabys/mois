@@ -8,7 +8,7 @@ interface AddressCodeBlockProps extends CodeProps {
   address?: Address | null;
 }
 
-const AddressCodeBlock = ({ beforeAddress, address, afterAddress, ...props }: AddressCodeBlockProps) => {
+const AddressCodeBlock = ({ beforeAddress, afterAddress, address, ...props }: AddressCodeBlockProps) => {
   if (!address) return null;
   return (
     <Code block {...props}>

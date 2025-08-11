@@ -16,8 +16,8 @@ import { CurrentUser } from "../../decorators";
 import { User } from "../users";
 import { CookieGuard } from "../auth/providers/guards";
 import { CreateOrganization, UpdateOrganization } from "../../models/requests";
-import { Address } from "../addresses";
 import { Permission } from "../roles";
+import { Address } from "@api/modules/addresses/entities";
 
 @ApiTags("Organizations")
 @Controller("organizations")

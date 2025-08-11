@@ -21,10 +21,9 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ARG NEXT_PUBLIC_API_URL
-RUN echo "NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}" >> .env.production
+
+# RUN echo "API_DOMAIN=${API_DOMAIN}" >> .env.production
 
 RUN corepack enable pnpm && pnpm run build;
 
@@ -34,11 +33,11 @@ FROM base AS runner
 # ============================
 WORKDIR /app
 
-ARG PORT_FE
-ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ARG NEXT_PUBLIC_API_URL
-RUN echo "NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}" >> .env.production
+ARG PORT_FE
+ARG API_DOMAIN
+
+#RUN echo "NEXT_PUBLIC_API_DOMAIN=${NEXT_PUBLIC_API_DOMAIN}" >> .env.production
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
@@ -46,5 +45,4 @@ COPY --from=builder /app/.next/static ./.next/static
 
 EXPOSE $PORT_FE
 
-ENV HOSTNAME="0.0.0.0"
 CMD ["node", "server.js"]

@@ -15,10 +15,10 @@ import {
 } from "typeorm";
 
 import { hashPassword } from "../../auth/utilities/crypto";
-import { Photo } from "../../photo/entities";
+import { Photo } from "@api/modules/photo";
 import { UserGender } from "../enums";
-import { Address } from "../../addresses";
 import { Role } from "../../roles";
+import { Address } from "@api/modules/addresses/entities";
 
 @Index(["email", "username"])
 @Entity()

@@ -173,7 +173,7 @@ const EventApplicationModal = ({
                   placeholder="ID/Passport valid until"
                   value={form.values.validUntil ? dayjs(form.values.validUntil).toDate() : null}
                   onChange={(value) => {
-                    value && form.setFieldValue("validUntil", value.toISOString());
+                    value && form.setFieldValue("validUntil", dayjs(value).toISOString());
                   }}
                   error={form.errors.validUntil}
                   required

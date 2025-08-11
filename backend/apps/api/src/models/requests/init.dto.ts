@@ -3,7 +3,7 @@ import { IsNotEmptyObject } from "class-validator";
 import { Type } from "class-transformer";
 import { CreateOrganization } from "./create-organization.dto";
 
-export class InitializeType {
+export class InitialiseType {
 	@IsNotEmptyObject()
 	@Type(() => CreateUser)
 	user: CreateUser;

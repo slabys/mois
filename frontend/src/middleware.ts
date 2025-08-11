@@ -1,4 +1,4 @@
-import { getGetInitializedQueryKey } from "@/utils/api";
+import { getGetInitialisedQueryKey } from "@/utils/api";
 import { absoluteUrl, verifyJwtToken } from "@/utils/middleware-helper";
 import { routes } from "@/utils/routes";
 import { NextRequest, NextResponse } from "next/server";
@@ -12,100 +12,58 @@ const notAuthorizedPaths = [
   routes.RESET_PASSWORD,
 ];
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-const cookieTokenName = "AuthCookie";
-let isInit = false;
+const apiUrl = process.env.NEXT_PUBLIC_API_DOMAIN;
+const initCookieName = "InitFlag";
+const authCookieName = "AuthCookie";
 
 export const middleware = async (request: NextRequest) => {
   const { pathname } = request.nextUrl;
   const isNonProtectedPath = notAuthorizedPaths.includes(pathname);
 
-  const token = request.cookies.get(cookieTokenName)?.value;
-  const verifiedToken = await verifyJwtToken(token);
+  let isInitialised = request.cookies.get(initCookieName)?.value === "1";
 
-  // If token exists and is not valid, delete the cookie and redirect to login.
-  if (!!token && verifiedToken === null) {
-    const response = NextResponse.redirect(absoluteUrl(request, routes.LOGIN));
-    response.cookies.delete(cookieTokenName);
-    return response;
-  }
-
-  // --- Step 1: Check if the application is initialised ---
-  try {
-    if (!isInit) {
-      const initResponse = await fetch(`${apiUrl}${getGetInitializedQueryKey()[0]}`, {
-        method: "GET",
-      })
-        .then(async (response) => {
-          console.log(JSON.stringify(response, null, 2));
-          return await response.json();
-        })
-        .catch(async (error) => {
-          console.log(JSON.stringify(error, null, 2));
-          return await error.json();
-        });
-      const { isInitialized } = initResponse;
-      isInit = isInitialized;
-      console.log(`[AUTH] App initialised: ${isInit}`);
-    }
-
-    if (!isInit && pathname !== routes.INIT) {
-      // Allow access only to the init page itself.
-      console.log(`[AUTH] App not initialised. Redirecting from ${pathname} to ${routes.INIT}`);
-      return NextResponse.redirect(absoluteUrl(request, routes.INIT));
-    }
-
-    if (!isInit && pathname === routes.INIT) {
-      // Allow access only to the init page itself.
-      console.log(`[AUTH] App not initialised. Redirecting from ${pathname} to ${routes.INIT}`);
-      return NextResponse.next();
-    }
-
-    // If the app IS initialised but the user tries to access the init page, redirect them to the login page.
-    if (isInit && pathname === routes.INIT) {
-      console.log(`[AUTH] App already initialised. Redirecting from ${pathname} to ${routes.LOGIN}`);
-      return NextResponse.redirect(absoluteUrl(request, routes.LOGIN));
-    }
-  } catch (error) {
-    console.error("[AUTH] Failed to check initialisation status:", JSON.stringify(error, null, 2));
-    // Handle this error state appropriately, perhaps by showing a generic error page.
-    // For now, we'll let it fall through to token validation.
-  }
-
-  // --- Step 2: Validate User Authentication Token (Optimized) ---
-  // If there's a token, verify it directly in the middleware.
-  if (!!verifiedToken) {
+  if (!isInitialised) {
     try {
-      // TOKEN IS VALID
-      // If the user is on a public-only page (like login/register), redirect to dashboard.
-      if (isNonProtectedPath) {
-        console.log(`[AUTH] Valid token. User on public page ${pathname}. Redirecting to ${routes.DASHBOARD}`);
-        return NextResponse.redirect(absoluteUrl(request, routes.DASHBOARD));
-      }
-
-      // Allow access to the requested protected page.
-      return NextResponse.next();
-    } catch (error) {
-      // TOKEN IS INVALID (or expired)
-      console.log(`[AUTH] Invalid token. Deleting cookie and redirecting to ${routes.LOGIN}`);
-      // If verification fails, the token is invalid. Redirect to login and delete the cookie.
-      const response = NextResponse.redirect(absoluteUrl(request, routes.LOGIN));
-      response.cookies.delete(cookieTokenName);
-      return response;
+      const initResponse = await fetch(`${apiUrl}${getGetInitialisedQueryKey()[0]}`, {
+        method: "GET",
+      });
+      const data = await initResponse.json();
+      isInitialised = !!data?.isInitialised;
+    } catch (err) {
+      console.error("[INIT] Failed to check init status:", err);
     }
   }
 
-  // --- Step 3: Handle Users Without a Token ---
-  // If there's no token and the user is trying to access a protected path, redirect them.
-  if (!verifiedToken) {
-    if (isNonProtectedPath) {
-      return NextResponse.next();
-    }
-    // console.log(`[AUTH] No token. Access to protected route ${pathname} denied. Redirecting to ${routes.LOGIN}`);
+  // Handle init page access rules
+  if (!isInitialised && pathname !== routes.INIT) {
+    return NextResponse.redirect(absoluteUrl(request, routes.INIT));
+  }
+  if (isInitialised && pathname === routes.INIT) {
     return NextResponse.redirect(absoluteUrl(request, routes.LOGIN));
   }
 
-  // Otherwise, allow the request to proceed (e.g., to the login page).
+  // Step 2: Validate authentication token
+  const token = request.cookies.get(authCookieName)?.value;
+  const verifiedToken = token ? await verifyJwtToken(token) : null;
+
+  // If token exists but invalid -> clear & go to login
+  if (token && !verifiedToken) {
+    const resp = NextResponse.redirect(absoluteUrl(request, routes.LOGIN));
+    resp.cookies.delete(authCookieName);
+    return resp;
+  }
+
+  // If token valid & user is on public-only page -> go to dashboard
+  if (verifiedToken && isNonProtectedPath) {
+    return NextResponse.redirect(absoluteUrl(request, routes.DASHBOARD));
+  }
+
+  // If no token & protected page -> go to login
+  if (!verifiedToken && !isNonProtectedPath) {
+    return NextResponse.redirect(absoluteUrl(request, routes.LOGIN));
+  }
+
+  // Otherwise -> allow
   return NextResponse.next();
 };
 

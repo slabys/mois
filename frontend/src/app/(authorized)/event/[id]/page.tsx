@@ -21,7 +21,7 @@ export const revalidate = 60;
 
 const UseFetchAllEvents = async () => {
   const queryKey = getGetEventsQueryKey();
-  const events: GetEvents200 = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${queryKey[0]}`)
+  const events: GetEvents200 = await fetch(`${process.env.NEXT_PUBLIC_API_DOMAIN}${queryKey[0]}`)
     .then((res) => res.json())
     .catch((e) => console.error(e));
 

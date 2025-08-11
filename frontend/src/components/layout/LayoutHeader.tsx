@@ -91,7 +91,9 @@ const LayoutHeader = () => {
       <Container size="xl" className={styles.inner}>
         <Anchor component={Link} href={routes.DASHBOARD}>
           <Flex direction="row" justify="center" align="center" gap={8}>
-            <Image src="/icon.svg" alt="LOGO" height={64} width="100%" />
+            <Box>
+              <Image src="/icon.svg" alt="LOGO" height={64} width="100%" />
+            </Box>
             <Text size="xl" c="black" display={{ base: "none", lg: "block" }}>
               Event Registration System
             </Text>

@@ -35,7 +35,7 @@ const VerifyPage = () => {
     if (token) {
       verifyMutation.refetch();
     }
-  }, [token]);
+  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div style={{ maxWidth: 400, margin: "0 auto", padding: 32 }}>

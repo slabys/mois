@@ -1,6 +1,6 @@
 export const routes = {
   // Initial setup
-  INIT: "/initialize",
+  INIT: "/initialise",
   // --- Unauthorized ---
   // Any unauthorized routes need to be added to CustomHooksLoader and middleware.ts
   LOGIN: "/login",
