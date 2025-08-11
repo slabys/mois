@@ -79,9 +79,9 @@ services:
     build:
       context: ./frontend
       args:
-        - API_DOMAIN=${API_DOMAIN:-localhost:4000}
+        - NEXT_PUBLIC_API_DOMAIN=${API_DOMAIN:-localhost:4000}
     environment:
-      - API_DOMAIN=${API_DOMAIN:-localhost:4000}
+      - NEXT_PUBLIC_API_DOMAIN=${API_DOMAIN:-localhost:4000}
       - PORT_FE=${PORT_FE:-3000}
       - JWT_SECRET=${JWT_SECRET:-secret}
     env_file:

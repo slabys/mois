@@ -23,8 +23,6 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# RUN echo "API_DOMAIN=${API_DOMAIN}" >> .env.production
-
 RUN corepack enable pnpm && pnpm run build;
 
 FROM base AS runner
@@ -35,9 +33,8 @@ WORKDIR /app
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ARG PORT_FE
-ARG API_DOMAIN
-
-#RUN echo "NEXT_PUBLIC_API_DOMAIN=${NEXT_PUBLIC_API_DOMAIN}" >> .env.production
+ARG NEXT_PUBLIC_API_DOMAIN
+ENV NEXT_PUBLIC_API_DOMAIN=$NEXT_PUBLIC_API_DOMAIN
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
