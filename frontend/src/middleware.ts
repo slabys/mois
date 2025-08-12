@@ -30,6 +30,7 @@ export const middleware = async (request: NextRequest) => {
       const data = await initResponse.json();
       isInitialised = !!data?.isInitialised;
     } catch (err) {
+      console.error(`${apiUrl}${getGetInitialisedQueryKey()[0]}`);
       console.error("[INIT] Failed to check init status:", err);
     }
   }

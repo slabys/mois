@@ -41,7 +41,7 @@ RUN npm install -g pnpm
 
 # Copy only the built application and necessary files from builder
 COPY --from=builder /app/${PROJECT_DIST} .
-#COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
 
@@ -49,8 +49,6 @@ COPY --from=builder /app/pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --prod=true
 
 EXPOSE $PORT_API
-
-CMD npx typeorm migration:run -d ./libs/config/typeorm.config.ts -t each
 
 # Start the server
 ENTRYPOINT node main.js
