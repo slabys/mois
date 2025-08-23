@@ -44,6 +44,8 @@ COPY --from=builder /app/${PROJECT_DIST} .
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
+# Copy e-mail templates
+COPY --from=builder /app/templates/ ./templates/
 
 # Install prod dependencies
 RUN pnpm install --frozen-lockfile --prod=true

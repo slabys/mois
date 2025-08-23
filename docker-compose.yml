@@ -27,6 +27,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.Migration
+    env_file:
+      - .env
     restart: no
     networks:
       - app-network

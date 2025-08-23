@@ -8,10 +8,10 @@ import { HandlebarsAdapter } from "@nestjs-modules/mailer/dist/adapters/handleba
 @Module({
 	imports: [ConfigModule, NestMailerModule.forRoot({
 		transport: {
-			service: "gmail",
+			// service: "Gmail",
 			host: process.env.MAIL_HOST,
-			port: 465,
-			secure: true,
+			port: 587,
+			// secure: true,
 			auth: {
 				user: process.env.MAIL_USER,
 				pass: process.env.MAIL_PASS,

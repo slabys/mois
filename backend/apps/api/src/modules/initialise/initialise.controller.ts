@@ -23,7 +23,7 @@ export class InitialiseController {
 		const result = await this.initialiseService.checkInitialisation();
 
 		response.cookie(INIT_COOKIE, result.isInitialised ? "1" : "0", {
-			domain: isProduction ? process.env.WEB_DOMAIN : "localhost",
+			domain: isProduction ? process.env.WEB_DOMAIN.split("https://")[1] : "localhost",
 			httpOnly: true,
 			secure: true,
 			sameSite: "none",
@@ -35,11 +35,9 @@ export class InitialiseController {
 	@ApiCreatedResponse({ type: InitialiseType, description: "Initialisation created successfully" })
 	@Post()
 	async createInitialState(@Body() body: InitialiseType, @Res({ passthrough: true }) response: Response) {
-		const result = await this.initialiseService.initialiseSystem(body);
-
 		const init = await this.initialiseService.initialiseSystem(body);
-		response.cookie(INIT_COOKIE, result.user ? "1" : "0", {
-			domain: isProduction ? process.env.WEB_DOMAIN : "localhost",
+		response.cookie(INIT_COOKIE, init.user ? "1" : "0", {
+			domain: isProduction ? process.env.WEB_DOMAIN.split("https://")[1] : "localhost",
 			httpOnly: true,
 			secure: true,
 			sameSite: "none",

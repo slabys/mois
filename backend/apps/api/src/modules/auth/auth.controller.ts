@@ -52,7 +52,7 @@ export class AuthController {
 
 		response
 			.cookie("AuthCookie", token, {
-				domain: isProduction ? process.env.WEB_DOMAIN : "localhost",
+				domain: isProduction ? process.env.WEB_DOMAIN.split("https://")[1] : "localhost",
 				httpOnly: true,
 				secure: true,
 				sameSite: "none",
@@ -75,7 +75,7 @@ export class AuthController {
 	async logoutUser(@Res({ passthrough: true }) response: Response) {
 		response
 			.clearCookie("AuthCookie", {
-				domain: isProduction ? process.env.WEB_DOMAIN : "localhost",
+				domain: isProduction ? process.env.WEB_DOMAIN.split("https://")[1] : "localhost",
 				httpOnly: true,
 				secure: true,
 				sameSite: "none",
@@ -91,7 +91,7 @@ export class AuthController {
 	async removeCookie(@Res({ passthrough: true }) response: Response) {
 		response
 			.clearCookie("AuthCookie", {
-				domain: isProduction ? process.env.WEB_DOMAIN : "localhost",
+				domain: isProduction ? process.env.WEB_DOMAIN.split("https://")[1] : "localhost",
 				httpOnly: true,
 				secure: true,
 				sameSite: "none",
@@ -173,17 +173,24 @@ export class AuthController {
 		const verificationToken = await this.authService.createEmailVerificationToken(user);
 		const verifyUrl = `${this.configService.getOrThrow("WEB_DOMAIN")}/verify?token=${verificationToken}`;
 
-		// TODO - Move to MailController (resend verification)
-		await this.mailerService.sendMail({
-			from: { name: "No Reply", address: this.configService.get<string>("MAIL_USER") },
-			to: [{ name: `${user.firstName} ${user.lastName}`, address: user.email }],
-			subject: "Verify your email - resend",
-			template: "verify-email",
-			context: {
-				name: `${user.firstName} ${user.lastName}`,
-				link: verifyUrl,
-			},
-		});
+		console.log(process.env.MAIL_HOST, process.env.MAIL_USER, process.env.MAIL_PASS);
+		try {
+			// TODO - Move to MailController (resend verification)
+			await this.mailerService.sendMail({
+				from: { name: "No Reply", address: this.configService.get<string>("MAIL_USER") },
+				to: [{ name: `${user.firstName} ${user.lastName}`, address: user.email }],
+				subject: "Verify your email - resend",
+				template: "verify-email",
+				context: {
+					name: `${user.firstName} ${user.lastName}`,
+					link: verifyUrl,
+				},
+			});
+		} catch (error) {
+			console.log(error);
+			return { message: "Unable to resend verification email" };
+		}
+
 
 		return { message: "Verification email resent" };
 	}
