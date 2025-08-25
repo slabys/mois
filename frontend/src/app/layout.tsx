@@ -6,21 +6,23 @@ import "@mantine/dates/styles.css";
 import "@mantine/dropzone/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/tiptap/styles.css";
-import { Metadata } from "next";
-import React, { ReactElement, Suspense } from "react";
+import { Metadata, Viewport } from "next";
+import React, { ReactNode, Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "ESN Event Registration System",
-  description: "Event Registration System for ESN",
-  manifest: "/manifest.json",
-  keywords: ["ESN", "ERS", "events", "registration"],
+  applicationName: "Event Registration System",
+  title: "Event Registration System",
+  description:
+    "ERS (Event Registration System) allows people to register for events, where admins can manage their applications and assign spots.",
+  keywords: ["ERS", "events", "registration"],
+  manifest: "manifest.webmanifest",
   icons: [
     {
-      url: "/icons/maskable_icon_x192.png",
+      url: "/icons/favicon.svg",
       rel: "icon",
     },
     {
-      url: "/icons/maskable_icon_x512.png",
+      url: "/icons/favicon.svg",
       rel: "apple-touch-icon",
     },
   ],
@@ -32,20 +34,27 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: ReactElement;
-}>) {
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: "contain",
+  interactiveWidget: "resizes-content",
+};
+
+interface RootLayoutProps {
+  children: ReactNode;
+}
+
+const RootLayout = ({ children }: RootLayoutProps) => {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" type="image/png" href="/icons/favicon-96x96.png" sizes="96x96" />
         <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
-        <link rel="shortcut icon" href="/icons/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
-        <meta name="apple-mobile-web-app-title" content="ESN ERS" />
-        <link rel="manifest" href="./manifest.ts" />
+        <link rel="shortcut icon" href="/icons/favicon.svg" />
+        <link rel="manifest" href="/manifest.webmanifest" />
+
         <ColorSchemeScript />
       </head>
       <body style={{ width: "100%", height: "100vh" }}>
@@ -57,4 +66,6 @@ export default function RootLayout({
       </body>
     </html>
   );
-}
+};
+
+export default RootLayout;

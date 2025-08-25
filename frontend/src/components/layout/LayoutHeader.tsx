@@ -92,7 +92,7 @@ const LayoutHeader = () => {
         <Anchor component={Link} href={routes.DASHBOARD}>
           <Flex direction="row" justify="center" align="center" gap={8}>
             <Box>
-              <Image src="/icon.svg" alt="LOGO" height={64} width="100%" />
+              <Image src="/icon.svg" alt="LOGO" height={64} width={64} />
             </Box>
             <Text size="xl" c="black" display={{ base: "none", lg: "block" }}>
               Event Registration System

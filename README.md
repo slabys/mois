@@ -344,16 +344,6 @@ docker compose -f docker-compose.yml build
 docker compose -f docker-compose.yml up -d
 ```
 
-#### RUN Docker Compose WITH NGINX
-
-```shell
-# Build images
-docker compose -f docker-compose.nginx.yml build
-
-# Start images in detached mode
-docker compose -f docker-compose.nginx.yml up -d
-```
-
 ## Contributors
 
 |                                               Šimon Slabý                                               |                                                Petr Vavřínek                                                |                                               Petr Mlejnek                                                |                   Ondřej Kmínek                    |

@@ -49,6 +49,7 @@ COPY --from=builder /app/templates/ ./templates/
 
 # Install prod dependencies
 RUN pnpm install --frozen-lockfile --prod=true
+RUN apk add --no-cache curl
 
 EXPOSE $PORT_API
 
