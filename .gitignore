@@ -5,4 +5,4 @@ dist
 postgres_data
 .env
 certbot
-database
+database/*
