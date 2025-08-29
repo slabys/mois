@@ -1,6 +1,9 @@
 "use client";
 
 import { useResendVerification, useVerifyEmail } from "@/utils/api";
+import routes from "@/utils/routes";
+import { Button } from "@mantine/core";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -76,6 +79,9 @@ const VerifyPage = () => {
           {resendSuccess && <p style={{ color: "green" }}>Verification email sent!</p>}
         </div>
       )}
+      <Button component={Link} href={routes.LOGIN}>
+        Back to Login page
+      </Button>
     </div>
   );
 };

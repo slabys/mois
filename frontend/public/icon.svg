@@ -8,15 +8,16 @@
         <g transform="matrix(1,0,0,1,-12,-12)">
             <g transform="matrix(1,0,0,1.05263,-1.5,-0.105263)">
                 <path d="M7.976,21L6,21C4.903,21 3.5,20.197 3.5,19.1L3.5,6.75C3.5,5.653 4.403,4.85 5.5,4.85L21,4.85C22.097,4.85 23,5.653 23,6.75L23,10.55"
-                      style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:2px;"/>
+                      style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
                 <g transform="matrix(1,0,0,1,-0.5,0)">
-                    <path d="M19,2L19,5.8" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:2px;"/>
+                    <path d="M19,2L19,5.8" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
                 </g>
                 <g transform="matrix(1,0,0,1,0.5,-0.179818)">
-                    <path d="M8,2L8,5.98" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:2px;"/>
+                    <path d="M8,2L8,5.98" style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
                 </g>
                 <g transform="matrix(1,0,0,1,2.42861e-16,-2)">
-                    <path d="M3.5,10.65L19.5,10.65" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:2px;"/>
+                    <path d="M3.5,10.65L19.5,10.65"
+                          style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
                 </g>
                 <g transform="matrix(1,0,0,1,0,0.95)">
                     <g transform="matrix(0.994712,0,0,0.9996,6.55383,-1.54551)">
@@ -39,8 +40,9 @@
         <g transform="matrix(1,0,0,1,-8,-8)">
             <g transform="matrix(0.913336,0,-8.50015e-17,0.913336,-2.6273,-3.26671)">
                 <path d="M4,20L8,20L18.5,9.5C19.03,8.97 19.328,8.25 19.328,7.5C19.328,5.948 18.052,4.672 16.5,4.672C15.75,4.672 15.03,4.97 14.5,5.5L4,16L4,20"
-                      style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:2px;"/>
-                <path d="M13.5,6.5L17.5,10.5" style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:2px;"/>
+                      style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
+                <path d="M13.5,6.5L17.5,10.5"
+                      style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
             </g>
         </g>
     </g>
@@ -48,7 +50,7 @@
         <g transform="matrix(1,0,0,1,-12,-12)">
             <rect x="0" y="0" width="24" height="24" style="fill:none;fill-rule:nonzero;"/>
             <path d="M3,17C6.333,13.667 8,11 8,9C8,6 7,6 6,6C5,6 3.968,7.085 4,9C4.034,11.048 5.658,13.877 6.5,15C8,17 9,17.5 10,16L12,13C12.333,15.667 13.333,17 15,17C15.53,17 17.639,15 18,15C18.517,15 19.517,15.667 21,17"
-                  style="fill:none;fill-rule:nonzero;stroke:black;stroke-width:2px;"/>
+                  style="fill:none;fill-rule:nonzero;stroke:currentColor;stroke-width:2px;"/>
         </g>
     </g>
 </svg>

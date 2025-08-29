@@ -94,7 +94,8 @@ const LayoutHeader = () => {
             <Box>
               <Image src="/icon.svg" alt="LOGO" height={64} width={64} />
             </Box>
-            <Text size="xl" c="black" display={{ base: "none", lg: "block" }}>
+            {/*TODO - fix color*/}
+            <Text size="xl" c="#00aef0" fw="bold" display={{ base: "none", lg: "block" }}>
               Event Registration System
             </Text>
           </Flex>
