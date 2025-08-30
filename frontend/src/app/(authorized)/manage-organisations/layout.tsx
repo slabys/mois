@@ -1,6 +1,6 @@
 import { getCurrentUser } from "@/utils/api";
 import { hasSomePermissions } from "@/utils/checkPermissions";
-import { manageEventLink, manageOrganisationLink } from "@/utils/headerLinks";
+import { manageOrganisationLink } from "@/utils/headerLinks";
 import routes from "@/utils/routes";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";

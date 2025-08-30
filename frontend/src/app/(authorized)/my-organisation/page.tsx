@@ -6,11 +6,9 @@ import AddressCodeBlock from "@components/AddressCodeBlock/AddressCodeBlock";
 import { Badge, Button, Card, Container, Grid, Group, Stack, Text } from "@mantine/core";
 import Link from "next/link";
 
-interface UseFetchAllEventsProps {
-  params: Promise<{ id: string }>;
-}
+interface UseFetchAllEventsProps {}
 
-const MyOrganisationsPage = ({ params }: UseFetchAllEventsProps) => {
+const MyOrganisationsPage = ({}: UseFetchAllEventsProps) => {
   const { data: currentUser } = useGetCurrentUser();
   const { data: userMemberships } = useUserOrganizationMemberships(currentUser?.id ?? "");
 
