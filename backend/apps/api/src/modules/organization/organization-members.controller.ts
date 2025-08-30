@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, UseGuards } from "@nestjs/common";
+import {
+	Body,
+	Controller,
+	Delete,
+	ForbiddenException,
+	Get,
+	NotFoundException,
+	Param,
+	Post,
+	UseGuards,
+} from "@nestjs/common";
 import { ApiBearerAuth, ApiExtraModels, ApiOkResponse, ApiTags, getSchemaPath } from "@nestjs/swagger";
 
 import { OrganizationService } from "./index";
@@ -6,9 +16,11 @@ import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 
 import { CookieGuard } from "../auth/providers/guards";
 import { AddOrganizationMembers } from "../../models/requests";
-import { UsersService } from "../users";
+import { User, UsersService } from "../users";
 import { PaginationDto, PaginationResponseDto } from "../../models/responses/pagination-response.dto";
 import { OrganizationMember } from "./entities";
+import { Permission } from "@api/modules/roles";
+import { CurrentUser } from "@api/decorators";
 
 @ApiTags("Organization members")
 @Controller("organization/:id")
@@ -48,15 +60,17 @@ export class OrganizationMembersController {
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
 	@Post("members")
-	async addOrganizationMembers(@Param("id") organizationId: string, @Body() body: AddOrganizationMembers) {
+	async addOrganizationMembers(@CurrentUser() currentUser: User, @Param("id") organizationId: string, @Body() body: AddOrganizationMembers) {
+		if (!currentUser.role.hasOneOfPermissions([Permission.OrganisationAddUser])) {
+			throw new ForbiddenException("User does not have required permissions");
+		}
 		const organization = await this.organizationService.findById(organizationId);
-
 		if (!organization) throw new NotFoundException("Organization not found");
 
-		const organisationMembers = await this.organizationService.findMembersOf(organization.id).then((r) => r.data);
-		const unassignedMemberIds = body.userIds.filter((id) => !organisationMembers.some((member) => member.user.id !== id));
+		const memberIds = organization.members.map((member) => member.user.id);
+		const unassignedMemberIds = body.userIds.filter((userId) => !memberIds.includes(userId));
 		const newMembers = await this.usersService.findManyById(unassignedMemberIds);
-
+		
 		return this.organizationService.addMembers(organization, newMembers);
 	}
 

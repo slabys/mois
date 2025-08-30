@@ -17,11 +17,11 @@ export class Role {
 	}
 
 	hasPermission(userPermission: Permission) {
-		return this.permissions.includes(userPermission);
+		return this.isAdmin() || this.permissions.includes(userPermission);
 	}
 
 	hasOneOfPermissions(userPermissions: Permission[]) {
-		return userPermissions.some((permission) => this.permissions.includes(permission));
+		return this.isAdmin() || userPermissions.some((permission) => this.permissions.includes(permission));
 	}
 
 	constructor(role?: Partial<Role>) {
