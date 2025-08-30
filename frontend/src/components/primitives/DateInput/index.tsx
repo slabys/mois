@@ -17,8 +17,8 @@ const DateInput = ({ value, onChange, ...props }: DateInputProps) => {
       leftSection={<IconCalendar />}
       dateParser={dateParser}
       valueFormat="DD.MM.YYYY"
-      locale="cs"
-      placeholder="Date"
+      placeholder="dd.mm.yyyy"
+      locale="en"
       value={value}
       onChange={onChange}
       {...props}

@@ -111,20 +111,8 @@ const EventEditModal = ({ eventDetail, isOpened, close, handleSuccess = () => {}
               error={form.errors.until}
             />
           </SimpleGrid>
-          <RichTextEditor
-            label="Short Description"
-            value={form.values.shortDescription}
-            onChange={(value) => {
-              form.setFieldValue("shortDescription", value);
-            }}
-          />
-          <RichTextEditor
-            label="Long Description"
-            value={form.values.longDescription}
-            onChange={(value) => {
-              form.setFieldValue("longDescription", value);
-            }}
-          />
+          <RichTextEditor label="Short Description" {...form.getInputProps("shortDescription")} letterLimit={300} />
+          <RichTextEditor label="Long Description" {...form.getInputProps("longDescription")} />
         </Flex>
         <Group justify="center" mt="lg">
           <Button type="submit" disabled={!isTouchedDirty} loading={eventUpdateMutation.isPending}>

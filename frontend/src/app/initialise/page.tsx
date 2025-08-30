@@ -151,7 +151,7 @@ const InitialisePage = () => {
       <Flex direction="column" justify="center" align="center" h="100%" gap={8}>
         <Box maw="32rem" w="100%">
           <Form form={form} onSubmit={initialiseSystem}>
-            <Stepper active={activeStep} onStepClick={onClickStep}>
+            <Stepper iconSize={12} active={activeStep} onStepClick={onClickStep}>
               <Stepper.Step label="Step 1:" description="User Information">
                 <Flex direction="column" gap={12}>
                   <SimpleGrid cols={2}>

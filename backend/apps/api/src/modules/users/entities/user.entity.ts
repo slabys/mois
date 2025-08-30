@@ -69,7 +69,7 @@ export class User extends BaseEntity {
 	password: string;
 
 	@ManyToOne(() => Photo, { eager: true, onDelete: "SET NULL" })
-	photo: Photo;
+	photo: Photo | null;
 
 	@CreateDateColumn()
 	createdAt: Date;
@@ -81,7 +81,7 @@ export class User extends BaseEntity {
 	personalAddress: Address | null;
 
 	@ManyToOne(() => Role, { cascade: true, eager: true, onDelete: "SET NULL" })
-	role: Role;
+	role: Role | null;
 
 	@BeforeUpdate()
 	@BeforeInsert()

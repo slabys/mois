@@ -3,7 +3,6 @@ import {
   getGetAllUsersQueryKey,
   getGetCurrentUserQueryKey,
   useGetAllRoles,
-  useGetCurrentUser,
   useUpdateUserRole,
 } from "@/utils/api";
 import { User } from "@/utils/api.schemas";
@@ -15,17 +14,17 @@ import { useQueryClient } from "@tanstack/react-query";
 import React, { useMemo, useState } from "react";
 
 interface MyModalProps {
+  currentUser: User;
+  user: User | undefined;
   isOpened: boolean;
   closeModal: () => void;
   handleOnSuccess: () => void;
-  user: User | undefined;
 }
 
-const ChangeRoleModal = ({ user, isOpened, closeModal, handleOnSuccess }: MyModalProps) => {
+const ChangeRoleModal = ({ currentUser, user, isOpened, closeModal, handleOnSuccess }: MyModalProps) => {
   const queryClient = useQueryClient();
-  const [newRole, setNewRole] = useState<string | null>(null);
+  const [newRole, setNewRole] = useState<string | null>(user?.role?.id.toString() ?? null);
 
-  const { refetch: refetchCurrentUser } = useGetCurrentUser();
   const { data: allRoles } = useGetAllRoles();
 
   const changeRoleMutation = useUpdateUserRole({
@@ -34,7 +33,6 @@ const ChangeRoleModal = ({ user, isOpened, closeModal, handleOnSuccess }: MyModa
         queryClient.invalidateQueries({ queryKey: [getGetAllUsersQueryKey()] });
         queryClient.invalidateQueries({ queryKey: [getGetAllRolesQueryKey()] });
         queryClient.invalidateQueries({ queryKey: [getGetCurrentUserQueryKey()] });
-        refetchCurrentUser();
         setNewRole(null);
         handleOnSuccess();
         closeModal();
@@ -85,12 +83,14 @@ const ChangeRoleModal = ({ user, isOpened, closeModal, handleOnSuccess }: MyModa
         <Divider />
         <Select
           label="Select New Role"
-          value={newRole}
+          defaultValue={user?.role?.id.toString()}
+          value={newRole?.toString()}
           data={allRoles.sort().map((role) => {
             return {
               label: role.name,
               value: role.id.toString(),
-              disabled: role.id === user?.role?.id || (role.id === 1 && user.role.id !== 1),
+              // If current user is not and admin, can not give admin role
+              disabled: currentUser?.role?.id !== 1 && role.id === 1,
             };
           })}
           onChange={(value) => setNewRole(value)}

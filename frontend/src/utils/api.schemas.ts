@@ -149,7 +149,17 @@ export const UserGender = {
 /**
  * @nullable
  */
+export type UserPhoto = Photo | null;
+
+/**
+ * @nullable
+ */
 export type UserPersonalAddress = Address | null;
+
+/**
+ * @nullable
+ */
+export type UserRole = Role | null;
 
 export interface User {
   id: string;
@@ -164,12 +174,14 @@ export interface User {
   gender: UserGender;
   /** @nullable */
   pronouns: string | null;
-  photo: Photo;
+  /** @nullable */
+  photo: UserPhoto;
   createdAt: string;
   updatedAt: string;
   /** @nullable */
   personalAddress: UserPersonalAddress;
-  role: Role;
+  /** @nullable */
+  role: UserRole;
   isVerified: boolean;
 }
 

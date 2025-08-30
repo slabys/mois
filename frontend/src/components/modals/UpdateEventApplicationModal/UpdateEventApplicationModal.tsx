@@ -182,7 +182,7 @@ const UpdateEventApplicationModal = ({
         <Stack gap="md">
           <Flex direction="column" gap="md">
             <SimpleGrid cols={2}>
-              <TextInput label="Person ID Number / Passport Number" {...form.getInputProps("idNumber")} required />
+              <TextInput label="ID/Passport Number" {...form.getInputProps("idNumber")} required />
               <DateInput
                 label="Valid until (ID/Passport)"
                 defaultValue={null}
@@ -252,10 +252,14 @@ const UpdateEventApplicationModal = ({
                 organization: (
                   <Blockquote>
                     <Text>Organisation: {selectedOrganisation?.name}</Text>
-                    <Text>
-                      Manager:{" "}
-                      {`${selectedOrganisation?.manager?.firstName} ${selectedOrganisation?.manager?.lastName}`}
-                    </Text>
+                    {selectedOrganisation?.cin && <Text>CIN: {selectedOrganisation.cin}</Text>}
+                    {selectedOrganisation?.vatin && <Text>VATIN: {selectedOrganisation.vatin}</Text>}
+                    {selectedOrganisation?.manager && (
+                      <Text>
+                        Manager:{" "}
+                        {`${selectedOrganisation?.manager?.firstName} ${selectedOrganisation?.manager?.lastName}`}
+                      </Text>
+                    )}
                   </Blockquote>
                 ),
               }[form.values.organization.type]}
@@ -373,7 +377,7 @@ const UpdateEventApplicationModal = ({
                 form.setTouched({ foodRestrictionAllergies: true });
               }}
               description={
-                <Text fz="xs">
+                <Text fz="xs" span>
                   Full allergen list:{" "}
                   <Anchor
                     fz="xs"

@@ -125,7 +125,7 @@ const EventApplicationModal = ({
     },
   });
 
-  const { activeStep, setActiveStep, onClickStep, nextStep, prevStep } = useStepper(form);
+  const { activeStep, onClickStep, nextStep, prevStep } = useStepper(form);
 
   const isTouchedDirty = form.isTouched() && form.isDirty();
 
@@ -162,15 +162,14 @@ const EventApplicationModal = ({
   return (
     <Modal size="xl" opened={isOpened} onClose={handleClose} title={<Text fz="h3">Event Application</Text>}>
       <Form form={form} onSubmit={handleEventApplication}>
-        <Stepper active={activeStep} onStepClick={setActiveStep}>
+        <Stepper active={activeStep} iconSize={32}>
           <Stepper.Step label="Step 1:" description="General Information">
             <Flex direction="column" gap="md">
               <SimpleGrid cols={2}>
-                <TextInput label="Person ID Number / Passport Number" {...form.getInputProps("idNumber")} required />
+                <TextInput label="ID/Passport Number" {...form.getInputProps("idNumber")} required />
                 <DateInput
                   label="Valid until (ID/Passport)"
                   defaultValue={null}
-                  placeholder="ID/Passport valid until"
                   value={form.values.validUntil ? dayjs(form.values.validUntil).toDate() : null}
                   onChange={(value) => {
                     value && form.setFieldValue("validUntil", dayjs(value).toISOString());
@@ -240,10 +239,14 @@ const EventApplicationModal = ({
                   organization: (
                     <Blockquote>
                       <Text>Organisation: {selectedOrganisation?.name}</Text>
-                      <Text>
-                        Manager:{" "}
-                        {`${selectedOrganisation?.manager?.firstName} ${selectedOrganisation?.manager?.lastName}`}
-                      </Text>
+                      {selectedOrganisation?.cin && <Text>CIN: {selectedOrganisation.cin}</Text>}
+                      {selectedOrganisation?.vatin && <Text>VATIN: {selectedOrganisation.vatin}</Text>}
+                      {selectedOrganisation?.manager && (
+                        <Text>
+                          Manager:{" "}
+                          {`${selectedOrganisation?.manager?.firstName} ${selectedOrganisation?.manager?.lastName}`}
+                        </Text>
+                      )}
                     </Blockquote>
                   ),
                 }[form.values.organization.type]}
@@ -361,7 +364,7 @@ const EventApplicationModal = ({
                   setFoodRestrictionList(value);
                 }}
                 description={
-                  <Text fz="xs">
+                  <Text fz="xs" span>
                     Full allergen list:{" "}
                     <Anchor
                       fz="xs"
@@ -441,11 +444,6 @@ const EventApplicationModal = ({
                 required
               />
             </Flex>
-            <Flex mt={16} gap={8} justify="center" align="center">
-              <Button type="submit" disabled={!isTouchedDirty} loading={eventApplicationMutation.isPending}>
-                Submit application
-              </Button>
-            </Flex>
           </Stepper.Completed>
         </Stepper>
 
@@ -453,9 +451,15 @@ const EventApplicationModal = ({
           <Button variant="default" onClick={prevStep} disabled={activeStep === 0}>
             Back
           </Button>
-          <Button onClick={nextStep} disabled={activeStep > 2}>
-            Next step
-          </Button>
+          {activeStep > 2 ? (
+            <Button type="submit" disabled={!isTouchedDirty} loading={eventApplicationMutation.isPending}>
+              Submit application
+            </Button>
+          ) : (
+            <Button onClick={nextStep} disabled={activeStep > 2}>
+              Next step
+            </Button>
+          )}
         </Flex>
       </Form>
     </Modal>

@@ -18,7 +18,7 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
   const [isChangeRoleModalOpen, { open: openChangeRoleModal, close: closeChangeRoleModal }] = useDisclosure(false);
   const [isCreateRoleModal, { open: openCreateRoleModal, close: closeCreateRoleModal }] = useDisclosure(false);
 
-  const { data: currentUser } = useGetCurrentUser();
+  const { data: currentUser, refetch: refetchCurrentUser } = useGetCurrentUser();
   const { data: allUsers, refetch: refetchUsers } = useGetAllUsers({ all: true });
 
   const exportToSheet = useGenerateSheetUsers({
@@ -58,7 +58,7 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
         filterData={allUsers.data}
         dataColumns={["firstName", "lastName", "username", "email", "birthDate", "nationality", "role.name"]}
         customColumns={
-          currentUser.role.permissions.includes(RolePermissionsItem.userupdateRole)
+          currentUser.role?.permissions.includes(RolePermissionsItem.userupdateRole)
             ? [
                 {
                   type: "button",
@@ -75,11 +75,13 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
       />
       {selectedUserId && (
         <ChangeRoleModal
+          currentUser={currentUser}
           user={allUsers.data.find((f) => f.id === selectedUserId)}
           isOpened={isChangeRoleModalOpen}
           closeModal={closeChangeRoleModal}
           handleOnSuccess={() => {
             refetchUsers();
+            refetchCurrentUser();
           }}
         />
       )}

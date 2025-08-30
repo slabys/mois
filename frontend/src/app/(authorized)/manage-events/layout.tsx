@@ -19,7 +19,7 @@ const ManageEventsLayout = async ({ children }: ManageEventsLayoutProps) => {
     },
   });
 
-  if (!hasSomePermissions(currentUser.role, manageEventLink.permissions)) redirect(routes.DASHBOARD);
+  if (!hasSomePermissions(currentUser?.role, manageEventLink.permissions)) redirect(routes.DASHBOARD);
 
   return children;
 };

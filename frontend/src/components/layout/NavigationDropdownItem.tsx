@@ -1,4 +1,4 @@
-import { Role } from "@/utils/api.schemas";
+import { UserRole } from "@/utils/api.schemas";
 import { hasSomePermissions } from "@/utils/checkPermissions";
 import { GroupedLinks } from "@components/layout/LayoutHeader";
 import styles from "@components/layout/LayoutHeader.module.css";
@@ -8,7 +8,7 @@ import Link from "next/link";
 import { forwardRef, useMemo } from "react";
 
 interface NavigationDropdownItemProps extends BoxProps {
-  userRole: Role;
+  userRole: UserRole;
   item: GroupedLinks;
   pathname: string;
   closeDrawer: () => void;
