@@ -1,5 +1,6 @@
 import { DateValue, DateInput as MantineDateInput, DateInputProps as MantineDateInputProps } from "@mantine/dates";
 import { IconCalendar } from "@tabler/icons-react";
+import dayjs from "dayjs";
 import "dayjs/locale/en";
 
 export interface DateInputProps extends MantineDateInputProps {
@@ -8,14 +9,18 @@ export interface DateInputProps extends MantineDateInputProps {
 }
 
 const DateInput = ({ value, onChange, ...props }: DateInputProps) => {
+  const dateParser: DateInputProps["dateParser"] = (input: string) => {
+    return dayjs(input).format("DD.MM.YYYY");
+  };
   return (
     <MantineDateInput
       leftSection={<IconCalendar />}
+      dateParser={dateParser}
       valueFormat="DD.MM.YYYY"
+      locale="cs"
       placeholder="Date"
       value={value}
       onChange={onChange}
-      locale="en"
       {...props}
     />
   );

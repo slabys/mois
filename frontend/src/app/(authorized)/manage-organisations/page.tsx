@@ -89,8 +89,14 @@ const ManageOrganisationsPage = () => {
   return (
     <Container size="xl">
       <Stack>
-        <Flex justify="space-between" align="center" w="100%">
-          <Title>Manage Organizations</Title>
+        <Flex
+          direction={{ base: "column", md: "row" }}
+          justify="space-between"
+          align={{ base: "start", md: "center" }}
+          w="100%"
+          gap={24}
+        >
+          <Title order={1}>Manage Organizations</Title>
           <Button onClick={openAddOrganizationModal} leftSection={<IconPlus />}>
             Add Organization
           </Button>

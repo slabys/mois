@@ -18,6 +18,7 @@ import EventEditModal from "@components/events/modals/EventEditModal";
 import EventApplicationModal from "@components/modals/EventApplicationModal/EventApplicationModal";
 import UpdateEventPhotoModal from "@components/modals/UpdateEventPhotoModal/UpdateEventPhotoModal";
 import {
+  Anchor,
   Blockquote,
   Button,
   Collapse,
@@ -198,7 +199,8 @@ const EventDetail = ({ id }: EventDetailProps) => {
                 <Flex direction="column" gap={4}>
                   {currentUser.personalAddress === null && (
                     <Blockquote color="red" icon={<IconInfoCircle />} p={20}>
-                      Fill your personal address on your profile before registration.
+                      Fill your <Anchor href={routes.ACCOUNT}>personal address</Anchor> on your account profile before
+                      registration.
                     </Blockquote>
                   )}
                   {isUserRegistered ? (

@@ -95,6 +95,7 @@ const RegistrationForm = () => {
               label="Birthdate"
               defaultValue={null}
               placeholder="Birthdate"
+              defaultLevel="year"
               value={form.values.birthDate ? dayjs(form.values.birthDate).toDate() : null}
               onChange={(value) => {
                 value && form.setFieldValue("birthDate", dayjs(value).toISOString());

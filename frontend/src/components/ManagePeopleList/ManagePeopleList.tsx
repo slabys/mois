@@ -6,7 +6,7 @@ import { downloadFile } from "@/utils/downloadFile";
 import ChangeRoleModal from "@components/modals/ChangeRoleModal/ChangeRoleModal";
 import CreateRoleModal from "@components/modals/CreateRoleModal/CreateRoleModal";
 import DynamicSearch from "@components/shared/DynamicSearch";
-import { Button, Flex, ScrollArea, Stack, Title } from "@mantine/core";
+import { Button, Flex, Stack, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconPlus, IconTableExport } from "@tabler/icons-react";
 import React, { useState } from "react";
@@ -37,8 +37,14 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
 
   return (
     <Stack>
-      <Flex justify="space-between" align="center" w="100%">
-        <Title>All Users</Title>
+      <Flex
+        direction={{ base: "column", md: "row" }}
+        justify="space-between"
+        align={{ base: "start", md: "center" }}
+        w="100%"
+        gap={24}
+      >
+        <Title order={1}>All Users</Title>
         <Flex gap={16}>
           <Button onClick={exportDataXLSX} leftSection={<IconTableExport />} color="green" variant="outline">
             Export Data
@@ -48,29 +54,25 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
           </Button>
         </Flex>
       </Flex>
-      <ScrollArea w="100%">
-        <Flex direction="column" gap={8}>
-          <DynamicSearch<User>
-            filterData={allUsers.data}
-            dataColumns={["firstName", "lastName", "username", "email", "birthDate", "nationality", "role.name"]}
-            customColumns={
-              currentUser.role.permissions.includes(RolePermissionsItem.userupdateRole)
-                ? [
-                    {
-                      type: "button",
-                      children: "Change Role",
-                      headerLabel: "Change Role",
-                      handleOnChange: (rowId) => {
-                        setSelectedUserId(rowId);
-                        openChangeRoleModal();
-                      },
-                    },
-                  ]
-                : []
-            }
-          />
-        </Flex>
-      </ScrollArea>
+      <DynamicSearch<User>
+        filterData={allUsers.data}
+        dataColumns={["firstName", "lastName", "username", "email", "birthDate", "nationality", "role.name"]}
+        customColumns={
+          currentUser.role.permissions.includes(RolePermissionsItem.userupdateRole)
+            ? [
+                {
+                  type: "button",
+                  children: "Change Role",
+                  headerLabel: "Change Role",
+                  handleOnChange: (rowId) => {
+                    setSelectedUserId(rowId);
+                    openChangeRoleModal();
+                  },
+                },
+              ]
+            : []
+        }
+      />
       {selectedUserId && (
         <ChangeRoleModal
           user={allUsers.data.find((f) => f.id === selectedUserId)}

@@ -1,8 +1,9 @@
 import { getGetEventsQueryKey, useCreateEvent } from "@/utils/api";
 import { CreateEvent } from "@/utils/api.schemas";
+import Modal from "@components/Modal/Modal";
 import RichTextEditor from "@components/Richtext/RichTextEditor";
 import DateInput from "@components/primitives/DateInput";
-import { Button, Flex, Group, Modal, NumberInput, SimpleGrid, Switch, TextInput } from "@mantine/core";
+import { Button, Flex, Group, NumberInput, SimpleGrid, Switch, TextInput } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { Form, hasLength, isNotEmpty, useForm } from "@mantine/form";
 import { useQueryClient } from "@tanstack/react-query";

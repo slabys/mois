@@ -5,7 +5,7 @@ import { dayMonthYear, isDateString } from "@/utils/time";
 import { DateInputProps } from "@components/primitives/DateInput";
 import CustomColumnsTBody from "@components/shared/CustomColumnsTBody";
 import CustomColumnsTHead from "@components/shared/CustomColumnsTHead";
-import { Box, ButtonProps, Flex, SelectProps, Table, TextInput, TextInputProps } from "@mantine/core";
+import { Box, ButtonProps, Flex, ScrollArea, SelectProps, Table, TextInput, TextInputProps } from "@mantine/core";
 import { useState } from "react";
 
 /** Base Column */
@@ -120,7 +120,7 @@ const DynamicSearch = <T extends User | Event>({ filterData, dataColumns, custom
           }}
         />
       </Box>
-      <Box>
+      <ScrollArea>
         <Table striped highlightOnHover={true}>
           <Table.Thead>
             <Table.Tr>
@@ -142,7 +142,7 @@ const DynamicSearch = <T extends User | Event>({ filterData, dataColumns, custom
             ))}
           </Table.Tbody>
         </Table>
-      </Box>
+      </ScrollArea>
     </Flex>
   );
 };

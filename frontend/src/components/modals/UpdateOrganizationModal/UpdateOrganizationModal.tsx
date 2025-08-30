@@ -1,6 +1,7 @@
 import { useUpdateOrganization } from "@/utils/api";
 import { Organization, UpdateOrganization } from "@/utils/api.schemas";
-import { Button, Grid, Group, Modal, TextInput } from "@mantine/core";
+import Modal from "@components/Modal/Modal";
+import { Button, Grid, Group, TextInput } from "@mantine/core";
 import { Form, isNotEmpty, useForm } from "@mantine/form";
 import React, { useEffect } from "react";
 

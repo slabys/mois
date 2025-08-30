@@ -7,7 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "ERS",
     description:
       "ERS (Event Registration System) allows people to register for events, where admins can manage their applications and assign spots.",
-    theme_color: "#2e3192",
+    theme_color: "#00aeef",
     background_color: "#ffffff",
     display: "standalone",
     scope: "/",

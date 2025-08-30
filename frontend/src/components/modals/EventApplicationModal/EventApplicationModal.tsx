@@ -2,6 +2,7 @@ import { useCreateUserApplication, useUserOrganizationMemberships } from "@/util
 import { CreateEventApplication, CreateEventApplicationInvoiceMethod, Organization, User } from "@/utils/api.schemas";
 import useStepper from "@/utils/useStepper";
 import AddressCodeBlock from "@components/AddressCodeBlock/AddressCodeBlock";
+import Modal from "@components/Modal/Modal";
 import DateInput from "@components/primitives/DateInput";
 import Select from "@components/primitives/Select";
 import {
@@ -17,7 +18,6 @@ import {
   Checkbox,
   Flex,
   Grid,
-  Modal,
   MultiSelect,
   SimpleGrid,
   Stepper,

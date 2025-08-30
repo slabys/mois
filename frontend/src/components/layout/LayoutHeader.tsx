@@ -2,24 +2,12 @@
 
 import { useGetCurrentUser, useLogoutUser } from "@/utils/api";
 import { RolePermissionsItem } from "@/utils/api.schemas";
+import { manageEventLink, manageOrganisationLink, managePeopleLink } from "@/utils/headerLinks";
 import routes from "@/utils/routes";
+import LogoERS from "@components/icons/LogoERS";
 import styles from "@components/layout/LayoutHeader.module.css";
 import NavigationItemList from "@components/layout/NavigationItemList";
-import {
-  Anchor,
-  Box,
-  Burger,
-  Button,
-  Container,
-  Divider,
-  Drawer,
-  Flex,
-  Group,
-  Image,
-  Menu,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { Anchor, Box, Burger, Button, Container, Divider, Drawer, Flex, Group, Menu, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconChevronDown, IconLogout, IconUser } from "@tabler/icons-react";
 import Link from "next/link";
@@ -38,31 +26,24 @@ export type GroupedLinks = {
 
 export type MainLinksProps = (MainLink | GroupedLinks)[];
 
+/** Header Links
+ *
+ * Link from routes
+ * Label is text to be displayed
+ *
+ * Permissions
+ * null - anyone has access
+ * [] (empty array) - nobody has access, only admins has access
+ * others - defined by user role
+ *
+ * */
 const mainLinks: MainLinksProps = [
   { link: routes.DASHBOARD, label: "Home", permissions: null },
   { link: routes.SENT_APPLICATIONS, label: "Sent Applications", permissions: null },
   { link: routes.MY_ORGANISATION, label: "My Organisation", permissions: null },
   {
     label: "Management",
-    children: [
-      {
-        link: routes.MANAGE_EVENTS,
-        label: "Manage Events",
-        permissions: ["event.create", "event.update", "event.duplicate"],
-      },
-      {
-        link: routes.MANAGE_ORGANISATIONS,
-        label: "Manage Organisations",
-        permissions: [
-          "organisation.create",
-          "organisation.update",
-          "organisation.addUser",
-          "organisation.updateUser",
-          "organisation.deleteUser",
-        ],
-      },
-      { link: routes.MANAGE_PEOPLE, label: "Manage People", permissions: [] },
-    ],
+    children: [manageEventLink, manageOrganisationLink, managePeopleLink],
   },
 ];
 
@@ -91,11 +72,8 @@ const LayoutHeader = () => {
       <Container size="xl" className={styles.inner}>
         <Anchor component={Link} href={routes.DASHBOARD}>
           <Flex direction="row" justify="center" align="center" gap={8}>
-            <Box>
-              <Image src="/icon.svg" alt="LOGO" height={64} width={64} />
-            </Box>
-            {/*TODO - fix color*/}
-            <Text size="xl" c="#00aef0" fw="bold" display={{ base: "none", lg: "block" }}>
+            <LogoERS height={64} width={64} color="primary" />
+            <Text size="xl" c="primary" fw="bold" display={{ base: "none", lg: "block" }}>
               Event Registration System
             </Text>
           </Flex>
@@ -185,6 +163,10 @@ const LayoutHeader = () => {
             Logout
           </Button>
         </Group>
+
+        <Flex direction="row" justify="center" align="center">
+          <Text fw={700}>Event Registration System</Text>
+        </Flex>
       </Drawer>
     </header>
   );

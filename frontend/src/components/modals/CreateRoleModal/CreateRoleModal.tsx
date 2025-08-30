@@ -1,7 +1,8 @@
 import { getGetAllRolesQueryKey, useCreateRole, useGetAllRoles, useGetRoleAllPermissions } from "@/utils/api";
 import { RolePermissionsItem } from "@/utils/api.schemas";
 import { formatPermission } from "@/utils/permissionGrouping";
-import { Button, Modal, MultiSelect, Stack, TextInput } from "@mantine/core";
+import Modal from "@components/Modal/Modal";
+import { Button, MultiSelect, Stack, TextInput } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
 import React, { useMemo, useState } from "react";
 

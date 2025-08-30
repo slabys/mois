@@ -8,8 +8,9 @@ import {
 } from "@/utils/api";
 import { User } from "@/utils/api.schemas";
 import { groupPermissions } from "@/utils/permissionGrouping";
+import Modal from "@components/Modal/Modal";
 import Select from "@components/primitives/Select";
-import { Box, Button, Divider, Modal, SimpleGrid, Stack, Text } from "@mantine/core";
+import { Box, Button, Divider, SimpleGrid, Stack, Text } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
 import React, { useMemo, useState } from "react";
 

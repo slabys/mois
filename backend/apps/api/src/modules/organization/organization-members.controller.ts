@@ -49,8 +49,6 @@ export class OrganizationMembersController {
 	@UseGuards(CookieGuard)
 	@Post("members")
 	async addOrganizationMembers(@Param("id") organizationId: string, @Body() body: AddOrganizationMembers) {
-		console.log(organizationId);
-		console.log(body);
 		const organization = await this.organizationService.findById(organizationId);
 
 		if (!organization) throw new NotFoundException("Organization not found");
@@ -71,7 +69,7 @@ export class OrganizationMembersController {
 	async deleteOrganizationMembers(@Param("id") organisationId: string, @Param("memberId") organisationMemberId: string) {
 		const organization = await this.organizationService.findById(organisationId);
 		if (!organization) throw new NotFoundException("Organization not found");
-		
+
 		const organisationMember = organization.members.find((member) => member.id.toString() === organisationMemberId);
 		if (organization.manager !== null && organization.manager.id === organisationMember.user.id) {
 			await this.organizationService.deleteOrganisationManager(organization.id);

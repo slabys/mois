@@ -1,32 +1,27 @@
-#FROM node:22-alpine
-
-# Set working directory
-#WORKDIR /app
-
-#COPY . .
-
-# Enable pnpm via corepack, install dependencies
-#RUN corepack enable pnpm && pnpm i --frozen-lockfile;
-
-# Run migrations
-#ENTRYPOINT [ "pnpm", "migration:run" ]
-
 FROM node:22-alpine
 
-# Avoid prompts in CI/builds
-ENV CI=true
+ARG DB_HOST
+ARG DB_PORT
+ARG DB_NAME
+ARG DB_USER
+ARG DB_PASS
+
+ENV DB_HOST=$DB_HOST
+ENV DB_PORT=$DB_PORT
+ENV DB_NAME=$DB_NAME
+ENV DB_USER=$DB_USER
+ENV DB_PASS=$DB_PASS
 
 # Set working directory
 WORKDIR /app
 
+COPY . .
+
 # Enable pnpm via corepack
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# Copy only the files needed to install deps first
-COPY package.json pnpm-lock.yaml ./
-
 # Install deps
-RUN pnpm install --frozen-lockfile
+#RUN pnpm install --frozen-lockfile
 
 # No stale node_modules copied:
 # RUN rm -rf node_modules && pnpm install --frozen-lockfile

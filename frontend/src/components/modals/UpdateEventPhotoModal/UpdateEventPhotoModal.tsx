@@ -1,6 +1,7 @@
 import { useUpdateEventPhoto } from "@/utils/api";
 import { Dropzone } from "@components/Dropzone/Dropzone";
-import { Button, Center, Group, Image, Modal } from "@mantine/core";
+import Modal from "@components/Modal/Modal";
+import { Button, Center, Group, Image } from "@mantine/core";
 import React, { useState } from "react";
 import { FileWithPath } from "react-dropzone-esm";
 

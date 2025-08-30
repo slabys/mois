@@ -1,6 +1,7 @@
 import { useCreateEventSpot } from "@/utils/api";
 import { CreateEventSpot } from "@/utils/api.schemas";
-import { Button, Flex, Group, Modal, NumberInput, SimpleGrid, TextInput } from "@mantine/core";
+import Modal from "@components/Modal/Modal";
+import { Button, Flex, Group, NumberInput, SimpleGrid, TextInput } from "@mantine/core";
 import { Form, hasLength, useForm } from "@mantine/form";
 import React from "react";
 

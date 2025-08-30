@@ -173,7 +173,6 @@ export class AuthController {
 		const verificationToken = await this.authService.createEmailVerificationToken(user);
 		const verifyUrl = `${this.configService.getOrThrow("WEB_DOMAIN")}/verify?token=${verificationToken}`;
 
-		console.log(process.env.MAIL_HOST, process.env.MAIL_USER, process.env.MAIL_PASS);
 		try {
 			// TODO - Move to MailController (resend verification)
 			await this.mailerService.sendMail({

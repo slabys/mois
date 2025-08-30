@@ -6,6 +6,7 @@ import {
   UpdateEventApplication,
 } from "@/utils/api.schemas";
 import AddressCodeBlock from "@components/AddressCodeBlock/AddressCodeBlock";
+import Modal from "@components/Modal/Modal";
 import DateInput from "@components/primitives/DateInput";
 import Select from "@components/primitives/Select";
 import {
@@ -21,7 +22,6 @@ import {
   Flex,
   Grid,
   Group,
-  Modal,
   MultiSelect,
   SimpleGrid,
   Stack,
@@ -135,8 +135,6 @@ const UpdateEventApplicationModal = ({
   });
 
   const handleSubmit = (data: UpdateEventApplication) => {
-    console.log(form.values);
-    console.log(data);
     updateEventApplication.mutate({
       id: currentApplication.id,
       data: data,

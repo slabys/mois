@@ -111,7 +111,13 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
 
   return (
     <Stack>
-      <Flex justify="space-between" align="center" w="100%">
+      <Flex
+        direction={{ base: "column", md: "row" }}
+        justify="space-between"
+        align={{ base: "start", md: "center" }}
+        w="100%"
+        gap={24}
+      >
         <Title>Manage Organisation Members</Title>
         <Title>{currentOrganisation?.name}</Title>
       </Flex>

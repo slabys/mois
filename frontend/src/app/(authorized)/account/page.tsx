@@ -43,8 +43,6 @@ const AccountPage = () => {
   const [newUserPhoto, setNewUserPhoto] = useState<FileWithPath | null>(null);
   const [isUpdatingUserPhoto, setUpdatingUserPhoto] = useState(false);
 
-  const [isEditing, setIsEditing] = useState(false);
-
   const [imageURL, _photoPreview] = useMemo(() => {
     if (!newUserPhoto) return [undefined, undefined];
     const imageUrl = URL.createObjectURL(newUserPhoto);
@@ -74,7 +72,7 @@ const AccountPage = () => {
       lastName: currentUser.lastName,
       username: currentUser.username,
       gender: currentUser.gender,
-      pronouns: currentUser.pronouns,
+      pronouns: currentUser.pronouns ?? undefined,
       phonePrefix: currentUser.phonePrefix,
       phoneNumber: currentUser.phoneNumber,
       personalAddress: currentUser.personalAddress ?? {
@@ -146,7 +144,6 @@ const AccountPage = () => {
         form.setValues(data);
         form.resetDirty();
         form.resetTouched();
-        setIsEditing(false);
         fetchCurrentUser();
       },
     },
@@ -267,11 +264,11 @@ const AccountPage = () => {
       <Form form={form} onSubmit={handleUpdateUser}>
         <Flex direction="column" gap={12}>
           <SimpleGrid cols={2}>
-            <TextInput label="First name" {...form.getInputProps("firstName")} disabled={!isEditing} />
-            <TextInput label="Second name" {...form.getInputProps("lastName")} disabled={!isEditing} />
+            <TextInput label="First name" {...form.getInputProps("firstName")} />
+            <TextInput label="Second name" {...form.getInputProps("lastName")} />
           </SimpleGrid>
           <SimpleGrid cols={3}>
-            <TextInput label="Username" {...form.getInputProps("username")} disabled={!isEditing} />
+            <TextInput label="Username" {...form.getInputProps("username")} />
             <Select
               label="Gender"
               data={Object.entries(CreateUserGender).map(([key, gender]) => {
@@ -281,9 +278,8 @@ const AccountPage = () => {
                 };
               })}
               {...form.getInputProps("gender")}
-              disabled={!isEditing}
             />
-            <TextInput label="Pronouns" {...form.getInputProps("pronouns")} disabled={!isEditing} />
+            <TextInput label="Pronouns" {...form.getInputProps("pronouns")} />
           </SimpleGrid>
           <Grid>
             <Grid.Col span={4}>
@@ -313,11 +309,10 @@ const AccountPage = () => {
                   })}
                 {...form.getInputProps("phonePrefix")}
                 searchable
-                disabled={!isEditing}
               />
             </Grid.Col>
             <Grid.Col span={8}>
-              <TextInput label="Phone number" {...form.getInputProps("phoneNumber")} disabled={!isEditing} />
+              <TextInput label="Phone number" {...form.getInputProps("phoneNumber")} />
             </Grid.Col>
           </Grid>
           <SimpleGrid cols={2}>
@@ -328,7 +323,6 @@ const AccountPage = () => {
               onChange={(e) => {
                 form.setFieldValue("password", e.currentTarget.value.length > 0 ? e.currentTarget.value : undefined);
               }}
-              disabled={!isEditing}
             />
             <PasswordInput
               label="Confirm Password"
@@ -340,12 +334,22 @@ const AccountPage = () => {
                   e.currentTarget.value.length > 0 ? e.currentTarget.value : undefined,
                 );
               }}
-              disabled={!isEditing}
             />
           </SimpleGrid>
           <Accordion defaultValue="Apples">
             <Accordion.Item value="Personal Address">
-              <Accordion.Control>Personal Address</Accordion.Control>
+              <Accordion.Control>
+                <Flex direction="row" gap={8}>
+                  <Text>
+                    Personal Address{" "}
+                    {currentUser && !currentUser?.personalAddress && (
+                      <Text c="red" span>
+                        (Missing information)
+                      </Text>
+                    )}
+                  </Text>
+                </Flex>
+              </Accordion.Control>
               <Accordion.Panel>
                 <Grid>
                   <Grid.Col span={8}>
@@ -353,7 +357,6 @@ const AccountPage = () => {
                       label="Street"
                       key={form.key("personalAddress.street")}
                       {...form.getInputProps("personalAddress.street")}
-                      disabled={!isEditing}
                       required={isPersonalAddress(form.values.personalAddress)}
                     />
                   </Grid.Col>
@@ -362,7 +365,6 @@ const AccountPage = () => {
                       label="House Number"
                       key={form.key("personalAddress.houseNumber")}
                       {...form.getInputProps("personalAddress.houseNumber")}
-                      disabled={!isEditing}
                       required={isPersonalAddress(form.values.personalAddress)}
                     />
                   </Grid.Col>
@@ -371,7 +373,6 @@ const AccountPage = () => {
                       label="ZIP code"
                       key={form.key("personalAddress.zip")}
                       {...form.getInputProps("personalAddress.zip")}
-                      disabled={!isEditing}
                       required={isPersonalAddress(form.values.personalAddress)}
                     />
                   </Grid.Col>
@@ -380,7 +381,6 @@ const AccountPage = () => {
                       label="City"
                       key={form.key("personalAddress.city")}
                       {...form.getInputProps("personalAddress.city")}
-                      disabled={!isEditing}
                       required={isPersonalAddress(form.values.personalAddress)}
                     />
                   </Grid.Col>
@@ -389,7 +389,6 @@ const AccountPage = () => {
                       label="Country"
                       key={form.key("personalAddress.country")}
                       {...form.getInputProps("personalAddress.country")}
-                      disabled={!isEditing}
                       required={isPersonalAddress(form.values.personalAddress)}
                     />
                   </Grid.Col>
@@ -399,16 +398,6 @@ const AccountPage = () => {
           </Accordion>
         </Flex>
         <Group justify="center" mt="lg">
-          <Button
-            onClick={() => {
-              form.reset();
-              setIsEditing(!isEditing);
-            }}
-            loading={updateUserMutation.isPending}
-            color={isEditing ? "red" : "blue"}
-          >
-            {isEditing ? "Cancel" : "Edit Info"}
-          </Button>
           <Button type="submit" disabled={!isTouchedDirty} loading={updateUserMutation.isPending}>
             Save changes
           </Button>

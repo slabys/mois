@@ -69,7 +69,7 @@ const RichTextRenderer = ({ content, ...props }: RichTextRendererProps) => {
       switch (type) {
         case "bold":
           return (
-            <Text span fw="bold">
+            <Text span fw={700}>
               {wrappedText}
             </Text>
           );
@@ -105,7 +105,7 @@ const RichTextRenderer = ({ content, ...props }: RichTextRendererProps) => {
           );
         case "textStyle":
           return (
-            <Text span c={attrs?.color}>
+            <Text span c={attrs?.color} fw="inherit">
               {wrappedText}
             </Text>
           );

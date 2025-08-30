@@ -162,7 +162,8 @@ export interface User {
   phonePrefix: string;
   phoneNumber: string;
   gender: UserGender;
-  pronouns: string;
+  /** @nullable */
+  pronouns: string | null;
   photo: Photo;
   createdAt: string;
   updatedAt: string;

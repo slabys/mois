@@ -5,6 +5,7 @@ import {
   MantineColorsTuple,
   MantineSize,
   MantineThemeOverride,
+  colorsTuple,
   createTheme,
   mergeMantineTheme,
   rem,
@@ -71,12 +72,78 @@ const themeOverride = createTheme({
   },
 
   // Colors
-  primaryColor: "blue",
+  primaryColor: "cyan",
   primaryShade: {
-    light: 6,
-    dark: 8,
+    light: 7,
+    dark: 9,
   },
-  colors: {},
+  colors: {
+    primaryCyan: colorsTuple("#00aeef"),
+    primaryDarkBlue: colorsTuple("#2e3192"),
+    primaryMagenta: colorsTuple("#ec008c"),
+    primaryGreen: colorsTuple("#7ac143"),
+    primaryOrange: colorsTuple("#f47b20"),
+    cyan: [
+      "#e1fbff",
+      "#ccf3ff",
+      "#9ce4ff",
+      "#68d5fe",
+      "#41c8fd",
+      "#2cc0fd",
+      "#1abcfe",
+      "#00aeef", // Primary 7
+      "#0093cc",
+      "#007fb4",
+    ],
+    darkBlue: [
+      "#efefff",
+      "#dbdcf4",
+      "#b4b5e5",
+      "#8a8cd6",
+      "#6869ca",
+      "#5254c3",
+      "#4648c1",
+      "#2e3192", // Primary 7
+      "#262c88",
+      "#1e2373",
+    ],
+    magenta: [
+      "#ffe8fa",
+      "#ffcfed",
+      "#ff9cd7",
+      "#fe65c0",
+      "#fd39ad",
+      "#fd1fa1",
+      "#fe109b",
+      "#ec008c", // Primary 7
+      "#cb0078",
+      "#b20068",
+    ],
+    green: [
+      "#f1fce8",
+      "#e4f4d8",
+      "#cae7b3",
+      "#add98b",
+      "#94cd69",
+      "#85c653",
+      "#7fbc46",
+      "#7ac143", // Primary 7
+      "#5c982e",
+      "#4c8321",
+    ],
+    orange: [
+      "#fff2e1",
+      "#ffe3cd",
+      "#fcc69e",
+      "#f8a86b",
+      "#f68d41",
+      "#f58237",
+      "#d97f28",
+      "#f47b20", // Primary 7
+      "#dc6414",
+      "#c8550a",
+    ],
+  },
   other: {},
 
   // Components

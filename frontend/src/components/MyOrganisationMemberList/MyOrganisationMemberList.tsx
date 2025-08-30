@@ -114,9 +114,15 @@ const MyOrganisationMemberList = ({ organizationId }: MyOrganisationMemberListPr
 
   return (
     <Stack>
-      <Flex justify="space-between" align="center" w="100%">
-        <Title>My Organisation</Title>
-        <Title>{currentOrganisation?.name}</Title>
+      <Flex
+        w="100%"
+        direction={{ base: "column", md: "row" }}
+        justify="space-between"
+        align={{ base: "start", md: "center" }}
+        gap={16}
+      >
+        <Title order={1}>My Organisation</Title>
+        <Title order={2}>{currentOrganisation?.name}</Title>
       </Flex>
       <Flex direction="column" gap={8}>
         {isUserManager && (

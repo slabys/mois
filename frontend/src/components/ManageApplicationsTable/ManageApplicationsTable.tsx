@@ -18,6 +18,7 @@ import {
   Box,
   Button,
   ComboboxData,
+  Divider,
   Flex,
   List,
   ListItem,
@@ -191,8 +192,8 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
 
   return (
     <>
-      <Flex justify="space-between" align="center" w="100%" wrap="wrap">
-        <Title>Manage Event Applications</Title>
+      <Flex justify="space-between" align="center" w="100%" wrap="wrap" gap={16}>
+        <Title order={1}>Manage Event Applications</Title>
         <Flex gap={16}>
           <Button onClick={exportDataXLSX} leftSection={<IconTableExport />} color="green" variant="outline">
             Export Data
@@ -203,16 +204,16 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
         </Flex>
       </Flex>
       {eventSpotsList && eventSpotsList?.length > 0 ? (
-        <List w="100%">
+        <List>
           {eventSpotsList?.map((spot, index) => (
             <ListItem key={`event-spot-${index}-${spot.id}`}>
-              <Flex direction="row" justify={{ base: "space-between", sm: "start" }} gap={8}>
-                <Box w={172}>
-                  <Text style={{ wordWrap: "break-word" }}>
+              <Flex direction="row" justify={{ base: "space-between", sm: "start" }} gap={24} w="100%">
+                <Box w={{ base: 200, md: 300 }}>
+                  <Text ta="justify">
                     {spot.name} - {spot.price} CZK
                   </Text>
                 </Box>
-                <Flex direction="row" gap={8}>
+                <Flex direction="row" align="center" gap={8}>
                   <Tooltip label="Edit Spot">
                     <ActionIcon
                       variant="subtle"
@@ -240,6 +241,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
                   </Tooltip>
                 </Flex>
               </Flex>
+              <Divider />
             </ListItem>
           ))}
         </List>

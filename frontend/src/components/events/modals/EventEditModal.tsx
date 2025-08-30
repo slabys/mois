@@ -2,9 +2,10 @@
 
 import { useUpdateEvent } from "@/utils/api";
 import { EventDetail } from "@/utils/api.schemas";
+import Modal from "@components/Modal/Modal";
 import RichTextEditor from "@components/Richtext/RichTextEditor";
 import DateInput from "@components/primitives/DateInput";
-import { Button, Flex, Group, Modal, NumberInput, SimpleGrid, Switch, TextInput } from "@mantine/core";
+import { Button, Flex, Group, NumberInput, SimpleGrid, Switch, TextInput } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { Form, useForm } from "@mantine/form";
 import dayjs from "dayjs";
@@ -69,8 +70,9 @@ const EventEditModal = ({ eventDetail, isOpened, close, handleSuccess = () => {}
       <Form form={form} onSubmit={handleEventUpdate}>
         <Flex direction="column" gap={8}>
           <Switch
-            label={`Is published: ${form.values.visible}`}
+            label={form.values.visible ? "Published" : "Unpublished"}
             defaultChecked={form.values.visible}
+            size="md"
             {...form.getInputProps("visible")}
           />
           <TextInput label="Title" {...form.getInputProps("title")} />

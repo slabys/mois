@@ -86,8 +86,14 @@ const ManageEventsPage = () => {
   return (
     <Container size="xl">
       <Stack>
-        <Flex justify="space-between" align="center" w="100%">
-          <Title>Manage Events</Title>
+        <Flex
+          direction={{ base: "column", md: "row" }}
+          justify="space-between"
+          align={{ base: "start", md: "center" }}
+          w="100%"
+          gap={24}
+        >
+          <Title order={1}>Manage Events</Title>
           <Button onClick={openModal} leftSection={<IconPlus />}>
             Add Event
           </Button>

@@ -16,7 +16,7 @@ const EventCard = ({ event }: EventCardProps) => {
   const { photo, title, since, until, applications, capacity, shortDescription } = event;
 
   return (
-    <Card withBorder radius="md" p={0} className={styles.card}>
+    <Card withBorder radius="md" p={0} shadow="sm" className={styles.card}>
       <Flex direction={{ base: "column", sm: "row" }} gap={0} w="100%" h="100%">
         <Box w={{ base: "100%", sm: 448 }} h={{ base: 224, sm: "auto" }}>
           <ApiImage src={photo?.id} h="100%" fit="cover" />
