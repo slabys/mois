@@ -5,14 +5,8 @@ WORKDIR /app
 
 COPY . .
 
-# Enable pnpm via corepack
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-# Install deps
-#RUN pnpm install --frozen-lockfile
-
-# No stale node_modules copied:
-# RUN rm -rf node_modules && pnpm install --frozen-lockfile
+RUN npm install -g pnpm
+RUN npm cache clean --force && rm -rf node_modules && pnpm install --frozen-lockfile
 
 # Default command
 ENTRYPOINT [ "pnpm", "migration:run" ]
