@@ -79,6 +79,7 @@ const EventDetail = ({ id }: EventDetailProps) => {
   }, [eventApplications, id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDeleteApplication = () => {
+    if (!confirm("Do you really want to unregister from this event?")) return;
     const eventApplicationId = eventApplications?.find((f) => f.user.id === currentUser?.id)?.id;
     if (eventApplicationId) {
       deleteEventApplication.mutate({ id: eventApplicationId });

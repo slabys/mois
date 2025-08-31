@@ -100,15 +100,23 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     },
   });
 
-  const handleDeleteSpot = (spotId: number) => {
+  const handleDeleteSpot = (spot: EventSpotSimple) => {
+    if (!confirm(`Do you really want to delete spot "${spot.name} (${spot.price} ${spot.currency})"?`)) return;
     deleteEventSpotMutation.mutate({
-      id: spotId,
+      id: spot.id,
     });
   };
 
-  const handleDeleteApplication = (applicationId: number) => {
+  const handleDeleteApplication = (application: EventApplicationDetailedWithApplications) => {
+    if (
+      !confirm(
+        `Do you really want to delete application for user "${application.user.firstName} ${application.user.lastName} (${application.user.username})"?`,
+      )
+    ) {
+      return;
+    }
     deleteApplicationMutation.mutate({
-      id: applicationId,
+      id: application.id,
     });
   };
 
@@ -176,12 +184,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
                 </ActionIcon>
               </Tooltip>
               <Tooltip label="Delete Application">
-                <ActionIcon
-                  variant="subtle"
-                  size={48}
-                  color="red"
-                  onClick={() => handleDeleteApplication(application.id)}
-                >
+                <ActionIcon variant="subtle" size={48} color="red" onClick={() => handleDeleteApplication(application)}>
                   <IconTrash width={32} height={32} />
                 </ActionIcon>
               </Tooltip>
@@ -233,7 +236,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
                       size={32}
                       color="red"
                       onClick={() => {
-                        handleDeleteSpot(spot.id);
+                        handleDeleteSpot(spot);
                       }}
                     >
                       <IconTrash width={24} height={24} />

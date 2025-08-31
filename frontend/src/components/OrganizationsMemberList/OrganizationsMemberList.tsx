@@ -8,6 +8,7 @@ import {
   useOrganizationMembers,
   useTransferManager,
 } from "@/utils/api";
+import { OrganizationMember } from "@/utils/api.schemas";
 import ApiImage from "@components/ApiImage/ApiImage";
 import {
   ActionIcon,
@@ -70,10 +71,17 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
     );
   }, [allUsersList, searchValue, organizationMembers]);
 
-  const handleDeleteOrganizationMembers = (memberId: string) => {
+  const handleDeleteOrganizationMembers = (member: OrganizationMember) => {
+    if (
+      !confirm(
+        `Do you really want to remove ${member.user.firstName} ${member.user.lastName} (${member.user.username}) from ${currentOrganisation?.name}?`,
+      )
+    ) {
+      return;
+    }
     deleteOrganizationMemberMutation.mutate({
       id: organizationId,
-      memberId: memberId,
+      memberId: member.id,
     });
   };
 
@@ -240,7 +248,7 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
                           size={48}
                           color="red"
                           loading={deleteOrganizationMemberMutation.isPending}
-                          onClick={() => handleDeleteOrganizationMembers(member.id)}
+                          onClick={() => handleDeleteOrganizationMembers(member)}
                         >
                           <IconUserX width={32} height={32} />
                         </ActionIcon>

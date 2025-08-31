@@ -37,6 +37,7 @@ const ManageEventsPage = () => {
   };
 
   const handleDeleteEvent = (event: EventSimple) => {
+    if (!confirm(`Do you really want to delete event "${event.title}"?`)) return;
     deleteEventMutation.mutate({ eventId: event.id });
   };
 

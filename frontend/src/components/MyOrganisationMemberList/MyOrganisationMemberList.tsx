@@ -9,6 +9,7 @@ import {
   useOrganizationMembers,
   useTransferManager,
 } from "@/utils/api";
+import { OrganizationMember } from "@/utils/api.schemas";
 import ApiImage from "@components/ApiImage/ApiImage";
 import {
   ActionIcon,
@@ -73,10 +74,15 @@ const MyOrganisationMemberList = ({ organizationId }: MyOrganisationMemberListPr
     );
   }, [allUsersList, searchValue, organizationMembers]);
 
-  const handleDeleteOrganizationMembers = (memberId: string) => {
+  const handleDeleteOrganizationMembers = (member: OrganizationMember) => {
+    if (
+      `Do you really want to remove ${member.user.firstName} ${member.user.lastName} (${member.user.username}) from ${currentOrganisation?.name}?`
+    ) {
+      return;
+    }
     deleteOrganizationMemberMutation.mutate({
       id: organizationId,
-      memberId: memberId,
+      memberId: member.id,
     });
   };
 
@@ -246,7 +252,7 @@ const MyOrganisationMemberList = ({ organizationId }: MyOrganisationMemberListPr
                             size={48}
                             color="red"
                             loading={deleteOrganizationMemberMutation.isPending}
-                            onClick={() => handleDeleteOrganizationMembers(member.id)}
+                            onClick={() => handleDeleteOrganizationMembers(member)}
                             disabled={member.user.id === currentUser?.id}
                           >
                             <IconUserX width={32} height={32} />
