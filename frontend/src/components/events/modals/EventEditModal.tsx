@@ -1,7 +1,7 @@
 "use client";
 
 import { useUpdateEvent } from "@/utils/api";
-import { EventDetail } from "@/utils/api.schemas";
+import { EventDetail, type UpdateEvent } from "@/utils/api.schemas";
 import Modal from "@components/Modal/Modal";
 import RichTextEditor from "@components/Richtext/RichTextEditor";
 import DateInput from "@components/primitives/DateInput";
@@ -19,7 +19,7 @@ interface EventEditModalProps {
 }
 
 const EventEditModal = ({ eventDetail, isOpened, close, handleSuccess = () => {} }: EventEditModalProps) => {
-  const form = useForm<Partial<EventDetail>>({
+  const form = useForm<UpdateEvent>({
     initialValues: {
       title: eventDetail.title,
       visible: eventDetail.visible,
@@ -27,6 +27,7 @@ const EventEditModal = ({ eventDetail, isOpened, close, handleSuccess = () => {}
       capacity: eventDetail.capacity,
       shortDescription: eventDetail.shortDescription,
       longDescription: eventDetail.longDescription,
+      links: eventDetail.links,
       since: eventDetail.since,
       until: eventDetail.until,
       codeOfConductLink: eventDetail.codeOfConductLink,
@@ -51,7 +52,7 @@ const EventEditModal = ({ eventDetail, isOpened, close, handleSuccess = () => {}
     },
   });
 
-  const handleEventUpdate = (values: Partial<EventDetail>) => {
+  const handleEventUpdate = (values: UpdateEvent) => {
     eventUpdateMutation.mutate({
       eventId: eventDetail.id,
       data: values,

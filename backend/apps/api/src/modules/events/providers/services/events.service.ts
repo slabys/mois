@@ -9,7 +9,7 @@ import { filterSince } from "../../utilities";
 import { PhotoService } from "../../../photo";
 import type { PaginationOptions } from "utilities/nest/decorators";
 import { formatPaginatedResponse } from "utilities/pagination.helper";
-import { CreateEventLinkPartial } from "@api/models/requests/create-event-link.dto";
+import { UpdateEventLinkPartial } from "@api/models/requests/update-event-link.dto";
 
 interface EventFindOptions {
 	visible?: boolean;
@@ -121,7 +121,7 @@ export class EventsService {
 		});
 	}
 
-	async createLinks(linksDto: CreateEventLinkPartial[]) {
+	async createLinks(linksDto: UpdateEventLinkPartial[]) {
 		const newLinks = this.linksRepository.create(linksDto.map((link) => ({ name: link.name, link: link.link })));
 		return this.linksRepository.save(newLinks);
 	}

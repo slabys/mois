@@ -748,17 +748,22 @@ export interface EventSimple {
   capacity: number;
 }
 
+export interface UpdateEventLinkPartial {
+  name?: string;
+  link?: string;
+}
+
 export interface UpdateEvent {
   /** Short description in JSON format for RichText */
   longDescription?: string;
   /** Short description in JSON format for RichText */
   shortDescription?: string;
+  links: UpdateEventLinkPartial[];
   /** @minLength 6 */
   title?: string;
   since?: string;
   until?: string;
   registrationDeadline?: string;
-  links?: EventLink[];
   visible?: boolean;
   /** Generate invoices after {@link registrationDeadline} */
   generateInvoices?: boolean;
