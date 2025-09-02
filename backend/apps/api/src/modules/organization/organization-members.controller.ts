@@ -28,8 +28,7 @@ export class OrganizationMembersController {
 	constructor(
 		private readonly organizationService: OrganizationService,
 		private readonly usersService: UsersService,
-	) {
-	}
+	) {}
 
 	@ApiExtraModels(OrganizationMember, PaginationResponseDto<OrganizationMember>)
 	@ApiOkResponse({
@@ -60,7 +59,11 @@ export class OrganizationMembersController {
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
 	@Post("members")
-	async addOrganizationMembers(@CurrentUser() currentUser: User, @Param("id") organizationId: string, @Body() body: AddOrganizationMembers) {
+	async addOrganizationMembers(
+		@CurrentUser() currentUser: User,
+		@Param("id") organizationId: string,
+		@Body() body: AddOrganizationMembers,
+	) {
 		if (!currentUser.role.hasOneOfPermissions([Permission.OrganisationAddUser])) {
 			throw new ForbiddenException("User does not have required permissions");
 		}
@@ -70,7 +73,7 @@ export class OrganizationMembersController {
 		const memberIds = organization.members.map((member) => member.user.id);
 		const unassignedMemberIds = body.userIds.filter((userId) => !memberIds.includes(userId));
 		const newMembers = await this.usersService.findManyById(unassignedMemberIds);
-		
+
 		return this.organizationService.addMembers(organization, newMembers);
 	}
 
@@ -80,7 +83,10 @@ export class OrganizationMembersController {
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
 	@Delete("members/:memberId")
-	async deleteOrganizationMembers(@Param("id") organisationId: string, @Param("memberId") organisationMemberId: string) {
+	async deleteOrganizationMembers(
+		@Param("id") organisationId: string,
+		@Param("memberId") organisationMemberId: string,
+	) {
 		const organization = await this.organizationService.findById(organisationId);
 		if (!organization) throw new NotFoundException("Organization not found");
 

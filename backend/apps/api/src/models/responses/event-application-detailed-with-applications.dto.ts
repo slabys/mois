@@ -18,8 +18,7 @@ export class EventApplicationDetailed extends PickType(EventApplication, [
 	"healthLimitations",
 	"additionalInformation",
 	"invoicedTo",
-]) {
-}
+]) {}
 
 /**
  * Event applications with event
@@ -27,5 +26,4 @@ export class EventApplicationDetailed extends PickType(EventApplication, [
 export class EventApplicationDetailedWithApplications extends IntersectionType(
 	EventApplicationDetailed,
 	EventApplicationSimpleWithApplications,
-) {
-}
+) {}

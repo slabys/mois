@@ -33,8 +33,7 @@ export class AuthController {
 		private readonly configService: ConfigService,
 		private readonly authService: AuthService,
 		private readonly usersService: UsersService,
-	) {
-	}
+	) {}
 
 	/**
 	 * Try to login user with given email and password
@@ -86,7 +85,6 @@ export class AuthController {
 			.status(HttpStatus.OK);
 	}
 
-
 	@Delete("clear-auth")
 	async removeCookie(@Res({ passthrough: true }) response: Response) {
 		response
@@ -128,10 +126,15 @@ export class AuthController {
 	}
 
 	@Post("reset-password")
-	async resetPassword(
-		@Body() body: ResetPasswordDto,
-	) {
-		let payload: any;
+	async resetPassword(@Body() body: ResetPasswordDto) {
+		let payload: {
+			id: string;
+			email: string;
+			iat: number;
+			exp: number;
+			iss: string;
+			sub: string;
+		};
 		try {
 			payload = await this.authService.verifyResetPasswordToken(body.token);
 		} catch (e) {
@@ -163,7 +166,6 @@ export class AuthController {
 		}
 	}
 
-
 	@Post("resend-verification")
 	async resendVerification(@Query("email") email: string) {
 		const user = await this.usersService.findByEmailWithPassword(email);
@@ -186,13 +188,10 @@ export class AuthController {
 				},
 			});
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 			return { message: "Unable to resend verification email" };
 		}
 
-
 		return { message: "Verification email resent" };
 	}
-
 }
-

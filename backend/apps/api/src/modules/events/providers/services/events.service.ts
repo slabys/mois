@@ -2,13 +2,14 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { FindOptionsRelations, FindOptionsSelect, type Repository } from "typeorm";
 
-import { Event } from "../../entities";
+import { Event, EventLink } from "../../entities";
 
 import { EventFilter } from "../../models";
 import { filterSince } from "../../utilities";
 import { PhotoService } from "../../../photo";
-import { PaginationOptions } from "utilities/nest/decorators";
+import type { PaginationOptions } from "utilities/nest/decorators";
 import { formatPaginatedResponse } from "utilities/pagination.helper";
+import { CreateEventLinkPartial } from "@api/models/requests/create-event-link.dto";
 
 interface EventFindOptions {
 	visible?: boolean;
@@ -19,11 +20,12 @@ interface EventFindOptions {
 @Injectable()
 export class EventsService {
 	constructor(
+		@InjectRepository(EventLink)
+		private readonly linksRepository: Repository<EventLink>,
 		@InjectRepository(Event)
 		private readonly eventsRepository: Repository<Event>,
 		private readonly photoService: PhotoService,
-	) {
-	}
+	) {}
 
 	/**
 	 * Find event by ID
@@ -38,6 +40,7 @@ export class EventsService {
 			relations: {
 				...options?.relations,
 				createdByUser: true,
+				links: true,
 			},
 		});
 	}
@@ -84,6 +87,7 @@ export class EventsService {
 			relations: {
 				...options?.relations,
 				createdByUser: true,
+				links: true,
 			},
 			order: {
 				since: "DESC",
@@ -94,10 +98,51 @@ export class EventsService {
 		return formatPaginatedResponse<Event>(events, totalCount, pagination);
 	}
 
+	/**
+	 * Delete event
+	 * @param event Event
+	 */
 	async delete(event: Event) {
 		if (event.photo) {
 			await this.photoService.delete(event.photo);
 		}
+		if (event.links) {
+			await this.linksRepository.delete(event.links);
+		}
 		await this.eventsRepository.remove(event);
+	}
+
+	async findEventByLink(linkId: number) {
+		return this.eventsRepository.findOne({
+			where: { links: { id: linkId } },
+			relations: {
+				links: true,
+			},
+		});
+	}
+
+	async createLinks(linksDto: CreateEventLinkPartial[]) {
+		const newLinks = this.linksRepository.create(linksDto.map((link) => ({ name: link.name, link: link.link })));
+		return this.linksRepository.save(newLinks);
+	}
+
+	/**
+	 * Delete event link
+	 * @param linkId Event link id
+	 */
+	async deleteLink(linkId: number) {
+		const link = await this.linksRepository.findOne({
+			where: { id: linkId },
+		});
+
+		await this.linksRepository.delete(link);
+	}
+
+	async deleteLinks(eventId: number) {
+		const eventLinks = await this.linksRepository.find({
+			where: { event: { id: eventId } },
+		});
+
+		await this.linksRepository.delete(eventLinks);
 	}
 }

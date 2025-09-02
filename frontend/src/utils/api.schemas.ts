@@ -697,21 +697,16 @@ Each event can have different "requirements"
 export type CreateEventRegistrationForm = { [key: string]: unknown };
 
 export interface CreateEvent {
-  /**
-   * Short description in JSON format for RichText
-   * @minLength 30
-   */
+  /** Short description in JSON format for RichText */
   longDescription: string;
-  /**
-   * Short description in JSON format for RichText
-   * @minLength 30
-   */
+  /** Short description in JSON format for RichText */
   shortDescription: string;
   /** @minLength 6 */
   title: string;
   since: string;
   until: string;
   registrationDeadline: string;
+  links?: EventLink[];
   visible?: boolean;
   /** Additional registration properties
 ! Must be valid JSON schema */
@@ -754,21 +749,16 @@ export interface EventSimple {
 }
 
 export interface UpdateEvent {
-  /**
-   * Short description in JSON format for RichText
-   * @minLength 30
-   */
+  /** Short description in JSON format for RichText */
   longDescription?: string;
-  /**
-   * Short description in JSON format for RichText
-   * @minLength 30
-   */
+  /** Short description in JSON format for RichText */
   shortDescription?: string;
   /** @minLength 6 */
   title?: string;
   since?: string;
   until?: string;
   registrationDeadline?: string;
+  links?: EventLink[];
   visible?: boolean;
   /** Generate invoices after {@link registrationDeadline} */
   generateInvoices?: boolean;
@@ -780,6 +770,15 @@ export interface UpdateEvent {
   termsAndConditionsLink?: string;
   photoPolicyLink?: string;
   codeOfConductLink?: string;
+}
+
+export interface CreateEventLinkPartial {
+  name?: string;
+  link?: string;
+}
+
+export interface CreateEventLinkDto {
+  links: CreateEventLinkPartial[];
 }
 
 export type EventSpotSimpleCurrency = (typeof EventSpotSimpleCurrency)[keyof typeof EventSpotSimpleCurrency];

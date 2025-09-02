@@ -22,16 +22,12 @@ import { Address } from "@api/modules/addresses/entities";
 @ApiTags("Organizations")
 @Controller("organizations")
 export class OrganizationsController {
-	constructor(
-		private readonly organizationService: OrganizationService,
-	) {
-	}
+	constructor(private readonly organizationService: OrganizationService) {}
 
 	@Get()
 	allOrganizations() {
 		return this.organizationService.findAll();
 	}
-
 
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
@@ -46,7 +42,11 @@ export class OrganizationsController {
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
 	@Post()
-	createOrganization(@CurrentUser() user: User, @Body() body: CreateOrganization) {
+	createOrganization(@CurrentUser() currentUser: User, @Body() body: CreateOrganization) {
+		if (!currentUser.role.hasOneOfPermissions([Permission.OrganisationCreate])) {
+			throw new UnauthorizedException("You don't have permission to perform this action");
+		}
+
 		const organization = new Organization();
 		const { address } = body;
 
@@ -67,7 +67,15 @@ export class OrganizationsController {
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
 	@Post(":id")
-	async updateOrganization(@Param("id", ParseUUIDPipe) id: string, @Body() body: UpdateOrganization) {
+	async updateOrganization(
+		@CurrentUser() currentUser: User,
+		@Param("id", ParseUUIDPipe) id: string,
+		@Body() body: UpdateOrganization,
+	) {
+		if (!currentUser.role.hasOneOfPermissions([Permission.OrganisationUpdate])) {
+			throw new UnauthorizedException("You don't have permission to perform this action");
+		}
+
 		const organization = await this.organizationService.findById(id);
 		if (!organization) throw new NotFoundException("Organization not found");
 
@@ -85,17 +93,29 @@ export class OrganizationsController {
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
 	@Post(":organisationId/:userId")
-	async transferManager(@CurrentUser() user: User, @Param("organisationId", ParseUUIDPipe) organisationId: string, @Param("userId", ParseUUIDPipe) userId: string) {
+	async transferManager(
+		@CurrentUser() currentUser: User,
+		@Param("organisationId", ParseUUIDPipe) organisationId: string,
+		@Param("userId", ParseUUIDPipe) userId: string,
+	) {
+		if (!currentUser.role.hasOneOfPermissions([Permission.OrganisationUpdate])) {
+			throw new UnauthorizedException("You don't have permission to perform this action");
+		}
+
 		const organization = await this.organizationService.findById(organisationId);
 
-		if (organization?.manager?.id === user?.id || user.role.hasPermission(Permission.OrganisationUpdate)) {
-			const organisationMember = await this.organizationService.findMemberByUserId(organisationId, userId, { relations: { user: true } });
+		if (
+			organization?.manager?.id === currentUser?.id ||
+			currentUser.role.hasPermission(Permission.OrganisationUpdate)
+		) {
+			const organisationMember = await this.organizationService.findMemberByUserId(organisationId, userId, {
+				relations: { user: true },
+			});
 
 			organization.update({ manager: organisationMember.user });
 			return await this.organizationService.save(organization);
 		}
 
 		throw new UnauthorizedException("You don't have permission to perform this action");
-
 	}
 }

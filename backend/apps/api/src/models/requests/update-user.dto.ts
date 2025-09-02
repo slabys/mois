@@ -13,7 +13,6 @@ export class UpdateUser extends PartialType(
 	@Type(() => CreateAddress)
 	personalAddress?: CreateAddress | null;
 
-
 	@Allow()
 	@IsOptional()
 	pronouns?: string | null;

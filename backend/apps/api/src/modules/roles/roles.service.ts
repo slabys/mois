@@ -8,8 +8,7 @@ export class RolesService {
 	constructor(
 		@InjectRepository(Role)
 		private readonly roleRepository: Repository<Role>,
-	) {
-	}
+	) {}
 
 	save(role: Partial<Role>) {
 		return this.roleRepository.save(role);

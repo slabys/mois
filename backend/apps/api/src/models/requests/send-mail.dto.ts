@@ -1,4 +1,4 @@
-import { Address, Attachment } from "nodemailer/lib/mailer";
+import type { Address, Attachment } from "nodemailer/lib/mailer";
 import { ApiProperty } from "@nestjs/swagger";
 import { IsArray, IsObject, IsOptional, IsString } from "class-validator";
 

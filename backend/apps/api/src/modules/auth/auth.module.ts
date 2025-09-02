@@ -28,5 +28,4 @@ import { UsersModule } from "../users";
 	providers: [AuthService, LocalStrategy, CookieStrategy, CookieGuard, LocalGuard],
 	exports: [AuthService, CookieGuard],
 })
-export class AuthModule {
-}
+export class AuthModule {}

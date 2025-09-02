@@ -9,8 +9,7 @@ import type { User } from "@api/modules/users";
 @ApiTags("Mail")
 @Controller("mail")
 export class MailController {
-	constructor(private readonly mailerService: MailService) {
-	}
+	constructor(private readonly mailerService: MailService) {}
 
 	/**
 	 * Send e-mail
@@ -21,7 +20,6 @@ export class MailController {
 	@ApiBadRequestResponse({ type: Error, description: "E-mail not sent" })
 	@Post()
 	async sendMail(@Body() body: SendEmailDTO, @CurrentUser() user: User) {
-
 		if (!user.role.isAdmin()) {
 			throw new ForbiddenException("You dont have permissions to send e-mail");
 		}
@@ -29,5 +27,4 @@ export class MailController {
 		this.mailerService.testSend();
 		// return await this.mailerService.sendMail(body);
 	}
-
 }

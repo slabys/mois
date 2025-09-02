@@ -10,6 +10,7 @@ import {
 	Patch,
 	Post,
 	Query,
+	UnauthorizedException,
 	UseGuards,
 } from "@nestjs/common";
 import {
@@ -28,7 +29,7 @@ import { FormDataRequest } from "nestjs-form-data";
 
 import { CookieGuard } from "../auth/providers/guards";
 import { Event, EventsService } from "./index";
-import { EventLink, EventSpot } from "./entities";
+import { EventSpot } from "./entities";
 import { PhotoService } from "../photo";
 import type { User } from "../users";
 import { ParseDatePipe } from "utilities/nest/pipes";
@@ -39,6 +40,8 @@ import { CreateEvent, UpdateEvent, UpdatePhoto } from "../../models/requests";
 import { EventDetail, EventSimple } from "../../models/responses";
 import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 import { PaginationDto, PaginationResponseDto } from "../../models/responses/pagination-response.dto";
+import { Permission } from "@api/modules/roles";
+import { CreateEventLinkDto } from "@api/models/requests/create-event-link.dto";
 
 @ApiTags("Events")
 @Controller("events")
@@ -47,8 +50,7 @@ export class EventsController {
 		private readonly eventsService: EventsService,
 		private readonly photoService: PhotoService,
 		private readonly eventSimpleWithApplicationsMapper: EventSimpleWithApplicationsMapper,
-	) {
-	}
+	) {}
 
 	/**
 	 * To filter by `since` use:
@@ -131,8 +133,11 @@ export class EventsController {
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
 	@Post()
-	async createEvent(@CurrentUser() user: User, @Body() body: CreateEvent) {
-		// TODO: Check user role for modifications
+	async createEvent(@CurrentUser() currentUser: User, @Body() body: CreateEvent) {
+		if (!currentUser.role.hasOneOfPermissions([Permission.EventCreate, Permission.EventDuplicate])) {
+			throw new UnauthorizedException("You don't have permission to perform this action");
+		}
+		const newCreatedLinks = await this.eventsService.createLinks(body.links);
 
 		let event = new Event();
 		event.title = body.title;
@@ -140,7 +145,7 @@ export class EventsController {
 		event.shortDescription = body.shortDescription;
 		event.since = new Date(body.since);
 		event.until = new Date(body.until);
-		event.createdByUser = user;
+		event.createdByUser = currentUser;
 		event.visible = body.visible;
 		event.registrationDeadline = new Date(body.registrationDeadline);
 		event.registrationForm = body.registrationForm;
@@ -148,6 +153,7 @@ export class EventsController {
 		event.codeOfConductLink = body.codeOfConductLink;
 		event.photoPolicyLink = body.photoPolicyLink;
 		event.termsAndConditionsLink = body.termsAndConditionsLink;
+		event.links = newCreatedLinks;
 		event.applications = [];
 
 		event = await this.eventsService.save(event);
@@ -161,8 +167,14 @@ export class EventsController {
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
 	@Post(":id")
-	async duplicateEvent(@Param("id", ParseIntPipe) id: number, @CurrentUser() user: User) {
+	async duplicateEvent(@Param("id", ParseIntPipe) id: number, @CurrentUser() currentUser: User) {
+		if (!currentUser.role.hasOneOfPermissions([Permission.EventCreate, Permission.EventDuplicate])) {
+			throw new UnauthorizedException("You don't have permission to perform this action");
+		}
+
 		const event = await this.eventsService.findByIdDetailed(id);
+
+		const newCreatedLinks = await this.eventsService.createLinks(event.links);
 
 		let newEvent = new Event({
 			title: event.title,
@@ -174,13 +186,13 @@ export class EventsController {
 			codeOfConductLink: event.codeOfConductLink,
 			photoPolicyLink: event.photoPolicyLink,
 			termsAndConditionsLink: event.termsAndConditionsLink,
-			createdByUser: user,
+			createdByUser: currentUser,
 			visible: false,
 			registrationForm: event.registrationForm,
 			registrationDeadline: event.registrationDeadline,
 			generateInvoices: event.generateInvoices,
 			spotTypes: event.spotTypes.map((e) => new EventSpot({ name: e.name, price: e.price })),
-			links: event.links.map((e) => new EventLink({ link: e.link, name: e.name })),
+			links: newCreatedLinks,
 		});
 
 		newEvent = await this.eventsService.save(newEvent);
@@ -196,15 +208,26 @@ export class EventsController {
 	@Patch(":eventId")
 	async updateEvent(
 		@Param("eventId", ParseIntPipe) eventId: number,
-		@CurrentUser() user: User,
+		@CurrentUser() currentUser: User,
 		@Body() body: UpdateEvent,
 	) {
-		// TODO: Check user role for modifications
+		if (
+			!currentUser.role.hasOneOfPermissions([Permission.EventCreate, Permission.EventDuplicate, Permission.EventUpdate])
+		) {
+			throw new UnauthorizedException("You don't have permission to perform this action");
+		}
+
 		let event = await this.eventsService.findByIdDetailed(eventId, {
 			visible: true,
 		});
 		if (!event) throw new NotFoundException("Event not found");
+		const newCreatedLinks = await this.eventsService.createLinks(body.links);
+
 		Object.assign(event, body);
+		event.links = newCreatedLinks;
+
+		// DELETE old event links
+		await this.eventsService.deleteLinks(eventId);
 
 		event = await this.eventsService.save(event);
 		return this.eventSimpleWithApplicationsMapper.map(event);
@@ -225,10 +248,12 @@ export class EventsController {
 	@Patch(":eventId/photo")
 	async updateEventPhoto(
 		@Param("eventId", ParseIntPipe) eventId: number,
-		@CurrentUser() user: User,
+		@CurrentUser() currentUser: User,
 		@Body() body: UpdatePhoto,
 	) {
-		// TODO: Check user role for modifications
+		if (!currentUser.role.hasOneOfPermissions([Permission.EventUpdate])) {
+			throw new UnauthorizedException("You don't have permission to perform this action");
+		}
 
 		const event = await this.eventsService.findByIdDetailed(eventId, {
 			relations: { applications: true },
@@ -248,10 +273,63 @@ export class EventsController {
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
 	@Delete(":eventId")
-	async deleteEvent(@Param("eventId", ParseIntPipe) eventId: number) {
+	async deleteEvent(@CurrentUser() currentUser: User, @Param("eventId", ParseIntPipe) eventId: number) {
+		if (!currentUser.role.hasOneOfPermissions([Permission.EventUpdate])) {
+			throw new UnauthorizedException("You don't have permission to perform this action");
+		}
+
 		const event = await this.eventsService.findById(eventId);
 		if (!event) throw new NotFoundException("Event not found");
 
 		await this.eventsService.delete(event);
+	}
+
+	@ApiOkResponse({ description: "Create event links" })
+	@ApiNotFoundResponse({ description: "Not found" })
+	@ApiBearerAuth()
+	@UseGuards(CookieGuard)
+	@Post(":eventId/link")
+	async createEventLinks(
+		@CurrentUser() currentUser: User,
+		@Param("eventId", ParseIntPipe) eventId: number,
+		@Body() body: CreateEventLinkDto,
+	) {
+		if (!currentUser.role.hasOneOfPermissions([Permission.EventUpdate])) {
+			throw new UnauthorizedException("You don't have permission to perform this action");
+		}
+
+		const event = await this.eventsService.findById(eventId);
+		if (!event) throw new NotFoundException("Event not found");
+
+		const newCreatedLinks = await this.eventsService.createLinks(body.links);
+
+		event.links = [...event.links, ...newCreatedLinks];
+
+		return await this.eventsService.save(event);
+	}
+
+	@ApiOkResponse({ description: "Event link deleted" })
+	@ApiNotFoundResponse({ description: "Not found" })
+	@ApiBearerAuth()
+	@UseGuards(CookieGuard)
+	@Delete("link/:linkId")
+	async deleteEventLink(
+		@CurrentUser() currentUser: User,
+		// @Param("eventId", ParseIntPipe) eventId: number,
+		@Param("linkId", ParseIntPipe) linkId: number,
+	) {
+		if (!currentUser.role.hasOneOfPermissions([Permission.EventUpdate])) {
+			throw new UnauthorizedException("You don't have permission to perform this action");
+		}
+
+		const event = await this.eventsService.findEventByLink(linkId);
+		if (!event) {
+			return await this.eventsService.deleteLink(linkId);
+		}
+
+		event.links = event.links.filter((link) => link.id !== linkId);
+		await this.eventsService.deleteLink(linkId);
+
+		return await this.eventsService.save(event);
 	}
 }

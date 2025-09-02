@@ -29,8 +29,7 @@ export class InitialiseService {
 		private readonly mailerService: MailerService,
 		private readonly authService: AuthService,
 		private readonly configService: ConfigService,
-	) {
-	}
+	) {}
 
 	/**
 	 * Save user entity
@@ -56,13 +55,15 @@ export class InitialiseService {
 			adminRole = await this.RoleRepository.save(adminRole);
 
 			// Create Personal Address for the User
-			let personalAddress = user?.personalAddress ? this.AddressRepository.create({
-				street: user.personalAddress.street,
-				city: user.personalAddress.city,
-				houseNumber: user.personalAddress.houseNumber,
-				zip: user.personalAddress.zip,
-				country: user.personalAddress.country,
-			}) : null;
+			let personalAddress = user?.personalAddress
+				? this.AddressRepository.create({
+						street: user.personalAddress.street,
+						city: user.personalAddress.city,
+						houseNumber: user.personalAddress.houseNumber,
+						zip: user.personalAddress.zip,
+						country: user.personalAddress.country,
+					})
+				: null;
 
 			if (personalAddress) {
 				personalAddress = await this.AddressRepository.save(personalAddress);
@@ -141,7 +142,6 @@ export class InitialiseService {
 		};
 	}
 
-
 	/**
 	 * Check if user and organisation exists
 	 * @returns boolean
@@ -155,5 +155,4 @@ export class InitialiseService {
 			message: isInitialised ? "Initial setup already fulfilled" : "Initial setup not fulfilled",
 		};
 	}
-
 }

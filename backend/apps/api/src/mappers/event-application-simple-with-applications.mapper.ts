@@ -10,8 +10,7 @@ import { EventSimpleWithApplicationsMapper } from "./event-simple-with-applicati
 
 @Injectable()
 export class EventApplicationSimpleWithApplicationsMapper {
-	constructor(private readonly eventSimpleWithApplicationsMapper: EventSimpleWithApplicationsMapper) {
-	}
+	constructor(private readonly eventSimpleWithApplicationsMapper: EventSimpleWithApplicationsMapper) {}
 
 	map(application: EventApplicationSimple): EventApplicationSimpleWithApplications;
 	map(application: EventApplicationSimple[]): EventApplicationSimpleWithApplications[];

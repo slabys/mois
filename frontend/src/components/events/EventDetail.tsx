@@ -9,7 +9,7 @@ import {
   useGetEvent,
   useGetEventApplications,
 } from "@/utils/api";
-import { hasEveryPermissions } from "@/utils/checkPermissions";
+import { hasEveryPermissions, hasSomePermissions } from "@/utils/checkPermissions";
 import routes from "@/utils/routes";
 import { dateWithTime, dayMonthYear } from "@/utils/time";
 import ApiImage from "@components/ApiImage/ApiImage";
@@ -137,22 +137,75 @@ const EventDetail = ({ id }: EventDetailProps) => {
           </Flex>
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 3 }} order={{ base: 1, md: 2 }}>
-          <Flex direction="column" gap={8}>
-            <Button
-              maw={{ base: 180, md: "100%" }}
-              mb={8}
-              variant="light"
-              onClick={toggle}
-              justify="space-between"
-              rightSection={
-                <IconChevronDown
-                  style={{ rotate: (isPhone ? !opened : opened) ? "0deg" : "180deg", transition: "rotate 300ms" }}
-                />
-              }
-              size="compact"
-            >
-              Show options
-            </Button>
+          <Flex direction="column" gap={16}>
+            {eventDetail.links.length > 0 && (
+              <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 1, xl: 1 }}>
+                {eventDetail.links.map((link, index) => (
+                  <Button
+                    key={`link-tree-${link.id}-${index}`}
+                    component={Link}
+                    href={link.link}
+                    target="_blank"
+                    color="magenta"
+                  >
+                    {link.name}
+                  </Button>
+                ))}
+              </SimpleGrid>
+            )}
+
+            <Divider my={8} />
+
+            <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 1, xl: 1 }}>
+              <Flex direction="column" gap={16}>
+                {currentUser.personalAddress === null && (
+                  <Blockquote color="red" icon={<IconInfoCircle />} p={20} mt={16}>
+                    Fill your <Anchor href={routes.ACCOUNT}>personal address</Anchor> on your account profile before
+                    registration.
+                  </Blockquote>
+                )}
+                {isUserRegistered ? (
+                  <Button
+                    onClick={handleDeleteApplication}
+                    color="red"
+                    leftSection={<IconCancel />}
+                    disabled={dayjs(eventDetail.registrationDeadline).diff(new Date()) <= 0}
+                  >
+                    Unregister from Event
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={openModalJoinEvent}
+                    color="green"
+                    leftSection={<IconWritingSign />}
+                    disabled={
+                      currentUser.personalAddress === null ||
+                      dayjs(eventDetail.registrationDeadline).diff(new Date()) <= 0
+                    }
+                  >
+                    Register to Event
+                  </Button>
+                )}
+              </Flex>
+            </SimpleGrid>
+
+            {hasSomePermissions(currentUser.role, ["event.update", "event.manageApplications"]) && (
+              <Button
+                mb={8}
+                variant="outline"
+                color="cyan"
+                onClick={toggle}
+                justify="space-between"
+                rightSection={
+                  <IconChevronDown
+                    style={{ rotate: (isPhone ? !opened : opened) ? "0deg" : "180deg", transition: "rotate 300ms" }}
+                  />
+                }
+                size="compact"
+              >
+                Show management options
+              </Button>
+            )}
             <Collapse in={isPhone ? !opened : opened}>
               <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 1, xl: 1 }}>
                 {hasEveryPermissions(currentUser.role, ["event.update"]) && (
@@ -173,11 +226,9 @@ const EventDetail = ({ id }: EventDetailProps) => {
               </SimpleGrid>
 
               {isUserRegistered && (
-                // TODO - not implemented on BE
                 <VisuallyHidden>
                   <Divider my={16} />
                   <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 1, xl: 1 }}>
-                    {/* TODO */}
                     <Button
                       component={Link}
                       href={routes.EVENT_MANAGE({ id: id })}
@@ -186,48 +237,12 @@ const EventDetail = ({ id }: EventDetailProps) => {
                     >
                       Show Invoice
                     </Button>
-                    {/* TODO */}
                     <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconCash />} disabled>
                       Upload Payment
                     </Button>
                   </SimpleGrid>
                 </VisuallyHidden>
               )}
-
-              <Divider my={16} />
-
-              <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 1, xl: 1 }}>
-                <Flex direction="column" gap={4}>
-                  {currentUser.personalAddress === null && (
-                    <Blockquote color="red" icon={<IconInfoCircle />} p={20}>
-                      Fill your <Anchor href={routes.ACCOUNT}>personal address</Anchor> on your account profile before
-                      registration.
-                    </Blockquote>
-                  )}
-                  {isUserRegistered ? (
-                    <Button
-                      onClick={handleDeleteApplication}
-                      color="red"
-                      leftSection={<IconCancel />}
-                      disabled={dayjs(eventDetail.registrationDeadline).diff(new Date()) <= 0}
-                    >
-                      Unregister from Event
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={openModalJoinEvent}
-                      color="green"
-                      leftSection={<IconWritingSign />}
-                      disabled={
-                        currentUser.personalAddress === null ||
-                        dayjs(eventDetail.registrationDeadline).diff(new Date()) <= 0
-                      }
-                    >
-                      Register to Event
-                    </Button>
-                  )}
-                </Flex>
-              </SimpleGrid>
             </Collapse>
           </Flex>
         </Grid.Col>

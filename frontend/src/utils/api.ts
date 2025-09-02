@@ -26,12 +26,14 @@ import type {
   AddOrganizationMembers,
   CreateEvent,
   CreateEventApplication,
+  CreateEventLinkDto,
   CreateEventSpot,
   CreateOrganization,
   CreateOrganization201,
   CreateRole,
   CreateUser,
   Error,
+  Event,
   EventApplicationDetailedWithApplications,
   EventApplicationSimpleWithApplications,
   EventDetail,
@@ -3360,6 +3362,123 @@ export const useUpdateEventPhoto = <TError = ErrorType<null | null>, TContext = 
   TContext
 > => {
   const mutationOptions = getUpdateEventPhotoMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+export const createEventLinks = (
+  eventId: number,
+  createEventLinkDto: CreateEventLinkDto,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<null | Event>(
+    {
+      url: `/events/${eventId}/link`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createEventLinkDto,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getCreateEventLinksMutationOptions = <TError = ErrorType<null>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createEventLinks>>,
+    TError,
+    { eventId: number; data: CreateEventLinkDto },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createEventLinks>>,
+  TError,
+  { eventId: number; data: CreateEventLinkDto },
+  TContext
+> => {
+  const mutationKey = ["createEventLinks"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createEventLinks>>,
+    { eventId: number; data: CreateEventLinkDto }
+  > = (props) => {
+    const { eventId, data } = props ?? {};
+
+    return createEventLinks(eventId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateEventLinksMutationResult = NonNullable<Awaited<ReturnType<typeof createEventLinks>>>;
+export type CreateEventLinksMutationBody = CreateEventLinkDto;
+export type CreateEventLinksMutationError = ErrorType<null>;
+
+export const useCreateEventLinks = <TError = ErrorType<null>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createEventLinks>>,
+      TError,
+      { eventId: number; data: CreateEventLinkDto },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createEventLinks>>,
+  TError,
+  { eventId: number; data: CreateEventLinkDto },
+  TContext
+> => {
+  const mutationOptions = getCreateEventLinksMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+export const deleteEventLink = (linkId: number, options?: SecondParameter<typeof customInstance>) => {
+  return customInstance<null>({ url: `/events/link/${linkId}`, method: "DELETE" }, options);
+};
+
+export const getDeleteEventLinkMutationOptions = <TError = ErrorType<null>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteEventLink>>, TError, { linkId: number }, TContext>;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<Awaited<ReturnType<typeof deleteEventLink>>, TError, { linkId: number }, TContext> => {
+  const mutationKey = ["deleteEventLink"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteEventLink>>, { linkId: number }> = (props) => {
+    const { linkId } = props ?? {};
+
+    return deleteEventLink(linkId, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteEventLinkMutationResult = NonNullable<Awaited<ReturnType<typeof deleteEventLink>>>;
+
+export type DeleteEventLinkMutationError = ErrorType<null>;
+
+export const useDeleteEventLink = <TError = ErrorType<null>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof deleteEventLink>>, TError, { linkId: number }, TContext>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<Awaited<ReturnType<typeof deleteEventLink>>, TError, { linkId: number }, TContext> => {
+  const mutationOptions = getDeleteEventLinkMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

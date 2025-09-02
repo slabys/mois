@@ -8,8 +8,7 @@ export class EventSpotsService {
 	constructor(
 		@InjectRepository(EventSpot)
 		private readonly eventSpotRepository: Repository<EventSpot>,
-	) {
-	}
+	) {}
 
 	findById(id: EventSpot["id"]) {
 		return this.eventSpotRepository.findOne({

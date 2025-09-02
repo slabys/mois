@@ -51,8 +51,7 @@ export class UsersController {
 		private readonly photoService: PhotoService,
 		private readonly organizationService: OrganizationService,
 		private readonly mailerService: MailerService,
-	) {
-	}
+	) {}
 
 	@ApiCreatedResponse({ type: User, description: "User has been created" })
 	@Post()
@@ -136,7 +135,6 @@ export class UsersController {
 		user.phonePrefix = body.phonePrefix ?? user.phonePrefix;
 		user.phoneNumber = body.phoneNumber ?? user.phoneNumber;
 
-
 		if (body.personalAddress) {
 			if (user.personalAddress) user.personalAddress.update(body.personalAddress);
 			else user.personalAddress = new Address(body.personalAddress);
@@ -177,7 +175,8 @@ export class UsersController {
 	@ApiBearerAuth()
 	@UseGuards(CookieGuard)
 	@Get(":id/organizations")
-	userOrganizationMemberships(@Param("id", ParseUUIDPipe) userId: string) { //, @Pagination() pagination: PaginationOptions
+	userOrganizationMemberships(@Param("id", ParseUUIDPipe) userId: string) {
+		//, @Pagination() pagination: PaginationOptions
 		return this.organizationService.findUserMemberships(userId);
 	}
 
@@ -212,13 +211,15 @@ export class UsersController {
 	@Header("Content-disposition", "attachment; filename=EventApplicationExport.xlsx")
 	@Get("export/users")
 	async generateSheetUsers(@Res() res: Response) {
-
-		const userList = await this.usersService.find({ all: true }, {
-			relations: {
-				personalAddress: true,
-				role: true,
+		const userList = await this.usersService.find(
+			{ all: true },
+			{
+				relations: {
+					personalAddress: true,
+					role: true,
+				},
 			},
-		});
+		);
 
 		const workbook = new ExcelJS.Workbook();
 		const worksheet = workbook.addWorksheet("Export");
@@ -246,9 +247,11 @@ export class UsersController {
 				lastName: user?.lastName,
 				email: user?.email,
 				username: user?.username,
-				personalAddress: user?.personalAddress ? `${user?.personalAddress?.street} ${user?.personalAddress?.houseNumber}
+				personalAddress: user?.personalAddress
+					? `${user?.personalAddress?.street} ${user?.personalAddress?.houseNumber}
 ${user?.personalAddress?.zip} ${user?.personalAddress?.city}
-${user?.personalAddress?.country}` : "",
+${user?.personalAddress?.country}`
+					: "",
 				birthDate: user?.birthDate,
 				nationality: user?.nationality,
 				phonePrefix: user?.phonePrefix,

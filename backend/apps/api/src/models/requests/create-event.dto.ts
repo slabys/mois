@@ -2,6 +2,7 @@ import { Transform } from "class-transformer";
 import { Allow, IsBoolean, IsInt, IsNumber, IsOptional, IsString, IsUrl, Min, MinLength } from "class-validator";
 import { DateTransform, IsValidDate, IsValidJsonSchema } from "utilities/nest/class-validator";
 import { ApiProperty } from "@nestjs/swagger";
+import type { EventLink } from "@api/modules/events/entities";
 
 export class CreateEvent {
 	@MinLength(6)
@@ -29,34 +30,39 @@ export class CreateEvent {
 	@Transform(DateTransform)
 	registrationDeadline: string;
 
+	@IsOptional()
+	links?: EventLink[] = [];
+
 	@ApiProperty({
 		description: "Short description in JSON format for RichText",
 		example: {
-			"type": "doc",
-			"content": [{
-				"type": "paragraph",
-				"attrs": { "textAlign": "left" },
-				"content": [{ "type": "text", "text": "Short description" }],
-			}],
+			type: "doc",
+			content: [
+				{
+					type: "paragraph",
+					attrs: { textAlign: "left" },
+					content: [{ type: "text", text: "Short description" }],
+				},
+			],
 		},
 	})
 	@IsString()
-	@MinLength(30)
 	longDescription: string;
 
 	@ApiProperty({
 		description: "Short description in JSON format for RichText",
 		example: {
-			"type": "doc",
-			"content": [{
-				"type": "paragraph",
-				"attrs": { "textAlign": "left" },
-				"content": [{ "type": "text", "text": "Short description" }],
-			}],
+			type: "doc",
+			content: [
+				{
+					type: "paragraph",
+					attrs: { textAlign: "left" },
+					content: [{ type: "text", text: "Short description" }],
+				},
+			],
 		},
 	})
 	@IsString()
-	@MinLength(30)
 	shortDescription: string;
 
 	@IsBoolean()

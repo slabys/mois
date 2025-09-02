@@ -18,12 +18,14 @@ export class Event extends BaseEntity {
 	@ApiProperty({
 		description: "Short description in JSON format for RichText",
 		example: {
-			"type": "doc",
-			"content": [{
-				"type": "paragraph",
-				"attrs": { "textAlign": "left" },
-				"content": [{ "type": "text", "text": "Short description" }],
-			}],
+			type: "doc",
+			content: [
+				{
+					type: "paragraph",
+					attrs: { textAlign: "left" },
+					content: [{ type: "text", text: "Short description" }],
+				},
+			],
 		},
 	})
 	shortDescription: string;
@@ -33,12 +35,14 @@ export class Event extends BaseEntity {
 	@ApiProperty({
 		description: "Long description in JSON format for RichText",
 		example: {
-			"type": "doc",
-			"content": [{
-				"type": "paragraph",
-				"attrs": { "textAlign": "left" },
-				"content": [{ "type": "text", "text": "Very long description" }],
-			}],
+			type: "doc",
+			content: [
+				{
+					type: "paragraph",
+					attrs: { textAlign: "left" },
+					content: [{ type: "text", text: "Very long description" }],
+				},
+			],
 		},
 	})
 	longDescription: string;

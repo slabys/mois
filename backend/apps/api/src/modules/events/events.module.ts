@@ -13,5 +13,4 @@ import { EventApplicationsService, EventSpotsService, EventsService } from "./pr
 	providers: [EventsService, EventSpotsService, EventApplicationsService],
 	exports: [EventsService, EventSpotsService, EventApplicationsService],
 })
-export class EventsModule {
-}
+export class EventsModule {}

@@ -12,5 +12,4 @@ export class ResetPasswordDto {
 	 */
 	@IsString()
 	password: string;
-
 }

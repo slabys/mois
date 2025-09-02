@@ -12,5 +12,4 @@ import { AddressesModule } from "@api/modules/addresses/addresses.module";
 	providers: [UsersService],
 	exports: [UsersService],
 })
-export class UsersModule {
-}
+export class UsersModule {}

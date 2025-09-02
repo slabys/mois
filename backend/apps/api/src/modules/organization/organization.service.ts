@@ -3,7 +3,7 @@ import { InjectEntityManager, InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, FindOneOptions, Repository } from "typeorm";
 import { Organization, OrganizationMember } from "./entities";
 import { User } from "../users";
-import { PaginationOptions } from "utilities/nest/decorators";
+import type { PaginationOptions } from "utilities/nest/decorators";
 import { formatPaginatedResponse } from "utilities/pagination.helper";
 
 @Injectable()
@@ -15,8 +15,7 @@ export class OrganizationService {
 		private readonly memberRepository: Repository<OrganizationMember>,
 		@InjectEntityManager()
 		private readonly entityManager: EntityManager,
-	) {
-	}
+	) {}
 
 	/**
 	 * Find organization by ID
@@ -111,7 +110,8 @@ export class OrganizationService {
 	 // * @param options Find options
 	 * @returns OrganizationMember[]
 	 */
-	findUserMemberships(userId: string) { //, options?: FindManyOptions
+	findUserMemberships(userId: string) {
+		//, options?: FindManyOptions
 		return this.memberRepository.find({
 			where: { user: { id: userId } },
 			relations: {
@@ -148,7 +148,6 @@ export class OrganizationService {
 				.from(OrganizationMember)
 				.where("id = :memberId", { memberId: memberId })
 				.execute();
-
 		});
 	}
 

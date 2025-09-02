@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { isEmail } from "class-validator";
 import { User } from "./entities";
 import { FindOptionsRelations, FindOptionsWhere, In, Repository } from "typeorm";
-import { PaginationOptions } from "utilities/nest/decorators";
+import type { PaginationOptions } from "utilities/nest/decorators";
 import { formatPaginatedResponse } from "utilities/pagination.helper";
 
 type UserId = User["id"];
@@ -17,8 +17,7 @@ export class UsersService {
 	constructor(
 		@InjectRepository(User)
 		private readonly UsersRepository: Repository<User>,
-	) {
-	}
+	) {}
 
 	/**
 	 * Save user entity

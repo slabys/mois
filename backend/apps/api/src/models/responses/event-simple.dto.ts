@@ -15,5 +15,4 @@ export class EventSimple extends PickType(Event, [
 	"photoPolicyLink",
 	"codeOfConductLink",
 	"capacity",
-]) {
-}
+]) {}

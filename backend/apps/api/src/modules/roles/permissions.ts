@@ -3,7 +3,7 @@ export enum Permission {
 	EventUpdate = "event.update",
 	EventDuplicate = "event.duplicate",
 	EventManageApplications = "event.manageApplications",
-	
+
 	OrganisationCreate = "organisation.create",
 	OrganisationUpdate = "organisation.update",
 	OrganisationAddUser = "organisation.addUser",

@@ -23,6 +23,4 @@ import { Address } from "@api/modules/addresses/entities";
 	providers: [InitialiseService],
 	exports: [InitialiseService],
 })
-
-export class InitialiseModule {
-}
+export class InitialiseModule {}

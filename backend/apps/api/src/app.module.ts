@@ -29,7 +29,6 @@ import { RolesController } from "@api/modules/roles/roles.controller";
 import { HealthController } from "@api/controllers/health.controller";
 import { EventsManagementController } from "@api/modules/events/events-management.controller";
 
-
 @Module({
 	imports: [
 		InitialiseModule,
@@ -54,7 +53,6 @@ import { EventsManagementController } from "@api/modules/events/events-managemen
 		RolesModule,
 		ConfigModule.forRoot(),
 		MailModule,
-
 	],
 	controllers: [
 		InitialiseController,
@@ -72,5 +70,4 @@ import { EventsManagementController } from "@api/modules/events/events-managemen
 	],
 	providers: [EventSimpleWithApplicationsMapper, EventApplicationSimpleWithApplicationsMapper],
 })
-export class AppModule {
-}
+export class AppModule {}

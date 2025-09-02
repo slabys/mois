@@ -9,6 +9,7 @@ import {
 	ParseUUIDPipe,
 	Patch,
 	Post,
+	UnauthorizedException,
 	UseGuards,
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
@@ -26,14 +27,12 @@ export class RolesController {
 	constructor(
 		private readonly userService: UsersService,
 		private readonly rolesService: RolesService,
-	) {
-	}
+	) {}
 
 	@ApiCreatedResponse({ type: Role, description: "Created role" })
 	@Post("create")
 	async createRole(@CurrentUser() user: User, @Body() body: CreateRole) {
-
-		let role = new Role({
+		const role = new Role({
 			name: body.name,
 			permissions: body.permissions,
 		});
@@ -42,12 +41,20 @@ export class RolesController {
 	}
 
 	@Patch("update/:userId/:roleId")
-	async updateUserRole(@CurrentUser() user: User, @Param("userId", ParseUUIDPipe) userId: string, @Param("roleId", ParseIntPipe) roleId: number | undefined) {
+	async updateUserRole(
+		@CurrentUser() currentUser: User,
+		@Param("userId", ParseUUIDPipe) userId: string,
+		@Param("roleId", ParseIntPipe) roleId: number | undefined,
+	) {
+		if (currentUser.role.hasOneOfPermissions([Permission.UserUpdateRole])) {
+			throw new UnauthorizedException("You don't have permission to perform this action");
+		}
+
 		const foundUser = await this.userService.findById(userId);
 		const foundRole = await this.rolesService.findById(roleId);
 
 		if (!roleId) {
-			if ((user?.role?.isAdmin()) || user?.role?.permissions?.includes(Permission.UserUpdateRole)) {
+			if (currentUser?.role?.isAdmin() || currentUser?.role?.permissions?.includes(Permission.UserUpdateRole)) {
 				foundUser.role = null;
 				return await this.userService.save(foundUser);
 			}
@@ -57,7 +64,7 @@ export class RolesController {
 		if (!foundUser) throw new NotFoundException("User not found");
 		if (!foundRole) throw new NotFoundException("Role not found");
 
-		if ((user?.role?.isAdmin()) || user?.role?.permissions?.includes(Permission.UserUpdateRole)) {
+		if (currentUser?.role?.isAdmin() || currentUser?.role?.permissions?.includes(Permission.UserUpdateRole)) {
 			foundUser.role = foundRole;
 			return await this.userService.save(foundUser);
 		}

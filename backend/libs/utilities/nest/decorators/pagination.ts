@@ -27,30 +27,30 @@ type ApiQueryWithDefault = ApiQueryOptions & {
  */
 const PaginationTypeEnhancer =
 	(defaultOptions?: Partial<PaginationOptions>): ParamDecoratorEnhancer =>
-		(target: Record<string, unknown>, propertyKey: string): void => {
-			const descriptor = Reflect.getOwnPropertyDescriptor(target, propertyKey);
-			ApiQuery(<ApiQueryWithDefault>{
-				name: "page",
-				type: Number,
-				required: false,
-				description: "Current page number",
-				default: defaultOptions?.page ?? 1,
-			})(target, propertyKey, descriptor);
-			ApiQuery(<ApiQueryWithDefault>{
-				name: "perPage",
-				type: Number,
-				required: false,
-				description: "Number of results per page",
-				default: defaultOptions?.perPage ?? 10,
-			})(target, propertyKey, descriptor);
-			ApiQuery(<ApiQueryWithDefault>{
-				name: "all",
-				type: Boolean,
-				required: false,
-				description: "If true, fetches all data (ignores pagination)",
-				default: false,
-			})(target, propertyKey, descriptor);
-		};
+	(target: Record<string, unknown>, propertyKey: string): void => {
+		const descriptor = Reflect.getOwnPropertyDescriptor(target, propertyKey);
+		ApiQuery(<ApiQueryWithDefault>{
+			name: "page",
+			type: Number,
+			required: false,
+			description: "Current page number",
+			default: defaultOptions?.page ?? 1,
+		})(target, propertyKey, descriptor);
+		ApiQuery(<ApiQueryWithDefault>{
+			name: "perPage",
+			type: Number,
+			required: false,
+			description: "Number of results per page",
+			default: defaultOptions?.perPage ?? 10,
+		})(target, propertyKey, descriptor);
+		ApiQuery(<ApiQueryWithDefault>{
+			name: "all",
+			type: Boolean,
+			required: false,
+			description: "If true, fetches all data (ignores pagination)",
+			default: false,
+		})(target, propertyKey, descriptor);
+	};
 
 /**
  * Pagination

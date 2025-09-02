@@ -4,7 +4,7 @@ import { EventApplication } from "../../entities";
 import { EventFilter } from "../../models";
 import { filterSince } from "../../utilities";
 import { FindOneOptions, Repository } from "typeorm";
-import { PaginationOptions } from "utilities/nest/decorators";
+import type { PaginationOptions } from "utilities/nest/decorators";
 import { formatPaginatedResponse } from "utilities/pagination.helper";
 
 interface FindEventOptions {
@@ -17,8 +17,7 @@ export class EventApplicationsService {
 	constructor(
 		@InjectRepository(EventApplication)
 		private readonly eventApplicationRepository: Repository<EventApplication>,
-	) {
-	}
+	) {}
 
 	/**
 	 * Find event application by ID

@@ -8,8 +8,7 @@ import { PaginationDto, PaginationResponseDto } from "../../models/responses/pag
 @ApiTags("Events [Management]")
 @Controller("management/events")
 export class EventsManagementController {
-	constructor(private readonly eventsService: EventsService) {
-	}
+	constructor(private readonly eventsService: EventsService) {}
 
 	/**
 	 * Find all events including not published/visible events

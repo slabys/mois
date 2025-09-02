@@ -11,5 +11,4 @@ import { FileStorageModule } from "../file-storage";
 	providers: [PhotoService],
 	exports: [PhotoService],
 })
-export class PhotoModule {
-}
+export class PhotoModule {}

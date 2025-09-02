@@ -36,7 +36,15 @@ export class UpdateEventApplicationCustomOrganization {
 
 @ApiExtraModels(UpdateEventApplicationExistingOrganization, UpdateEventApplicationCustomOrganization)
 export class UpdateEventApplication extends PartialType(
-	PickType(CreateEventApplication, ["idNumber", "validUntil", "invoicedTo", "invoiceMethod", "foodRestrictionAllergies", "healthLimitations", "additionalInformation"]),
+	PickType(CreateEventApplication, [
+		"idNumber",
+		"validUntil",
+		"invoicedTo",
+		"invoiceMethod",
+		"foodRestrictionAllergies",
+		"healthLimitations",
+		"additionalInformation",
+	]),
 ) {
 	@ApiProperty({
 		type: () => Object,

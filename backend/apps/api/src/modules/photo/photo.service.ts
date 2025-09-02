@@ -13,8 +13,7 @@ export class PhotoService {
 		@InjectRepository(Photo)
 		private readonly photoRepository: Repository<Photo>,
 		private readonly fileStorageService: FileStorageService,
-	) {
-	}
+	) {}
 
 	async findById(id: string) {
 		return this.photoRepository.findOneBy({ id });

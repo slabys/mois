@@ -42,15 +42,12 @@ import { CurrentUser } from "@api/decorators";
 import { CreateEventApplication, UpdateEventApplication } from "@api/models/requests";
 import { EventApplicationSimpleWithApplications } from "@api/models/responses";
 import { EventApplicationSimpleWithApplicationsMapper } from "@api/mappers";
-import {
-	EventApplicationDetailedWithApplications,
-} from "@api/models/responses/event-application-detailed-with-applications.dto";
+import { EventApplicationDetailedWithApplications } from "@api/models/responses/event-application-detailed-with-applications.dto";
 import { PaginationDto, PaginationResponseDto } from "@api/models/responses/pagination-response.dto";
 import * as ExcelJS from "exceljs";
 import { Permission } from "@api/modules/roles";
 import { UpdateApplicationSlotDto } from "@api/modules/events/dto/update-application-slot.dto";
 import { Address } from "@api/modules/addresses/entities";
-
 
 @ApiTags("Event applications")
 @Controller("events")
@@ -63,8 +60,7 @@ export class EventApplicationsController {
 		private readonly eventSpotsService: EventSpotsService,
 		private readonly fileStorageService: FileStorageService,
 		private readonly eventApplicationSimpleWithApplicationsMapper: EventApplicationSimpleWithApplicationsMapper,
-	) {
-	}
+	) {}
 
 	/**
 	 * Get all signed-in user applications
@@ -144,22 +140,22 @@ export class EventApplicationsController {
 	@UseGuards(CookieGuard)
 	@Post(":eventId/applications")
 	async createUserApplication(
-		@CurrentUser() user: User,
+		@CurrentUser() currentUser: User,
 		@Param("eventId", ParseIntPipe) eventId: number,
 		@Body() body: CreateEventApplication,
 	): Promise<EventApplicationSimpleWithApplications> {
-		const exist = await this.eventApplicationsService.exist(eventId, user.id);
+		const exist = await this.eventApplicationsService.exist(eventId, currentUser.id);
 		if (exist) throw new ConflictException("Event application already exist");
 
-		const currentUser = await this.usersService.findById(user.id, {
+		const user = await this.usersService.findById(currentUser.id, {
 			relations: { personalAddress: true },
 		});
 
-		if (!currentUser.personalAddress) throw new ForbiddenException("User must have valid personal address");
+		if (!user.personalAddress) throw new ForbiddenException("User must have valid personal address");
 
 		let application = new EventApplication({
-			user,
-			personalAddress: currentUser.personalAddress.copy(),
+			user: currentUser,
+			personalAddress: user.personalAddress.copy(),
 			invoiceMethod: body.invoiceMethod,
 			invoicedTo: body.invoicedTo,
 			additionalInformation: body.additionalInformation ?? "",
@@ -171,7 +167,7 @@ export class EventApplicationsController {
 		});
 
 		if (body.organization.type === "organization") {
-			const member = await this.organizationService.findMemberByUserId(body.organization.id, user.id, {
+			const member = await this.organizationService.findMemberByUserId(body.organization.id, currentUser.id, {
 				relations: { organization: true },
 			});
 
@@ -320,7 +316,13 @@ export class EventApplicationsController {
 	) {
 		const application = await this.eventApplicationsService.findById(applicationId);
 
-		if (!(currentUser.id === application.user.id || currentUser.role.isAdmin() || currentUser.role.hasOneOfPermissions([Permission.EventManageApplications]))) {
+		if (
+			!(
+				currentUser.id === application.user.id ||
+				currentUser.role.isAdmin() ||
+				currentUser.role.hasOneOfPermissions([Permission.EventManageApplications])
+			)
+		) {
 			return;
 		}
 
@@ -336,7 +338,6 @@ export class EventApplicationsController {
 	@Header("Content-disposition", "attachment; filename=EventApplicationExport.xlsx")
 	@Get("export/:eventId/applications")
 	async generateSheetEventApplication(@Res() res: Response, @Param("eventId", ParseIntPipe) eventId: number) {
-
 		const applicationList = await this.eventApplicationsService.findByEventId(eventId);
 
 		const workbook = new ExcelJS.Workbook();
@@ -384,13 +385,17 @@ export class EventApplicationsController {
 				nationality: user?.nationality,
 				idNumber: application?.idNumber,
 				idValidUntil: application?.validUntil,
-				personalAddress: user?.personalAddress ? `${user?.personalAddress?.street} ${user?.personalAddress?.houseNumber}
+				personalAddress: user?.personalAddress
+					? `${user?.personalAddress?.street} ${user?.personalAddress?.houseNumber}
 ${user?.personalAddress?.zip} ${user?.personalAddress?.city}
-${user?.personalAddress?.country}` : "",
+${user?.personalAddress?.country}`
+					: "",
 				invoiceMethod: application?.invoiceMethod,
-				invoiceAddress: application?.invoiceAddress ? `${application?.invoiceAddress?.street} ${application?.invoiceAddress?.houseNumber}
+				invoiceAddress: application?.invoiceAddress
+					? `${application?.invoiceAddress?.street} ${application?.invoiceAddress?.houseNumber}
 ${application?.invoiceAddress?.zip} ${application?.invoiceAddress?.city}
-${application?.invoiceAddress?.country}` : "",
+${application?.invoiceAddress?.country}`
+					: "",
 				foodRestrictions: application?.foodRestrictionAllergies,
 				healthLimitations: application?.healthLimitations,
 			});

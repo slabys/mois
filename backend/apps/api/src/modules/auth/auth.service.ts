@@ -11,8 +11,7 @@ export class AuthService {
 		private readonly usersService: UsersService,
 		private readonly jwtService: JwtService,
 		private readonly configService: ConfigService,
-	) {
-	}
+	) {}
 
 	/**
 	 * Validate user email and password in database
@@ -55,7 +54,7 @@ export class AuthService {
 	}
 
 	// Verify reset password token
-	async verifyResetPasswordToken(token: string): Promise<any> {
+	async verifyResetPasswordToken(token: string) {
 		return this.jwtService.verifyAsync(token, {
 			issuer: this.configService.getOrThrow("WEB_DOMAIN"),
 			subject: "reset-password",
@@ -79,11 +78,10 @@ export class AuthService {
 	 * @param token User e-mail token
 	 * @returns Promise<any>
 	 */
-	async verifyVerificationToken(token: string): Promise<any> {
+	async verifyVerificationToken(token: string) {
 		return this.jwtService.verifyAsync(token, {
 			issuer: this.configService.getOrThrow("WEB_DOMAIN"),
 			subject: "verify",
 		});
 	}
-
 }
