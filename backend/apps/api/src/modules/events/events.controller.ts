@@ -41,7 +41,6 @@ import { EventDetail, EventSimple } from "../../models/responses";
 import { Pagination, PaginationOptions } from "utilities/nest/decorators";
 import { PaginationDto, PaginationResponseDto } from "../../models/responses/pagination-response.dto";
 import { Permission } from "@api/modules/roles";
-import { CreateEventLinkDto } from "@api/models/requests/create-event-link.dto";
 
 @ApiTags("Events")
 @Controller("events")
@@ -292,7 +291,7 @@ export class EventsController {
 	async createEventLinks(
 		@CurrentUser() currentUser: User,
 		@Param("eventId", ParseIntPipe) eventId: number,
-		@Body() body: CreateEventLinkDto,
+		@Body() body: CreateEvent,
 	) {
 		if (!currentUser.role.hasOneOfPermissions([Permission.EventUpdate])) {
 			throw new UnauthorizedException("You don't have permission to perform this action");

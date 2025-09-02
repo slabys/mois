@@ -690,6 +690,11 @@ Each event can have different "requirements"
   photo: EventDetailPhoto;
 }
 
+export interface CreateEventLinkPartial {
+  name: string;
+  link: string;
+}
+
 /**
  * Additional registration properties
 ! Must be valid JSON schema
@@ -706,7 +711,7 @@ export interface CreateEvent {
   since: string;
   until: string;
   registrationDeadline: string;
-  links?: EventLink[];
+  links?: CreateEventLinkPartial[];
   visible?: boolean;
   /** Additional registration properties
 ! Must be valid JSON schema */
@@ -749,8 +754,10 @@ export interface EventSimple {
 }
 
 export interface UpdateEventLinkPartial {
-  name?: string;
-  link?: string;
+  name: string;
+  link: string;
+  /** @nullable */
+  id: number | null;
 }
 
 export interface UpdateEvent {
@@ -775,15 +782,6 @@ export interface UpdateEvent {
   termsAndConditionsLink?: string;
   photoPolicyLink?: string;
   codeOfConductLink?: string;
-}
-
-export interface CreateEventLinkPartial {
-  name?: string;
-  link?: string;
-}
-
-export interface CreateEventLinkDto {
-  links: CreateEventLinkPartial[];
 }
 
 export type EventSpotSimpleCurrency = (typeof EventSpotSimpleCurrency)[keyof typeof EventSpotSimpleCurrency];

@@ -26,7 +26,6 @@ import type {
   AddOrganizationMembers,
   CreateEvent,
   CreateEventApplication,
-  CreateEventLinkDto,
   CreateEventSpot,
   CreateOrganization,
   CreateOrganization201,
@@ -3368,7 +3367,7 @@ export const useUpdateEventPhoto = <TError = ErrorType<null | null>, TContext = 
 
 export const createEventLinks = (
   eventId: number,
-  createEventLinkDto: CreateEventLinkDto,
+  createEvent: CreateEvent,
   options?: SecondParameter<typeof customInstance>,
   signal?: AbortSignal,
 ) => {
@@ -3377,7 +3376,7 @@ export const createEventLinks = (
       url: `/events/${eventId}/link`,
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      data: createEventLinkDto,
+      data: createEvent,
       signal,
     },
     options,
@@ -3388,14 +3387,14 @@ export const getCreateEventLinksMutationOptions = <TError = ErrorType<null>, TCo
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createEventLinks>>,
     TError,
-    { eventId: number; data: CreateEventLinkDto },
+    { eventId: number; data: CreateEvent },
     TContext
   >;
   request?: SecondParameter<typeof customInstance>;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof createEventLinks>>,
   TError,
-  { eventId: number; data: CreateEventLinkDto },
+  { eventId: number; data: CreateEvent },
   TContext
 > => {
   const mutationKey = ["createEventLinks"];
@@ -3407,7 +3406,7 @@ export const getCreateEventLinksMutationOptions = <TError = ErrorType<null>, TCo
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof createEventLinks>>,
-    { eventId: number; data: CreateEventLinkDto }
+    { eventId: number; data: CreateEvent }
   > = (props) => {
     const { eventId, data } = props ?? {};
 
@@ -3418,7 +3417,7 @@ export const getCreateEventLinksMutationOptions = <TError = ErrorType<null>, TCo
 };
 
 export type CreateEventLinksMutationResult = NonNullable<Awaited<ReturnType<typeof createEventLinks>>>;
-export type CreateEventLinksMutationBody = CreateEventLinkDto;
+export type CreateEventLinksMutationBody = CreateEvent;
 export type CreateEventLinksMutationError = ErrorType<null>;
 
 export const useCreateEventLinks = <TError = ErrorType<null>, TContext = unknown>(
@@ -3426,7 +3425,7 @@ export const useCreateEventLinks = <TError = ErrorType<null>, TContext = unknown
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof createEventLinks>>,
       TError,
-      { eventId: number; data: CreateEventLinkDto },
+      { eventId: number; data: CreateEvent },
       TContext
     >;
     request?: SecondParameter<typeof customInstance>;
@@ -3435,7 +3434,7 @@ export const useCreateEventLinks = <TError = ErrorType<null>, TContext = unknown
 ): UseMutationResult<
   Awaited<ReturnType<typeof createEventLinks>>,
   TError,
-  { eventId: number; data: CreateEventLinkDto },
+  { eventId: number; data: CreateEvent },
   TContext
 > => {
   const mutationOptions = getCreateEventLinksMutationOptions(options);

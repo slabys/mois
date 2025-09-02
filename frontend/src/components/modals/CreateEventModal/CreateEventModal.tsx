@@ -1,14 +1,21 @@
 import { getGetEventsQueryKey, useCreateEvent } from "@/utils/api";
-import { CreateEvent } from "@/utils/api.schemas";
+import { CreateEvent, CreateEventLinkPartial } from "@/utils/api.schemas";
 import Modal from "@components/Modal/Modal";
 import RichTextEditor from "@components/Richtext/RichTextEditor";
 import DateInput from "@components/primitives/DateInput";
-import { Button, Flex, Group, NumberInput, SimpleGrid, Switch, TextInput } from "@mantine/core";
+import { ActionIcon, Button, Fieldset, Flex, Group, NumberInput, SimpleGrid, Switch, TextInput } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { Form, hasLength, isNotEmpty, useForm } from "@mantine/form";
+import { IconLinkPlus, IconTrash } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import React from "react";
+
+type FormCreateEvent = Omit<CreateEvent, "links"> & {
+  links: (CreateEventLinkPartial & {
+    customId: string;
+  })[];
+};
 
 interface MyModalProps {
   isOpened: boolean;
@@ -30,13 +37,14 @@ const CreateEventModal = ({ onCreateSuccess, isOpened, closeModal }: MyModalProp
     },
   });
 
-  const form = useForm<Partial<CreateEvent>>({
+  const form = useForm<Partial<FormCreateEvent>>({
     initialValues: {
       visible: false,
       title: undefined,
       capacity: 0,
       shortDescription: "",
       longDescription: "",
+      links: [],
       since: new Date().toISOString(),
       until: new Date().toISOString(),
       registrationDeadline: new Date().toISOString(),
@@ -57,7 +65,7 @@ const CreateEventModal = ({ onCreateSuccess, isOpened, closeModal }: MyModalProp
     },
   });
 
-  const handleCreateEvent = (submitValues: Partial<CreateEvent>) => {
+  const handleCreateEvent = (submitValues: Partial<FormCreateEvent>) => {
     form.validate();
     if (form.isValid()) {
       createEventMutation.mutate({
@@ -67,6 +75,23 @@ const CreateEventModal = ({ onCreateSuccess, isOpened, closeModal }: MyModalProp
   };
 
   const isTouchedDirty = form.isTouched() && form.isDirty();
+
+  const handleRemoveLink = (customId: string) => {
+    form.setFieldValue("links", (prevValue) => prevValue?.filter((value) => value.customId !== customId) ?? []);
+  };
+
+  const handleAddNewLink = () => {
+    form.setFieldValue("links", (prevValue) => {
+      return [
+        ...(prevValue ?? []),
+        {
+          customId: crypto.randomUUID(),
+          name: "",
+          link: "",
+        },
+      ];
+    });
+  };
 
   const handleClose = () => {
     form.reset();
@@ -124,6 +149,52 @@ const CreateEventModal = ({ onCreateSuccess, isOpened, closeModal }: MyModalProp
           <TextInput label="Terms and Conditions Link" {...form.getInputProps("termsAndConditionsLink")} />
           <TextInput label="Code of Conduct Link" {...form.getInputProps("codeOfConductLink")} />
           <TextInput label="Photo Consent Link" {...form.getInputProps("photoPolicyLink")} />
+          <Fieldset legend="Link tree" variant="filled" p={16}>
+            <Flex direction="column" gap={8} w="100%">
+              {form.values.links?.map((value, index) => {
+                return (
+                  <Flex key={`link-tree-create-${index}-${value.customId}`} w="100%" gap={16}>
+                    <Flex direction={{ base: "column", md: "row" }} w="100%" gap={{ base: 8, md: 16 }}>
+                      <TextInput
+                        label="Name"
+                        placeholder="ERS link"
+                        w="100%"
+                        value={value.name}
+                        onChange={(event) => {
+                          event.preventDefault();
+                          form.setFieldValue(`links.${index}.name`, event.currentTarget.value);
+                        }}
+                      />
+                      <TextInput
+                        label="URL"
+                        placeholder="https://www.ers.cz/"
+                        w="100%"
+                        value={value.link}
+                        onChange={(event) => {
+                          form.setFieldValue(`links.${index}.link`, event.currentTarget.value);
+                        }}
+                      />
+                    </Flex>
+                    <Flex w="fit-content" justify="center" align="center">
+                      <ActionIcon
+                        onClick={() => handleRemoveLink(value.customId)}
+                        variant="light"
+                        color="red"
+                        size="lg"
+                      >
+                        <IconTrash />
+                      </ActionIcon>
+                    </Flex>
+                  </Flex>
+                );
+              })}
+            </Flex>
+            <Flex justify="center" align="center" mt={16}>
+              <Button leftSection={<IconLinkPlus />} onClick={handleAddNewLink} variant="light">
+                Add new link
+              </Button>
+            </Flex>
+          </Fieldset>
         </Flex>
         <Group justify="center" mt="lg">
           <Button type="submit" disabled={!isTouchedDirty} loading={createEventMutation.isPending}>

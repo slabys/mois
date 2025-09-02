@@ -1,8 +1,10 @@
 import { Transform } from "class-transformer";
 import { Allow, IsBoolean, IsInt, IsNumber, IsOptional, IsString, IsUrl, Min, MinLength } from "class-validator";
 import { DateTransform, IsValidDate, IsValidJsonSchema } from "utilities/nest/class-validator";
-import { ApiProperty } from "@nestjs/swagger";
-import type { EventLink } from "@api/modules/events/entities";
+import { ApiProperty, OmitType } from "@nestjs/swagger";
+import { EventLink } from "@api/modules/events/entities";
+
+export class CreateEventLinkPartial extends OmitType(EventLink, ["id", "event"]) {}
 
 export class CreateEvent {
 	@MinLength(6)
@@ -31,7 +33,7 @@ export class CreateEvent {
 	registrationDeadline: string;
 
 	@IsOptional()
-	links?: EventLink[] = [];
+	links?: CreateEventLinkPartial[] = [];
 
 	@ApiProperty({
 		description: "Short description in JSON format for RichText",
