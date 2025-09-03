@@ -26,7 +26,8 @@ export class EventsService {
 		@InjectRepository(Event)
 		private readonly eventsRepository: Repository<Event>,
 		private readonly photoService: PhotoService,
-	) {}
+	) {
+	}
 
 	/**
 	 * Find event by ID
@@ -144,6 +145,8 @@ export class EventsService {
 			where: { event: { id: eventId } },
 		});
 
-		await this.linksRepository.delete(eventLinks);
+		if (eventLinks.length > 0) {
+			await this.linksRepository.delete(eventLinks);
+		}
 	}
 }
