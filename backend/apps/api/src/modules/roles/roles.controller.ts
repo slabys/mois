@@ -27,7 +27,8 @@ export class RolesController {
 	constructor(
 		private readonly userService: UsersService,
 		private readonly rolesService: RolesService,
-	) {}
+	) {
+	}
 
 	@ApiCreatedResponse({ type: Role, description: "Created role" })
 	@Post("create")
@@ -46,7 +47,7 @@ export class RolesController {
 		@Param("userId", ParseUUIDPipe) userId: string,
 		@Param("roleId", ParseIntPipe) roleId: number | undefined,
 	) {
-		if (currentUser.role.hasOneOfPermissions([Permission.UserUpdateRole])) {
+		if (!currentUser.role.hasOneOfPermissions([Permission.UserUpdateRole])) {
 			throw new UnauthorizedException("You don't have permission to perform this action");
 		}
 
@@ -54,7 +55,7 @@ export class RolesController {
 		const foundRole = await this.rolesService.findById(roleId);
 
 		if (!roleId) {
-			if (currentUser?.role?.isAdmin() || currentUser?.role?.permissions?.includes(Permission.UserUpdateRole)) {
+			if (!currentUser.role.hasOneOfPermissions([Permission.UserUpdateRole])) {
 				foundUser.role = null;
 				return await this.userService.save(foundUser);
 			}
