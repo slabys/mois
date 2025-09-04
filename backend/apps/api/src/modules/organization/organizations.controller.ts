@@ -22,7 +22,8 @@ import { Address } from "@api/modules/addresses/entities";
 @ApiTags("Organizations")
 @Controller("organizations")
 export class OrganizationsController {
-	constructor(private readonly organizationService: OrganizationService) {}
+	constructor(private readonly organizationService: OrganizationService) {
+	}
 
 	@Get()
 	allOrganizations() {
@@ -98,24 +99,20 @@ export class OrganizationsController {
 		@Param("organisationId", ParseUUIDPipe) organisationId: string,
 		@Param("userId", ParseUUIDPipe) userId: string,
 	) {
-		if (!currentUser.role.hasOneOfPermissions([Permission.OrganisationUpdate])) {
-			throw new UnauthorizedException("You don't have permission to perform this action");
-		}
-
 		const organization = await this.organizationService.findById(organisationId);
 
 		if (
-			organization?.manager?.id === currentUser?.id ||
-			currentUser.role.hasPermission(Permission.OrganisationUpdate)
+			!(organization?.manager?.id === currentUser?.id ||
+				currentUser.role.hasPermission(Permission.OrganisationUpdate))
 		) {
-			const organisationMember = await this.organizationService.findMemberByUserId(organisationId, userId, {
-				relations: { user: true },
-			});
-
-			organization.update({ manager: organisationMember.user });
-			return await this.organizationService.save(organization);
+			throw new UnauthorizedException("You don't have permission to perform this action");
 		}
 
-		throw new UnauthorizedException("You don't have permission to perform this action");
+		const organisationMember = await this.organizationService.findMemberByUserId(organisationId, userId, {
+			relations: { user: true },
+		});
+
+		organization.update({ manager: organisationMember.user });
+		return await this.organizationService.save(organization);
 	}
 }
