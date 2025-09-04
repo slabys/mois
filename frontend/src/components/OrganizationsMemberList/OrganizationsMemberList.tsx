@@ -35,11 +35,14 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
 
   const { data: currentOrganisation, refetch: refetchCurrentOrganisation } = useGetOrganisationById(organizationId);
 
-  const { data: allUsersList, refetch: refetchAllUsers } = useGetAllUsers(undefined, {
-    query: {
-      enabled: !!searchValue,
+  const { data: allUsersList, refetch: refetchAllUsers } = useGetAllUsers(
+    { all: true },
+    {
+      query: {
+        enabled: !!searchValue,
+      },
     },
-  });
+  );
 
   const { data: organizationMembers, refetch: refetchOrganisationMembers } = useOrganizationMembers(organizationId);
 
@@ -62,14 +65,14 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
     return (
       allUsersList?.data?.filter((user) => {
         // Check if is not in organisation already, if yes, then it will not be added
+        if (organizationMembers?.data?.find((member) => member.user.id === user.id)) return;
         // Check if firstName, lastName, username or e-mail is included in search field
-        return (
-          !organizationMembers?.data?.find((member) => member.user.id === user.id) &&
-          [user.firstName, user.lastName, user.username, user.email].some((value) => value.includes(searchValue ?? ""))
-        );
+        return [user.firstName, user.lastName, user.username, user.email].some((value) => {
+          return value.toLowerCase().includes(searchValue?.toLowerCase() ?? "");
+        });
       }) ?? []
     );
-  }, [allUsersList, searchValue, organizationMembers]);
+  }, [allUsersList, searchValue, organizationMembers, organizationId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDeleteOrganizationMembers = (member: OrganizationMember) => {
     if (

@@ -56,7 +56,16 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
       </Flex>
       <DynamicSearch<User>
         filterData={allUsers.data}
-        dataColumns={["firstName", "lastName", "username", "email", "birthDate", "nationality", "role.name"]}
+        dataColumns={[
+          "firstName",
+          "lastName",
+          "username",
+          "email",
+          "birthDate",
+          "nationality",
+          "isVerified",
+          "role.name",
+        ]}
         customColumns={
           currentUser.role?.permissions.includes(RolePermissionsItem.userupdateRole)
             ? [

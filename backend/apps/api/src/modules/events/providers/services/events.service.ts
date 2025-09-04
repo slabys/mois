@@ -94,6 +94,7 @@ export class EventsService {
 			order: {
 				since: "DESC",
 			},
+			// TODO - fix apgination if "all" is undefined fetch all
 			take: pagination.all ? undefined : pagination.perPage,
 			skip: pagination.all ? undefined : (pagination.page - 1) * pagination.perPage,
 		});
@@ -108,9 +109,14 @@ export class EventsService {
 		if (event.photo) {
 			await this.photoService.delete(event.photo);
 		}
-		if (event.links) {
+
+		const eventLinks = await this.linksRepository.find({
+			where: { event: { id: event.id } },
+		});
+		if (eventLinks.length > 0) {
 			await this.linksRepository.delete(event.links);
 		}
+
 		await this.eventsRepository.remove(event);
 	}
 

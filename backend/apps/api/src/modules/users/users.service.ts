@@ -17,7 +17,8 @@ export class UsersService {
 	constructor(
 		@InjectRepository(User)
 		private readonly UsersRepository: Repository<User>,
-	) {}
+	) {
+	}
 
 	/**
 	 * Save user entity
@@ -101,6 +102,7 @@ export class UsersService {
 			relations: {
 				...options?.relations,
 			},
+			// TODO - fix apgination if "all" is undefined fetch all
 			take: pagination.all ? undefined : pagination.perPage,
 			skip: pagination.all ? undefined : (pagination.page - 1) * pagination.perPage,
 		});

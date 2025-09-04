@@ -17,7 +17,8 @@ export class EventApplicationsService {
 	constructor(
 		@InjectRepository(EventApplication)
 		private readonly eventApplicationRepository: Repository<EventApplication>,
-	) {}
+	) {
+	}
 
 	/**
 	 * Find event application by ID
@@ -77,6 +78,7 @@ export class EventApplicationsService {
 				},
 				spotType: true,
 			},
+			// TODO - fix apgination if "all" is undefined fetch all
 			take: pagination.all ? undefined : pagination.perPage,
 			skip: pagination.all ? undefined : (pagination.page - 1) * pagination.perPage,
 		});

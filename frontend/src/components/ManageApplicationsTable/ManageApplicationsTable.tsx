@@ -10,6 +10,7 @@ import {
 } from "@/utils/api";
 import { type EventApplicationDetailedWithApplications, type EventSpotSimple } from "@/utils/api.schemas";
 import { downloadFile } from "@/utils/downloadFile";
+import { dateWithTime } from "@/utils/time";
 import CreateSpotModal from "@components/modals/CreateSpotModal/CreateSpotModal";
 import UpdateEventApplicationModal from "@components/modals/UpdateEventApplicationModal/UpdateEventApplicationModal";
 import UpdateSpotModal from "@components/modals/UpdateSpotModal/UpdateSpotModal";
@@ -136,6 +137,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     ? []
     : applicationsList?.map((application, index) => (
         <Table.Tr key={`application-${index}-${application.id}`}>
+          <Table.Td>{dateWithTime(application.createdAt)}</Table.Td>
           <Table.Td>{application.user.firstName + " " + application.user.lastName}</Table.Td>
           <Table.Td>
             {application.organization ? application.organization.name : application.customOrganization?.name}
@@ -257,6 +259,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
           <Table withTableBorder withColumnBorders withRowBorders striped highlightOnHover={true}>
             <Table.Thead>
               <Table.Tr>
+                <Table.Th miw={148}>Created at</Table.Th>
                 <Table.Th miw={148}>First and Last Name</Table.Th>
                 <Table.Th miw={148}>Section</Table.Th>
                 <Table.Th miw={148}>Country</Table.Th>

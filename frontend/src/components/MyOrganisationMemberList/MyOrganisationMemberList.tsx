@@ -38,11 +38,14 @@ const MyOrganisationMemberList = ({ organizationId }: MyOrganisationMemberListPr
   const { data: currentOrganisation, refetch: refetchCurrentOrganisation } = useGetOrganisationById(organizationId);
   const { data: organizationMembers, refetch: refetchOrganisationMembers } = useOrganizationMembers(organizationId);
 
-  const { data: allUsersList, refetch: refetchAllUsers } = useGetAllUsers(undefined, {
-    query: {
-      enabled: !!searchValue,
+  const { data: allUsersList, refetch: refetchAllUsers } = useGetAllUsers(
+    { all: true },
+    {
+      query: {
+        enabled: !!searchValue,
+      },
     },
-  });
+  );
 
   const isUserManager = currentUser?.id === currentOrganisation?.manager?.id;
 

@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  onSuccessNotification,
-  showErrorNotification,
-  showLoadingNotification,
-  updateErrorNotification,
-} from "@/utils/notifications";
+import { onSuccessNotification, showErrorNotification, showLoadingNotification } from "@/utils/notifications";
 import { Notifications } from "@mantine/notifications";
 import { MutationCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
@@ -29,7 +24,6 @@ const Providers = ({ children }: ProvidersProps) => {
             showLoadingNotification();
           },
           onError: (error) => {
-            updateErrorNotification();
             showErrorNotification(error);
           },
           onSuccess: () => {

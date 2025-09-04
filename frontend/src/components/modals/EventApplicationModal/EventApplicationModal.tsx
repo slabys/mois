@@ -71,10 +71,6 @@ const EventApplicationModal = ({
     validate: (values) => {
       const errors: Record<string, string | null> = {};
 
-      if (!values.organization) {
-        errors["organization.type"] = "Organization data is required";
-      }
-
       if (activeStep === 0) {
         if (!values.validUntil) {
           errors["validUntil"] = "ID/Passport valid until date is required";
@@ -82,6 +78,10 @@ const EventApplicationModal = ({
 
         if (!values.idNumber?.trim()) {
           errors["idNumber"] = "ID number is required";
+        }
+
+        if (!values.organization) {
+          errors["organization.type"] = "Organization data is required";
         }
 
         if (values.organization?.type === "custom") {

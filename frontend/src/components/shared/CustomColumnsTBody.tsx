@@ -1,10 +1,36 @@
 "use client";
 
-import DateInput from "@components/primitives/DateInput";
+import DateInput, { DateInputProps } from "@components/primitives/DateInput";
 import Select from "@components/primitives/Select";
 import { CustomColumn } from "@components/shared/DynamicSearch";
-import { Button, Table, TextInput } from "@mantine/core";
+import { Button, ButtonProps, SelectProps, Table, TextInput, TextInputProps } from "@mantine/core";
 import dayjs from "dayjs";
+
+/** Base Column */
+interface BaseColumn {
+  headerLabel?: string;
+  handleOnChange?: (rowId: string, value?: string | null) => void;
+}
+
+/** Input column type */
+export interface TextInputColumn extends BaseColumn, TextInputProps {
+  type: "textInput";
+}
+
+/** Input column type */
+export interface ButtonColumn extends BaseColumn, ButtonProps {
+  type: "button";
+}
+
+/** Select column type */
+export interface SelectColumn extends BaseColumn, SelectProps {
+  type: "select";
+}
+
+/** Date column type */
+export interface DateColumn extends BaseColumn, DateInputProps {
+  type: "date";
+}
 
 /** Props for the Dynamic Table */
 export interface CustomDynamicColumnsProps {

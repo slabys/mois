@@ -2,37 +2,36 @@
 
 import { Event, User } from "@/utils/api.schemas";
 import { dayMonthYear, isDateString } from "@/utils/time";
-import { DateInputProps } from "@components/primitives/DateInput";
-import CustomColumnsTBody from "@components/shared/CustomColumnsTBody";
+import CustomColumnsTBody, {
+  ButtonColumn,
+  DateColumn,
+  SelectColumn,
+  TextInputColumn,
+} from "@components/shared/CustomColumnsTBody";
 import CustomColumnsTHead from "@components/shared/CustomColumnsTHead";
-import { Box, ButtonProps, Flex, ScrollArea, SelectProps, Table, TextInput, TextInputProps } from "@mantine/core";
+import { Box, Flex, ScrollArea, Table, TextInput } from "@mantine/core";
 import { useState } from "react";
 
-/** Base Column */
-interface BaseColumn {
-  headerLabel?: string;
-  handleOnChange?: (rowId: string, value?: string | null) => void;
-}
+/** ---- Dot path utilities ---- */
+type IsRecord<T> = T extends object ? (T extends any[] ? false : T extends Date ? false : true) : false;
 
-/** Input column type */
-export interface TextInputColumn extends BaseColumn, TextInputProps {
-  type: "textInput";
-}
+type DotPrefix<S extends string> = S extends "" ? "" : `.${S}`;
 
-/** Input column type */
-export interface ButtonColumn extends BaseColumn, ButtonProps {
-  type: "button";
-}
-
-/** Select column type */
-export interface SelectColumn extends BaseColumn, SelectProps {
-  type: "select";
-}
-
-/** Date column type */
-export interface DateColumn extends BaseColumn, DateInputProps {
-  type: "date";
-}
+/** Recursively builds "a", "a.b", "a.b.c" keys for object-like fields.
+ *  - Skips functions, arrays (treats them as leaves), and Date.
+ *  - Handles nullable fields by recursing on NonNullable<T>.
+ */
+export type DotPaths<T> = T extends Function
+  ? never
+  : IsRecord<T> extends true
+    ? {
+        [K in keyof T & string]: NonNullable<T[K]> extends infer V
+          ? IsRecord<V> extends true
+            ? `${K}` | `${K}${DotPrefix<DotPaths<NonNullable<V>>>}`
+            : `${K}`
+          : never;
+      }[keyof T & string]
+    : never;
 
 /** Union type for all column types */
 export type CustomColumn = TextInputColumn | ButtonColumn | SelectColumn | DateColumn;
@@ -90,7 +89,7 @@ const formatNestedText = (column: string): string => {
 /** Props for the Dynamic Table */
 export interface DynamicSearchProps<T> {
   filterData: T[];
-  dataColumns: (keyof T | string)[];
+  dataColumns: DotPaths<T>[];
   customColumns: CustomColumn[];
 }
 
@@ -135,7 +134,9 @@ const DynamicSearch = <T extends User | Event>({ filterData, dataColumns, custom
             {filteredData.map((row, rowIndex) => (
               <Table.Tr key={`${row.id}-dynamic-body-row-${rowIndex}`}>
                 {dataColumns.map((column, colIndex) => (
-                  <Table.Td key={`${rowIndex}-dynamic-body-column-${colIndex}`}>{getNestedValue(row, column)}</Table.Td>
+                  <Table.Td key={`${rowIndex}-dynamic-body-column-${colIndex}`}>
+                    {getNestedValue(row, column).toString()}
+                  </Table.Td>
                 ))}
                 <CustomColumnsTBody rowId={row.id.toString()} customColumns={customColumns} />
               </Table.Tr>

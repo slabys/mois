@@ -18,15 +18,7 @@ export const showErrorNotification = (errorResponse: ErrorType | Error) => {
 
   updateErrorNotification();
 
-  if (!message || !error || !statusCode) return null;
-
-  if (typeof message === "string") {
-    notifications.show({
-      title: `${statusCode} - ${error}`,
-      message: message,
-      color: "red",
-    });
-  } else {
+  if (typeof message === "object") {
     message.forEach((err: string) => {
       notifications.show({
         title: `${statusCode} - ${error}`,
@@ -34,7 +26,13 @@ export const showErrorNotification = (errorResponse: ErrorType | Error) => {
         color: "red",
       });
     });
+    return;
   }
+  notifications.show({
+    title: `${statusCode} - ${error}`,
+    message: message ?? error,
+    color: "red",
+  });
 };
 
 export const showLoadingNotification = () => {
