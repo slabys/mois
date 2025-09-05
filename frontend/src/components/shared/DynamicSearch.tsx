@@ -3,10 +3,10 @@
 import { Event, User } from "@/utils/api.schemas";
 import { dayMonthYear, isDateString } from "@/utils/time";
 import CustomColumnsTBody, {
-	ButtonColumn,
-	DateColumn,
-	SelectColumn,
-	TextInputColumn
+  ButtonColumn,
+  DateColumn,
+  SelectColumn,
+  TextInputColumn,
 } from "@components/shared/CustomColumnsTBody";
 import CustomColumnsTHead from "@components/shared/CustomColumnsTHead";
 import { Box, Flex, ScrollArea, Table, TextInput } from "@mantine/core";
