@@ -3,10 +3,10 @@
 import { Event, User } from "@/utils/api.schemas";
 import { dayMonthYear, isDateString } from "@/utils/time";
 import CustomColumnsTBody, {
-  ButtonColumn,
-  DateColumn,
-  SelectColumn,
-  TextInputColumn,
+	ButtonColumn,
+	DateColumn,
+	SelectColumn,
+	TextInputColumn
 } from "@components/shared/CustomColumnsTBody";
 import CustomColumnsTHead from "@components/shared/CustomColumnsTHead";
 import { Box, Flex, ScrollArea, Table, TextInput } from "@mantine/core";
@@ -36,7 +36,7 @@ export type DotPaths<T> = T extends Function
 /** Union type for all column types */
 export type CustomColumn = TextInputColumn | ButtonColumn | SelectColumn | DateColumn;
 
-const getNestedValue = <T extends object>(obj: T, path: keyof T | string): any => {
+const getNestedValue = <T extends object>(obj: T, path: keyof T | string) => {
   if (!obj) return undefined;
 
   let value = path
@@ -134,9 +134,7 @@ const DynamicSearch = <T extends User | Event>({ filterData, dataColumns, custom
             {filteredData.map((row, rowIndex) => (
               <Table.Tr key={`${row.id}-dynamic-body-row-${rowIndex}`}>
                 {dataColumns.map((column, colIndex) => (
-                  <Table.Td key={`${rowIndex}-dynamic-body-column-${colIndex}`}>
-                    {getNestedValue(row, column).toString()}
-                  </Table.Td>
+                  <Table.Td key={`${rowIndex}-dynamic-body-column-${colIndex}`}>{getNestedValue(row, column)}</Table.Td>
                 ))}
                 <CustomColumnsTBody rowId={row.id.toString()} customColumns={customColumns} />
               </Table.Tr>
