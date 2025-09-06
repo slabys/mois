@@ -42,7 +42,9 @@ import { CurrentUser } from "@api/decorators";
 import { CreateEventApplication, UpdateEventApplication } from "@api/models/requests";
 import { EventApplicationSimpleWithApplications } from "@api/models/responses";
 import { EventApplicationSimpleWithApplicationsMapper } from "@api/mappers";
-import { EventApplicationDetailedWithApplications } from "@api/models/responses/event-application-detailed-with-applications.dto";
+import {
+	EventApplicationDetailedWithApplications,
+} from "@api/models/responses/event-application-detailed-with-applications.dto";
 import { PaginationDto, PaginationResponseDto } from "@api/models/responses/pagination-response.dto";
 import * as ExcelJS from "exceljs";
 import { Permission } from "@api/modules/roles";
@@ -60,7 +62,8 @@ export class EventApplicationsController {
 		private readonly eventSpotsService: EventSpotsService,
 		private readonly fileStorageService: FileStorageService,
 		private readonly eventApplicationSimpleWithApplicationsMapper: EventApplicationSimpleWithApplicationsMapper,
-	) {}
+	) {
+	}
 
 	/**
 	 * Get all signed-in user applications
@@ -319,8 +322,7 @@ export class EventApplicationsController {
 		if (
 			!(
 				currentUser.id === application.user.id ||
-				currentUser.role.isAdmin() ||
-				currentUser.role.hasOneOfPermissions([Permission.EventManageApplications])
+				currentUser.role?.hasOneOfPermissions([Permission.EventManageApplications])
 			)
 		) {
 			return;

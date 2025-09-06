@@ -19,8 +19,8 @@ import { AddOrganizationMembers } from "../../models/requests";
 import { User, UsersService } from "../users";
 import { PaginationDto, PaginationResponseDto } from "../../models/responses/pagination-response.dto";
 import { OrganizationMember } from "./entities";
-import { Permission } from "@api/modules/roles";
 import { CurrentUser } from "@api/decorators";
+import { Permission } from "@api/modules/roles";
 
 @ApiTags("Organization members")
 @Controller("organization/:id")
@@ -28,7 +28,8 @@ export class OrganizationMembersController {
 	constructor(
 		private readonly organizationService: OrganizationService,
 		private readonly usersService: UsersService,
-	) {}
+	) {
+	}
 
 	@ApiExtraModels(OrganizationMember, PaginationResponseDto<OrganizationMember>)
 	@ApiOkResponse({
@@ -64,17 +65,20 @@ export class OrganizationMembersController {
 		@Param("id") organizationId: string,
 		@Body() body: AddOrganizationMembers,
 	) {
-		if (!currentUser.role.hasOneOfPermissions([Permission.OrganisationAddUser])) {
-			throw new ForbiddenException("User does not have required permissions");
-		}
 		const organization = await this.organizationService.findById(organizationId);
 		if (!organization) throw new NotFoundException("Organization not found");
 
-		const memberIds = organization.members.map((member) => member.user.id);
-		const unassignedMemberIds = body.userIds.filter((userId) => !memberIds.includes(userId));
-		const newMembers = await this.usersService.findManyById(unassignedMemberIds);
+		if (
+			organization.manager?.id === currentUser.id ||
+			currentUser.role?.hasOneOfPermissions([Permission.OrganisationAddUser])) {
+			const memberIds = organization.members.map((member) => member.user.id);
+			const unassignedMemberIds = body.userIds.filter((userId) => !memberIds.includes(userId));
+			const newMembers = await this.usersService.findManyById(unassignedMemberIds);
 
-		return this.organizationService.addMembers(organization, newMembers);
+			return this.organizationService.addMembers(organization, newMembers);
+		}
+
+		throw new ForbiddenException("User does not have required permissions");
 	}
 
 	/**

@@ -9,7 +9,7 @@ import {
   useOrganizationMembers,
   useTransferManager,
 } from "@/utils/api";
-import { OrganizationMember } from "@/utils/api.schemas";
+import { Organization, OrganizationMember, User } from "@/utils/api.schemas";
 import ApiImage from "@components/ApiImage/ApiImage";
 import {
   ActionIcon,
@@ -79,7 +79,9 @@ const MyOrganisationMemberList = ({ organizationId }: MyOrganisationMemberListPr
 
   const handleDeleteOrganizationMembers = (member: OrganizationMember) => {
     if (
-      `Do you really want to remove ${member.user.firstName} ${member.user.lastName} (${member.user.username}) from ${currentOrganisation?.name}?`
+      !confirm(
+        `Do you really want to remove ${member.user.firstName} ${member.user.lastName} (${member.user.username}) from ${currentOrganisation?.name}?`,
+      )
     ) {
       return;
     }
@@ -106,10 +108,17 @@ const MyOrganisationMemberList = ({ organizationId }: MyOrganisationMemberListPr
     },
   });
 
-  const handleTransferSectionManager = (organisationId: string, userId: string) => {
+  const handleTransferSectionManager = (organisation: Organization, user: User) => {
+    if (
+      !confirm(
+        `Do you really want to transfer organisation manager to ${user.firstName} ${user.lastName} (${user.username})?`,
+      )
+    ) {
+      return;
+    }
     transferOrganisationManagerMutation.mutate({
-      organisationId: organisationId,
-      userId: userId,
+      organisationId: organisation.id,
+      userId: user.id,
     });
   };
 
@@ -243,7 +252,7 @@ const MyOrganisationMemberList = ({ organizationId }: MyOrganisationMemberListPr
                             variant="subtle"
                             size={48}
                             color="yellow"
-                            onClick={() => handleTransferSectionManager(currentOrganisation.id, member.user.id)}
+                            onClick={() => handleTransferSectionManager(currentOrganisation, member.user)}
                             disabled={currentOrganisation?.manager?.id === member.user.id}
                           >
                             <IconCrown width={32} height={32} />

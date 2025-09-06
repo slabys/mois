@@ -49,7 +49,8 @@ export class EventsController {
 		private readonly eventsService: EventsService,
 		private readonly photoService: PhotoService,
 		private readonly eventSimpleWithApplicationsMapper: EventSimpleWithApplicationsMapper,
-	) {}
+	) {
+	}
 
 	/**
 	 * To filter by `since` use:
@@ -133,7 +134,7 @@ export class EventsController {
 	@UseGuards(CookieGuard)
 	@Post()
 	async createEvent(@CurrentUser() currentUser: User, @Body() body: CreateEvent) {
-		if (!currentUser.role.hasOneOfPermissions([Permission.EventCreate, Permission.EventDuplicate])) {
+		if (!currentUser.role?.hasOneOfPermissions([Permission.EventCreate, Permission.EventDuplicate])) {
 			throw new UnauthorizedException("You don't have permission to perform this action");
 		}
 		const newCreatedLinks = await this.eventsService.createLinks(body.links);
@@ -167,7 +168,7 @@ export class EventsController {
 	@UseGuards(CookieGuard)
 	@Post(":id")
 	async duplicateEvent(@Param("id", ParseIntPipe) id: number, @CurrentUser() currentUser: User) {
-		if (!currentUser.role.hasOneOfPermissions([Permission.EventCreate, Permission.EventDuplicate])) {
+		if (!currentUser.role?.hasOneOfPermissions([Permission.EventCreate, Permission.EventDuplicate])) {
 			throw new UnauthorizedException("You don't have permission to perform this action");
 		}
 
@@ -211,7 +212,7 @@ export class EventsController {
 		@Body() body: UpdateEvent,
 	) {
 		if (
-			!currentUser.role.hasOneOfPermissions([Permission.EventCreate, Permission.EventDuplicate, Permission.EventUpdate])
+			!currentUser.role?.hasOneOfPermissions([Permission.EventCreate, Permission.EventDuplicate, Permission.EventUpdate])
 		) {
 			throw new UnauthorizedException("You don't have permission to perform this action");
 		}
@@ -250,7 +251,7 @@ export class EventsController {
 		@CurrentUser() currentUser: User,
 		@Body() body: UpdatePhoto,
 	) {
-		if (!currentUser.role.hasOneOfPermissions([Permission.EventUpdate])) {
+		if (!currentUser.role?.hasOneOfPermissions([Permission.EventUpdate])) {
 			throw new UnauthorizedException("You don't have permission to perform this action");
 		}
 
@@ -273,7 +274,7 @@ export class EventsController {
 	@UseGuards(CookieGuard)
 	@Delete(":eventId")
 	async deleteEvent(@CurrentUser() currentUser: User, @Param("eventId", ParseIntPipe) eventId: number) {
-		if (!currentUser.role.hasOneOfPermissions([Permission.EventUpdate])) {
+		if (!currentUser.role?.hasOneOfPermissions([Permission.EventUpdate])) {
 			throw new UnauthorizedException("You don't have permission to perform this action");
 		}
 
@@ -293,7 +294,7 @@ export class EventsController {
 		@Param("eventId", ParseIntPipe) eventId: number,
 		@Body() body: CreateEvent,
 	) {
-		if (!currentUser.role.hasOneOfPermissions([Permission.EventUpdate])) {
+		if (!currentUser.role?.hasOneOfPermissions([Permission.EventUpdate])) {
 			throw new UnauthorizedException("You don't have permission to perform this action");
 		}
 
@@ -317,7 +318,7 @@ export class EventsController {
 		// @Param("eventId", ParseIntPipe) eventId: number,
 		@Param("linkId", ParseIntPipe) linkId: number,
 	) {
-		if (!currentUser.role.hasOneOfPermissions([Permission.EventUpdate])) {
+		if (!currentUser.role?.hasOneOfPermissions([Permission.EventUpdate])) {
 			throw new UnauthorizedException("You don't have permission to perform this action");
 		}
 

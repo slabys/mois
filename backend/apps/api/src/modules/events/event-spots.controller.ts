@@ -37,7 +37,8 @@ export class EventSpotsController {
 	constructor(
 		private readonly eventSpotsService: EventSpotsService,
 		private readonly eventsService: EventsService,
-	) {}
+	) {
+	}
 
 	/**
 	 * Find event spots for event
@@ -72,7 +73,7 @@ export class EventSpotsController {
 		@Body() body: CreateEventSpot,
 		@CurrentUser() currentUser: User,
 	) {
-		if (!currentUser.role.hasOneOfPermissions([Permission.EventManageApplications])) {
+		if (!currentUser.role?.hasOneOfPermissions([Permission.EventManageApplications])) {
 			throw new UnauthorizedException("You don't have permission to perform this action");
 		}
 
@@ -98,7 +99,7 @@ export class EventSpotsController {
 	@UseGuards(CookieGuard)
 	@Delete("events/spots/:id")
 	async deleteEventSpot(@Param("id", ParseIntPipe) eventSpotId: number, @CurrentUser() currentUser: User) {
-		if (!currentUser.role.hasOneOfPermissions([Permission.EventManageApplications])) {
+		if (!currentUser.role?.hasOneOfPermissions([Permission.EventManageApplications])) {
 			throw new UnauthorizedException("You don't have permission to perform this action");
 		}
 
@@ -122,7 +123,7 @@ export class EventSpotsController {
 		@Param("id", ParseIntPipe) eventSpotId: number,
 		@Body() body: UpdateEventSpot,
 	) {
-		if (!currentUser.role.hasOneOfPermissions([Permission.EventManageApplications])) {
+		if (!currentUser.role?.hasOneOfPermissions([Permission.EventManageApplications])) {
 			throw new UnauthorizedException("You don't have permission to perform this action");
 		}
 

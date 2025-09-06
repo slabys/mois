@@ -44,7 +44,7 @@ export class OrganizationsController {
 	@UseGuards(CookieGuard)
 	@Post()
 	createOrganization(@CurrentUser() currentUser: User, @Body() body: CreateOrganization) {
-		if (!currentUser.role.hasOneOfPermissions([Permission.OrganisationCreate])) {
+		if (!currentUser.role?.hasOneOfPermissions([Permission.OrganisationCreate])) {
 			throw new UnauthorizedException("You don't have permission to perform this action");
 		}
 
@@ -73,7 +73,7 @@ export class OrganizationsController {
 		@Param("id", ParseUUIDPipe) id: string,
 		@Body() body: UpdateOrganization,
 	) {
-		if (!currentUser.role.hasOneOfPermissions([Permission.OrganisationUpdate])) {
+		if (!currentUser.role?.hasOneOfPermissions([Permission.OrganisationUpdate])) {
 			throw new UnauthorizedException("You don't have permission to perform this action");
 		}
 
@@ -103,7 +103,7 @@ export class OrganizationsController {
 
 		if (
 			!(organization?.manager?.id === currentUser?.id ||
-				currentUser.role.hasPermission(Permission.OrganisationUpdate))
+				currentUser.role?.hasPermission(Permission.OrganisationUpdate))
 		) {
 			throw new UnauthorizedException("You don't have permission to perform this action");
 		}
