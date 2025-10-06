@@ -44,6 +44,7 @@ const ApplicationsTable = ({ eventId }: ApplicationsTableProps) => {
         </Table.Tr>
       ));
 
+  if (!currentUser || !userOrganisationMemberships) return;
   if (!isManager(currentUser, userOrganisationMemberships)) redirect(routes.DASHBOARD);
 
   return (

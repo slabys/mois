@@ -10,7 +10,7 @@ import {
   useGetEventApplications,
   useUserOrganizationMemberships,
 } from "@/utils/api";
-import { hasEveryPermissions, hasSomePermissions } from "@/utils/checkPermissions";
+import { hasEveryPermissions, hasSomePermissions, isManager } from "@/utils/checkPermissions";
 import routes from "@/utils/routes";
 import { dateWithTime, dayMonthYear } from "@/utils/time";
 import ApiImage from "@components/ApiImage/ApiImage";
@@ -71,7 +71,6 @@ const EventDetail = ({ id }: EventDetailProps) => {
       enabled: !!currentUser?.id,
     },
   });
-  const isUserManager = userOrganisationMemberships?.some((f) => f.organization.manager?.id === currentUser?.id);
 
   const deleteEventApplication = useDeleteEventApplication({
     mutation: {
@@ -160,7 +159,7 @@ const EventDetail = ({ id }: EventDetailProps) => {
                 ))}
               </SimpleGrid>
             )}
-            {isUserManager && (
+            {isManager(currentUser, userOrganisationMemberships) && (
               <>
                 <Divider my={8} />
 
