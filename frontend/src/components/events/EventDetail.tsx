@@ -8,6 +8,7 @@ import {
   useGetCurrentUser,
   useGetEvent,
   useGetEventApplications,
+  useUserOrganizationMemberships,
 } from "@/utils/api";
 import { hasEveryPermissions, hasSomePermissions } from "@/utils/checkPermissions";
 import routes from "@/utils/routes";
@@ -65,6 +66,12 @@ const EventDetail = ({ id }: EventDetailProps) => {
   const { data: eventApplications, refetch: refetchEventApplications } = useGetEventApplications(id);
   const { data: eventDetail, refetch: refetchEvent } = useGetEvent(id);
   const { data: currentUser, refetch: refetchCurrentUser } = useGetCurrentUser();
+  const { data: userOrganisationMemberships } = useUserOrganizationMemberships(currentUser?.id ?? "", {
+    query: {
+      enabled: !!currentUser?.id,
+    },
+  });
+  const isUserManager = userOrganisationMemberships?.some((f) => f.organization.manager?.id === currentUser?.id);
 
   const deleteEventApplication = useDeleteEventApplication({
     mutation: {
@@ -153,6 +160,15 @@ const EventDetail = ({ id }: EventDetailProps) => {
                 ))}
               </SimpleGrid>
             )}
+            {isUserManager && (
+              <>
+                <Divider my={8} />
+
+                <Button component={Link} href={routes.EVENT_APPLICATIONS({ id })} color="darkBlue">
+                  Event Applications
+                </Button>
+              </>
+            )}
 
             <Divider my={8} />
 
@@ -188,7 +204,6 @@ const EventDetail = ({ id }: EventDetailProps) => {
                 )}
               </Flex>
             </SimpleGrid>
-
             {hasSomePermissions(currentUser.role, ["event.update", "event.manageApplications"]) && (
               <Button
                 mb={8}
@@ -219,7 +234,11 @@ const EventDetail = ({ id }: EventDetailProps) => {
                   </Button>
                 )}
                 {hasEveryPermissions(currentUser.role, ["event.manageApplications"]) && (
-                  <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconUsersGroup />}>
+                  <Button
+                    component={Link}
+                    href={routes.EVENT_APPLICATIONS_MANAGE({ id: id })}
+                    leftSection={<IconUsersGroup />}
+                  >
                     Manage Applications
                   </Button>
                 )}
@@ -231,13 +250,18 @@ const EventDetail = ({ id }: EventDetailProps) => {
                   <SimpleGrid cols={{ base: 1, xs: 2, sm: 3, md: 1, xl: 1 }}>
                     <Button
                       component={Link}
-                      href={routes.EVENT_MANAGE({ id: id })}
+                      href={routes.EVENT_APPLICATIONS_MANAGE({ id: id })}
                       leftSection={<IconInvoice />}
                       disabled
                     >
                       Show Invoice
                     </Button>
-                    <Button component={Link} href={routes.EVENT_MANAGE({ id: id })} leftSection={<IconCash />} disabled>
+                    <Button
+                      component={Link}
+                      href={routes.EVENT_APPLICATIONS_MANAGE({ id: id })}
+                      leftSection={<IconCash />}
+                      disabled
+                    >
                       Upload Payment
                     </Button>
                   </SimpleGrid>

@@ -23,7 +23,8 @@ export const routes = {
 
   // Events
   EVENT_DETAIL: (props: { id: number }) => `/event/${props.id}`,
-  EVENT_MANAGE: (props: { id: number }) => `/event/manage/${props.id}`,
+  EVENT_APPLICATIONS: (props: { id: number }) => `/event/applications/${props.id}`,
+  EVENT_APPLICATIONS_MANAGE: (props: { id: number }) => `/event/manage/${props.id}`,
 
   // Organization
   ORGANISATION_MEMBERS: (props: { id: string }) => `/organisation-members/${props.id}`,
