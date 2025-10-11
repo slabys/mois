@@ -61,6 +61,7 @@ services:
       - MAIL_HOST=${MAIL_HOST}
       - MAIL_USER=${MAIL_USER}
       - MAIL_PASS=${MAIL_PASS}
+      - TZ=Europe/Prague
     env_file:
       - .env
     ports:
@@ -91,6 +92,7 @@ services:
       - JWT_SECRET=${JWT_SECRET:-secret}
       - NEXT_PUBLIC_VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY:-vapid_public}
       - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY:-vapid_private}
+      - TZ=Europe/Prague
     env_file:
       - .env
     ports:
