@@ -101,8 +101,15 @@ const EventApplicationModal = ({
       }
 
       if (activeStep === 1) {
-        if (!values.invoiceAddress) {
-          errors["invoiceAddress"] = "Invoice address is required";
+        if (values.invoiceMethod === "different") {
+          if (!values.invoicedTo) {
+            errors["invoicedTo"] = "Invoiced to is required";
+          }
+          if (!values.invoiceAddress?.street) errors["invoiceAddress.street"] = "Invoiced to is required";
+          if (!values.invoiceAddress?.houseNumber) errors["invoiceAddress.houseNumber"] = "House number to is required";
+          if (!values.invoiceAddress?.zip) errors["invoiceAddress.zip"] = "ZIP is required";
+          if (!values.invoiceAddress?.city) errors["invoiceAddress.city"] = "City to is required";
+          if (!values.invoiceAddress?.country) errors["invoiceAddress.country"] = "Country to is required";
         }
       }
 
@@ -124,6 +131,8 @@ const EventApplicationModal = ({
       };
     },
   });
+
+  console.log(form.values);
 
   const { activeStep, onClickStep, nextStep, prevStep } = useStepper(form);
 
@@ -296,7 +305,13 @@ const EventApplicationModal = ({
                       break;
                     }
                     case "different": {
-                      form.setFieldValue("invoiceAddress", undefined);
+                      form.setFieldValue("invoiceAddress", {
+                        street: "",
+                        houseNumber: "",
+                        zip: "",
+                        city: "",
+                        country: "",
+                      });
                       form.setFieldValue("invoicedTo", null);
                     }
                   }
