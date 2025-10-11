@@ -2,6 +2,11 @@
 # Base Stage
 # ============================
 FROM node:22-alpine AS base
+RUN apk add --no-cache tzdata
+ENV TZ=$TZ
+RUN apk add --no-cache tzdata \
+&& ln -snf /usr/share/zoneinfo/$TZ /etc/localtime \
+&& echo $TZ > /etc/timezone
 
 FROM base AS deps
 # ============================
