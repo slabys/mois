@@ -104,6 +104,10 @@ const EventDetail = ({ id }: EventDetailProps) => {
   if (!eventApplications || !eventDetail || !currentUser) {
     return null;
   }
+
+  console.log(eventDetail);
+  console.log(dayMonthYear(eventDetail.until));
+
   return eventDetail ? (
     <>
       <Grid>

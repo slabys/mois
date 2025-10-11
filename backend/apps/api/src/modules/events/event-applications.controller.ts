@@ -50,6 +50,7 @@ import * as ExcelJS from "exceljs";
 import { Permission } from "@api/modules/roles";
 import { UpdateApplicationSlotDto } from "@api/modules/events/dto/update-application-slot.dto";
 import { Address } from "@api/modules/addresses/entities";
+import { dayMonthYear } from "utilities/time";
 
 @ApiTags("Event applications")
 @Controller("events")
@@ -356,7 +357,7 @@ export class EventApplicationsController {
 			{ header: "Phone Number", key: "phone" },
 			{ header: "Gender", key: "gender" },
 			{ header: "Pronouns", key: "pronouns" },
-			{ header: "Birthdate", key: "birthdate" },
+			{ header: "Birthdate (dd.mm.yyyy)", key: "birthdate" },
 
 			{ header: "Nationality", key: "nationality" },
 			{ header: "ID / Passport Number", key: "idNumber" },
@@ -383,7 +384,7 @@ export class EventApplicationsController {
 				phone: `${user?.phonePrefix ?? ""}${user?.phoneNumber ?? ""}`,
 				gender: user?.gender,
 				pronouns: user?.pronouns,
-				birthdate: user?.birthDate,
+				birthdate: dayMonthYear(user?.birthDate),
 				nationality: user?.nationality,
 				idNumber: application?.idNumber,
 				idValidUntil: application?.validUntil,
