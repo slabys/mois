@@ -50,8 +50,6 @@ export class AuthController {
 		const tokenAge = 7 * 24 * 60 * 60 * 1_000; // 7 days in milliseconds
 		const token = await this.authService.createToken(user);
 
-		console.log(response);
-
 		response
 			.cookie("AuthCookie", token, {
 				domain: isProduction ? process.env.WEB_DOMAIN.split("https://")[1] : "localhost",
