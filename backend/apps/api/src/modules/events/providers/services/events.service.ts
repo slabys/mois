@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { FindOptionsRelations, FindOptionsSelect, type Repository } from "typeorm";
+import { FindOptionsRelations, FindOptionsSelect, LessThanOrEqual, MoreThanOrEqual, type Repository } from "typeorm";
 
 import { Event, EventLink } from "../../entities";
 
@@ -78,6 +78,31 @@ export class EventsService {
 
 	save(event: Partial<Event>) {
 		return this.eventsRepository.save(new Event(event));
+	}
+
+	async findOngoing(
+		options?: EventFindOptions,
+		pagination?: PaginationOptions,
+	) {
+		const now = new Date();
+
+		const [events, totalCount] = await this.eventsRepository.findAndCount({
+			where: {
+				since: LessThanOrEqual(now),
+				until: MoreThanOrEqual(now),
+				visible: options?.visible,
+			},
+			relations: {
+				...options?.relations,
+				createdByUser: true,
+				links: true,
+			},
+			order: { since: "ASC" },
+			take: pagination?.all ? undefined : pagination?.perPage,
+			skip: pagination?.all ? undefined : (pagination?.page - 1) * pagination?.perPage,
+		});
+
+		return formatPaginatedResponse<Event>(events, totalCount, pagination);
 	}
 
 	async findByFilter(filter?: EventFilter, options?: EventFindOptions, pagination?: PaginationOptions) {

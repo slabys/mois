@@ -48,6 +48,8 @@ import type {
   GetEventsParams,
   GetManagementEvents200,
   GetManagementEventsParams,
+  GetOngoingEvents200,
+  GetOngoingEventsParams,
   GetRoleAllPermissions200Item,
   GetUserApplications200,
   GetUserApplicationsParams,
@@ -2876,6 +2878,113 @@ export function useGenerateSheetEventApplication<
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
   const queryOptions = getGenerateSheetEventApplicationQueryOptions(eventId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * Ongoing events:
+
+Returns events where `since <= at <= until`.
+
+Query:
+- `at`: timestamp (ms since epoch). If omitted, now is used.
+ */
+export const getOngoingEvents = (
+  params?: GetOngoingEventsParams,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<GetOngoingEvents200>({ url: `/events/ongoing`, method: "GET", params, signal }, options);
+};
+
+export const getGetOngoingEventsQueryKey = (params?: GetOngoingEventsParams) => {
+  return [`/events/ongoing`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetOngoingEventsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getOngoingEvents>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: GetOngoingEventsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOngoingEvents>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetOngoingEventsQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getOngoingEvents>>> = ({ signal }) =>
+    getOngoingEvents(params, requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getOngoingEvents>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetOngoingEventsQueryResult = NonNullable<Awaited<ReturnType<typeof getOngoingEvents>>>;
+export type GetOngoingEventsQueryError = ErrorType<unknown>;
+
+export function useGetOngoingEvents<TData = Awaited<ReturnType<typeof getOngoingEvents>>, TError = ErrorType<unknown>>(
+  params: undefined | GetOngoingEventsParams,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOngoingEvents>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOngoingEvents>>,
+          TError,
+          Awaited<ReturnType<typeof getOngoingEvents>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetOngoingEvents<TData = Awaited<ReturnType<typeof getOngoingEvents>>, TError = ErrorType<unknown>>(
+  params?: GetOngoingEventsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOngoingEvents>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOngoingEvents>>,
+          TError,
+          Awaited<ReturnType<typeof getOngoingEvents>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetOngoingEvents<TData = Awaited<ReturnType<typeof getOngoingEvents>>, TError = ErrorType<unknown>>(
+  params?: GetOngoingEventsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOngoingEvents>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useGetOngoingEvents<TData = Awaited<ReturnType<typeof getOngoingEvents>>, TError = ErrorType<unknown>>(
+  params?: GetOngoingEventsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getOngoingEvents>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetOngoingEventsQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;

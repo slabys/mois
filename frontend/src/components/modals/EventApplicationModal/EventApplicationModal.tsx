@@ -132,8 +132,6 @@ const EventApplicationModal = ({
     },
   });
 
-  console.log(form.values);
-
   const { activeStep, onClickStep, nextStep, prevStep } = useStepper(form);
 
   const isTouchedDirty = form.isTouched() && form.isDirty();

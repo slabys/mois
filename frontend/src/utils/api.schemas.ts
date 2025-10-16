@@ -958,6 +958,26 @@ export type GetUserApplications200 = {
 
 export type GenerateSheetEventApplication200 = { [key: string]: unknown };
 
+export type GetOngoingEventsParams = {
+  /**
+   * Current page number
+   */
+  page?: number;
+  /**
+   * Number of results per page
+   */
+  perPage?: number;
+  /**
+   * If true, fetches all data (ignores pagination)
+   */
+  all?: boolean;
+};
+
+export type GetOngoingEvents200 = {
+  data?: Event[];
+  pagination?: PaginationDto;
+};
+
 export type GetEventsParams = {
   sinceSince?: number;
   toSince?: number;

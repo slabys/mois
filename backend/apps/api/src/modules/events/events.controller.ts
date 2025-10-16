@@ -53,6 +53,40 @@ export class EventsController {
 	}
 
 	/**
+	 * Ongoing events:
+	 *
+	 * Returns events where `since <= at <= until`.
+	 *
+	 * Query:
+	 * - `at`: timestamp (ms since epoch). If omitted, now is used.
+	 *
+	 */
+	@ApiExtraModels(Event, PaginationResponseDto<Event>)
+	@ApiOkResponse({
+		description: "Ongoing Events",
+		content: {
+			"application/json": {
+				schema: {
+					type: "object",
+					properties: {
+						data: { type: "array", items: { $ref: getSchemaPath(Event) } },
+						pagination: { $ref: getSchemaPath(PaginationDto) },
+					},
+				},
+			},
+		},
+	})
+	@Get("ongoing")
+	async getOngoingEvents(
+		@Pagination() pagination?: PaginationOptions,
+	) {
+		return this.eventsService.findOngoing(
+			{ visible: true, relations: { applications: true } },
+			pagination,
+		);
+	}
+
+	/**
 	 * To filter by `since` use:
 	 *
 	 * `sinceSince`: Events with `since` more than entered value

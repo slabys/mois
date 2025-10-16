@@ -105,9 +105,6 @@ const EventDetail = ({ id }: EventDetailProps) => {
     return null;
   }
 
-  console.log(eventDetail);
-  console.log(dayMonthYear(eventDetail.until));
-
   return eventDetail ? (
     <>
       <Grid>
