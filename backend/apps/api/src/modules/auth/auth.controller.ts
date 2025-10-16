@@ -33,7 +33,8 @@ export class AuthController {
 		private readonly configService: ConfigService,
 		private readonly authService: AuthService,
 		private readonly usersService: UsersService,
-	) {}
+	) {
+	}
 
 	/**
 	 * Try to login user with given email and password
@@ -48,6 +49,8 @@ export class AuthController {
 	) {
 		const tokenAge = 7 * 24 * 60 * 60 * 1_000; // 7 days in milliseconds
 		const token = await this.authService.createToken(user);
+
+		console.log(response);
 
 		response
 			.cookie("AuthCookie", token, {

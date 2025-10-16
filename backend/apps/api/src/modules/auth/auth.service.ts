@@ -11,7 +11,8 @@ export class AuthService {
 		private readonly usersService: UsersService,
 		private readonly jwtService: JwtService,
 		private readonly configService: ConfigService,
-	) {}
+	) {
+	}
 
 	/**
 	 * Validate user email and password in database
@@ -22,9 +23,6 @@ export class AuthService {
 	async validateUser(emailOrUsername: string, password: string): Promise<User | null> {
 		const user = await this.usersService.findByUsernameOrEmailWithPassword(emailOrUsername);
 		if (!user) return null;
-		if (!user.isVerified) {
-			return null;
-		}
 
 		const result = await verifyPassword(password, user.password);
 		return result ? user : null;

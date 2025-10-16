@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 import { IStrategyOptions, Strategy } from "passport-local";
 
@@ -16,6 +16,8 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
 	async validate(email: string, password: string): Promise<User> {
 		const user = await this.authService.validateUser(email, password);
+
+		if (!user.isVerified) throw new NotFoundException("Your account e-mail address was not verified.");
 		if (!user) throw new UnauthorizedException("Invalid password or username or email does not exist");
 		// Do not expose password hash by mistake
 

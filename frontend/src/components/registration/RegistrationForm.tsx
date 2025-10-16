@@ -25,7 +25,7 @@ const RegistrationForm = () => {
       onSuccess: () => {
         notifications.update({
           title: "Registration",
-          message: "You have registered successfully!",
+          message: "You have registered successfully! Verify your e-mail to log in.",
           color: "green",
           loading: false,
           autoClose: true,

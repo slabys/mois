@@ -10,6 +10,7 @@ import CustomColumnsTBody, {
 } from "@components/shared/CustomColumnsTBody";
 import CustomColumnsTHead from "@components/shared/CustomColumnsTHead";
 import { Box, Flex, ScrollArea, Table, TextInput } from "@mantine/core";
+import { IconCheck, IconX } from "@tabler/icons-react";
 import { useState } from "react";
 
 /** ---- Dot path utilities ---- */
@@ -54,6 +55,7 @@ const getNestedValue = <T extends object>(obj: T, path: keyof T | string) => {
   if (path in obj) {
     path = path as keyof T;
     if (isDateString(obj[path])) return dayMonthYear(value);
+    if (typeof obj[path] === "boolean") return value ? <IconCheck color="green" /> : <IconX color="red" />;
     if (typeof obj[path] === "object") {
       if (!obj[path]) return;
       return Object.entries(obj[path] as object).map(([key, value]) => {
