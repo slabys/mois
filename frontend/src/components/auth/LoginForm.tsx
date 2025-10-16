@@ -47,7 +47,11 @@ const LoginForm = () => {
             Log In
           </Button>
           {/* LOGIN ERROR */}
-          {loginUserMutation.isError && <Text c="red">Something went wrong! Please try again.</Text>}
+          {loginUserMutation.isError && (
+            <Text c="red">
+              {loginUserMutation.error.response?.data.message ?? "Something went wrong! Please try again."}
+            </Text>
+          )}
         </Flex>
       </Form>
     </Box>
