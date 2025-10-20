@@ -373,6 +373,12 @@ export class EventApplicationsController {
 		applicationList.map((application) => {
 			const { organization, user, spotType } = application;
 
+			const invoicedTo = application?.invoiceMethod === "different"
+				? `${application?.invoicedTo}`
+				: application?.invoiceMethod === "organisation"
+					? `${organization.name}`
+					: `${user.firstName} ${user.lastName}`;
+
 			worksheet.addRow({
 				organisation: organization !== null ? application.organization.name : application.customOrganization?.name,
 				spotName: spotType?.name,
@@ -394,16 +400,11 @@ ${user?.personalAddress?.zip} ${user?.personalAddress?.city}
 ${user?.personalAddress?.country}`
 					: "",
 				invoiceMethod: application?.invoiceMethod,
-				invoiceAddress: application?.invoiceAddress
-					? application?.invoiceMethod === "different"
-						? `${application?.invoicedTo}
+				invoiceAddress: application?.invoiceAddress &&
+					`${invoicedTo}
 ${application?.invoiceAddress?.street} ${application?.invoiceAddress?.houseNumber}
 ${application?.invoiceAddress?.zip} ${application?.invoiceAddress?.city}
-${application?.invoiceAddress?.country}`
-						: `${application?.invoiceAddress?.street} ${application?.invoiceAddress?.houseNumber}
-${application?.invoiceAddress?.zip} ${application?.invoiceAddress?.city}
-${application?.invoiceAddress?.country}`
-					: "",
+${application?.invoiceAddress?.country}`,
 				foodRestrictions: application?.foodRestrictionAllergies,
 				healthLimitations: application?.healthLimitations,
 			});
