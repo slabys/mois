@@ -395,7 +395,12 @@ ${user?.personalAddress?.country}`
 					: "",
 				invoiceMethod: application?.invoiceMethod,
 				invoiceAddress: application?.invoiceAddress
-					? `${application?.invoiceAddress?.street} ${application?.invoiceAddress?.houseNumber}
+					? application?.invoiceMethod === "different"
+						? `${application?.invoicedTo}
+${application?.invoiceAddress?.street} ${application?.invoiceAddress?.houseNumber}
+${application?.invoiceAddress?.zip} ${application?.invoiceAddress?.city}
+${application?.invoiceAddress?.country}`
+						: `${application?.invoiceAddress?.street} ${application?.invoiceAddress?.houseNumber}
 ${application?.invoiceAddress?.zip} ${application?.invoiceAddress?.city}
 ${application?.invoiceAddress?.country}`
 					: "",
