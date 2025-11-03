@@ -449,7 +449,10 @@ const EventApplicationModal = ({
                 label={
                   <Text>
                     I agree with{" "}
-                    <Link href="https://drive.google.com/file/d/1t0Arn_1QEqdmXOEXP3xQQrwvGfC73BbN/view?usp=sharing" target="_blank">
+                    <Link
+                      href="https://drive.google.com/file/d/1t0Arn_1QEqdmXOEXP3xQQrwvGfC73BbN/view?usp=sharing"
+                      target="_blank"
+                    >
                       Code of Conduct
                     </Link>
                   </Text>
