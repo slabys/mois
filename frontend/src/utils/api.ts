@@ -64,6 +64,8 @@ import type {
   ResetPasswordDto,
   Role,
   SendEmailDTO,
+  Settings,
+  SettingsDTO,
   TransferManager201,
   UpdateApplicationSlotDto,
   UpdateEvent,
@@ -4347,6 +4349,143 @@ export const useSendMail = <TError = ErrorType<Error>, TContext = unknown>(
   queryClient?: QueryClient,
 ): UseMutationResult<Awaited<ReturnType<typeof sendMail>>, TError, { data: SendEmailDTO }, TContext> => {
   const mutationOptions = getSendMailMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+/**
+ * Get all the global setting of the app
+ */
+export const getSettings = (options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
+  return customInstance<Settings>({ url: `/settings`, method: "GET", signal }, options);
+};
+
+export const getGetSettingsQueryKey = () => {
+  return [`/settings`] as const;
+};
+
+export const getGetSettingsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSettings>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSettings>>, TError, TData>>;
+  request?: SecondParameter<typeof customInstance>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetSettingsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSettings>>> = ({ signal }) =>
+    getSettings(requestOptions, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getSettings>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetSettingsQueryResult = NonNullable<Awaited<ReturnType<typeof getSettings>>>;
+export type GetSettingsQueryError = ErrorType<unknown>;
+
+export function useGetSettings<TData = Awaited<ReturnType<typeof getSettings>>, TError = ErrorType<unknown>>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSettings>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSettings>>,
+          TError,
+          Awaited<ReturnType<typeof getSettings>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetSettings<TData = Awaited<ReturnType<typeof getSettings>>, TError = ErrorType<unknown>>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSettings>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSettings>>,
+          TError,
+          Awaited<ReturnType<typeof getSettings>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetSettings<TData = Awaited<ReturnType<typeof getSettings>>, TError = ErrorType<unknown>>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSettings>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useGetSettings<TData = Awaited<ReturnType<typeof getSettings>>, TError = ErrorType<unknown>>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSettings>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetSettingsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * Update the global setting of the app
+ */
+export const updateSettings = (settingsDTO: SettingsDTO, options?: SecondParameter<typeof customInstance>) => {
+  return customInstance<Settings>(
+    { url: `/settings`, method: "PUT", headers: { "Content-Type": "application/json" }, data: settingsDTO },
+    options,
+  );
+};
+
+export const getUpdateSettingsMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof updateSettings>>, TError, { data: SettingsDTO }, TContext>;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<Awaited<ReturnType<typeof updateSettings>>, TError, { data: SettingsDTO }, TContext> => {
+  const mutationKey = ["updateSettings"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSettings>>, { data: SettingsDTO }> = (props) => {
+    const { data } = props ?? {};
+
+    return updateSettings(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateSettingsMutationResult = NonNullable<Awaited<ReturnType<typeof updateSettings>>>;
+export type UpdateSettingsMutationBody = SettingsDTO;
+export type UpdateSettingsMutationError = ErrorType<unknown>;
+
+export const useUpdateSettings = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof updateSettings>>, TError, { data: SettingsDTO }, TContext>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<Awaited<ReturnType<typeof updateSettings>>, TError, { data: SettingsDTO }, TContext> => {
+  const mutationOptions = getUpdateSettingsMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

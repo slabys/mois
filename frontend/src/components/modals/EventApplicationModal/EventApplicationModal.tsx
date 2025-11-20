@@ -1,5 +1,11 @@
 import { useCreateUserApplication, useUserOrganizationMemberships } from "@/utils/api";
-import { CreateEventApplication, CreateEventApplicationInvoiceMethod, Organization, User } from "@/utils/api.schemas";
+import {
+  CreateEventApplication,
+  CreateEventApplicationInvoiceMethod,
+  EventDetail,
+  Organization,
+  User,
+} from "@/utils/api.schemas";
 import useStepper from "@/utils/useStepper";
 import AddressCodeBlock from "@components/AddressCodeBlock/AddressCodeBlock";
 import Modal from "@components/Modal/Modal";
@@ -31,8 +37,8 @@ import Link from "next/link";
 import React, { useState } from "react";
 
 interface JoinEventModalProps {
-  eventId: number;
   currentUser: User;
+  eventDetail: EventDetail;
   isOpened: boolean;
   closeModal: () => void;
   handleSuccess?: () => void;
@@ -42,7 +48,7 @@ type InvoiceMethodsType = "personal" | "organisation" | "different";
 
 const EventApplicationModal = ({
   currentUser,
-  eventId,
+  eventDetail,
   isOpened,
   closeModal,
   handleSuccess = () => {},
@@ -156,7 +162,7 @@ const EventApplicationModal = ({
     form.validate();
     if (form.isValid()) {
       eventApplicationMutation.mutate({
-        eventId: eventId,
+        eventId: eventDetail.id,
         data: submitValues as CreateEventApplication,
       });
     }
@@ -421,10 +427,7 @@ const EventApplicationModal = ({
                 label={
                   <Text>
                     I agree with{" "}
-                    <Link
-                      href="https://drive.google.com/file/d/1F3_rMeT2Gv6cFux4EE73iW7pN1k1cIYf/view?pli=1"
-                      target="_blank"
-                    >
+                    <Link href={eventDetail.termsAndConditionsLink} target="_blank">
                       Terms and conditions
                     </Link>
                   </Text>
@@ -435,10 +438,7 @@ const EventApplicationModal = ({
                 label={
                   <Text>
                     I agree with{" "}
-                    <Link
-                      href="https://drive.google.com/file/d/1dWT-2mBct7T7SUhgRpAtctQUtB1Kj5ce/view?usp=sharing"
-                      target="_blank"
-                    >
+                    <Link href={eventDetail.photoPolicyLink} target="_blank">
                       Photo Consent
                     </Link>
                   </Text>
@@ -449,10 +449,7 @@ const EventApplicationModal = ({
                 label={
                   <Text>
                     I agree with{" "}
-                    <Link
-                      href="https://drive.google.com/file/d/1t0Arn_1QEqdmXOEXP3xQQrwvGfC73BbN/view?usp=sharing"
-                      target="_blank"
-                    >
+                    <Link href={eventDetail.codeOfConductLink} target="_blank">
                       Code of Conduct
                     </Link>
                   </Text>

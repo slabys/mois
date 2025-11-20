@@ -19,4 +19,8 @@ export const manageOrganisationLink: MainLink = {
   ],
 };
 
-export const managePeopleLink = { link: routes.MANAGE_PEOPLE, label: "Manage People", permissions: [] };
+// Empty permission --> only admin
+export const managePeopleLink: MainLink = { link: routes.MANAGE_PEOPLE, label: "Manage People", permissions: [] };
+
+// Empty permission --> only admin
+export const settingsLink: MainLink = { link: routes.SETTINGS, label: "Settings", permissions: [] };

@@ -9,10 +9,10 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   return (
-    <Box mih="100%" h="100%">
+    <Box mih="100vh" h="100%">
       <LayoutHeader />
       {/* Height calculated from full height (100% - Header - Footer) */}
-      <Box mih="calc(100% - (84px + 24px) - (50px + 32px))">{children}</Box>
+      <Box mih="calc(100vh - (84px + 50px + 56px))">{children}</Box>
       <LayoutFooter />
     </Box>
   );

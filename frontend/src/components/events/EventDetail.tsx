@@ -286,7 +286,7 @@ const EventDetail = ({ id }: EventDetailProps) => {
       {!!currentUser ? (
         <EventApplicationModal
           currentUser={currentUser}
-          eventId={eventDetail.id}
+          eventDetail={eventDetail}
           handleSuccess={handleRefetchDetail}
           isOpened={isModalJoinEventOpen}
           closeModal={() => {

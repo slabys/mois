@@ -28,6 +28,8 @@ import { EventSpotsController } from "@api/modules/events/event-spots.controller
 import { RolesController } from "@api/modules/roles/roles.controller";
 import { HealthController } from "@api/controllers/health.controller";
 import { EventsManagementController } from "@api/modules/events/events-management.controller";
+import { SettingsModule } from "@api/modules/settings/settings.module";
+import { SettingsController } from "@api/modules/settings/settings.controller";
 
 @Module({
 	imports: [
@@ -53,6 +55,7 @@ import { EventsManagementController } from "@api/modules/events/events-managemen
 		RolesModule,
 		ConfigModule.forRoot(),
 		MailModule,
+		SettingsModule,
 	],
 	controllers: [
 		InitialiseController,
@@ -67,7 +70,9 @@ import { EventsManagementController } from "@api/modules/events/events-managemen
 		RolesController,
 		EventsManagementController,
 		HealthController,
+		SettingsController,
 	],
 	providers: [EventSimpleWithApplicationsMapper, EventApplicationSimpleWithApplicationsMapper],
 })
-export class AppModule {}
+export class AppModule {
+}

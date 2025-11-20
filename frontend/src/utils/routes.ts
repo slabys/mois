@@ -1,6 +1,8 @@
 export const routes = {
   // Initial setup
   INIT: "/initialise",
+  // App settings
+  SETTINGS: "/settings",
   // --- Unauthorized ---
   // Any unauthorized routes need to be added to CustomHooksLoader and middleware.ts
   LOGIN: "/login",
@@ -28,10 +30,6 @@ export const routes = {
 
   // Organization
   ORGANISATION_MEMBERS: (props: { id: string }) => `/organisation-members/${props.id}`,
-
-  // Footer
-  PRIVACY_POLICY: "/privacy-policy",
-  TERMS_AND_CONDITIONS: "/terms-and-conditions",
 };
 
 export default routes;

@@ -886,6 +886,21 @@ export interface Error {
   [key: string]: unknown;
 }
 
+export interface Settings {
+  id: string;
+  termsAndConditions?: string;
+  privacyPolicy?: string;
+  footerDescription?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SettingsDTO {
+  termsAndConditions?: string;
+  privacyPolicy?: string;
+  footerDescription?: string;
+}
+
 export type ForgotPasswordParams = {
   email: string;
 };

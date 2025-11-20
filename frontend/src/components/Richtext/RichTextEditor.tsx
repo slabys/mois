@@ -10,9 +10,9 @@ import Superscript from "@tiptap/extension-superscript";
 import TextAlign from "@tiptap/extension-text-align";
 import { TextStyle } from "@tiptap/extension-text-style";
 import Underline from "@tiptap/extension-underline";
-import { JSONContent, useEditor } from "@tiptap/react";
+import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { useMemo } from "react";
+import { useEffect } from "react";
 
 interface RichTextEditorProps {
   label?: string;
@@ -20,23 +20,12 @@ interface RichTextEditorProps {
   onChange?: (value: string) => void;
   error?: any;
   letterLimit?: number;
+  editable?: boolean;
 }
 
-const RichTextEditor = ({ label, value, onChange, error, letterLimit }: RichTextEditorProps) => {
-  const parsedContent = useMemo(() => {
-    try {
-      if (value && value?.length > 0) {
-        return JSON.parse(value) as JSONContent;
-      }
-      return null;
-    } catch (e) {
-      console.error(e);
-      return null;
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
+const RichTextEditor = ({ label, value, onChange, error, letterLimit, editable = true }: RichTextEditorProps) => {
   const editor = useEditor({
-    immediatelyRender: true,
+    immediatelyRender: false,
     extensions: [
       StarterKit,
       RichTextLink,
@@ -51,12 +40,26 @@ const RichTextEditor = ({ label, value, onChange, error, letterLimit }: RichText
         limit: letterLimit,
       }),
     ],
-    content: parsedContent,
+    content: value ? JSON.parse(value) : null,
+    editable: editable,
 
     onUpdate: ({ editor }) => {
       if (onChange) onChange(JSON.stringify(editor.getJSON()));
     },
   });
+
+  // update editor content every time the value changes
+  useEffect(() => {
+    if (editor && value) {
+      const currentContent = JSON.stringify(editor.getJSON());
+      // avoid unneccessary updates
+      if (currentContent !== value) {
+        editor.commands.setContent(JSON.parse(value));
+      }
+    }
+  }, [editor, value]);
+
+  if (!editor) return null;
 
   return (
     <Input.Wrapper label={label} error={error}>
@@ -111,8 +114,8 @@ const RichTextEditor = ({ label, value, onChange, error, letterLimit }: RichText
         <TipTapEditor.Content />
       </TipTapEditor>
       {letterLimit && (
-        <Text c={editor.getText().length >= letterLimit ? "red" : "black"}>
-          {letterLimit && `${editor.getText().length} / ${letterLimit} characters`}
+        <Text c={(editor?.getText().length ?? 0) >= letterLimit ? "red" : "black"}>
+          {letterLimit && `${editor?.getText().length ?? 0} / ${letterLimit} characters`}
         </Text>
       )}
     </Input.Wrapper>
