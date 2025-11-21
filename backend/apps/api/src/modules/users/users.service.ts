@@ -63,7 +63,7 @@ export class UsersService {
 	findByEmailWithPassword(email: User["email"]): Promise<User | null> {
 		return this.UsersRepository.createQueryBuilder("user")
 			.addSelect("user.password")
-			.where("user.email = :email", { email })
+			.where("LOWER(user.email) = LOWER(:email)", { email }) // Check the email in lower case --> case-insensitive
 			.getOne();
 	}
 

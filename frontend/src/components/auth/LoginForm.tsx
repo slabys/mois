@@ -39,7 +39,7 @@ const LoginForm = () => {
     <Box maw="32rem" w="100%">
       <Form form={form} onSubmit={loginUser}>
         <Flex direction="column" gap={12}>
-          <TextInput label="Email" {...form.getInputProps("email")} />
+          <TextInput label="E-mail / Username" {...form.getInputProps("email")} />
           <PasswordInput label="Password" type="password" {...form.getInputProps("password")} />
         </Flex>
         <Flex direction="column" gap={16} mt={16}>

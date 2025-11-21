@@ -155,7 +155,6 @@ export class AuthController {
 		try {
 			const payload = await this.authService.verifyVerificationToken(token);
 			const user = await this.usersService.findById(payload.id);
-			console.log(user);
 			if (!user) throw new BadRequestException("User not found");
 			if (user.isVerified) return { message: "Already verified" };
 

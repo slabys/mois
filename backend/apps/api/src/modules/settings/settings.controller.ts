@@ -29,7 +29,6 @@ export class SettingsController {
 	@ApiOkResponse({ type: Settings, description: "Returns settings" })
 	@Put()
 	async updateSettings(@Body() dto: SettingsDTO) {
-		console.log(dto);
 		return this.settingsService.updateSettings(dto);
 	}
 }
