@@ -23,7 +23,7 @@ const SettingsPage = () => {
     const initValues = {
       termsAndConditions: data.termsAndConditions ?? "",
       privacyPolicy: data.privacyPolicy ?? "",
-      footerDescription: data.footerDescription,
+      footerDescription: data.footerDescription ?? "",
     };
     form.setInitialValues(initValues);
     form.setValues(initValues);
