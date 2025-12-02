@@ -136,7 +136,7 @@ export class UsersService {
 		const deletedUserId = user.id;
 
 		// Replace personal data
-		user.email = `deleted+${deletedUserId}@${process.env.MAIL_DOMAIN}`;
+		user.email = `deleted+${deletedUserId}`;
 		user.username = `deleted_${deletedUserId}`;
 		user.firstName = "Deleted";
 		user.lastName = "User";
