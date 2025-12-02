@@ -18,7 +18,13 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
   const [isChangeRoleModalOpen, { open: openChangeRoleModal, close: closeChangeRoleModal }] = useDisclosure(false);
   const [isCreateRoleModal, { open: openCreateRoleModal, close: closeCreateRoleModal }] = useDisclosure(false);
 
-  const deleteUserMutation = useDeleteUser();
+  const deleteUserMutation = useDeleteUser({
+    mutation: {
+      onSuccess: () => {
+        refetchUsers();
+      },
+    },
+  });
   const { data: currentUser, refetch: refetchCurrentUser } = useGetCurrentUser();
   const { data: allUsers, refetch: refetchUsers } = useGetAllUsers({ all: true });
 
@@ -35,8 +41,15 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
   };
 
   const handleDeleteUser = (id: string) => {
+    const deleteUser = allUsers?.data?.find((f) => f.id === id);
+    if (
+      deleteUser &&
+      !confirm(
+        `Do you really want to delete user "${deleteUser?.firstName} ${deleteUser?.lastName} (${deleteUser?.username})"?`,
+      )
+    )
+      return;
     deleteUserMutation.mutate({ id });
-    refetchUsers();
   };
 
   if (!currentUser || !allUsers?.data) return null;
@@ -63,7 +76,6 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
       <DynamicSearch<User>
         filterData={allUsers.data}
         dataColumns={[
-          "id",
           "firstName",
           "lastName",
           "username",
