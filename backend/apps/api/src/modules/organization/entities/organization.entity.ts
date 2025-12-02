@@ -1,5 +1,5 @@
+import { Address } from "@api/modules/addresses/entities";
 import { ApiHideProperty } from "@nestjs/swagger";
-import { User } from "../../users";
 import {
 	Column,
 	CreateDateColumn,
@@ -10,8 +10,8 @@ import {
 	OneToMany,
 	PrimaryGeneratedColumn,
 } from "typeorm";
+import { User } from "../../users";
 import { OrganizationMember } from "./organization-member.entity";
-import { Address } from "@api/modules/addresses/entities";
 
 // Should be parent.id but it's not converted to parent_id, so this needs to be "hardcoded"
 @Entity()
@@ -22,6 +22,9 @@ export class Organization {
 
 	@Column()
 	name: string;
+
+	@Column()
+	legalName: string;
 
 	@Column({ nullable: true, default: null })
 	cin: string | null;

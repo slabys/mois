@@ -1,5 +1,4 @@
-import { Organization } from "../../organization";
-import { User } from "../../users";
+import { Address } from "@api/modules/addresses/entities";
 import {
 	BaseEntity,
 	Column,
@@ -12,11 +11,12 @@ import {
 	PrimaryGeneratedColumn,
 	Unique,
 } from "typeorm";
+import { Organization } from "../../organization";
+import { User } from "../../users";
+import { InvoiceMethods } from "../invoice-methods";
 import { EventCustomOrganization } from "./event-custom-organization.entity";
 import { EventSpot } from "./event-spot.entity";
 import { Event } from "./event.entity";
-import { InvoiceMethods } from "../invoice-methods";
-import { Address } from "@api/modules/addresses/entities";
 
 /**
  * Event application represents registration to event
@@ -50,7 +50,7 @@ export class EventApplication extends BaseEntity {
 	@OneToOne(
 		() => EventCustomOrganization,
 		(organization) => organization.application,
-		{ cascade: true, nullable: true },
+		{ cascade: true, nullable: true, orphanedRowAction: "delete" },
 	)
 	customOrganization: EventCustomOrganization | null;
 
@@ -84,10 +84,13 @@ export class EventApplication extends BaseEntity {
 	@Column({ nullable: true })
 	additionalInformation: string;
 
-	@Column({ nullable: true })
-	foodRestrictionAllergies: string;
+	@Column({ default: "" })
+	allergies: string;
 
-	@Column({ nullable: true })
+	@Column({ default: "" })
+	foodRestriction: string;
+
+	@Column({ default: "" })
 	healthLimitations: string;
 
 	@Column({ nullable: true })

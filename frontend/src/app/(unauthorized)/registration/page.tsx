@@ -1,3 +1,5 @@
+"use client";
+
 import routes from "@/utils/routes";
 import RegistrationForm from "@components/registration/RegistrationForm";
 import { Anchor, Container, Flex, Title } from "@mantine/core";

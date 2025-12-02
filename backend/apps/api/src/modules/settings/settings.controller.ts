@@ -8,8 +8,7 @@ import { Settings } from "@api/modules/settings/entities/settings.entity";
 
 @Controller("settings")
 export class SettingsController {
-	constructor(private readonly settingsService: SettingsService) {
-	}
+	constructor(private readonly settingsService: SettingsService) {}
 
 	/**
 	 * Get all the global setting of the app
@@ -19,7 +18,6 @@ export class SettingsController {
 	async getSettings() {
 		return this.settingsService.getOrCreateSettings();
 	}
-
 
 	/**
 	 * Update the global setting of the app

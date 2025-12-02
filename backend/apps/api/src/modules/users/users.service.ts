@@ -1,24 +1,21 @@
-import { Injectable } from "@nestjs/common";
+import { randomUUID } from "node:crypto";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import bcrypt from "bcryptjs";
 import { isEmail } from "class-validator";
-import { User } from "./entities";
-import { FindOptionsRelations, FindOptionsWhere, In, Repository } from "typeorm";
+import { FindManyOptions, FindOptionsWhere, In, Repository } from "typeorm";
 import type { PaginationOptions } from "utilities/nest/decorators";
 import { formatPaginatedResponse } from "utilities/pagination.helper";
+import { User } from "./entities";
 
 type UserId = User["id"];
-
-interface FindUserOptions {
-	relations?: FindOptionsRelations<User>;
-}
 
 @Injectable()
 export class UsersService {
 	constructor(
 		@InjectRepository(User)
 		private readonly UsersRepository: Repository<User>,
-	) {
-	}
+	) {}
 
 	/**
 	 * Save user entity
@@ -35,7 +32,7 @@ export class UsersService {
 	 * @param options
 	 * @returns
 	 */
-	findById(id: UserId, options?: FindUserOptions) {
+	findById(id: UserId, options?: FindManyOptions<User>) {
 		return this.UsersRepository.findOne({
 			where: { id },
 			relations: options?.relations,
@@ -48,7 +45,7 @@ export class UsersService {
 	 * @param options Find options
 	 * @returns
 	 */
-	findManyById(ids: string[], options?: FindUserOptions) {
+	findManyById(ids: string[], options?: FindManyOptions<User>) {
 		return this.UsersRepository.find({
 			where: { id: In(ids) },
 			relations: options?.relations,
@@ -96,9 +93,12 @@ export class UsersService {
 	 * Find all users ordered by lastName
 	 * @returns FormatPaginatedResponseType<User[]>
 	 */
-	async find(pagination?: PaginationOptions, options?: FindUserOptions) {
+	async find(pagination?: PaginationOptions, options?: FindManyOptions<User>) {
 		const [users, totalCount] = await this.UsersRepository.findAndCount({
 			order: { createdAt: "ASC" },
+			where: {
+				isDeleted: false,
+			},
 			relations: {
 				...options?.relations,
 			},
@@ -118,5 +118,48 @@ export class UsersService {
 	 */
 	exist(criteria: FindOptionsWhere<User> | FindOptionsWhere<User>[]) {
 		return this.UsersRepository.existsBy(criteria);
+	}
+
+	/**
+	 * Deleting user anonymizes user data but keep the row and all relations.
+	 */
+	async deleteUser(id: string): Promise<User> {
+		const user = await this.UsersRepository.findOne({
+			where: { id },
+			relations: { personalAddress: true, photo: true, role: true },
+		});
+
+		if (!user) {
+			throw new NotFoundException("User not found");
+		}
+
+		const deletedUserId = user.id;
+
+		// Replace personal data
+		user.email = `deleted+${deletedUserId}@${process.env.MAIL_DOMAIN}`;
+		user.username = `deleted_${deletedUserId}`;
+		user.firstName = "Deleted";
+		user.lastName = "User";
+		// user.birthDate = null;
+		// user.nationality = "";
+		user.phonePrefix = "+123";
+		user.phoneNumber = "123456789";
+		// user.gender = null;
+		// user.pronouns = null;
+		user.personalAddress = null;
+
+		// Remove photo, role, etc. as desired
+		user.photo = null;
+		user.role = null;
+
+		// Disable login
+		user.isVerified = false;
+		user.isDeleted = true;
+
+		// Set password to a random, unusable value
+		const randomPassword = randomUUID();
+		user.password = await bcrypt.hash(randomPassword, 10);
+
+		return this.UsersRepository.save(user);
 	}
 }

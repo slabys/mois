@@ -9,8 +9,7 @@ export class SettingsService {
 	constructor(
 		@InjectRepository(Settings)
 		private readonly SettingsRepository: Repository<Settings>,
-	) {
-	}
+	) {}
 
 	async getOrCreateSettings() {
 		let info = (await this.SettingsRepository.find())[0];

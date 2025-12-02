@@ -33,8 +33,7 @@ export class AuthController {
 		private readonly configService: ConfigService,
 		private readonly authService: AuthService,
 		private readonly usersService: UsersService,
-	) {
-	}
+	) {}
 
 	/**
 	 * Try to login user with given email and password

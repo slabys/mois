@@ -37,8 +37,7 @@ export class EventSpotsController {
 	constructor(
 		private readonly eventSpotsService: EventSpotsService,
 		private readonly eventsService: EventsService,
-	) {
-	}
+	) {}
 
 	/**
 	 * Find event spots for event

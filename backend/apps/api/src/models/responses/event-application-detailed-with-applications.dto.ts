@@ -1,5 +1,5 @@
 import { IntersectionType, PickType } from "@nestjs/swagger";
-import { EventApplication } from "../../modules/events/entities";
+import { EventApplication } from "@api/modules/events/entities";
 import { EventApplicationSimpleWithApplications } from "./event-application-simple-with-applications.dto";
 
 export class EventApplicationDetailed extends PickType(EventApplication, [
@@ -14,7 +14,8 @@ export class EventApplicationDetailed extends PickType(EventApplication, [
 	"invoiceAddress",
 	"invoiceMethod",
 	"validUntil",
-	"foodRestrictionAllergies",
+	"allergies",
+	"foodRestriction",
 	"healthLimitations",
 	"additionalInformation",
 	"invoicedTo",

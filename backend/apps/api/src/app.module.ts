@@ -74,5 +74,4 @@ import { SettingsController } from "@api/modules/settings/settings.controller";
 	],
 	providers: [EventSimpleWithApplicationsMapper, EventApplicationSimpleWithApplicationsMapper],
 })
-export class AppModule {
-}
+export class AppModule {}

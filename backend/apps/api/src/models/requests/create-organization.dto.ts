@@ -8,6 +8,9 @@ export class CreateOrganization {
 	name: string;
 
 	@IsString()
+	legalName: string;
+
+	@IsString()
 	cin?: string | null | undefined;
 
 	@IsString()

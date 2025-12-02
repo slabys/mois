@@ -16,7 +16,7 @@ const apiUrl = process.env.NEXT_PUBLIC_API_DOMAIN;
 const initCookieName = "InitFlag";
 const authCookieName = "AuthCookie";
 
-export const middleware = async (request: NextRequest) => {
+export const proxy = async (request: NextRequest) => {
   const { pathname } = request.nextUrl;
   const isNonProtectedPath = notAuthorizedPaths.includes(pathname);
 

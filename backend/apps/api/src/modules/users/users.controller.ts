@@ -3,6 +3,7 @@ import {
 	Body,
 	ConflictException,
 	Controller,
+	Delete,
 	Get,
 	Header,
 	InternalServerErrorException,
@@ -11,6 +12,7 @@ import {
 	Patch,
 	Post,
 	Res,
+	UnauthorizedException,
 	UseGuards,
 } from "@nestjs/common";
 import {
@@ -19,6 +21,7 @@ import {
 	ApiConsumes,
 	ApiCreatedResponse,
 	ApiExtraModels,
+	ApiNoContentResponse,
 	ApiOkResponse,
 	ApiTags,
 	getSchemaPath,
@@ -29,17 +32,18 @@ import { OrganizationService } from "../organization";
 import { PhotoService } from "../photo";
 import { User, UsersService } from "./index";
 
-import { CookieGuard } from "../auth/providers/guards";
-import { CurrentUser } from "../../decorators";
-import { CreateUser, UpdatePhoto, UpdateUser } from "../../models/requests";
-import { OrganizationMemberWithoutUser } from "../../models/responses";
-import { Pagination, PaginationOptions } from "utilities/nest/decorators";
-import { PaginationDto, PaginationResponseDto } from "../../models/responses/pagination-response.dto";
-import * as ExcelJS from "exceljs";
-import { AuthService } from "@api/modules/auth";
-import { ConfigService } from "@nestjs/config";
-import { MailerService } from "@nestjs-modules/mailer";
+import { CurrentUser } from "@api/decorators";
+import { CreateUser, UpdatePhoto, UpdateUser } from "@api/models/requests";
+import { OrganizationMemberWithoutUser } from "@api/models/responses";
+import { PaginationDto, PaginationResponseDto } from "@api/models/responses/pagination-response.dto";
 import { Address } from "@api/modules/addresses/entities";
+import { AuthService } from "@api/modules/auth";
+import { Permission } from "@api/modules/roles";
+import { MailerService } from "@nestjs-modules/mailer";
+import { ConfigService } from "@nestjs/config";
+import * as ExcelJS from "exceljs";
+import { Pagination, PaginationOptions } from "utilities/nest/decorators";
+import { CookieGuard } from "../auth/providers/guards";
 
 @ApiTags("Users")
 @Controller("users")
@@ -206,6 +210,24 @@ export class UsersController {
 	@Get("all")
 	getAllUsers(@Pagination() pagination?: PaginationOptions) {
 		return this.usersService.find(pagination, { relations: { personalAddress: true, role: true } });
+	}
+
+	/**
+	 * Delete (anonymize) user.
+	 * Users are not getting deleted but their data are replaced with non-identifiable placeholders
+	 */
+	@ApiBearerAuth()
+	@UseGuards(CookieGuard)
+	@ApiNoContentResponse({
+		description: "User has been deleted or anonymized",
+	})
+	@Delete(":id")
+	async deleteUser(@CurrentUser() currentUser: User, @Param("id", ParseUUIDPipe) userId: string): Promise<void> {
+		if (!currentUser.role?.hasOneOfPermissions([Permission.UserDelete]) && currentUser.id !== userId) {
+			throw new UnauthorizedException("You don't have permission to perform this action");
+		}
+
+		await this.usersService.deleteUser(userId);
 	}
 
 	@Header("Content-disposition", "attachment; filename=EventApplicationExport.xlsx")

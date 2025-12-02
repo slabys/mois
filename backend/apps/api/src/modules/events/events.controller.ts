@@ -49,8 +49,7 @@ export class EventsController {
 		private readonly eventsService: EventsService,
 		private readonly photoService: PhotoService,
 		private readonly eventSimpleWithApplicationsMapper: EventSimpleWithApplicationsMapper,
-	) {
-	}
+	) {}
 
 	/**
 	 * Ongoing events:
@@ -77,13 +76,8 @@ export class EventsController {
 		},
 	})
 	@Get("ongoing")
-	async getOngoingEvents(
-		@Pagination() pagination?: PaginationOptions,
-	) {
-		return this.eventsService.findOngoing(
-			{ visible: true, relations: { applications: true } },
-			pagination,
-		);
+	async getOngoingEvents(@Pagination() pagination?: PaginationOptions) {
+		return this.eventsService.findOngoing({ visible: true, relations: { applications: true } }, pagination);
 	}
 
 	/**
@@ -246,7 +240,11 @@ export class EventsController {
 		@Body() body: UpdateEvent,
 	) {
 		if (
-			!currentUser.role?.hasOneOfPermissions([Permission.EventCreate, Permission.EventDuplicate, Permission.EventUpdate])
+			!currentUser.role?.hasOneOfPermissions([
+				Permission.EventCreate,
+				Permission.EventDuplicate,
+				Permission.EventUpdate,
+			])
 		) {
 			throw new UnauthorizedException("You don't have permission to perform this action");
 		}

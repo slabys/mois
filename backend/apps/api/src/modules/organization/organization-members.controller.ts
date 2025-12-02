@@ -28,8 +28,7 @@ export class OrganizationMembersController {
 	constructor(
 		private readonly organizationService: OrganizationService,
 		private readonly usersService: UsersService,
-	) {
-	}
+	) {}
 
 	@ApiExtraModels(OrganizationMember, PaginationResponseDto<OrganizationMember>)
 	@ApiOkResponse({
@@ -70,7 +69,8 @@ export class OrganizationMembersController {
 
 		if (
 			organization.manager?.id === currentUser.id ||
-			currentUser.role?.hasOneOfPermissions([Permission.OrganisationAddUser])) {
+			currentUser.role?.hasOneOfPermissions([Permission.OrganisationAddUser])
+		) {
 			const memberIds = organization.members.map((member) => member.user.id);
 			const unassignedMemberIds = body.userIds.filter((userId) => !memberIds.includes(userId));
 			const newMembers = await this.usersService.findManyById(unassignedMemberIds);

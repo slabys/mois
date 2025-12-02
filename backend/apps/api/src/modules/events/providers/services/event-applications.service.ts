@@ -1,11 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import { InjectRepository } from "@nestjs/typeorm";
-import { EventApplication } from "../../entities";
-import { EventFilter } from "../../models";
-import { filterSince } from "../../utilities";
-import { FindOneOptions, Repository } from "typeorm";
+import { InjectEntityManager, InjectRepository } from "@nestjs/typeorm";
+import { EntityManager, FindOneOptions, Repository } from "typeorm";
 import type { PaginationOptions } from "utilities/nest/decorators";
 import { formatPaginatedResponse } from "utilities/pagination.helper";
+import { EventApplication, EventCustomOrganization } from "../../entities";
+import { EventFilter } from "../../models";
+import { filterSince } from "../../utilities";
 
 interface FindEventOptions {
 	filter?: EventFilter;
@@ -17,8 +17,11 @@ export class EventApplicationsService {
 	constructor(
 		@InjectRepository(EventApplication)
 		private readonly eventApplicationRepository: Repository<EventApplication>,
-	) {
-	}
+		@InjectRepository(EventCustomOrganization)
+		private readonly eventCustomOrganizationRepository: Repository<EventCustomOrganization>,
+		@InjectEntityManager()
+		private readonly entityManager: EntityManager,
+	) {}
 
 	/**
 	 * Find event application by ID
@@ -151,6 +154,7 @@ export class EventApplicationsService {
 	/**
 	 * Find applications by event ID detailed (with relations)
 	 * @param id Event ID
+	 * @param options
 	 * @returns
 	 */
 	findByEventIdDetailed(id: number, options?: FindEventOptions) {
@@ -163,7 +167,8 @@ export class EventApplicationsService {
 				idNumber: true,
 				invoiceMethod: true,
 				validUntil: true,
-				foodRestrictionAllergies: true,
+				allergies: true,
+				foodRestriction: true,
 				healthLimitations: true,
 				additionalInformation: true,
 				invoicedTo: true,
@@ -194,6 +199,14 @@ export class EventApplicationsService {
 	 */
 	async delete(application: EventApplication) {
 		await this.eventApplicationRepository.remove(application);
+	}
+
+	/**
+	 * Delete event application
+	 * @param customOrganization
+	 */
+	async deleteCustomOrganizationInApplication(customOrganization: EventCustomOrganization) {
+		await this.eventCustomOrganizationRepository.remove(customOrganization);
 	}
 
 	/**

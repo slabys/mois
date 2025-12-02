@@ -1,3 +1,5 @@
+"use client";
+
 import routes from "@/utils/routes";
 import ForgotPasswordForm from "@components/ForgotPassword/ForgotPasswordForm";
 import { Anchor, Container, Flex, Title } from "@mantine/core";

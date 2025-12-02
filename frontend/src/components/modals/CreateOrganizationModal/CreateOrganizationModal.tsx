@@ -15,6 +15,7 @@ const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateO
   const form = useForm<Partial<CreateOrganization>>({
     initialValues: {
       name: "",
+      legalName: "",
       cin: "",
       vatin: "",
       address: {
@@ -71,10 +72,13 @@ const CreateOrganizationModal = ({ isOpened, closeModal, handleSuccess }: CrateO
           <Grid.Col span={{ base: 12, md: 6 }}>
             <TextInput label="Organisation Name" {...form.getInputProps("name")} required />
           </Grid.Col>
-          <Grid.Col span={{ base: 6, md: 3 }}>
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput label="Legal Organisation Name" {...form.getInputProps("legalName")} required />
+          </Grid.Col>
+          <Grid.Col span={{ base: 6 }}>
             <TextInput label="Organisation CIN" {...form.getInputProps("cin")} />
           </Grid.Col>
-          <Grid.Col span={{ base: 6, md: 3 }}>
+          <Grid.Col span={{ base: 6 }}>
             <TextInput label="Organisation VATIN" {...form.getInputProps("vatin")} />
           </Grid.Col>
           <Grid.Col span={8}>

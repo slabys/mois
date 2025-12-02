@@ -91,6 +91,7 @@ const AccountPage = () => {
   }, [currentUser, fetchCurrentUser, isFetchedAfterMount]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const form = useForm<UpdateUserProps>({
+    mode: "uncontrolled",
     initialValues: {
       firstName: undefined,
       lastName: undefined,

@@ -12,15 +12,17 @@ interface CrateOrganizationModalProps {
   handleSuccess: () => void;
 }
 
-const UpdateOrganizationModal = ({
+const UpdateOrganisationModal = ({
   activeOrganization,
   isOpened,
   closeModal,
   handleSuccess,
 }: CrateOrganizationModalProps) => {
   const form = useForm<Partial<UpdateOrganization>>({
+    mode: "uncontrolled",
     initialValues: {
       name: activeOrganization.name,
+      legalName: activeOrganization.legalName,
       cin: activeOrganization.cin ?? undefined,
       vatin: activeOrganization.vatin ?? undefined,
       address: activeOrganization.address
@@ -49,6 +51,7 @@ const UpdateOrganizationModal = ({
   useEffect(() => {
     form.setValues({
       name: activeOrganization.name,
+      legalName: activeOrganization.legalName,
       cin: activeOrganization.cin ?? undefined,
       vatin: activeOrganization.vatin ?? undefined,
       address: activeOrganization.address
@@ -97,10 +100,13 @@ const UpdateOrganizationModal = ({
           <Grid.Col span={{ base: 12, md: 6 }}>
             <TextInput label="Organisation Name" {...form.getInputProps("name")} />
           </Grid.Col>
-          <Grid.Col span={{ base: 6, md: 3 }}>
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput label="Legal Name" {...form.getInputProps("legalName")} />
+          </Grid.Col>
+          <Grid.Col span={{ base: 6 }}>
             <TextInput label="Organisation CIN" {...form.getInputProps("cin")} />
           </Grid.Col>
-          <Grid.Col span={{ base: 6, md: 3 }}>
+          <Grid.Col span={{ base: 6 }}>
             <TextInput label="Organisation VATIN" {...form.getInputProps("vatin")} />
           </Grid.Col>
           <Grid.Col span={8}>
@@ -128,4 +134,4 @@ const UpdateOrganizationModal = ({
     </Modal>
   );
 };
-export default UpdateOrganizationModal;
+export default UpdateOrganisationModal;

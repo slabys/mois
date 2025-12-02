@@ -26,8 +26,7 @@ export class EventsService {
 		@InjectRepository(Event)
 		private readonly eventsRepository: Repository<Event>,
 		private readonly photoService: PhotoService,
-	) {
-	}
+	) {}
 
 	/**
 	 * Find event by ID
@@ -80,10 +79,7 @@ export class EventsService {
 		return this.eventsRepository.save(new Event(event));
 	}
 
-	async findOngoing(
-		options?: EventFindOptions,
-		pagination?: PaginationOptions,
-	) {
+	async findOngoing(options?: EventFindOptions, pagination?: PaginationOptions) {
 		const now = new Date();
 
 		const [events, totalCount] = await this.eventsRepository.findAndCount({

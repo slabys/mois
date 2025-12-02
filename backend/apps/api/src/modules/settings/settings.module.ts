@@ -10,5 +10,4 @@ import { SettingsController } from "@api/modules/settings/settings.controller";
 	controllers: [SettingsController],
 	exports: [SettingsService],
 })
-export class SettingsModule {
-}
+export class SettingsModule {}

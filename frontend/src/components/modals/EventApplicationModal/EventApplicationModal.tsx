@@ -12,10 +12,13 @@ import Modal from "@components/Modal/Modal";
 import DateInput from "@components/primitives/DateInput";
 import Select from "@components/primitives/Select";
 import {
-  allergenData,
-  healthLimitationsData,
-  renderMultiSelectOption,
-} from "@components/shared/renderMultiSelectOptions";
+  allergenOptions,
+  foodRestrictionOptions,
+  healthLimitationsOptions,
+  joinRestrictions,
+  renderAllergenOptions,
+  renderFoodRestrictionsOptions,
+} from "@components/shared/renderRestrictionOptions";
 import {
   Anchor,
   Blockquote,
@@ -53,6 +56,7 @@ const EventApplicationModal = ({
   closeModal,
   handleSuccess = () => {},
 }: JoinEventModalProps) => {
+  const [allergenList, setAllergenList] = useState<string[]>([]);
   const [foodRestrictionList, setFoodRestrictionList] = useState<string[]>([]);
   const [healthLimitationsList, setHealthLimitationsList] = useState<string[]>([]);
   const [selectedOrganisation, setSelectedOrganisation] = useState<Organization | null>(null);
@@ -61,6 +65,7 @@ const EventApplicationModal = ({
   const { data: userOrganisationMemberships } = useUserOrganizationMemberships(currentUser.id);
 
   const form = useForm<Partial<CreateEventApplication>>({
+    mode: "uncontrolled",
     initialValues: {
       validUntil: undefined,
       idNumber: undefined,
@@ -70,7 +75,8 @@ const EventApplicationModal = ({
       invoiceAddress: undefined,
       invoiceMethod: undefined,
       additionalInformation: "",
-      foodRestrictionAllergies: "",
+      allergies: "",
+      foodRestriction: "",
       healthLimitations: "",
       additionalFormData: {},
     },
@@ -122,18 +128,13 @@ const EventApplicationModal = ({
       return errors;
     },
     transformValues: (values) => {
-      const { foodRestrictionAllergies, healthLimitations, ...restValues } = values;
+      const { allergies, foodRestriction, healthLimitations, ...restValues } = values;
 
       return {
         ...restValues,
-        foodRestrictionAllergies:
-          foodRestrictionList.length > 0
-            ? `${foodRestrictionList.sort().join(", ")}${foodRestrictionList.includes("Other") ? `, ${foodRestrictionAllergies}` : ""}`
-            : foodRestrictionAllergies,
-        healthLimitations:
-          healthLimitationsList.length > 0
-            ? `${healthLimitationsList.sort().join(", ")}${healthLimitationsList.includes("Other") ? `, ${healthLimitations}` : ""}`
-            : healthLimitations,
+        allergies: joinRestrictions(allergenList, allergies),
+        foodRestriction: joinRestrictions(foodRestrictionList, foodRestriction),
+        healthLimitations: joinRestrictions(healthLimitationsList, healthLimitations),
       };
     },
   });
@@ -298,7 +299,7 @@ const EventApplicationModal = ({
                     }
                     case "organisation": {
                       if (!selectedOrganisation) return;
-                      form.setFieldValue("invoicedTo", selectedOrganisation.name);
+                      form.setFieldValue("invoicedTo", selectedOrganisation.legalName);
                       form.setFieldValue("invoiceAddress", {
                         city: selectedOrganisation.address.city,
                         country: selectedOrganisation.address.country,
@@ -376,11 +377,11 @@ const EventApplicationModal = ({
           <Stepper.Step label="Step 3" description="Additional Information">
             <Flex direction="column" gap="md">
               <MultiSelect
-                label="Food Restrictions and allergies"
-                data={Object.entries(allergenData).map(([key]) => key)}
-                renderOption={renderMultiSelectOption}
+                label="Allergies"
+                data={Object.entries(allergenOptions).map(([key]) => key)}
+                renderOption={renderAllergenOptions}
                 onChange={(value) => {
-                  setFoodRestrictionList(value);
+                  setAllergenList(value);
                 }}
                 description={
                   <Text fz="xs" span>
@@ -397,16 +398,25 @@ const EventApplicationModal = ({
                 hidePickedOptions
                 clearable
               />
+              {allergenList.includes("Other") && (
+                <Textarea label="Allergies (Other)" {...form.getInputProps("allergies")} autosize />
+              )}
+              <MultiSelect
+                label="Food Restrictions"
+                data={Object.entries(foodRestrictionOptions).map(([key]) => key)}
+                renderOption={renderFoodRestrictionsOptions}
+                onChange={(value) => {
+                  setFoodRestrictionList(value);
+                }}
+                hidePickedOptions
+                clearable
+              />
               {foodRestrictionList.includes("Other") && (
-                <Textarea
-                  label="Food Restrictions and allergies (Other)"
-                  {...form.getInputProps("foodRestrictionAllergies")}
-                  autosize
-                />
+                <Textarea label="Food Restrictions (Other)" {...form.getInputProps("foodRestriction")} autosize />
               )}
               <MultiSelect
                 label="Disability or Health Limitations"
-                data={healthLimitationsData}
+                data={Object.entries(healthLimitationsOptions).map(([key]) => key)}
                 onChange={(value) => {
                   setHealthLimitationsList(value);
                 }}

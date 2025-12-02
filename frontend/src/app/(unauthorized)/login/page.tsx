@@ -1,3 +1,5 @@
+"use client";
+
 import routes from "@/utils/routes";
 import LoginForm from "@components/auth/LoginForm";
 import { Anchor, Container, Flex, Title } from "@mantine/core";

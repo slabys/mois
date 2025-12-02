@@ -9,7 +9,7 @@ import dayjs from "dayjs";
 /** Base Column */
 interface BaseColumn {
   headerLabel?: string;
-  handleOnChange?: (rowId: string, value?: string | null) => void;
+  customHandle?: (rowId: string, value?: string | null) => void;
 }
 
 /** Input column type */
@@ -39,7 +39,7 @@ export interface CustomDynamicColumnsProps {
 }
 
 const CustomColumnsTBody = ({ rowId, customColumns }: CustomDynamicColumnsProps) => {
-  return customColumns.map((col, index) => {
+  return customColumns.map(({ customHandle, headerLabel: _, ...col }, index) => {
     return (
       <Table.Td key={index}>
         {col.type === "textInput" && (
@@ -49,7 +49,7 @@ const CustomColumnsTBody = ({ rowId, customColumns }: CustomDynamicColumnsProps)
             placeholder={col.placeholder}
             value={col.value}
             onChange={(event) => {
-              col.handleOnChange && col.handleOnChange(rowId, event.currentTarget.value);
+              customHandle?.(rowId, event.currentTarget.value);
             }}
           />
         )}
@@ -60,7 +60,7 @@ const CustomColumnsTBody = ({ rowId, customColumns }: CustomDynamicColumnsProps)
             data={col.data}
             value={col.value}
             onChange={(value) => {
-              col.handleOnChange && col.handleOnChange(rowId, value);
+              customHandle?.(rowId, value);
             }}
           />
         )}
@@ -70,7 +70,8 @@ const CustomColumnsTBody = ({ rowId, customColumns }: CustomDynamicColumnsProps)
             label={col.label}
             value={col.value}
             onChange={(value) => {
-              col.handleOnChange && value && col.handleOnChange(rowId, dayjs(value).toISOString());
+              if (!value) return;
+              customHandle?.(rowId, dayjs(value).toISOString());
             }}
           />
         )}
@@ -78,8 +79,9 @@ const CustomColumnsTBody = ({ rowId, customColumns }: CustomDynamicColumnsProps)
           <Button
             key={`button-${rowId}-${index}`}
             onClick={() => {
-              col.handleOnChange && col.handleOnChange(rowId);
+              customHandle?.(rowId);
             }}
+            {...col}
           >
             {col.children}
           </Button>

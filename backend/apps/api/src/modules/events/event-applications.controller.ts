@@ -16,6 +16,7 @@ import {
 	Post,
 	Query,
 	Res,
+	UnauthorizedException,
 	UseGuards,
 } from "@nestjs/common";
 import {
@@ -29,27 +30,25 @@ import {
 	getSchemaPath,
 } from "@nestjs/swagger";
 
+import { ajv } from "utilities/ajv";
+import { ParseDatePipe } from "utilities/nest/pipes";
 import { CookieGuard } from "../auth/providers/guards";
-import { EventApplicationsService, EventSpotsService, EventsService } from "./index";
-import { EventApplication, EventCustomOrganization } from "./entities";
 import { FileStorageService } from "../file-storage";
 import { OrganizationService } from "../organization";
 import { User, UsersService } from "../users";
-import { ajv } from "utilities/ajv";
-import { ParseDatePipe } from "utilities/nest/pipes";
+import { EventApplication, EventCustomOrganization } from "./entities";
+import { EventApplicationsService, EventSpotsService, EventsService } from "./index";
 
 import { CurrentUser } from "@api/decorators";
+import { EventApplicationSimpleWithApplicationsMapper } from "@api/mappers";
 import { CreateEventApplication, UpdateEventApplication } from "@api/models/requests";
 import { EventApplicationSimpleWithApplications } from "@api/models/responses";
-import { EventApplicationSimpleWithApplicationsMapper } from "@api/mappers";
-import {
-	EventApplicationDetailedWithApplications,
-} from "@api/models/responses/event-application-detailed-with-applications.dto";
+import { EventApplicationDetailedWithApplications } from "@api/models/responses/event-application-detailed-with-applications.dto";
 import { PaginationDto, PaginationResponseDto } from "@api/models/responses/pagination-response.dto";
-import * as ExcelJS from "exceljs";
-import { Permission } from "@api/modules/roles";
-import { UpdateApplicationSlotDto } from "@api/modules/events/dto/update-application-slot.dto";
 import { Address } from "@api/modules/addresses/entities";
+import { UpdateApplicationSlotDto } from "@api/modules/events/dto/update-application-slot.dto";
+import { Permission } from "@api/modules/roles";
+import * as ExcelJS from "exceljs";
 import { dayMonthYear } from "utilities/time";
 
 @ApiTags("Event applications")
@@ -62,9 +61,9 @@ export class EventApplicationsController {
 		private readonly organizationService: OrganizationService,
 		private readonly eventSpotsService: EventSpotsService,
 		private readonly fileStorageService: FileStorageService,
+
 		private readonly eventApplicationSimpleWithApplicationsMapper: EventApplicationSimpleWithApplicationsMapper,
-	) {
-	}
+	) {}
 
 	/**
 	 * Get all signed-in user applications
@@ -163,7 +162,8 @@ export class EventApplicationsController {
 			invoiceMethod: body.invoiceMethod,
 			invoicedTo: body.invoicedTo,
 			additionalInformation: body.additionalInformation ?? "",
-			foodRestrictionAllergies: body.foodRestrictionAllergies ?? "",
+			allergies: body.allergies ?? "",
+			foodRestriction: body.foodRestriction ?? "",
 			healthLimitations: body.healthLimitations ?? "",
 			invoiceAddress: new Address(body.invoiceAddress),
 			validUntil: body.validUntil,
@@ -215,6 +215,7 @@ export class EventApplicationsController {
 	/**
 	 * Update event application
 	 *
+	 * @param currentUser
 	 * @param applicationId Event Application ID
 	 * @param body
 	 * @returns
@@ -223,18 +224,29 @@ export class EventApplicationsController {
 	@UseGuards(CookieGuard)
 	@Patch("application/:id")
 	async updateEventApplication(
+		@CurrentUser() currentUser: User,
 		@Param("id", ParseIntPipe) applicationId: number,
 		@Body() body: UpdateEventApplication,
 	): Promise<EventApplicationSimpleWithApplications> {
 		let application = await this.eventApplicationsService.findById(applicationId, {
 			relations: {
 				personalAddress: true,
+				customOrganization: true,
 				event: {
 					applications: true,
 				},
 			},
 		});
 		if (!application) throw new NotFoundException("Event application not found");
+
+		if (
+			!(
+				currentUser.role?.hasOneOfPermissions([Permission.EventManageApplications]) ||
+				currentUser.id === application.user.id
+			)
+		) {
+			throw new UnauthorizedException("You don't have permission to perform this action");
+		}
 
 		if (body.spotTypeId) {
 			const eventSpot = await this.eventSpotsService.findById(body.spotTypeId);
@@ -246,8 +258,41 @@ export class EventApplicationsController {
 
 		if (body.invoiceAddress) application.personalAddress.update(body.invoiceAddress);
 
+		application.invoicedTo = body.invoicedTo ?? application.invoicedTo;
 		application.validUntil = body.validUntil ?? application.validUntil;
 		application.idNumber = body.idNumber ?? application.idNumber;
+		application.allergies = body.allergies ?? application.allergies;
+		application.foodRestriction = body.foodRestriction ?? application.foodRestriction;
+		application.healthLimitations = body.healthLimitations ?? application.healthLimitations;
+		application.additionalInformation = body.additionalInformation ?? application.additionalInformation;
+
+		application.invoiceMethod = body.invoiceMethod ?? application.invoiceMethod;
+
+		if (body.organization.type === "organization") {
+			// If this application was previously linked to a custom org, delete that custom org.
+			if (application.customOrganization) {
+				await this.eventApplicationsService.deleteCustomOrganizationInApplication(application.customOrganization);
+				application.customOrganization = null;
+			}
+
+			const member = await this.organizationService.findMemberByUserId(body.organization.id, currentUser.id, {
+				relations: { organization: true },
+			});
+
+			if (!member) throw new BadRequestException("Invalid organization given");
+			application.organization = member.organization;
+		} else {
+			application.organization = null;
+
+			if (application.customOrganization) {
+				await this.eventApplicationsService.deleteCustomOrganizationInApplication(application.customOrganization);
+			}
+
+			application.customOrganization = new EventCustomOrganization({
+				country: body.organization.country,
+				name: body.organization.name,
+			});
+		}
 
 		if (body.additionalFormData) {
 			const event = await this.eventService.findById(application.event.id, {
@@ -366,18 +411,21 @@ export class EventApplicationsController {
 			{ header: "Invoice Method", key: "invoiceMethod" },
 
 			{ header: "Invoice Address", key: "invoiceAddress" },
-			{ header: "Food Restrictions and Allergies", key: "foodRestrictions" },
+			{ header: "Food Restrictions", key: "foodRestrictions" },
+			{ header: "Allergies", key: "allergies" },
 			{ header: "Disability or Health Limitations", key: "healthLimitations" },
+			{ header: "Additional Information", key: "additionalInformation" },
 		];
 
 		applicationList.map((application) => {
 			const { organization, user, spotType } = application;
 
-			const invoicedTo = application?.invoiceMethod === "different"
-				? `${application?.invoicedTo}`
-				: application?.invoiceMethod === "organisation"
-					? `${organization.name}`
-					: `${user.firstName} ${user.lastName}`;
+			const invoicedTo =
+				application?.invoiceMethod === "different"
+					? `${application?.invoicedTo}`
+					: application?.invoiceMethod === "organisation"
+						? `${organization.name}`
+						: `${user.firstName} ${user.lastName}`;
 
 			worksheet.addRow({
 				organisation: organization !== null ? application.organization.name : application.customOrganization?.name,
@@ -400,13 +448,16 @@ ${user?.personalAddress?.zip} ${user?.personalAddress?.city}
 ${user?.personalAddress?.country}`
 					: "",
 				invoiceMethod: application?.invoiceMethod,
-				invoiceAddress: application?.invoiceAddress &&
+				invoiceAddress:
+					application?.invoiceAddress &&
 					`${invoicedTo}
 ${application?.invoiceAddress?.street} ${application?.invoiceAddress?.houseNumber}
 ${application?.invoiceAddress?.zip} ${application?.invoiceAddress?.city}
 ${application?.invoiceAddress?.country}`,
-				foodRestrictions: application?.foodRestrictionAllergies,
+				allergies: application?.allergies,
+				foodRestrictions: application?.foodRestriction,
 				healthLimitations: application?.healthLimitations,
+				additionalInformation: application?.additionalInformation,
 			});
 		});
 

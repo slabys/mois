@@ -27,8 +27,7 @@ export class RolesController {
 	constructor(
 		private readonly userService: UsersService,
 		private readonly rolesService: RolesService,
-	) {
-	}
+	) {}
 
 	@ApiCreatedResponse({ type: Role, description: "Created role" })
 	@Post("create")

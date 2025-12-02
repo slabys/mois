@@ -4,7 +4,7 @@ import { useAllOrganizations } from "@/utils/api";
 import type { Organization } from "@/utils/api.schemas";
 import routes from "@/utils/routes";
 import CreateOrganizationModal from "@components/modals/CreateOrganizationModal/CreateOrganizationModal";
-import UpdateOrganizationModal from "@components/modals/UpdateOrganizationModal/UpdateOrganizationModal";
+import UpdateOrganisationModal from "@components/modals/UpdateOrganizationModal/UpdateOrganisationModal";
 import { ActionIcon, Button, Container, Flex, ScrollArea, Stack, Table, Text, Title, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconEdit, IconPlus, IconTrash, IconUsersGroup } from "@tabler/icons-react";
@@ -29,6 +29,7 @@ const ManageOrganisationsPage = () => {
   const rows = organisationsList?.map((organization, index) => (
     <Table.Tr key={`event-${index}-${organization.id}`}>
       <Table.Td>{organization.name}</Table.Td>
+      <Table.Td>{organization.legalName}</Table.Td>
       <Table.Td>{organization.cin}</Table.Td>
       <Table.Td>{organization.vatin}</Table.Td>
       <Table.Td>
@@ -116,6 +117,9 @@ const ManageOrganisationsPage = () => {
                   <Table.Th h="100%" miw={96} maw={128}>
                     Name
                   </Table.Th>
+                  <Table.Th h="100%" miw={96} maw={128}>
+                    Legal Name
+                  </Table.Th>
                   <Table.Th miw={96} maw={96}>
                     CIN
                   </Table.Th>
@@ -147,7 +151,7 @@ const ManageOrganisationsPage = () => {
         closeModal={closeAddOrganizationModal}
       />
       {activeOrganisation && (
-        <UpdateOrganizationModal
+        <UpdateOrganisationModal
           activeOrganization={activeOrganisation}
           handleSuccess={handleRefetch}
           isOpened={isUpdateOrganizationModalOpen}

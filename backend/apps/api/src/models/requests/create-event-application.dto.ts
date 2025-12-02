@@ -2,7 +2,7 @@ import { Transform, Type } from "class-transformer";
 import { IsEnum, IsNotEmptyObject, IsNumber, IsObject, IsOptional, IsString } from "class-validator";
 import { CreateAddress } from "./create-address.dto";
 import { ApiExtraModels, ApiProperty, refs } from "@nestjs/swagger";
-import { InvoiceMethods } from "../../modules/events/invoice-methods";
+import { InvoiceMethods } from "@api/modules/events/invoice-methods";
 import { DateTransform, IsValidDate } from "utilities/nest/class-validator";
 
 export class CreateEventApplicationExistingOrganization {
@@ -60,7 +60,10 @@ export class CreateEventApplication {
 	additionalInformation: string;
 
 	@IsString()
-	foodRestrictionAllergies: string;
+	allergies: string;
+
+	@IsString()
+	foodRestriction: string;
 
 	@IsString()
 	healthLimitations: string;

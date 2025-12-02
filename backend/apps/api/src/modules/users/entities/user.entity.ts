@@ -14,11 +14,11 @@ import {
 	UpdateDateColumn,
 } from "typeorm";
 
-import { hashPassword } from "../../auth/utilities/crypto";
-import { Photo } from "@api/modules/photo";
-import { UserGender } from "../enums";
-import { Role } from "../../roles";
 import { Address } from "@api/modules/addresses/entities";
+import { Photo } from "@api/modules/photo";
+import { hashPassword } from "../../auth/utilities/crypto";
+import { Role } from "../../roles";
+import { UserGender } from "../enums";
 
 @Index(["email", "username"])
 @Entity()
@@ -41,7 +41,7 @@ export class User extends BaseEntity {
 	lastName: string;
 
 	@Column({ nullable: true })
-	birthDate: Date;
+	birthDate: Date | null;
 
 	@Column({ nullable: true })
 	nationality: string;
@@ -82,6 +82,9 @@ export class User extends BaseEntity {
 
 	@ManyToOne(() => Role, { cascade: true, eager: true, onDelete: "SET NULL" })
 	role: Role | null;
+
+	@Column({ default: false, select: false })
+	isDeleted: boolean;
 
 	@BeforeUpdate()
 	@BeforeInsert()

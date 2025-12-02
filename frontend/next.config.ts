@@ -1,11 +1,6 @@
-import { fileURLToPath } from "node:url";
-import { dirname } from "path";
+import type { NextConfig } from "next";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-/** @type {import("next").NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
   output: "standalone",
   reactStrictMode: false,
   env: {

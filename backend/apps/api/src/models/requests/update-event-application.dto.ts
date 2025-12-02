@@ -1,7 +1,7 @@
 import { ApiExtraModels, ApiProperty, PartialType, PickType, refs } from "@nestjs/swagger";
-import { CreateEventApplication } from "./create-event-application.dto";
-import { IsNotEmptyObject, IsNumber, IsObject, IsOptional, IsString } from "class-validator";
 import { Type } from "class-transformer";
+import { IsNotEmptyObject, IsNumber, IsObject, IsOptional, IsString } from "class-validator";
+import { CreateEventApplication } from "./create-event-application.dto";
 
 export class UpdateEventApplicationExistingOrganization {
 	@IsString()
@@ -41,9 +41,11 @@ export class UpdateEventApplication extends PartialType(
 		"validUntil",
 		"invoicedTo",
 		"invoiceMethod",
-		"foodRestrictionAllergies",
+		"allergies",
+		"foodRestriction",
 		"healthLimitations",
 		"additionalInformation",
+		"invoiceAddress",
 	]),
 ) {
 	@ApiProperty({

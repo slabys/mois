@@ -11,19 +11,18 @@ import {
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
-import { Organization, OrganizationService } from "./index";
-import { CurrentUser } from "../../decorators";
-import { User } from "../users";
-import { CookieGuard } from "../auth/providers/guards";
-import { CreateOrganization, UpdateOrganization } from "../../models/requests";
-import { Permission } from "../roles";
+import { CurrentUser } from "@api/decorators";
+import { CreateOrganization, UpdateOrganization } from "@api/models/requests";
 import { Address } from "@api/modules/addresses/entities";
+import { CookieGuard } from "../auth/providers/guards";
+import { Permission } from "../roles";
+import { User } from "../users";
+import { Organization, OrganizationService } from "./index";
 
 @ApiTags("Organizations")
 @Controller("organizations")
 export class OrganizationsController {
-	constructor(private readonly organizationService: OrganizationService) {
-	}
+	constructor(private readonly organizationService: OrganizationService) {}
 
 	@Get()
 	allOrganizations() {
@@ -52,6 +51,7 @@ export class OrganizationsController {
 		const { address } = body;
 
 		organization.name = body.name;
+		organization.legalName = body.legalName;
 		organization.cin = body?.cin ?? null;
 		organization.vatin = body?.vatin ?? null;
 		organization.address = new Address({
@@ -81,6 +81,7 @@ export class OrganizationsController {
 		if (!organization) throw new NotFoundException("Organization not found");
 
 		organization.name = body.name ?? organization.name;
+		organization.legalName = body.legalName ?? organization.legalName;
 		organization.cin = body?.cin ?? organization.cin;
 		organization.vatin = body?.vatin ?? organization.vatin;
 
@@ -102,8 +103,7 @@ export class OrganizationsController {
 		const organization = await this.organizationService.findById(organisationId);
 
 		if (
-			!(organization?.manager?.id === currentUser?.id ||
-				currentUser.role?.hasPermission(Permission.OrganisationUpdate))
+			!(organization?.manager?.id === currentUser?.id || currentUser.role?.hasPermission(Permission.OrganisationUpdate))
 		) {
 			throw new UnauthorizedException("You don't have permission to perform this action");
 		}

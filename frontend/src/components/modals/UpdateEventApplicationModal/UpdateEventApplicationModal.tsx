@@ -10,10 +10,14 @@ import Modal from "@components/Modal/Modal";
 import DateInput from "@components/primitives/DateInput";
 import Select from "@components/primitives/Select";
 import {
-  allergenData,
-  healthLimitationsData,
-  renderMultiSelectOption,
-} from "@components/shared/renderMultiSelectOptions";
+  allergenOptions,
+  foodRestrictionOptions,
+  healthLimitationsOptions,
+  joinRestrictions,
+  renderAllergenOptions,
+  renderFoodRestrictionsOptions,
+  renderHealthLimitationOptions,
+} from "@components/shared/renderRestrictionOptions";
 import {
   Anchor,
   Blockquote,
@@ -31,7 +35,7 @@ import {
 } from "@mantine/core";
 import { Form, useForm } from "@mantine/form";
 import dayjs from "dayjs";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface UpdateEventModalProps {
   currentApplication: EventApplicationDetailedWithApplications;
@@ -46,45 +50,64 @@ const UpdateEventApplicationModal = ({
   closeModal,
   handleSuccess = () => {},
 }: UpdateEventModalProps) => {
-  const foodRestrictionsData = Object.entries(allergenData).map(([key]) => key);
-  const applicationFoodRestriction = currentApplication.foodRestrictionAllergies.split(", ");
+  const allergenEntries = Object.entries(allergenOptions).map(([key]) => key);
+  const applicationAllergens = currentApplication.allergies.split(", ");
+  const foodRestrictionEntries = Object.entries(foodRestrictionOptions).map(([key]) => key);
+  const applicationFoodRestrictions = currentApplication.foodRestriction.split(", ");
+  const healthLimitationsEntries = Object.entries(healthLimitationsOptions).map(([key]) => key);
+  const applicationHealthLimitations = currentApplication.healthLimitations.split(", ");
 
-  const [foodRestrictionList, setFoodRestrictionList] = useState<string[]>(
-    foodRestrictionsData.filter((item) => {
-      return applicationFoodRestriction.includes(item);
-    }),
-  );
-  const [otherFoodRestrictionList, setOtherFoodRestrictionList] = useState<string>(
-    applicationFoodRestriction
-      .filter((item) => {
-        return !foodRestrictionsData.includes(item);
-      })
-      .join(", "),
-  );
+  const getAllergens = () => {
+    return allergenEntries.filter((item) => applicationAllergens.includes(item));
+  };
+  const getOtherAllergens = () => {
+    return applicationAllergens.filter((item) => !allergenEntries.includes(item)).join(", ");
+  };
+  const getFoodRestrictions = () => {
+    return foodRestrictionEntries.filter((item) => applicationFoodRestrictions.includes(item));
+  };
+  const getOtherFoodRestrictions = () => {
+    return applicationFoodRestrictions.filter((item) => !foodRestrictionEntries.includes(item)).join(", ");
+  };
+  const getHealthLimitations = () => {
+    return healthLimitationsEntries.filter((item) => applicationHealthLimitations.includes(item));
+  };
+  const getOtherHealthLimitations = () => {
+    return applicationHealthLimitations.filter((item) => !healthLimitationsEntries.includes(item)).join(", ");
+  };
 
-  const [healthLimitationsList, setHealthLimitationsList] = useState<string[]>(
-    currentApplication.healthLimitations.split(", ").filter((item) => {
-      return healthLimitationsData.includes(item);
-    }),
-  );
-  const [otherHealthLimitationsList, setOtherHealthLimitationsList] = useState<string>(
-    currentApplication.healthLimitations
-      .split(", ")
-      .filter((item) => {
-        return !healthLimitationsData.includes(item);
-      })
-      .join(", "),
-  );
-
+  const [allergenList, setAllergenList] = useState<string[]>(getAllergens());
+  const [foodRestrictionList, setFoodRestrictionList] = useState<string[]>(getFoodRestrictions());
+  const [healthLimitationsList, setHealthLimitationsList] = useState<string[]>(getHealthLimitations());
   const [selectedOrganisation, setSelectedOrganisation] = useState<Organization | null>(
     currentApplication.organization,
   );
+
   const { data: currentUser } = useGetCurrentUser();
 
   const { data: userOrganisationMemberships } = useUserOrganizationMemberships(currentApplication.user.id);
 
   const form = useForm<UpdateEventApplication>({
-    initialValues: {
+    mode: "uncontrolled",
+    validate: {},
+    transformValues: (values) => {
+      const { allergies, foodRestriction, healthLimitations, ...restValues } = values;
+
+      return {
+        ...restValues,
+        allergies: joinRestrictions(allergenList, allergies),
+        foodRestriction: joinRestrictions(foodRestrictionList, foodRestriction),
+        healthLimitations: joinRestrictions(healthLimitationsList, healthLimitations),
+      };
+    },
+  });
+
+  useEffect(() => {
+    setAllergenList(getAllergens());
+    setFoodRestrictionList(getFoodRestrictions());
+    setHealthLimitationsList(getHealthLimitations());
+    setSelectedOrganisation(currentApplication.organization);
+    form.setValues({
       idNumber: currentApplication.idNumber,
       validUntil: currentApplication.validUntil,
       invoiceMethod: currentApplication.invoiceMethod,
@@ -100,36 +123,22 @@ const UpdateEventApplicationModal = ({
               name: currentApplication.customOrganization.name,
               country: currentApplication.customOrganization.country,
             },
-      foodRestrictionAllergies: currentApplication.foodRestrictionAllergies,
-      healthLimitations: currentApplication.healthLimitations,
+      allergies: getOtherAllergens(),
+      foodRestriction: getOtherFoodRestrictions(),
+      healthLimitations: getOtherHealthLimitations(),
       additionalInformation: currentApplication.additionalInformation,
       invoicedTo: currentApplication.invoicedTo,
-    },
-    validate: {},
-    transformValues: (values) => {
-      const { foodRestrictionAllergies, healthLimitations, ...restValues } = values;
-
-      return {
-        ...restValues,
-        foodRestrictionAllergies:
-          foodRestrictionList.length > 0
-            ? `${foodRestrictionList.sort().join(", ")}${foodRestrictionList.includes("Other") ? `, ${otherFoodRestrictionList}` : ""}`
-            : otherFoodRestrictionList,
-        healthLimitations:
-          healthLimitationsList.length > 0
-            ? `${healthLimitationsList.sort().join(", ")}${healthLimitationsList.includes("Other") ? `, ${otherHealthLimitationsList}` : ""}`
-            : otherHealthLimitationsList,
-      };
-    },
-  });
+      invoiceAddress: currentApplication.invoiceAddress,
+    });
+  }, [currentApplication, isOpened]);
 
   const isTouchedDirty = form.isTouched() && form.isDirty();
 
   const updateEventApplication = useUpdateEventApplication({
     mutation: {
-      onSuccess: () => {
+      onSuccess: (data) => {
         handleSuccess();
-        closeModal();
+        handleCloseModal();
       },
     },
   });
@@ -142,32 +151,6 @@ const UpdateEventApplicationModal = ({
   };
 
   const handleCloseModal = () => {
-    setFoodRestrictionList(
-      foodRestrictionsData.filter((item) => {
-        return applicationFoodRestriction.includes(item);
-      }),
-    );
-    setOtherFoodRestrictionList(
-      applicationFoodRestriction
-        .filter((item) => {
-          return !foodRestrictionsData.includes(item);
-        })
-        .join(", "),
-    );
-
-    setHealthLimitationsList(
-      currentApplication.healthLimitations.split(", ").filter((item) => {
-        return healthLimitationsData.includes(item);
-      }),
-    );
-    setOtherHealthLimitationsList(
-      currentApplication.healthLimitations
-        .split(", ")
-        .filter((item) => {
-          return !healthLimitationsData.includes(item);
-        })
-        .join(", "),
-    );
     form.reset();
     closeModal();
   };
@@ -236,6 +219,7 @@ const UpdateEventApplicationModal = ({
                   id: membership.organization.id,
                 });
                 setSelectedOrganisation(membership.organization);
+                form.setFieldValue("invoicedTo", membership.organization.name);
               }}
               error={form.errors["organization.type"]}
               clearable={false}
@@ -365,16 +349,14 @@ const UpdateEventApplicationModal = ({
           </Flex>
           <Flex direction="column" gap="md">
             <MultiSelect
-              label="Food Restrictions and allergies"
-              data={Object.entries(allergenData).map(([key]) => key)}
-              renderOption={renderMultiSelectOption}
-              defaultValue={foodRestrictionsData.filter((item) => {
-                return applicationFoodRestriction.includes(item);
-              })}
+              label="Allergies"
+              data={allergenEntries}
+              renderOption={renderAllergenOptions}
+              defaultValue={allergenList}
               onChange={(value) => {
-                setFoodRestrictionList(value);
-                form.setDirty({ foodRestrictionAllergies: true });
-                form.setTouched({ foodRestrictionAllergies: true });
+                setAllergenList(value);
+                form.setDirty({ allergies: true });
+                form.setTouched({ allergies: true });
               }}
               description={
                 <Text fz="xs" span>
@@ -391,21 +373,29 @@ const UpdateEventApplicationModal = ({
               hidePickedOptions
               clearable
             />
+            {allergenList.includes("Other") && (
+              <Textarea label="Allergies (Other)" {...form.getInputProps("allergies")} autosize />
+            )}
+            <MultiSelect
+              label="Food Restriction"
+              data={foodRestrictionEntries}
+              renderOption={renderFoodRestrictionsOptions}
+              defaultValue={foodRestrictionList}
+              onChange={(value) => {
+                setFoodRestrictionList(value);
+                form.setDirty({ foodRestriction: true });
+                form.setTouched({ foodRestriction: true });
+              }}
+              hidePickedOptions
+              clearable
+            />
             {foodRestrictionList.includes("Other") && (
-              <Textarea
-                label="Food Restrictions and allergies (Other)"
-                value={otherFoodRestrictionList}
-                onChange={(value) => {
-                  setOtherFoodRestrictionList(value.currentTarget.value);
-                  form.setDirty({ foodRestrictionAllergies: true });
-                  form.setTouched({ foodRestrictionAllergies: true });
-                }}
-                autosize
-              />
+              <Textarea label="Food Restrictions (Other)" {...form.getInputProps("foodRestriction")} autosize />
             )}
             <MultiSelect
               label="Disability or Health Limitations"
-              data={healthLimitationsData}
+              data={healthLimitationsEntries}
+              renderOption={renderHealthLimitationOptions}
               defaultValue={healthLimitationsList}
               onChange={(value) => {
                 setHealthLimitationsList(value);
@@ -416,12 +406,7 @@ const UpdateEventApplicationModal = ({
             {healthLimitationsList.includes("Other") && (
               <Textarea
                 label="Disability or Health Limitations (Other)"
-                value={otherHealthLimitationsList}
-                onChange={(value) => {
-                  setOtherHealthLimitationsList(value.currentTarget.value);
-                  form.setDirty({ healthLimitations: true });
-                  form.setTouched({ healthLimitations: true });
-                }}
+                {...form.getInputProps("healthLimitations")}
                 autosize
               />
             )}

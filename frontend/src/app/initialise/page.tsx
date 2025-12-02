@@ -61,6 +61,7 @@ const InitialisePage = () => {
       },
       organization: {
         name: "",
+        legalName: "",
         cin: undefined,
         vatin: undefined,
         address: {
@@ -151,7 +152,7 @@ const InitialisePage = () => {
       <Flex direction="column" justify="center" align="center" h="100%" gap={8}>
         <Box maw="32rem" w="100%">
           <Form form={form} onSubmit={initialiseSystem}>
-            <Stepper iconSize={12} active={activeStep} onStepClick={onClickStep}>
+            <Stepper iconSize={32} active={activeStep} onStepClick={onClickStep}>
               <Stepper.Step label="Step 1:" description="User Information">
                 <Flex direction="column" gap={12}>
                   <SimpleGrid cols={2}>
@@ -247,6 +248,13 @@ const InitialisePage = () => {
                 <Grid>
                   <Grid.Col span={12}>
                     <TextInput label="Organisation Name" {...form.getInputProps("organization.name")} required />
+                  </Grid.Col>
+                  <Grid.Col span={12}>
+                    <TextInput
+                      label="Organisation Legal Name"
+                      {...form.getInputProps("organization.legalName")}
+                      required
+                    />
                   </Grid.Col>
                   <Grid.Col span={6}>
                     <TextInput label="Organisation CIN" {...form.getInputProps("organization.cin")} />

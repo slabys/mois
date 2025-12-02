@@ -1,6 +1,6 @@
 "use client";
 
-import { useGenerateSheetUsers, useGetAllUsers, useGetCurrentUser } from "@/utils/api";
+import { useDeleteUser, useGenerateSheetUsers, useGetAllUsers, useGetCurrentUser } from "@/utils/api";
 import { RolePermissionsItem, User } from "@/utils/api.schemas";
 import { downloadFile } from "@/utils/downloadFile";
 import ChangeRoleModal from "@components/modals/ChangeRoleModal/ChangeRoleModal";
@@ -18,6 +18,7 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
   const [isChangeRoleModalOpen, { open: openChangeRoleModal, close: closeChangeRoleModal }] = useDisclosure(false);
   const [isCreateRoleModal, { open: openCreateRoleModal, close: closeCreateRoleModal }] = useDisclosure(false);
 
+  const deleteUserMutation = useDeleteUser();
   const { data: currentUser, refetch: refetchCurrentUser } = useGetCurrentUser();
   const { data: allUsers, refetch: refetchUsers } = useGetAllUsers({ all: true });
 
@@ -31,6 +32,11 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
     exportToSheet.refetch().then((response) => {
       downloadFile(response?.data);
     });
+  };
+
+  const handleDeleteUser = (id: string) => {
+    deleteUserMutation.mutate({ id });
+    refetchUsers();
   };
 
   if (!currentUser || !allUsers?.data) return null;
@@ -57,6 +63,7 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
       <DynamicSearch<User>
         filterData={allUsers.data}
         dataColumns={[
+          "id",
           "firstName",
           "lastName",
           "username",
@@ -71,11 +78,20 @@ const ManagePeopleList = ({}: ManagePeopleListProps) => {
             ? [
                 {
                   type: "button",
-                  children: "Change Role",
                   headerLabel: "Change Role",
-                  handleOnChange: (rowId) => {
+                  children: "Change Role",
+                  customHandle: (rowId) => {
                     setSelectedUserId(rowId);
                     openChangeRoleModal();
+                  },
+                },
+                {
+                  type: "button",
+                  headerLabel: "Delete",
+                  children: "Delete",
+                  color: "red",
+                  customHandle: (rowId) => {
+                    handleDeleteUser(rowId);
                   },
                 },
               ]
