@@ -1,7 +1,7 @@
 import { Controller, Get, NotFoundException, Param, ParseUUIDPipe, Req, Res, StreamableFile } from "@nestjs/common";
 import { ApiHeader, ApiNotFoundResponse, ApiOkResponse, ApiTags } from "@nestjs/swagger";
 import { Request, Response } from "express";
-import { fromBuffer } from "file-type";
+import { fileTypeFromBuffer } from "file-type";
 
 import { PhotoService } from "./index";
 
@@ -34,7 +34,7 @@ export class PhotoController {
 		const buffer = Buffer.concat(chunks);
 
 		const host = request.get("host");
-		const { mime } = await fromBuffer(buffer);
+		const { mime } = await fileTypeFromBuffer(buffer);
 		res.setHeader("Access-Control-Allow-Origin", host);
 		res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
 
