@@ -170,14 +170,7 @@ const OrganizationMemberList = ({ organizationId }: OrganizationMemberListProps)
         ) : null}
       </Flex>
       <ScrollArea w="100%">
-        <Table
-          withTableBorder
-          withColumnBorders
-          withRowBorders
-          striped
-          highlightOnHover={true}
-          style={{ textAlign: "center" }}
-        >
+        <Table withTableBorder withColumnBorders withRowBorders striped highlightOnHover={true}>
           <Table.Thead>
             <Table.Tr>
               <Table.Th h="100%" maw={64} w={64}>

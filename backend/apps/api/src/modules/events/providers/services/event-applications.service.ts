@@ -172,6 +172,7 @@ export class EventApplicationsService {
 				healthLimitations: true,
 				additionalInformation: true,
 				invoicedTo: true,
+				priority: true,
 			},
 			relations: {
 				...options?.relations,
@@ -181,6 +182,19 @@ export class EventApplicationsService {
 				spotType: true,
 				invoiceAddress: true,
 			},
+			order: {
+				organization: {
+					name: "ASC",
+				},
+				priority: "ASC",
+			},
+		});
+	}
+
+	findByIds(ids: number[], options?: FindOneOptions<EventApplication>) {
+		return this.eventApplicationRepository.find({
+			...(options ?? {}),
+			where: ids.map((id) => ({ id })),
 		});
 	}
 
@@ -189,8 +203,16 @@ export class EventApplicationsService {
 	 * @param data
 	 * @returns
 	 */
-	save(data: Partial<EventApplication>) {
+	async save(data: Partial<EventApplication>) {
 		return this.eventApplicationRepository.save(data);
+	}
+
+	async updatePriorities(priorities: { applicationId: number; priority: number }[]) {
+		return this.entityManager.transaction(async (em) => {
+			for (const { applicationId, priority } of priorities) {
+				await em.update(EventApplication, applicationId, { priority });
+			}
+		});
 	}
 
 	/**

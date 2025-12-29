@@ -30,6 +30,8 @@ import { HealthController } from "@api/controllers/health.controller";
 import { EventsManagementController } from "@api/modules/events/events-management.controller";
 import { SettingsModule } from "@api/modules/settings/settings.module";
 import { SettingsController } from "@api/modules/settings/settings.controller";
+import { SugarCubesModule } from "@api/modules/sugar-cubes/sugar-cubes.module";
+import { SugarCubesController } from "@api/modules/sugar-cubes/sugar-cubes.controller";
 
 @Module({
 	imports: [
@@ -56,6 +58,7 @@ import { SettingsController } from "@api/modules/settings/settings.controller";
 		ConfigModule.forRoot(),
 		MailModule,
 		SettingsModule,
+    SugarCubesModule
 	],
 	controllers: [
 		InitialiseController,
@@ -71,6 +74,7 @@ import { SettingsController } from "@api/modules/settings/settings.controller";
 		EventsManagementController,
 		HealthController,
 		SettingsController,
+    SugarCubesController
 	],
 	providers: [EventSimpleWithApplicationsMapper, EventApplicationSimpleWithApplicationsMapper],
 })

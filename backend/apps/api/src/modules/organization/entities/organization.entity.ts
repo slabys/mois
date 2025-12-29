@@ -1,14 +1,14 @@
 import { Address } from "@api/modules/addresses/entities";
 import { ApiHideProperty } from "@nestjs/swagger";
 import {
-	Column,
-	CreateDateColumn,
-	type DeepPartial,
-	Entity,
-	Index,
-	ManyToOne,
-	OneToMany,
-	PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  type DeepPartial,
+  Entity,
+  Index,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
 } from "typeorm";
 import { User } from "../../users";
 import { OrganizationMember } from "./organization-member.entity";
@@ -34,6 +34,9 @@ export class Organization {
 
 	@ManyToOne(() => Address, { nullable: false, cascade: true, eager: true })
 	address: Address;
+
+	@Column({ default: false })
+	isDeleted: boolean;
 
 	// Relations
 	@ApiHideProperty()

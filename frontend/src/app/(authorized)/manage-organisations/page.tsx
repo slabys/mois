@@ -1,6 +1,6 @@
 "use client";
 
-import { useAllOrganizations } from "@/utils/api";
+import { useAllOrganizations, useDeleteOrganization } from "@/utils/api";
 import type { Organization } from "@/utils/api.schemas";
 import routes from "@/utils/routes";
 import CreateOrganizationModal from "@components/modals/CreateOrganizationModal/CreateOrganizationModal";
@@ -21,9 +21,24 @@ const ManageOrganisationsPage = () => {
 
   const { data: organisationsList, refetch: refetchOrganisationsList } = useAllOrganizations();
 
+  const deleteOrganizationMutation = useDeleteOrganization({
+    mutation: {
+      onSuccess: () => {
+        handleRefetch();
+      },
+    },
+  });
+
   const handleRefetch = () => {
     setActiveOrganisation(null);
     refetchOrganisationsList();
+  };
+
+  const handleDeleteOrganization = (organization: Organization) => {
+    if (!confirm(`Do you really want to delete organization ${organization.name}?`)) {
+      return;
+    }
+    deleteOrganizationMutation.mutate({ id: organization.id });
   };
 
   const rows = organisationsList?.map((organization, index) => (
@@ -77,8 +92,13 @@ const ManageOrganisationsPage = () => {
             </ActionIcon>
           </Tooltip>
           <Tooltip label="Delete Organization">
-            {/*TODO - delete organization*/}
-            <ActionIcon variant="subtle" size={48} color="red" disabled>
+            <ActionIcon
+              variant="subtle"
+              size={48}
+              color="red"
+              onClick={() => handleDeleteOrganization(organization)}
+              loading={deleteOrganizationMutation.isPending}
+            >
               <IconTrash width={32} height={32} />
             </ActionIcon>
           </Tooltip>

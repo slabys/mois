@@ -120,6 +120,7 @@ export const RolePermissionsItem = {
   eventupdate: "event.update",
   eventduplicate: "event.duplicate",
   eventmanageApplications: "event.manageApplications",
+  eventreviewSugarCubes: "event.reviewSugarCubes",
   organisationcreate: "organisation.create",
   organisationupdate: "organisation.update",
   organisationaddUser: "organisation.addUser",
@@ -253,6 +254,7 @@ export interface Organization {
   /** @nullable */
   vatin: string | null;
   address: Address;
+  isDeleted: boolean;
   /** @nullable */
   manager: OrganizationManager;
   createdAt: string;
@@ -372,6 +374,8 @@ export interface EventApplication {
   healthLimitations: string;
   validUntil: string;
   idNumber: string;
+  /** @nullable */
+  priority: number | null;
   createdAt: string;
 }
 
@@ -511,6 +515,8 @@ export interface EventApplicationDetailedWithApplications {
   additionalInformation: string;
   /** @nullable */
   invoicedTo: string | null;
+  /** @nullable */
+  priority: number | null;
   event: EventSimpleWithApplications;
 }
 
@@ -587,6 +593,8 @@ export interface EventApplicationSimpleWithApplications {
   id: number;
   user: User;
   /** @nullable */
+  priority: number | null;
+  /** @nullable */
   spotType: EventApplicationSimpleWithApplicationsSpotType;
 }
 
@@ -645,6 +653,16 @@ export interface UpdateEventApplication {
   healthLimitations?: string;
   additionalInformation?: string;
   invoiceAddress?: CreateAddress;
+}
+
+export interface EventApplicationPriorityDto {
+  applicationId: number;
+  /** @minimum 1 */
+  priority: number;
+}
+
+export interface UpdateEventApplicationPrioritiesDto {
+  priorities: EventApplicationPriorityDto[];
 }
 
 export interface UpdateApplicationSlotDto {
@@ -856,6 +874,7 @@ export const CreateRolePermissionsItem = {
   eventupdate: "event.update",
   eventduplicate: "event.duplicate",
   eventmanageApplications: "event.manageApplications",
+  eventreviewSugarCubes: "event.reviewSugarCubes",
   organisationcreate: "organisation.create",
   organisationupdate: "organisation.update",
   organisationaddUser: "organisation.addUser",
@@ -889,6 +908,41 @@ export interface SettingsDTO {
   privacyPolicy: string | null;
   /** @nullable */
   footerDescription: string | null;
+}
+
+export interface CreateSugarCubeDto {
+  /** Recipient user ID */
+  toUserId: string;
+  /** Sugar cube message */
+  message: string;
+  /** Whether the sender should be anonymous */
+  isAnonymous: boolean;
+}
+
+/**
+ * @nullable
+ */
+export type SugarCubeFromUser = EventApplication | null;
+
+export interface SugarCube {
+  id: number;
+  /** Message */
+  message: string;
+  /** Whether the sender is anonymous */
+  isAnonymous: boolean;
+  /** Whether the sugar cube has been reported */
+  isReported: boolean;
+  /** @nullable */
+  fromUser: SugarCubeFromUser;
+  toUser: EventApplication;
+  event: Event;
+  createdAt: string;
+}
+
+export type SugarCubeRecipientOptionDtoGrouped = { [key: string]: User[] };
+
+export interface SugarCubeRecipientOptionDto {
+  grouped: SugarCubeRecipientOptionDtoGrouped;
 }
 
 export interface MailAddress {
@@ -1039,6 +1093,7 @@ export const GetRoleAllPermissions200Item = {
   eventupdate: "event.update",
   eventduplicate: "event.duplicate",
   eventmanageApplications: "event.manageApplications",
+  eventreviewSugarCubes: "event.reviewSugarCubes",
   organisationcreate: "organisation.create",
   organisationupdate: "organisation.update",
   organisationaddUser: "organisation.addUser",
