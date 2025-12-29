@@ -1,20 +1,18 @@
 import { getGetEventsQueryKey, useCreateEvent } from "@/utils/api";
-import { CreateEvent, CreateEventLinkPartial } from "@/utils/api.schemas";
+import { CreateEvent } from "@/utils/api.schemas";
 import Modal from "@components/Modal/Modal";
 import RichTextEditor from "@components/Richtext/RichTextEditor";
+import LinkTree, { LinkItem } from "@components/events/LinkTree";
 import DateInput from "@components/primitives/DateInput";
-import { ActionIcon, Button, Fieldset, Flex, Group, NumberInput, SimpleGrid, Switch, TextInput } from "@mantine/core";
+import { Button, Fieldset, Flex, Group, NumberInput, SimpleGrid, Switch, TextInput } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { Form, hasLength, isNotEmpty, useForm } from "@mantine/form";
-import { IconLinkPlus, IconTrash } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import React from "react";
 
 type FormCreateEvent = Omit<CreateEvent, "links"> & {
-  links: (CreateEventLinkPartial & {
-    customId: string;
-  })[];
+  links: LinkItem[];
 };
 
 interface MyModalProps {
@@ -76,23 +74,6 @@ const CreateEventModal = ({ onCreateSuccess, isOpened, closeModal }: MyModalProp
 
   const isTouchedDirty = form.isTouched() && form.isDirty();
 
-  const handleRemoveLink = (customId: string) => {
-    form.setFieldValue("links", (prevValue) => prevValue?.filter((value) => value.customId !== customId) ?? []);
-  };
-
-  const handleAddNewLink = () => {
-    form.setFieldValue("links", (prevValue) => {
-      return [
-        ...(prevValue ?? []),
-        {
-          customId: crypto.randomUUID(),
-          name: "",
-          link: "",
-        },
-      ];
-    });
-  };
-
   const handleClose = () => {
     form.reset();
     closeModal();
@@ -150,50 +131,7 @@ const CreateEventModal = ({ onCreateSuccess, isOpened, closeModal }: MyModalProp
           <TextInput label="Code of Conduct Link" {...form.getInputProps("codeOfConductLink")} />
           <TextInput label="Photo Consent Link" {...form.getInputProps("photoPolicyLink")} />
           <Fieldset legend="Link tree" variant="filled" p={16}>
-            <Flex direction="column" gap={8} w="100%">
-              {form.values.links?.map((value, index) => {
-                return (
-                  <Flex key={`link-tree-create-${index}-${value.customId}`} w="100%" gap={16}>
-                    <Flex direction={{ base: "column", md: "row" }} w="100%" gap={{ base: 8, md: 16 }}>
-                      <TextInput
-                        label="Name"
-                        placeholder="ERS link"
-                        w="100%"
-                        value={value.name}
-                        onChange={(event) => {
-                          event.preventDefault();
-                          form.setFieldValue(`links.${index}.name`, event.currentTarget.value);
-                        }}
-                      />
-                      <TextInput
-                        label="URL"
-                        placeholder="https://www.ers.cz/"
-                        w="100%"
-                        value={value.link}
-                        onChange={(event) => {
-                          form.setFieldValue(`links.${index}.link`, event.currentTarget.value);
-                        }}
-                      />
-                    </Flex>
-                    <Flex w="fit-content" justify="center" align="center">
-                      <ActionIcon
-                        onClick={() => handleRemoveLink(value.customId)}
-                        variant="light"
-                        color="red"
-                        size="lg"
-                      >
-                        <IconTrash />
-                      </ActionIcon>
-                    </Flex>
-                  </Flex>
-                );
-              })}
-            </Flex>
-            <Flex justify="center" align="center" mt={16}>
-              <Button leftSection={<IconLinkPlus />} onClick={handleAddNewLink} variant="light">
-                Add new link
-              </Button>
-            </Flex>
+            <LinkTree links={form.values.links ?? []} onChange={(links) => form.setFieldValue("links", links)} />
           </Fieldset>
         </Flex>
         <Group justify="center" mt="lg">
