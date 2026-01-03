@@ -21,7 +21,7 @@ export default defineConfig({
       target: "http://localhost:4000/docs-json",
     },
     hooks: {
-      afterAllFilesWrite: ["yarn prettier --write ./src/utils/api.ts"],
+      afterAllFilesWrite: ["pnpm prettier --write ./src/utils/api.ts"],
     },
   },
 });

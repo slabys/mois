@@ -23,10 +23,10 @@ export class OrganizationService {
 	 * @returns
 	 */
 	findById(id: string) {
-		// return this.organizationRepository.findOneBy({ id });
 		return this.organizationRepository.findOne({
 			where: {
 				id: id,
+				isDeleted: false,
 			},
 			relations: {
 				manager: true,
@@ -52,6 +52,9 @@ export class OrganizationService {
 	 */
 	findAll() {
 		return this.organizationRepository.find({
+			where: {
+				isDeleted: false,
+			},
 			relations: {
 				manager: true,
 			},
@@ -70,6 +73,7 @@ export class OrganizationService {
 			where: {
 				organization: {
 					id,
+					isDeleted: false,
 				},
 			},
 			relations: {
@@ -95,6 +99,7 @@ export class OrganizationService {
 			where: {
 				organization: {
 					id: organizationId,
+					isDeleted: false,
 				},
 				user: {
 					id: userId,
@@ -113,7 +118,10 @@ export class OrganizationService {
 	findUserMemberships(userId: string) {
 		//, options?: FindManyOptions
 		return this.memberRepository.find({
-			where: { user: { id: userId } },
+			where: {
+				user: { id: userId },
+				organization: { isDeleted: false },
+			},
 			relations: {
 				organization: {
 					manager: true,
@@ -169,5 +177,18 @@ export class OrganizationService {
 			organization.manager = null;
 			return await em.save(organization);
 		});
+	}
+
+	/**
+	 * Soft delete organisation
+	 * @param organisationId organisation ID
+	 */
+	async delete(organisationId: string) {
+		const organization = await this.findById(organisationId);
+		if (!organization) {
+			throw new NotFoundException("Organization not found");
+		}
+		organization.isDeleted = true;
+		return await this.organizationRepository.save(organization);
 	}
 }

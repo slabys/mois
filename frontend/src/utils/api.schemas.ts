@@ -253,6 +253,7 @@ export interface Organization {
   /** @nullable */
   vatin: string | null;
   address: Address;
+  isDeleted: boolean;
   /** @nullable */
   manager: OrganizationManager;
   createdAt: string;
@@ -953,6 +954,8 @@ export type GenerateSheetUsers200 = { [key: string]: unknown };
 export type CreateOrganization201 = { [key: string]: unknown };
 
 export type UpdateOrganization201 = { [key: string]: unknown };
+
+export type DeleteOrganization200 = { [key: string]: unknown };
 
 export type TransferManager201 = { [key: string]: unknown };
 
