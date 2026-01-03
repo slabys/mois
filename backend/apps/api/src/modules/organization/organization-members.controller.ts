@@ -1,13 +1,13 @@
 import {
-	Body,
-	Controller,
-	Delete,
-	ForbiddenException,
-	Get,
-	NotFoundException,
-	Param,
-	Post,
-	UseGuards,
+  Body,
+  Controller,
+  Delete,
+  ForbiddenException,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  UseGuards,
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiExtraModels, ApiOkResponse, ApiTags, getSchemaPath } from "@nestjs/swagger";
 
@@ -88,17 +88,26 @@ export class OrganizationMembersController {
 	@UseGuards(CookieGuard)
 	@Delete("members/:memberId")
 	async deleteOrganizationMembers(
+		@CurrentUser() currentUser: User,
 		@Param("id") organisationId: string,
 		@Param("memberId") organisationMemberId: string,
 	) {
 		const organization = await this.organizationService.findById(organisationId);
 		if (!organization) throw new NotFoundException("Organization not found");
 
-		const organisationMember = organization.members.find((member) => member.id.toString() === organisationMemberId);
-		if (organization.manager !== null && organization.manager.id === organisationMember.user.id) {
-			await this.organizationService.deleteOrganisationManager(organization.id);
-		}
+		if (
+			!(organization.manager?.id === currentUser.id ||
+			currentUser.role?.hasOneOfPermissions([Permission.OrganisationDeleteUser])
+		)) {
+      throw new ForbiddenException("User does not have required permissions");
+    }
+			const organisationMember = organization.members.find((member) => member.id.toString() === organisationMemberId);
+			if (!organisationMember) throw new NotFoundException("Member not found in organization");
 
-		return await this.organizationService.deleteMembers(organisationMemberId);
+			if (organization.manager !== null && organization.manager.id === organisationMember.user.id) {
+				await this.organizationService.deleteOrganisationManager(organization.id);
+			}
+
+			return await this.organizationService.deleteMembers(organisationMemberId);
 	}
 }

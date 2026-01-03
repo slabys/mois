@@ -9,7 +9,8 @@ import {
   useOrganizationMembers,
   useTransferManager,
 } from "@/utils/api";
-import { Organization, OrganizationMember, User } from "@/utils/api.schemas";
+import { Organization, OrganizationMember, User, UserRole } from "@/utils/api.schemas";
+import { hasSomePermissions } from "@/utils/checkPermissions";
 import ApiImage from "@components/ApiImage/ApiImage";
 import {
   ActionIcon,
@@ -47,7 +48,12 @@ const MyOrganisationMemberList = ({ organizationId }: MyOrganisationMemberListPr
     },
   );
 
-  const isUserManager = currentUser?.id === currentOrganisation?.manager?.id;
+  const isUserManager = useMemo(() => {
+    return (
+      currentOrganisation?.manager?.id === currentUser?.id ||
+      hasSomePermissions(currentUser?.role as UserRole, ["organisation.deleteUser"])
+    );
+  }, [currentOrganisation, currentUser]);
 
   const addOrganizationMemberMutation = useAddOrganizationMembers({
     mutation: {
@@ -182,14 +188,7 @@ const MyOrganisationMemberList = ({ organizationId }: MyOrganisationMemberListPr
         ) : null}
       </Flex>
       <ScrollArea w="100%">
-        <Table
-          withTableBorder
-          withColumnBorders
-          withRowBorders
-          striped
-          highlightOnHover={true}
-          style={{ textAlign: "center" }}
-        >
+        <Table withTableBorder withColumnBorders withRowBorders striped highlightOnHover={true}>
           <Table.Thead>
             <Table.Tr>
               <Table.Th h="100%" maw={64} w={64}>
