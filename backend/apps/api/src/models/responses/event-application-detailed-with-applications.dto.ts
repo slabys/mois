@@ -19,6 +19,7 @@ export class EventApplicationDetailed extends PickType(EventApplication, [
 	"healthLimitations",
 	"additionalInformation",
 	"invoicedTo",
+	"priority",
 ]) {}
 
 /**

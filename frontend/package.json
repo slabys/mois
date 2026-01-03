@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "test": "prettier -c \"./src/**/*.{ts,tsx,css}\"",
-    "fix": "prettier -w \"./src/**/*.{ts,tsx,css}\""
+    "fix": "prettier -w \"./src/**/*.{ts,tsx,css}\"",
+    "generateTypes": "pnpm orval"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

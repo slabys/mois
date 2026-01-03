@@ -31,7 +31,6 @@ import type {
   CreateOrganization201,
   CreateRole,
   CreateUser,
-  DeleteOrganization200,
   Error,
   Event,
   EventApplicationDetailedWithApplications,
@@ -71,6 +70,7 @@ import type {
   UpdateApplicationSlotDto,
   UpdateEvent,
   UpdateEventApplication,
+  UpdateEventApplicationPrioritiesDto,
   UpdateEventSpot,
   UpdateOrganization,
   UpdateOrganization201,
@@ -1732,7 +1732,7 @@ export const useUpdateOrganization = <TError = ErrorType<unknown>, TContext = un
 };
 
 export const deleteOrganization = (id: string, options?: SecondParameter<typeof customInstance>) => {
-  return customInstance<DeleteOrganization200>({ url: `/organizations/${id}`, method: "DELETE" }, options);
+  return customInstance<Organization>({ url: `/organizations/${id}`, method: "DELETE" }, options);
 };
 
 export const getDeleteOrganizationMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
@@ -2652,6 +2652,80 @@ export const useDeleteEventApplication = <TError = ErrorType<void>, TContext = u
   queryClient?: QueryClient,
 ): UseMutationResult<Awaited<ReturnType<typeof deleteEventApplication>>, TError, { id: number }, TContext> => {
   const mutationOptions = getDeleteEventApplicationMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+export const updatePriorities = (
+  updateEventApplicationPrioritiesDto: UpdateEventApplicationPrioritiesDto,
+  options?: SecondParameter<typeof customInstance>,
+) => {
+  return customInstance<void>(
+    {
+      url: `/events/applications/priorities`,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      data: updateEventApplicationPrioritiesDto,
+    },
+    options,
+  );
+};
+
+export const getUpdatePrioritiesMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updatePriorities>>,
+    TError,
+    { data: UpdateEventApplicationPrioritiesDto },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updatePriorities>>,
+  TError,
+  { data: UpdateEventApplicationPrioritiesDto },
+  TContext
+> => {
+  const mutationKey = ["updatePriorities"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updatePriorities>>,
+    { data: UpdateEventApplicationPrioritiesDto }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return updatePriorities(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdatePrioritiesMutationResult = NonNullable<Awaited<ReturnType<typeof updatePriorities>>>;
+export type UpdatePrioritiesMutationBody = UpdateEventApplicationPrioritiesDto;
+export type UpdatePrioritiesMutationError = ErrorType<unknown>;
+
+export const useUpdatePriorities = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updatePriorities>>,
+      TError,
+      { data: UpdateEventApplicationPrioritiesDto },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updatePriorities>>,
+  TError,
+  { data: UpdateEventApplicationPrioritiesDto },
+  TContext
+> => {
+  const mutationOptions = getUpdatePrioritiesMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

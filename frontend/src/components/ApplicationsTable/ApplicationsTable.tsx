@@ -1,7 +1,7 @@
 "use client";
 
 import { useGetCurrentUser, useGetEvent, useGetEventApplications, useUserOrganizationMemberships } from "@/utils/api";
-import { isManager } from "@/utils/checkPermissions";
+import { isUserManager } from "@/utils/checkPermissions";
 import routes from "@/utils/routes";
 import { dateWithTime } from "@/utils/time";
 import { Flex, ScrollArea, Table, Text, Title } from "@mantine/core";
@@ -26,7 +26,7 @@ const ApplicationsTable = ({ eventId }: ApplicationsTableProps) => {
     ? []
     : applicationsList?.map((application, index) => (
         <Table.Tr key={`application-${index}-${application.id}`}>
-          <Table.Td>{dateWithTime(application.createdAt)}</Table.Td>
+          <Table.Td>{application.priority}</Table.Td>
           <Table.Td>{application.user.firstName + " " + application.user.lastName}</Table.Td>
           <Table.Td>
             {application.organization ? application.organization.name : application.customOrganization?.name}
@@ -41,11 +41,12 @@ const ApplicationsTable = ({ eventId }: ApplicationsTableProps) => {
               ? `${application.spotType.name} - ${application.spotType.price} ${application.spotType.currency}`
               : "N/A"}
           </Table.Td>
+          <Table.Td>{dateWithTime(application.createdAt)}</Table.Td>
         </Table.Tr>
       ));
 
   if (!currentUser || !userOrganisationMemberships) return;
-  if (!isManager(currentUser, userOrganisationMemberships)) redirect(routes.DASHBOARD);
+  if (!isUserManager(currentUser, userOrganisationMemberships)) redirect(routes.DASHBOARD);
 
   return (
     <>
@@ -57,11 +58,12 @@ const ApplicationsTable = ({ eventId }: ApplicationsTableProps) => {
           <Table withTableBorder withColumnBorders withRowBorders striped highlightOnHover={true}>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th miw={148}>Created at</Table.Th>
+                <Table.Th miw={50}>Priority</Table.Th>
                 <Table.Th miw={148}>Full Name</Table.Th>
                 <Table.Th miw={148}>Section</Table.Th>
                 <Table.Th miw={148}>Country</Table.Th>
                 <Table.Th miw={224}>Current Spot</Table.Th>
+                <Table.Th miw={148}>Registered at</Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>{eventApplicationsRows}</Table.Tbody>

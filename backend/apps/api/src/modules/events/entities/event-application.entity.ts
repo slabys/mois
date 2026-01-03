@@ -1,15 +1,15 @@
 import { Address } from "@api/modules/addresses/entities";
 import {
-	BaseEntity,
-	Column,
-	CreateDateColumn,
-	type DeepPartial,
-	Entity,
-	JoinColumn,
-	ManyToOne,
-	OneToOne,
-	PrimaryGeneratedColumn,
-	Unique,
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  type DeepPartial,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  Unique,
 } from "typeorm";
 import { Organization } from "../../organization";
 import { User } from "../../users";
@@ -98,6 +98,9 @@ export class EventApplication extends BaseEntity {
 
 	@Column({ select: true })
 	idNumber: string;
+
+	@Column({ type: "int", nullable: true })
+	priority: number | null;
 
 	@CreateDateColumn()
 	createdAt: Date;
