@@ -42,7 +42,7 @@ const SortableItem = ({ id, application }: SortableItemProps) => {
           {application.user.firstName} {application.user.lastName} ({application.user.username})
         </Text>
         {application.priority && (
-          <Text size="xs" color="dimmed">
+          <Text size="xs" c="dimmed">
             Previous priority: {application.priority}
           </Text>
         )}
