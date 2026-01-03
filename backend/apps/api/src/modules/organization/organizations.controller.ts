@@ -1,13 +1,14 @@
 import {
-	Body,
-	Controller,
-	Get,
-	NotFoundException,
-	Param,
-	ParseUUIDPipe,
-	Post,
-	UnauthorizedException,
-	UseGuards,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  UnauthorizedException,
+  UseGuards,
 } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
@@ -114,5 +115,16 @@ export class OrganizationsController {
 
 		organization.update({ manager: organisationMember.user });
 		return await this.organizationService.save(organization);
+	}
+
+	@ApiBearerAuth()
+	@UseGuards(CookieGuard)
+	@Delete(":id")
+	async deleteOrganization(@CurrentUser() currentUser: User, @Param("id", ParseUUIDPipe) id: string) {
+		if (!currentUser.role?.hasOneOfPermissions([Permission.OrganisationUpdate])) {
+			throw new UnauthorizedException("You don't have permission to perform this action");
+		}
+
+		return this.organizationService.delete(id);
 	}
 }

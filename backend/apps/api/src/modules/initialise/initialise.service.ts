@@ -39,7 +39,7 @@ export class InitialiseService {
 	async initialiseSystem(init: InitialiseType) {
 		const { user, role, organization } = await this.entityManager.transaction(async (em) => {
 			const userCount = await this.UsersRepository.count();
-			const organizationCount = await this.OrganisationRepository.count();
+			const organizationCount = await this.OrganisationRepository.count({ where: { isDeleted: false } });
 
 			if (userCount > 0 && organizationCount > 0) {
 				throw new ConflictException("System is already initialised");
@@ -148,7 +148,7 @@ export class InitialiseService {
 	 */
 	async checkInitialisation() {
 		const countUser = await this.UsersRepository.count();
-		const countOrganisation = await this.UsersRepository.count();
+		const countOrganisation = await this.OrganisationRepository.count({ where: { isDeleted: false } });
 		const isInitialised = countUser > 0 && countOrganisation > 0;
 		return {
 			isInitialised: isInitialised,
