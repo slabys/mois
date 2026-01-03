@@ -373,6 +373,8 @@ export interface EventApplication {
   healthLimitations: string;
   validUntil: string;
   idNumber: string;
+  /** @nullable */
+  priority: number | null;
   createdAt: string;
 }
 
@@ -512,6 +514,8 @@ export interface EventApplicationDetailedWithApplications {
   additionalInformation: string;
   /** @nullable */
   invoicedTo: string | null;
+  /** @nullable */
+  priority: number | null;
   event: EventSimpleWithApplications;
 }
 
@@ -588,6 +592,8 @@ export interface EventApplicationSimpleWithApplications {
   id: number;
   user: User;
   /** @nullable */
+  priority: number | null;
+  /** @nullable */
   spotType: EventApplicationSimpleWithApplicationsSpotType;
 }
 
@@ -646,6 +652,16 @@ export interface UpdateEventApplication {
   healthLimitations?: string;
   additionalInformation?: string;
   invoiceAddress?: CreateAddress;
+}
+
+export interface EventApplicationPriorityDto {
+  applicationId: number;
+  /** @minimum 1 */
+  priority: number;
+}
+
+export interface UpdateEventApplicationPrioritiesDto {
+  priorities: EventApplicationPriorityDto[];
 }
 
 export interface UpdateApplicationSlotDto {
@@ -954,8 +970,6 @@ export type GenerateSheetUsers200 = { [key: string]: unknown };
 export type CreateOrganization201 = { [key: string]: unknown };
 
 export type UpdateOrganization201 = { [key: string]: unknown };
-
-export type DeleteOrganization200 = { [key: string]: unknown };
 
 export type TransferManager201 = { [key: string]: unknown };
 

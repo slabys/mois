@@ -10,13 +10,14 @@ import {
   useGetEventApplications,
   useUserOrganizationMemberships,
 } from "@/utils/api";
-import { hasEveryPermissions, hasSomePermissions, isManager } from "@/utils/checkPermissions";
+import { hasEveryPermissions, hasSomePermissions, isUserAdmin, isUserManager } from "@/utils/checkPermissions";
 import routes from "@/utils/routes";
 import { dateWithTime, dayMonthYear } from "@/utils/time";
 import ApiImage from "@components/ApiImage/ApiImage";
 import RichTextRenderer from "@components/Richtext/RichTextRenderer";
 import EventEditModal from "@components/events/modals/EventEditModal";
 import EventApplicationModal from "@components/modals/EventApplicationModal/EventApplicationModal";
+import PriorityListModal from "@components/modals/PriorityListModal/PriorityListModal";
 import UpdateEventPhotoModal from "@components/modals/UpdateEventPhotoModal/UpdateEventPhotoModal";
 import {
   Anchor,
@@ -62,6 +63,8 @@ const EventDetail = ({ id }: EventDetailProps) => {
   const [isModalEditOpen, { open: openModalEdit, close: closeModalEdit }] = useDisclosure(false);
   const [isModalUploadPhotoOpen, { open: openModalUploadPhoto, close: closeModalUploadPhoto }] = useDisclosure(false);
   const [isModalJoinEventOpen, { open: openModalJoinEvent, close: closeModalJoinEvent }] = useDisclosure(false);
+  const [isModalPriorityListOpen, { open: openModalPriorityList, close: closeModalPriorityList }] =
+    useDisclosure(false);
 
   const { data: eventApplications, refetch: refetchEventApplications } = useGetEventApplications(id);
   const { data: eventDetail, refetch: refetchEvent } = useGetEvent(id);
@@ -71,6 +74,8 @@ const EventDetail = ({ id }: EventDetailProps) => {
       enabled: !!currentUser?.id,
     },
   });
+
+  const isRegistrationOpen = dayjs(eventDetail?.registrationDeadline).isAfter(dayjs());
 
   const deleteEventApplication = useDeleteEventApplication({
     mutation: {
@@ -160,12 +165,20 @@ const EventDetail = ({ id }: EventDetailProps) => {
                 ))}
               </SimpleGrid>
             )}
-            {isManager(currentUser, userOrganisationMemberships) && (
+            {isUserManager(currentUser, userOrganisationMemberships) && (
               <>
                 <Divider my={8} />
 
                 <Button component={Link} href={routes.EVENT_APPLICATIONS({ id })} color="darkBlue">
                   Event Applications
+                </Button>
+
+                <Button
+                  onClick={openModalPriorityList}
+                  color="darkBlue"
+                  disabled={!(isUserAdmin(currentUser.role) || isRegistrationOpen)}
+                >
+                  Priority list
                 </Button>
               </>
             )}
@@ -294,6 +307,17 @@ const EventDetail = ({ id }: EventDetailProps) => {
           }}
         />
       ) : null}
+      <PriorityListModal
+        isOpened={isModalPriorityListOpen}
+        closeModal={() => {
+          refetchEventApplications();
+          closeModalPriorityList();
+        }}
+        eventApplications={eventApplications}
+        userOrganisationMemberships={userOrganisationMemberships ?? []}
+        currentUser={currentUser}
+        onSuccess={handleRefetchDetail}
+      />
     </>
   ) : (
     <Grid>

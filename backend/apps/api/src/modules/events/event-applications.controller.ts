@@ -1,33 +1,33 @@
 import {
-	BadRequestException,
-	Body,
-	ConflictException,
-	Controller,
-	Delete,
-	ForbiddenException,
-	Get,
-	Header,
-	NotFoundException,
-	NotImplementedException,
-	Param,
-	ParseIntPipe,
-	ParseUUIDPipe,
-	Patch,
-	Post,
-	Query,
-	Res,
-	UnauthorizedException,
-	UseGuards,
+  BadRequestException,
+  Body,
+  ConflictException,
+  Controller,
+  Delete,
+  ForbiddenException,
+  Get,
+  Header,
+  NotFoundException,
+  NotImplementedException,
+  Param,
+  ParseIntPipe,
+  ParseUUIDPipe,
+  Patch,
+  Post,
+  Query,
+  Res,
+  UnauthorizedException,
+  UseGuards,
 } from "@nestjs/common";
 import {
-	ApiBearerAuth,
-	ApiConflictResponse,
-	ApiExtraModels,
-	ApiNotFoundResponse,
-	ApiOkResponse,
-	ApiQuery,
-	ApiTags,
-	getSchemaPath,
+  ApiBearerAuth,
+  ApiConflictResponse,
+  ApiExtraModels,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiQuery,
+  ApiTags,
+  getSchemaPath,
 } from "@nestjs/swagger";
 
 import { ajv } from "utilities/ajv";
@@ -43,10 +43,13 @@ import { CurrentUser } from "@api/decorators";
 import { EventApplicationSimpleWithApplicationsMapper } from "@api/mappers";
 import { CreateEventApplication, UpdateEventApplication } from "@api/models/requests";
 import { EventApplicationSimpleWithApplications } from "@api/models/responses";
-import { EventApplicationDetailedWithApplications } from "@api/models/responses/event-application-detailed-with-applications.dto";
+import {
+  EventApplicationDetailedWithApplications,
+} from "@api/models/responses/event-application-detailed-with-applications.dto";
 import { PaginationDto, PaginationResponseDto } from "@api/models/responses/pagination-response.dto";
 import { Address } from "@api/modules/addresses/entities";
 import { UpdateApplicationSlotDto } from "@api/modules/events/dto/update-application-slot.dto";
+import { UpdateEventApplicationPrioritiesDto } from "@api/modules/events/dto/update-event-application-priorities.dto";
 import { Permission } from "@api/modules/roles";
 import * as ExcelJS from "exceljs";
 import { dayMonthYear } from "utilities/time";
@@ -134,7 +137,7 @@ export class EventApplicationsController {
 	}
 
 	/**
-	 * Create event application
+	 * Create an event application
 	 */
 	@ApiConflictResponse({
 		description: "Event application for user already exist",
@@ -327,6 +330,31 @@ export class EventApplicationsController {
 		if (!application) throw new NotFoundException("Event application not found");
 
 		await this.eventApplicationsService.delete(application);
+	}
+
+	@ApiBearerAuth()
+	@UseGuards(CookieGuard)
+	@Patch("applications/priorities")
+	async updatePriorities(@CurrentUser() currentUser: User, @Body() body: UpdateEventApplicationPrioritiesDto) {
+		const applicationIds = body.priorities.map((p) => p.applicationId);
+		if (applicationIds.length === 0) return;
+
+		const applications = await this.eventApplicationsService.findByIds(applicationIds, {
+			relations: { organization: { manager: true } },
+		});
+
+		const canEdit = currentUser.role?.hasOneOfPermissions([Permission.EventManageApplications]);
+
+		for (const application of applications) {
+			const isManager = application.organization?.manager?.id === currentUser.id;
+			if (!canEdit && !isManager) {
+				throw new ForbiddenException(
+					`You don't have permission to update priority for application ${application.id}`,
+				);
+			}
+		}
+
+		await this.eventApplicationsService.updatePriorities(body.priorities);
 	}
 
 	/**
