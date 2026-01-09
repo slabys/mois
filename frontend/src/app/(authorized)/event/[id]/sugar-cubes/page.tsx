@@ -92,7 +92,7 @@ const SugarCubesPage = () => {
 
         {!canSend && (
           <Text c="dimmed" fs="italic">
-            Sugar cubes can only be sent from the start of the event until 3 days after it ends. Deadline:{" "}
+            Sugar cubes can only be sent from the start of the event and 3 days after it ends.
           </Text>
         )}
 
