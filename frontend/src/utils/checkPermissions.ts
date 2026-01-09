@@ -24,6 +24,6 @@ export const isUserManager = (
   return !!isManager;
 };
 
-export const isUserAdmin = (role: UserRole): boolean => {
+export const isUserAdmin = (role?: UserRole): boolean => {
   return role?.id === 1 && role?.name.toLowerCase() === "admin";
 };

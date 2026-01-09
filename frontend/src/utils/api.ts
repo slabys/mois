@@ -30,6 +30,7 @@ import type {
   CreateOrganization,
   CreateOrganization201,
   CreateRole,
+  CreateSugarCubeDto,
   CreateUser,
   Error,
   Event,
@@ -66,6 +67,8 @@ import type {
   SendEmailDTO,
   Settings,
   SettingsDTO,
+  SugarCube,
+  SugarCubeRecipientOptionDto,
   TransferManager201,
   UpdateApplicationSlotDto,
   UpdateEvent,
@@ -2351,7 +2354,7 @@ export function useGetEventApplications<
 }
 
 /**
- * Create event application
+ * Create an event application
  */
 export const createUserApplication = (
   eventId: number,
@@ -4598,6 +4601,572 @@ export const useUpdateSettings = <TError = ErrorType<unknown>, TContext = unknow
 
   return useMutation(mutationOptions, queryClient);
 };
+
+export const createSugarCube = (
+  eventId: number,
+  createSugarCubeDto: CreateSugarCubeDto,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<SugarCube>(
+    {
+      url: `/sugar-cubes/event/${eventId}`,
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      data: createSugarCubeDto,
+      signal,
+    },
+    options,
+  );
+};
+
+export const getCreateSugarCubeMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createSugarCube>>,
+    TError,
+    { eventId: number; data: CreateSugarCubeDto },
+    TContext
+  >;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createSugarCube>>,
+  TError,
+  { eventId: number; data: CreateSugarCubeDto },
+  TContext
+> => {
+  const mutationKey = ["createSugarCube"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createSugarCube>>,
+    { eventId: number; data: CreateSugarCubeDto }
+  > = (props) => {
+    const { eventId, data } = props ?? {};
+
+    return createSugarCube(eventId, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateSugarCubeMutationResult = NonNullable<Awaited<ReturnType<typeof createSugarCube>>>;
+export type CreateSugarCubeMutationBody = CreateSugarCubeDto;
+export type CreateSugarCubeMutationError = ErrorType<unknown>;
+
+export const useCreateSugarCube = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createSugarCube>>,
+      TError,
+      { eventId: number; data: CreateSugarCubeDto },
+      TContext
+    >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createSugarCube>>,
+  TError,
+  { eventId: number; data: CreateSugarCubeDto },
+  TContext
+> => {
+  const mutationOptions = getCreateSugarCubeMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+export const getReceivedSugarCubes = (
+  eventId: number,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<SugarCube[]>({ url: `/sugar-cubes/event/${eventId}/received`, method: "GET", signal }, options);
+};
+
+export const getGetReceivedSugarCubesQueryKey = (eventId?: number) => {
+  return [`/sugar-cubes/event/${eventId}/received`] as const;
+};
+
+export const getGetReceivedSugarCubesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getReceivedSugarCubes>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getReceivedSugarCubes>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetReceivedSugarCubesQueryKey(eventId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getReceivedSugarCubes>>> = ({ signal }) =>
+    getReceivedSugarCubes(eventId, requestOptions, signal);
+
+  return { queryKey, queryFn, enabled: !!eventId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getReceivedSugarCubes>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetReceivedSugarCubesQueryResult = NonNullable<Awaited<ReturnType<typeof getReceivedSugarCubes>>>;
+export type GetReceivedSugarCubesQueryError = ErrorType<unknown>;
+
+export function useGetReceivedSugarCubes<
+  TData = Awaited<ReturnType<typeof getReceivedSugarCubes>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getReceivedSugarCubes>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getReceivedSugarCubes>>,
+          TError,
+          Awaited<ReturnType<typeof getReceivedSugarCubes>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetReceivedSugarCubes<
+  TData = Awaited<ReturnType<typeof getReceivedSugarCubes>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getReceivedSugarCubes>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getReceivedSugarCubes>>,
+          TError,
+          Awaited<ReturnType<typeof getReceivedSugarCubes>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetReceivedSugarCubes<
+  TData = Awaited<ReturnType<typeof getReceivedSugarCubes>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getReceivedSugarCubes>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useGetReceivedSugarCubes<
+  TData = Awaited<ReturnType<typeof getReceivedSugarCubes>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getReceivedSugarCubes>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetReceivedSugarCubesQueryOptions(eventId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const getSentSugarCubes = (
+  eventId: number,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<SugarCube[]>({ url: `/sugar-cubes/event/${eventId}/sent`, method: "GET", signal }, options);
+};
+
+export const getGetSentSugarCubesQueryKey = (eventId?: number) => {
+  return [`/sugar-cubes/event/${eventId}/sent`] as const;
+};
+
+export const getGetSentSugarCubesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSentSugarCubes>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSentSugarCubes>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetSentSugarCubesQueryKey(eventId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSentSugarCubes>>> = ({ signal }) =>
+    getSentSugarCubes(eventId, requestOptions, signal);
+
+  return { queryKey, queryFn, enabled: !!eventId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getSentSugarCubes>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetSentSugarCubesQueryResult = NonNullable<Awaited<ReturnType<typeof getSentSugarCubes>>>;
+export type GetSentSugarCubesQueryError = ErrorType<unknown>;
+
+export function useGetSentSugarCubes<
+  TData = Awaited<ReturnType<typeof getSentSugarCubes>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSentSugarCubes>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSentSugarCubes>>,
+          TError,
+          Awaited<ReturnType<typeof getSentSugarCubes>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetSentSugarCubes<
+  TData = Awaited<ReturnType<typeof getSentSugarCubes>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSentSugarCubes>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSentSugarCubes>>,
+          TError,
+          Awaited<ReturnType<typeof getSentSugarCubes>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetSentSugarCubes<
+  TData = Awaited<ReturnType<typeof getSentSugarCubes>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSentSugarCubes>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useGetSentSugarCubes<
+  TData = Awaited<ReturnType<typeof getSentSugarCubes>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSentSugarCubes>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetSentSugarCubesQueryOptions(eventId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const reportSugarCube = (id: number, options?: SecondParameter<typeof customInstance>, signal?: AbortSignal) => {
+  return customInstance<SugarCube | SugarCube>({ url: `/sugar-cubes/${id}/report`, method: "POST", signal }, options);
+};
+
+export const getReportSugarCubeMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
+  mutation?: UseMutationOptions<Awaited<ReturnType<typeof reportSugarCube>>, TError, { id: number }, TContext>;
+  request?: SecondParameter<typeof customInstance>;
+}): UseMutationOptions<Awaited<ReturnType<typeof reportSugarCube>>, TError, { id: number }, TContext> => {
+  const mutationKey = ["reportSugarCube"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof reportSugarCube>>, { id: number }> = (props) => {
+    const { id } = props ?? {};
+
+    return reportSugarCube(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ReportSugarCubeMutationResult = NonNullable<Awaited<ReturnType<typeof reportSugarCube>>>;
+
+export type ReportSugarCubeMutationError = ErrorType<unknown>;
+
+export const useReportSugarCube = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof reportSugarCube>>, TError, { id: number }, TContext>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<Awaited<ReturnType<typeof reportSugarCube>>, TError, { id: number }, TContext> => {
+  const mutationOptions = getReportSugarCubeMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+
+export const getReportedSugarCubes = (
+  eventId: number,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<SugarCube[]>({ url: `/sugar-cubes/event/${eventId}/reported`, method: "GET", signal }, options);
+};
+
+export const getGetReportedSugarCubesQueryKey = (eventId?: number) => {
+  return [`/sugar-cubes/event/${eventId}/reported`] as const;
+};
+
+export const getGetReportedSugarCubesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getReportedSugarCubes>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getReportedSugarCubes>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetReportedSugarCubesQueryKey(eventId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getReportedSugarCubes>>> = ({ signal }) =>
+    getReportedSugarCubes(eventId, requestOptions, signal);
+
+  return { queryKey, queryFn, enabled: !!eventId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getReportedSugarCubes>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetReportedSugarCubesQueryResult = NonNullable<Awaited<ReturnType<typeof getReportedSugarCubes>>>;
+export type GetReportedSugarCubesQueryError = ErrorType<unknown>;
+
+export function useGetReportedSugarCubes<
+  TData = Awaited<ReturnType<typeof getReportedSugarCubes>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getReportedSugarCubes>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getReportedSugarCubes>>,
+          TError,
+          Awaited<ReturnType<typeof getReportedSugarCubes>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetReportedSugarCubes<
+  TData = Awaited<ReturnType<typeof getReportedSugarCubes>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getReportedSugarCubes>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getReportedSugarCubes>>,
+          TError,
+          Awaited<ReturnType<typeof getReportedSugarCubes>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetReportedSugarCubes<
+  TData = Awaited<ReturnType<typeof getReportedSugarCubes>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getReportedSugarCubes>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useGetReportedSugarCubes<
+  TData = Awaited<ReturnType<typeof getReportedSugarCubes>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getReportedSugarCubes>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetReportedSugarCubesQueryOptions(eventId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const getSugarCubesRecipientOptions = (
+  eventId: number,
+  options?: SecondParameter<typeof customInstance>,
+  signal?: AbortSignal,
+) => {
+  return customInstance<SugarCubeRecipientOptionDto>(
+    { url: `/sugar-cubes/event/${eventId}/recipient-options`, method: "GET", signal },
+    options,
+  );
+};
+
+export const getGetSugarCubesRecipientOptionsQueryKey = (eventId?: number) => {
+  return [`/sugar-cubes/event/${eventId}/recipient-options`] as const;
+};
+
+export const getGetSugarCubesRecipientOptionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetSugarCubesRecipientOptionsQueryKey(eventId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>> = ({ signal }) =>
+    getSugarCubesRecipientOptions(eventId, requestOptions, signal);
+
+  return { queryKey, queryFn, enabled: !!eventId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetSugarCubesRecipientOptionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>
+>;
+export type GetSugarCubesRecipientOptionsQueryError = ErrorType<unknown>;
+
+export function useGetSugarCubesRecipientOptions<
+  TData = Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>,
+          TError,
+          Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetSugarCubesRecipientOptions<
+  TData = Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>,
+          TError,
+          Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>
+        >,
+        "initialData"
+      >;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetSugarCubesRecipientOptions<
+  TData = Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useGetSugarCubesRecipientOptions<
+  TData = Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>,
+  TError = ErrorType<unknown>,
+>(
+  eventId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getSugarCubesRecipientOptions>>, TError, TData>>;
+    request?: SecondParameter<typeof customInstance>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetSugarCubesRecipientOptionsQueryOptions(eventId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
 
 /**
  * Send e-mail
