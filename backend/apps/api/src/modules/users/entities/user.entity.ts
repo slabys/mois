@@ -1,17 +1,17 @@
-import { ApiHideProperty } from "@nestjs/swagger";
+import { ApiHideProperty, ApiProperty } from "@nestjs/swagger";
 import { Exclude } from "class-transformer";
 import {
-	BaseEntity,
-	BeforeInsert,
-	BeforeUpdate,
-	Column,
-	CreateDateColumn,
-	type DeepPartial,
-	Entity,
-	Index,
-	ManyToOne,
-	PrimaryGeneratedColumn,
-	UpdateDateColumn,
+  BaseEntity,
+  BeforeInsert,
+  BeforeUpdate,
+  Column,
+  CreateDateColumn,
+  type DeepPartial,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm";
 
 import { Address } from "@api/modules/addresses/entities";
@@ -24,20 +24,25 @@ import { UserGender } from "../enums";
 @Entity()
 export class User extends BaseEntity {
 	@PrimaryGeneratedColumn("uuid")
+	@ApiProperty()
 	id: string;
 
 	@Index()
 	@Column({ unique: true })
+	@ApiProperty()
 	email: string;
 
 	@Index()
 	@Column({ unique: true })
+	@ApiProperty()
 	username: string;
 
 	@Column()
+	@ApiProperty()
 	firstName: string;
 
 	@Column()
+	@ApiProperty()
 	lastName: string;
 
 	@Column({ nullable: true })

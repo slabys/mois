@@ -120,6 +120,7 @@ export const RolePermissionsItem = {
   eventupdate: "event.update",
   eventduplicate: "event.duplicate",
   eventmanageApplications: "event.manageApplications",
+  eventreviewSugarCubes: "event.reviewSugarCubes",
   organisationcreate: "organisation.create",
   organisationupdate: "organisation.update",
   organisationaddUser: "organisation.addUser",
@@ -873,6 +874,7 @@ export const CreateRolePermissionsItem = {
   eventupdate: "event.update",
   eventduplicate: "event.duplicate",
   eventmanageApplications: "event.manageApplications",
+  eventreviewSugarCubes: "event.reviewSugarCubes",
   organisationcreate: "organisation.create",
   organisationupdate: "organisation.update",
   organisationaddUser: "organisation.addUser",
@@ -906,6 +908,41 @@ export interface SettingsDTO {
   privacyPolicy: string | null;
   /** @nullable */
   footerDescription: string | null;
+}
+
+export interface CreateSugarCubeDto {
+  /** Recipient user ID */
+  toUserId: string;
+  /** Sugar cube message */
+  message: string;
+  /** Whether the sender should be anonymous */
+  isAnonymous: boolean;
+}
+
+/**
+ * @nullable
+ */
+export type SugarCubeFromUser = EventApplication | null;
+
+export interface SugarCube {
+  id: number;
+  /** Message */
+  message: string;
+  /** Whether the sender is anonymous */
+  isAnonymous: boolean;
+  /** Whether the sugar cube has been reported */
+  isReported: boolean;
+  /** @nullable */
+  fromUser: SugarCubeFromUser;
+  toUser: EventApplication;
+  event: Event;
+  createdAt: string;
+}
+
+export type SugarCubeRecipientOptionDtoGrouped = { [key: string]: User[] };
+
+export interface SugarCubeRecipientOptionDto {
+  grouped: SugarCubeRecipientOptionDtoGrouped;
 }
 
 export interface MailAddress {
@@ -1056,6 +1093,7 @@ export const GetRoleAllPermissions200Item = {
   eventupdate: "event.update",
   eventduplicate: "event.duplicate",
   eventmanageApplications: "event.manageApplications",
+  eventreviewSugarCubes: "event.reviewSugarCubes",
   organisationcreate: "organisation.create",
   organisationupdate: "organisation.update",
   organisationaddUser: "organisation.addUser",

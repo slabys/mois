@@ -180,6 +180,10 @@ const EventDetail = ({ id }: EventDetailProps) => {
                 >
                   Priority list
                 </Button>
+
+                <Button component={Link} href={routes.SUGAR_CUBES({ id: Number(id) })} color="darkBlue">
+                  Sugar Cubes
+                </Button>
               </>
             )}
 
