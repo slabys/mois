@@ -31,7 +31,7 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconEdit, IconFileTypePdf, IconPlus, IconTableExport, IconTrash } from "@tabler/icons-react";
+import { IconEdit, IconPlus, IconTableExport, IconTrash } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 
 interface ManageApplicationsTableProps {
@@ -137,6 +137,7 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
     ? []
     : applicationsList?.map((application, index) => (
         <Table.Tr key={`application-${index}-${application.id}`}>
+          <Table.Td>{application.priority}</Table.Td>
           <Table.Td>{dateWithTime(application.createdAt)}</Table.Td>
           <Table.Td>{application.user.firstName + " " + application.user.lastName}</Table.Td>
           <Table.Td>
@@ -166,12 +167,6 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
           </Table.Td>
           <Table.Td>
             <Flex justify="space-evenly" gap={16}>
-              <Tooltip label="Generate Invoice">
-                {/*TODO - Generate Invoice*/}
-                <ActionIcon variant="subtle" size={48} color="black" disabled>
-                  <IconFileTypePdf width={32} height={32} />
-                </ActionIcon>
-              </Tooltip>
               <Tooltip label="Edit Application">
                 <ActionIcon
                   variant="subtle"
@@ -259,7 +254,8 @@ const ManageApplicationsTable = ({ eventId }: ManageApplicationsTableProps) => {
           <Table withTableBorder withColumnBorders withRowBorders striped highlightOnHover={true}>
             <Table.Thead>
               <Table.Tr>
-                <Table.Th miw={148}>Created at</Table.Th>
+                <Table.Th miw={50}>Priority</Table.Th>
+                <Table.Th miw={148}>Registered at</Table.Th>
                 <Table.Th miw={148}>First and Last Name</Table.Th>
                 <Table.Th miw={148}>Section</Table.Th>
                 <Table.Th miw={148}>Country</Table.Th>
