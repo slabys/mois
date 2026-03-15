@@ -97,6 +97,11 @@ const EventDetail = ({ id }: EventDetailProps) => {
     }
   };
 
+  const isRegistered =
+    eventApplications?.some((application) => {
+      return currentUser?.id === application.user.id;
+    }) ?? false;
+
   const handleRefetchDetail = () => {
     queryClient.invalidateQueries({ queryKey: [getGetEventApplicationsQueryKey(id)] });
     queryClient.invalidateQueries({ queryKey: [getGetEventQueryKey(id)] });
@@ -180,11 +185,13 @@ const EventDetail = ({ id }: EventDetailProps) => {
                 >
                   Priority list
                 </Button>
-
-                <Button component={Link} href={routes.SUGAR_CUBES({ id: Number(id) })} color="darkBlue">
-                  Sugar Cubes
-                </Button>
               </>
+            )}
+
+            {isRegistered && (
+              <Button component={Link} href={routes.SUGAR_CUBES({ id: Number(id) })} color="darkBlue">
+                Sugar Cubes
+              </Button>
             )}
 
             <Divider my={8} />
