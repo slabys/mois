@@ -10,7 +10,7 @@ import {
   useGetEventApplications,
   useUserOrganizationMemberships,
 } from "@/utils/api";
-import { hasEveryPermissions, hasSomePermissions, isUserAdmin, isUserManager } from "@/utils/checkPermissions";
+import { hasEveryPermissions, hasSomePermissions, isUserManager } from "@/utils/checkPermissions";
 import routes from "@/utils/routes";
 import { dateWithTime, dayMonthYear } from "@/utils/time";
 import ApiImage from "@components/ApiImage/ApiImage";
@@ -178,7 +178,7 @@ const EventDetail = ({ id }: EventDetailProps) => {
                   Event Applications
                 </Button>
 
-                <Button onClick={openModalPriorityList} color="darkBlue" disabled={!isUserAdmin(currentUser.role)}>
+                <Button onClick={openModalPriorityList} color="darkBlue">
                   Priority list
                 </Button>
               </>
