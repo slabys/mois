@@ -75,7 +75,7 @@ const EventDetail = ({ id }: EventDetailProps) => {
     },
   });
 
-  const isRegistrationOpen = dayjs(eventDetail?.registrationDeadline).isAfter(dayjs());
+  const isPriorityListOpen = dayjs(eventDetail?.since).isAfter(dayjs());
 
   const deleteEventApplication = useDeleteEventApplication({
     mutation: {
@@ -178,7 +178,7 @@ const EventDetail = ({ id }: EventDetailProps) => {
                   Event Applications
                 </Button>
 
-                <Button onClick={openModalPriorityList} color="darkBlue">
+                <Button onClick={openModalPriorityList} color="darkBlue" disabled={!isPriorityListOpen}>
                   Priority list
                 </Button>
               </>
