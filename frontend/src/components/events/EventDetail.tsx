@@ -178,11 +178,7 @@ const EventDetail = ({ id }: EventDetailProps) => {
                   Event Applications
                 </Button>
 
-                <Button
-                  onClick={openModalPriorityList}
-                  color="darkBlue"
-                  disabled={!(isUserAdmin(currentUser.role) || isRegistrationOpen)}
-                >
+                <Button onClick={openModalPriorityList} color="darkBlue" disabled={!isUserAdmin(currentUser.role)}>
                   Priority list
                 </Button>
               </>
